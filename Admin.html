@@ -1,42 +1,21 @@
-<html><head><meta content="text/html; charset=UTF-8" http-equiv="content-type"></head><body class="doc-content" style="background-color:#ffffff;max-width:599.8pt;padding:14.4pt 7.2pt 7.2pt 5pt"><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">async function init(regionCode) {</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; CONFIG.userRegion = regionCode;</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; </span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; // Fetch real-time status from your Google Apps Script API</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; const response = await fetch(&#39;YOUR_APPS_SCRIPT_WEB_APP_URL?action=getRegion&amp;region=&#39; + regionCode);</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; const data = await response.json();</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; </span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; document.getElementById(&#39;node-location&#39;).innerText = `NODE_${regionCode}`;</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; </span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; // The &quot;Merit-Lock&quot; logic we built</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; if (data.isMeritZone) {</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; &nbsp; &nbsp; document.getElementById(&#39;donation-gate&#39;).classList.add(&#39;hidden&#39;);</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">&nbsp; &nbsp; }</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal">}</span></p><p style="padding:0;margin:0;color:#000000;font-size:11pt;font-family:&quot;Arial&quot;;line-height:1.15;orphans:2;widows:2;height:11pt;text-align:left"><span style="color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:&quot;Arial&quot;;font-style:normal"></span></p></body></html>
-<section class="nexus-card p-6 mt-8 border-yellow-600">
-    <h2 class="text-yellow-500 text-xl mb-4">SYSTEM OPTIMIZER (CROSS-PLATFORM)</h2>
+<section id="module-sandbox" class="nexus-card p-8 locked">
+    <h2 class="text-3xl mb-2 text-blue-400">MODULE_02: ARCHITECT SANDBOX</h2>
+    <p class="text-sm uppercase mb-6 text-gray-500">Requires Module_01 Validation</p>
     
-    <label class="block text-xs mb-2">TARGET FILE:</label>
-    <select id="target-file" class="w-full bg-black border border-yellow-900 p-2 mb-4 text-white">
-        <option value="index.html">Index.html (Main Site)</option>
-        <option value="Admin.html">Admin.html (This Dashboard)</option>
-        <option value="style.css">Style.css (Global Visuals)</option>
-    </select>
+    <div class="sandbox-grid">
+        <div class="p-6 border border-green-900 bg-black/50">
+            <h4 class="mb-2 text-white">SECURITY DECRYPTION</h4>
+            <div id="game-terminal" class="font-mono text-xs mb-4 h-20 overflow-hidden opacity-80">
+                // SYSTEM READY...
+            </div>
+            <button id="start-decrypt" onclick="startMiniGame()" class="text-xs border border-blue-500 px-4 py-1 hover:bg-blue-500/20">
+                START BOUNTY
+            </button>
+        </div>
 
-    <label class="block text-xs mb-2">NEW CODE / CSS SNIPPET:</label>
-    <textarea id="code-input" rows="10" class="w-full bg-black border border-yellow-900 p-2 text-green-500 font-mono text-sm" placeholder="Paste updated code here..."></textarea>
-    
-    <button onclick="deployUpdate()" class="w-full mt-4 bg-yellow-900 hover:bg-yellow-600 text-white font-bold py-3 transition">
-        PUSH TO GITHUB LIVE
-    </button>
-    
-    <p id="deploy-status" class="mt-2 text-xs italic text-gray-500"></p>
+        <div class="p-6 border border-gray-800 opacity-50">
+            <h4 class="mb-2">CODE SIMULATION</h4>
+            <p class="text-xs">[ LOCKED: PHASE 3 ]</p>
+        </div>
+    </div>
 </section>
-
-<script>
-async function deployUpdate() {
-    const file = document.getElementById('target-file').value;
-    const code = document.getElementById('code-input').value;
-    const status = document.getElementById('deploy-status');
-    
-    status.innerText = "INITIATING BRIDGE SYNC...";
-    
-    // This calls your Google Apps Script 'Brain'
-    google.script.run
-        .withSuccessHandler(() => {
-            status.innerText = "SUCCESS: GITHUB NODE UPDATED.";
-            status.style.color = "#00ff41";
-        })
-        .withFailureHandler((err) => {
-            status.innerText = "ERROR: " + err;
-            status.style.color = "#ff3300";
-        })
-        .pushUpdateToGitHub(file, code, "Mobile Optimization via Admin Console");
-}
-</script>
