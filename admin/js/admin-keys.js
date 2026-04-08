@@ -54,7 +54,7 @@ export function generateAdminKey(purpose, createdBy) {
  * Redeem an admin key.
  * On success, upgrades the current user's role to 'admin'.
  *
- * @param {string} db     - Firebase db instance (or shim) for role update.
+ * @param {object} db     - Firebase db instance (or shim) for role update.
  * @param {string} keyStr - The key string entered by the user.
  * @param {object} user   - Current user session { uid, email, role }.
  * @returns {Promise<{ success: boolean, message: string }>}

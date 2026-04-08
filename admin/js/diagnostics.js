@@ -16,7 +16,7 @@ export function runBrowserDiagnostics() {
     language:         nav.language,
     cookiesEnabled:   nav.cookieEnabled,
     onLine:           nav.onLine,
-    doNotTrack:       nav.doNotTrack === '1',
+    doNotTrack:       nav.doNotTrack === '1' || nav.doNotTrack === 'yes',
     hardwareConcurrency: nav.hardwareConcurrency ?? 'unknown',
     deviceMemoryGB:   nav.deviceMemory ?? 'unknown',
     screenResolution: `${screen.width}x${screen.height}`,

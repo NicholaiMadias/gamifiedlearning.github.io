@@ -86,9 +86,10 @@
 
   document.getElementById('refresh-logs').addEventListener('click', refresh);
 
+  let filterDebounce;
   document.getElementById('log-filter').addEventListener('input', () => {
-    clearTimeout(document.getElementById('log-filter')._t);
-    document.getElementById('log-filter')._t = setTimeout(refresh, 300);
+    clearTimeout(filterDebounce);
+    filterDebounce = setTimeout(refresh, 300);
   });
 
   document.getElementById('clear-logs').addEventListener('click', () => {
