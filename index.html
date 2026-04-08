@@ -1,159 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match Maker | Gamified Learning</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gamified Learning</title>
   <style>
-    :root {
-      --bg: #050910;
-      --panel: #0d1625;
-      --panel-strong: #0f1d33;
-      --accent: #00ff9f;
-      --accent-2: #4fd1ff;
-      --text: #e8f6ff;
-      --muted: #7aa0bd;
-      --outline: rgba(0, 255, 159, 0.35);
-    }
-
-    * { box-sizing: border-box; }
+    /* ── Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
-      font-family: 'Space Grotesk', system-ui, sans-serif;
-      background: radial-gradient(circle at 20% 20%, rgba(0, 255, 159, 0.08), transparent 30%), radial-gradient(circle at 80% 10%, rgba(79, 209, 255, 0.08), transparent 25%), var(--bg);
-      color: var(--text);
-    }
-
-    a { color: var(--accent); }
-
-    .shell {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 2rem 1.25rem 3rem;
-    }
-
-    header {
+      background: #0a0a0f;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      gap: 2rem;
+      padding: 1.5rem 1rem 3rem;
     }
 
-    .title {
-      font-size: clamp(1.6rem, 2vw + 0.5rem, 2.2rem);
-      letter-spacing: -0.02em;
-      margin: 0;
-    }
-
-    .badge {
-      padding: 0.35rem 0.7rem;
-      border: 1px solid var(--outline);
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(0, 255, 159, 0.08), rgba(79, 209, 255, 0.08));
-      font-size: 0.85rem;
-      color: var(--muted);
+    h1.app-title {
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      color: #00ff41;
+      text-shadow: 0 0 10px #00ff4180;
     }
 
-    .panel {
-      background: linear-gradient(160deg, var(--panel) 0%, var(--panel-strong) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 18px;
-      padding: 1.2rem;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-    }
-
-    .panel + .panel { margin-top: 1rem; }
-
-    .section-heading {
-      margin: 0 0 0.4rem;
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
-
-    .muted {
-      color: var(--muted);
-      margin: 0 0 0.8rem;
-      line-height: 1.5;
-    }
-
-    .match-wrapper {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-      gap: 1rem;
-      align-items: start;
-    }
-
-    .hud {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.6rem;
-      margin: 0.6rem 0 1rem;
-    }
-
-    .hud-card {
-      padding: 0.85rem 1rem;
+    /* ── Match Maker ──────────────────────────────── */
+    .match-card {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(255, 255, 255, 0.02);
+      padding: 1rem;
+      width: 100%;
+      max-width: 460px;
     }
 
-    .hud-label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--muted);
-      letter-spacing: 0.04em;
+    .match-card h2 {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 0.25rem;
-    }
-
-    .hud-value {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .controls {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
+      color: #00ff41;
       margin-bottom: 0.6rem;
     }
 
-    .btn {
-      background: rgba(0, 255, 159, 0.08);
-      color: var(--text);
-      border: 1px solid var(--outline);
-      border-radius: 10px;
-      padding: 0.65rem 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.2s ease;
-    }
-
-    .btn.secondary { background: rgba(79, 209, 255, 0.08); border-color: rgba(79, 209, 255, 0.35); }
-    .btn:hover { transform: translateY(-1px); border-color: var(--accent); box-shadow: 0 6px 20px rgba(0, 255, 159, 0.16); }
-    .btn:active { transform: translateY(0); }
-
-    .status {
-      padding: 0.6rem 0.75rem;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px dashed rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.95rem;
-      min-height: 44px;
+    .match-stats {
       display: flex;
-      align-items: center;
+      justify-content: space-around;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 0.8rem;
     }
+
+    .match-stats span { color: #00ff41; font-weight: 700; }
 
     .match-grid {
       display: grid;
@@ -163,175 +65,178 @@
       width: 100%;
       max-width: 420px;
       margin: 0 auto;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     }
 
     .match-cell {
       aspect-ratio: 1 / 1;
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       cursor: pointer;
       background: #111;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      color: #fff;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+      box-shadow: 0 0 6px rgba(0,0,0,0.6);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      user-select: none;
     }
 
-    .match-cell:hover { transform: translateY(-2px); }
-    .match-cell.selected { outline: 2px solid var(--accent); box-shadow: 0 0 0 3px rgba(0, 255, 159, 0.2); }
+    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .match-cell:active { transform: scale(0.94); }
 
-    .match-cell[data-gem=\"heart\"] { background: linear-gradient(145deg, #1a0f1a, #2c0f2c); border-color: rgba(255, 99, 132, 0.5); }
-    .match-cell[data-gem=\"star\"] { background: linear-gradient(145deg, #15151f, #1f2233); border-color: rgba(255, 215, 0, 0.6); }
-    .match-cell[data-gem=\"cross\"] { background: linear-gradient(145deg, #1a1a1a, #222); border-color: rgba(255, 255, 255, 0.35); }
-    .match-cell[data-gem=\"flame\"] { background: linear-gradient(145deg, #21150d, #30170a); border-color: rgba(255, 120, 50, 0.6); }
-    .match-cell[data-gem=\"drop\"] { background: linear-gradient(145deg, #0d1b2a, #0b2238); border-color: rgba(79, 209, 255, 0.6); }
-
-    .banner {
+    .match-badge-banner {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #00ff41;
+      background: #001a00;
+      border: 1px solid #00ff4160;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
       margin-top: 0.6rem;
-      padding: 0.75rem 0.9rem;
-      border-radius: 10px;
-      background: rgba(0, 255, 159, 0.08);
-      border: 1px solid var(--outline);
-      color: var(--accent);
-      font-weight: 700;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .banner.visible { opacity: 1; transform: translateY(0); }
+    .match-badge-banner.hidden { display: none; }
 
+    .match-restart-btn {
+      display: block;
+      margin: 0.8rem auto 0;
+      background: transparent;
+      border: 1px solid #00ff41;
+      color: #00ff41;
+      padding: 0.4rem 1.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s;
+    }
+
+    .match-restart-btn:hover { background: #00ff4120; }
+
+    /* ── Matrix of Conscience ─────────────────────── */
     .matrix-card {
+      background: #0d0d1a;
+      border-radius: 12px;
       padding: 1.2rem;
-      border-radius: 14px;
-      background: linear-gradient(130deg, rgba(0, 255, 159, 0.06), rgba(79, 209, 255, 0.05));
-      border: 1px solid rgba(0, 255, 159, 0.24);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 460px;
     }
 
-    .matrix-border { position: relative; overflow: hidden; }
-    .matrix-border::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      pointer-events: none;
-    }
+    .matrix-border { border: 1px solid #1a2a3a; }
 
-    .matrix-heading { margin: 0 0 0.5rem; letter-spacing: 0.02em; }
-    .matrix-sub { margin: 0 0 1rem; color: var(--muted); }
+    .matrix-heading {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #4fc3f7;
+      margin-bottom: 1rem;
+    }
 
     .matrix-economy-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 0.8rem;
     }
 
-    .matrix-tile {
-      padding: 1rem;
-      border-radius: 12px;
-      background: rgba(5, 11, 18, 0.8);
-      border: 1px solid rgba(0, 255, 159, 0.18);
+    .matrix-cell {
+      background: #111827;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 0.8rem;
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      align-items: center;
+      gap: 0.3rem;
     }
 
-    .matrix-label { font-size: 0.9rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
-    .matrix-value { font-size: 1.4rem; font-weight: 700; color: var(--accent-2); }
-    .matrix-note { margin: 0; color: var(--muted); line-height: 1.4; }
+    .matrix-cell .icon { font-size: 1.6rem; }
 
-    @media (max-width: 920px) {
-      .match-wrapper { grid-template-columns: 1fr; }
-      header { flex-direction: column; align-items: flex-start; }
+    .matrix-cell .label {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64b5f6;
     }
 
-    @media (max-width: 640px) {
-      .shell { padding: 1.5rem 1rem 2rem; }
-      .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .matrix-cell .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e0e0e0;
+    }
+
+    .matrix-cell .bar-track {
+      width: 100%;
+      height: 4px;
+      background: #1e3a5f;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .matrix-cell .bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #1565c0, #4fc3f7);
+      transition: width 0.4s ease;
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header>
-      <div>
-        <p class="badge">7×7 mobile optimized</p>
-        <h1 class="title">Match Maker</h1>
-        <p class="muted">Swap adjacent glyphs to align three or more. Build chains, climb levels, and keep the conduit stable.</p>
-      </div>
-    </header>
 
-    <section class="panel">
-      <div class="match-wrapper">
-        <div>
-          <h2 class="section-heading">Command Console</h2>
-          <p class="muted">Keep an eye on your charge, available moves, and level unlocks.</p>
-          <div class="hud">
-            <div class="hud-card">
-              <span class="hud-label">Score</span>
-              <span class="hud-value" id="match-score">0</span>
-            </div>
-            <div class="hud-card">
-              <span class="hud-label">Moves</span>
-              <span class="hud-value" id="match-moves">20</span>
-            </div>
-            <div class="hud-card">
-              <span class="hud-label">Level</span>
-              <span class="hud-value" id="match-level">1</span>
-            </div>
-          </div>
-          <div class="controls">
-            <button class="btn" id="match-restart">Restart Run</button>
-            <button class="btn secondary" id="match-shuffle">Refresh Grid</button>
-          </div>
-          <div class="status" id="match-status">Loading grid…</div>
-          <div class="banner" id="match-banner"></div>
-        </div>
-        <div>
-          <h2 class="section-heading">Playfield</h2>
-          <p class="muted">Tap once to select, tap an adjacent tile to swap. Only valid matches are allowed.</p>
-          <div class="match-grid" id="match-grid"></div>
-        </div>
-      </div>
-    </section>
+  <h1 class="app-title">Gamified Learning</h1>
 
-    <section class="panel matrix-card matrix-border" id="matrix-economy-screen">
-      <h2 class="matrix-heading">Matrix of Conscience</h2>
-      <p class="matrix-sub">Live signal health from the conduit. These channels respond as you climb levels.</p>
-      <div class="matrix-economy-grid">
-        <div class="matrix-tile">
-          <span class="matrix-label">Signal Integrity</span>
-          <span class="matrix-value">92%</span>
-          <p class="matrix-note">Stable lattice; harmonic resonance is within tolerance.</p>
-        </div>
-        <div class="matrix-tile">
-          <span class="matrix-label">Entropy</span>
-          <span class="matrix-value">0.21</span>
-          <p class="matrix-note">Noise floor remains low; chain reactions reduce drift.</p>
-        </div>
-        <div class="matrix-tile">
-          <span class="matrix-label">Alignment</span>
-          <span class="matrix-value">7×7</span>
-          <p class="matrix-note">Grid equilibrium locked. Mobile viewport prioritized.</p>
-        </div>
-        <div class="matrix-tile">
-          <span class="matrix-label">Badge Channel</span>
-          <span class="matrix-value">Live</span>
-          <p class="matrix-note">Level clears broadcast through the conduit channel.</p>
-        </div>
-      </div>
-    </section>
-  </div>
+  <!-- ══ Match Maker ══════════════════════════════════ -->
+  <section class="match-card" id="match-maker-screen">
+    <h2>Match Maker</h2>
 
-  <script type="module" src="./match-maker-ui.js"></script>
+    <div class="match-stats">
+      <div>Score: <span id="match-score">0</span></div>
+      <div>Moves: <span id="match-moves">20</span></div>
+      <div>Level: <span id="match-level">1</span></div>
+    </div>
+
+    <div class="match-grid" id="match-grid"></div>
+
+    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
+  </section>
+
+  <!-- ══ Matrix of Conscience ════════════════════════ -->
+  <section class="matrix-card matrix-border" id="matrix-economy-screen">
+    <h2 class="matrix-heading">Matrix of Conscience</h2>
+
+    <div class="matrix-economy-grid">
+      <div class="matrix-cell">
+        <span class="icon">💖</span>
+        <span class="label">Empathy</span>
+        <span class="value" id="mc-empathy">72</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
+      </div>
+
+      <div class="matrix-cell">
+        <span class="icon">⚖️</span>
+        <span class="label">Justice</span>
+        <span class="value" id="mc-justice">58</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
+      </div>
+
+      <div class="matrix-cell">
+        <span class="icon">🧠</span>
+        <span class="label">Wisdom</span>
+        <span class="value" id="mc-wisdom">45</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
+      </div>
+
+      <div class="matrix-cell">
+        <span class="icon">🌱</span>
+        <span class="label">Growth</span>
+        <span class="value" id="mc-growth">83</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
