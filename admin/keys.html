@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Keys — Sovereign Matrix</title>
+  <link rel="stylesheet" href="/admin/css/matrix.css">
+</head>
+<body>
+
+<nav class="matrix-nav">
+  <a href="/admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
+  <ul class="nav-links">
+    <li><a href="/admin/index.html">Dashboard</a></li>
+    <li><a href="/admin/users.html">Users</a></li>
+    <li><a href="/admin/keys.html" class="active">Keys</a></li>
+    <li><a href="/admin/diagnostics.html">Diagnostics</a></li>
+    <li><a href="/admin/network-defense.html">Network Defense</a></li>
+    <li><a href="/admin/logs.html">Logs</a></li>
+  </ul>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- Generate Key -->
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Admin Key Generator</h2>
+    <p style="font-size:0.75rem;color:#3a5a3a;margin-bottom:1rem">
+      Generate single-use keys that grant admin access upon redemption.
+    </p>
+
+    <label for="key-purpose" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em">
+      Purpose
+    </label>
+    <input id="key-purpose" class="matrix-input" placeholder="e.g. New Admin Onboarding" maxlength="80">
+    <button id="generate-key" class="btn btn-neon">Generate Key</button>
+
+    <div id="generated-key" class="matrix-terminal" style="display:none"></div>
+  </section>
+
+  <!-- Redeem Key -->
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Redeem Key</h2>
+    <p style="font-size:0.75rem;color:#3a5a3a;margin-bottom:1rem">
+      Enter an admin key to upgrade a user account's role to admin.
+    </p>
+
+    <label for="redeem-code" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em">
+      Key Code
+    </label>
+    <input id="redeem-code" class="matrix-input" placeholder="MTRX-XXXX-XXXX-XXXX" maxlength="20">
+    <button id="redeem-key" class="btn btn-neon">Redeem</button>
+    <pre id="redeem-status" class="matrix-terminal" style="display:none"></pre>
+  </section>
+
+  <!-- Key List -->
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Generated Keys</h2>
+    <div style="overflow-x:auto">
+      <table class="matrix-table" id="key-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Purpose</th>
+            <th>Created</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="key-table-body">
+          <tr><td colspan="4" style="text-align:center;color:#555">No keys generated yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  import { requireRole, logout, ROLES } from '/admin/js/admin-router.js';
+  import { db }                          from '/admin/js/auth.js';
+  import { generateAdminKey, redeemAdminKey, listAdminKeys } from '/admin/js/admin-keys.js';
+
+  const user = requireRole(ROLES.SUPER_PLUS);
+  if (!user) throw new Error('Unauthorized');
+
+  document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
+
+  const nav = document.querySelector('.matrix-nav');
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className   = 'btn btn-danger';
+  logoutBtn.style.fontSize = '0.72rem';
+  logoutBtn.style.padding  = '0.3rem 0.75rem';
+  logoutBtn.addEventListener('click', logout);
+  nav.appendChild(logoutBtn);
+
+  function renderKeys() {
+    const keys  = listAdminKeys();
+    const tbody = document.getElementById('key-table-body');
+    if (keys.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#555">No keys generated yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = keys.map(k => `
+      <tr>
+        <td style="font-family:monospace;letter-spacing:0.05em">${k.key}</td>
+        <td>${k.purpose}</td>
+        <td>${new Date(k.createdAt).toLocaleString()}</td>
+        <td>${k.used
+          ? `<span style="color:#ff2244">Used ${new Date(k.usedAt).toLocaleString()}</span>`
+          : '<span style="color:#00ff41">Available</span>'
+        }</td>
+      </tr>
+    `).join('');
+  }
+
+  renderKeys();
+
+  // Generate
+  document.getElementById('generate-key').addEventListener('click', () => {
+    const purpose = document.getElementById('key-purpose').value.trim();
+    const result  = generateAdminKey(purpose, user.uid);
+    const box     = document.getElementById('generated-key');
+    box.textContent = `Key: ${result.key}\nPurpose: ${result.purpose}\nCreated: ${result.createdAt}`;
+    box.style.display = 'block';
+    renderKeys();
+  });
+
+  // Redeem
+  document.getElementById('redeem-key').addEventListener('click', async () => {
+    const code   = document.getElementById('redeem-code').value.trim();
+    const status = document.getElementById('redeem-status');
+    const btn    = document.getElementById('redeem-key');
+
+    btn.disabled    = true;
+    btn.textContent = 'Redeeming…';
+
+    const result = await redeemAdminKey(db, code, user);
+    status.textContent    = result.message;
+    status.style.display  = 'block';
+    status.style.color    = result.success ? 'var(--matrix-green)' : 'var(--matrix-red)';
+
+    btn.disabled    = false;
+    btn.textContent = 'Redeem';
+    renderKeys();
+  });
+</script>
+
+</body>
+</html>
