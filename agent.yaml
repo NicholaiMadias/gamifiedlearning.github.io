@@ -1,0 +1,37 @@
+name: Validate CNAME
+
+on:
+  pull_request:
+    paths:
+      - 'docs/CNAME'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate CNAME
+        run: |
+          EXPECTED=""
+          case "${{ github.repository }}" in
+            "NicholaiMadias/Amazing-Grace")
+              EXPECTED="amazinggracehomeliving.com"
+              ;;
+            "Gamified-Learning-Matrix/gamifiedlearning.github.io" | \
+            "Gamified-Learning-Matrix/Gamified-Learning")
+              EXPECTED="gamifiedlearning.org"
+              ;;
+            "Gamified-Learning-Matrix/Limitless-Nexus")
+              EXPECTED="limitlessnexus.com"
+              ;;
+          esac
+
+          ACTUAL=$(cat docs/CNAME)
+
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "❌ CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
+            exit 1
+          fi
+
+          echo "✅ CNAME is correct: $ACTUAL"
