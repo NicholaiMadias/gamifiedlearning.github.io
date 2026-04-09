@@ -1,4 +1,4 @@
-// match-maker-ui.js - UI rendering and interaction for Match Maker game
+// match-maker-ui.js
 import {
   createInitialGrid,
   canSwap,
@@ -18,33 +18,26 @@ let level = 1;
 let db = null;
 let user = null;
 
-export function initMatchMaker(database, currentUser) {
-  db = database;
-  user = currentUser;
-  grid = createInitialGrid();
+const SCORE_PER_LEVEL = 500;
+const CHAIN_REACTION_DELAY_MS = 200;
+
+export function initMatchMaker(dbRef, userRef) {
+  db = dbRef;
+  user = userRef;
   score = 0;
   moves = 20;
   level = 1;
   selected = null;
-
+  grid = createInitialGrid();
   renderGrid();
-  updateUI();
-}
 
-function updateUI() {
-  const scoreEl = document.getElementById('match-score');
-  const movesEl = document.getElementById('match-moves');
-  const levelEl = document.getElementById('match-level');
-
-  if (scoreEl) scoreEl.textContent = score;
-  if (movesEl) movesEl.textContent = moves;
-  if (levelEl) levelEl.textContent = level;
+  document.getElementById('match-score').textContent = score;
+  document.getElementById('match-moves').textContent = moves;
+  document.getElementById('match-level').textContent = level;
 }
 
 function renderGrid() {
   const container = document.getElementById('match-grid');
-  if (!container) return;
-
   container.innerHTML = '';
 
   for (let r = 0; r < GRID_SIZE; r++) {
@@ -63,18 +56,17 @@ function renderGrid() {
 function gemIcon(type) {
   switch (type) {
     case 'heart': return '💖';
-    case 'star': return '⭐';
+
+   case 'star':  return '⭐';
     case 'cross': return '✝️';
     case 'flame': return '🔥';
-    case 'drop': return '💧';
-    default: return '⬛';
+    case 'drop':  return '💧';
+    default:      return '⬛';
   }
 }
 
 function onCellClick(r, c) {
-  if (moves <= 0) {
-    return; // Game over
-  }
+  if (moves <= 0) return;
 
   if (!selected) {
     selected = { r, c };
@@ -83,35 +75,36 @@ function onCellClick(r, c) {
   }
 
   const { r: r1, c: c1 } = selected;
-
-  // Clicked the same cell - deselect
   if (r === r1 && c === c1) {
     highlightCell(r, c, false);
     selected = null;
     return;
   }
 
-  // Check if valid swap
   if (!canSwap(grid, r1, c1, r, c)) {
+    highlightCell(r1, c1, false);
+    selected = { r, c };
+    highlightCell(r, c, true);
+    return;
+  }
+
+  const swapped = applySwap(grid, r1, c1, r, c);
+  const matches = findMatches(swapped);
+
+  if (matches.length === 0) {
+    // Invalid swap — no match produced, revert selection
     highlightCell(r1, c1, false);
     selected = null;
     return;
   }
 
-  // Perform the swap
-  grid = applySwap(grid, r1, c1, r, c);
-  resolveMatches();
+  grid = swapped;
   highlightCell(r1, c1, false);
   selected = null;
-
-  // Decrease moves
   moves--;
-  updateUI();
+  document.getElementById('match-moves').textContent = moves;
 
-  // Check for game over
-  if (moves <= 0) {
-    checkLevelComplete();
-  }
+  resolveMatches();
 }
 
 function highlightCell(r, c, on) {
@@ -121,64 +114,44 @@ function highlightCell(r, c, on) {
 }
 
 function resolveMatches() {
-  let matches = findMatches(grid);
-
+  const matches = findMatches(grid);
   if (matches.length === 0) {
     renderGrid();
+    checkLevelUp();
+    checkGameOver();
     return;
   }
 
-  // Calculate score
   matches.forEach(m => {
     score += m.length * 10;
   });
-  updateUI();
+  document.getElementById('match-score').textContent = score;
 
-  // Clear matches and apply gravity
   grid = clearMatches(grid, matches);
   grid = applyGravity(grid);
   renderGrid();
 
-  // Check for chain reactions after a delay
-  setTimeout(resolveMatches, 200);
+  // chain reactions
+  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
 }
 
-function checkLevelComplete() {
-  // Level completion threshold
-  const threshold = level * 500;
-
+function checkLevelUp() {
+  const threshold = level * SCORE_PER_LEVEL;
   if (score >= threshold) {
+    onLevelComplete(level, score, db, user);
     level++;
-    moves = 20;
-    score = 0;
-    grid = createInitialGrid();
-
-    // Notify badge system
-    if (typeof onLevelComplete === 'function') {
-      onLevelComplete(db, user, level - 1);
-    }
-
-    renderGrid();
-    updateUI();
-
-    alert(`Level ${level - 1} Complete! Starting Level ${level}`);
-  } else {
-    alert(`Game Over! Score: ${score}. Try again!`);
-    resetGame();
+    moves += 10;
+    document.getElementById('match-level').textContent = level;
+    document.getElementById('match-moves').textContent = moves;
   }
 }
 
-function resetGame() {
-  score = 0;
-  moves = 20;
-  level = 1;
-  selected = null;
-  grid = createInitialGrid();
-  renderGrid();
-  updateUI();
-}
-
-// Export reset function for external use
-export function resetMatchMaker() {
-  resetGame();
+function checkGameOver() {
+  if (moves <= 0) {
+    const banner = document.getElementById('match-badge-banner');
+    if (banner) {
+      banner.textContent = `Game Over! Final score: ${score}`;
+      banner.classList.remove('hidden');
+    }
+  }
 }
