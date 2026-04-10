@@ -1,0 +1,30 @@
+# ── Local environment / secrets (NEVER commit these) ──────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Google service-account and OAuth credential files ─────────────────────────
+service-account*.json
+credentials*.json
+token*.json
+*-sa-key.json
+client_secret*.json
+google-credentials.json
+
+# ── Node.js ───────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ── Jekyll build output ───────────────────────────────────────────────────────
+_site/
+.jekyll-cache/
+.jekyll-metadata
+
+# ── macOS / editor artefacts ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

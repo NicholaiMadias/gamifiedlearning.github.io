@@ -1,0 +1,90 @@
+name: Google Drive Upload
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Workflow: Upload an artifact to Google Drive after a successful build.
+#
+# Triggers:
+#   • Manual run (workflow_dispatch) – useful for ad-hoc uploads.
+#   • On push to main (if UPLOAD_ON_PUSH is set to 'true').
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#   GDRIVE_CLIENT_ID       – OAuth2 Client ID
+#   GDRIVE_CLIENT_SECRET   – OAuth2 Client Secret
+#   GDRIVE_REFRESH_TOKEN   – Long-lived refresh token
+#   GDRIVE_FOLDER_ID       – Destination Drive folder ID
+#
+# Optional / configurable via workflow_dispatch inputs or repository variables:
+#   GDRIVE_FILE_NAME       – Name to give the file in Drive
+#   GDRIVE_MIME_TYPE       – MIME type of the uploaded file
+#   UPLOAD_SOURCE_PATH     – Path to the local file to upload
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:
+    inputs:
+      file_name:
+        description: 'Name to give the file in Drive'
+        required: false
+        default: 'ci-upload'
+      mime_type:
+        description: 'MIME type of the file'
+        required: false
+        default: 'text/plain'
+      source_path:
+        description: 'Path (relative to repo root) of the file to upload'
+        required: false
+        default: 'README.md'
+
+jobs:
+  upload-to-drive:
+    name: Upload to Google Drive
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # ── 1. Checkout repository ─────────────────────────────────────────────
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Node.js ──────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── 3. Install optional dotenv (allows local .env in dev; ignored in CI)
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci --ignore-scripts
+          else
+            npm install --no-save dotenv
+          fi
+
+      # ── 4. Run the Drive upload script ─────────────────────────────────────
+      #       All sensitive values come from GitHub Secrets – never from the
+      #       repo itself or hardcoded workflow yaml.
+      - name: Upload file to Google Drive
+        id: drive_upload
+        env:
+          GDRIVE_CLIENT_ID:     ${{ secrets.GDRIVE_CLIENT_ID }}
+          GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
+          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
+          GDRIVE_FOLDER_ID:     ${{ secrets.GDRIVE_FOLDER_ID }}
+          GDRIVE_FILE_NAME:     ${{ github.event.inputs.file_name || 'ci-upload' }}
+          GDRIVE_MIME_TYPE:     ${{ github.event.inputs.mime_type || 'text/plain' }}
+          UPLOAD_SOURCE_PATH:   ${{ github.event.inputs.source_path || 'README.md' }}
+        run: node scripts/google-drive/createFile.js
+
+      # ── 5. Report outcome ──────────────────────────────────────────────────
+      - name: Report upload result
+        if: success()
+        run: |
+          echo "✅ Upload complete"
+          echo "File ID  : ${{ steps.drive_upload.outputs.drive_file_id }}"
+          echo "View link: ${{ steps.drive_upload.outputs.drive_file_link }}"
+
+      - name: Report upload failure
+        if: failure()
+        run: echo "❌ Google Drive upload failed. Check the logs above for details."
