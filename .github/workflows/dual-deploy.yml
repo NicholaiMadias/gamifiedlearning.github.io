@@ -20,11 +20,25 @@ jobs:
           mkdir -p dist
           rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' ./ dist/
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy to gamifiedlearning.org
+        if: github.repository == 'NicholaiMadias/gamifiedlearning.github.io'
+        run: |
+          mkdir -p public
+          cp -R dist/* public/
+          echo "gamifiedlearning.org" > public/CNAME
+
+      - name: Deploy to amazinggracehomeliving.com
+        if: github.repository == 'NicholaiMadias/gamifiedlearning.github.io'
+        run: |
+          mkdir -p public-aghl
+          cp -R dist/* public-aghl/
+          echo "amazinggracehomeliving.com" > public-aghl/CNAME
+
+      - name: Publish to GitHub Pages (gamifiedlearning.org)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./public
 
       - name: Sync to WordPress (Gamified Learning)
         env:
