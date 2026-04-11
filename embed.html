@@ -237,6 +237,8 @@
   </section>
 
   <script>
+  (function () {
+    'use strict';
     // ── matchMakerState.js (inlined) ─────────────────────────────────────────
     const GRID_SIZE = 7;
     const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
@@ -509,6 +511,7 @@
       document.getElementById('match-badge-banner').classList.add('hidden');
       initMatchMaker();
     });
+  }());
   </script>
 </body>
 </html>
