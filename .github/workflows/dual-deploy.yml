@@ -20,16 +20,15 @@ jobs:
           mkdir -p dist
           rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' ./ dist/
 
-      - name: Deploy to gamifiedlearning.org
+      - name: Prepare dual-domain directories
         if: github.repository == 'NicholaiMadias/gamifiedlearning.github.io'
         run: |
+          # gamifiedlearning.org — published to GitHub Pages below
           mkdir -p public
           cp -R dist/* public/
           echo "gamifiedlearning.org" > public/CNAME
 
-      - name: Deploy to amazinggracehomeliving.com
-        if: github.repository == 'NicholaiMadias/gamifiedlearning.github.io'
-        run: |
+          # amazinggracehomeliving.com — staged for future secondary deployment
           mkdir -p public-aghl
           cp -R dist/* public-aghl/
           echo "amazinggracehomeliving.com" > public-aghl/CNAME
