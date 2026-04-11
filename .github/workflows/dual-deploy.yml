@@ -1,0 +1,39 @@
+name: Dual Deploy
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build static site
+        run: |
+          rm -rf dist
+          mkdir -p dist
+          rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' ./ dist/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
+      - name: Sync to WordPress (Gamified Learning)
+        env:
+          WP_API_KEY: ${{ secrets.WP_API_KEY }}
+        run: |
+          test -f dist/index.html
+          CONTENT=$(jq -Rs . < dist/index.html)
+          curl -sSf \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${WP_API_KEY}" \
+            -d "{\"content\": ${CONTENT}}" \
+            https://www.gamifiedlearning.org/wp-json/nexus-sync/v1/update
