@@ -14,6 +14,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate CNAME
+        run: |
+          if [ ! -f CNAME ]; then
+            echo "CNAME file not found at repo root"
+            exit 1
+          fi
+          ACTUAL=$(tr -d '[:space:]' < CNAME)
+          EXPECTED="amazinggracehomeliving.com"
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
+            exit 1
+          fi
+          echo "CNAME validated: $ACTUAL"
+
       - name: Build static site
         run: |
           rm -rf dist
