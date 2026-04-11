@@ -4,7 +4,7 @@
 
 const LEVEL_BADGES = {
   1: { icon: '[S]', label: 'Seedling' },
-  2: { icon: '[Z]', label: 'Charged' },
+  2: { icon: '[L]', label: 'Charged' },
   3: { icon: '[F]', label: 'On Fire' },
   4: { icon: '[D]', label: 'Diamond' },
   5: { icon: '[C]', label: 'Champion' },

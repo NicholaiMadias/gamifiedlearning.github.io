@@ -57,7 +57,7 @@ function gemIcon(type) {
   switch (type) {
     case 'heart': return 'H';
     case 'star':  return '*';
-    case 'cross': return '+';
+    case 'cross': return 'X';
     case 'flame': return 'F';
     case 'drop':  return '~';
     default:      return '?';
