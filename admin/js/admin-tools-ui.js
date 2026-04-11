@@ -36,12 +36,15 @@ export async function renderToolAssignment(db) {
   snap.forEach(child => {
     const u   = child.val();
     const uid = child.key;
+    const userIdentifier = u.email || uid;
 
     const checkboxes = TOOLS.map(t => {
       const checked = u.tools?.[t.key] ? 'checked' : '';
+      const ariaLabel = `Assign ${t.label} to ${userIdentifier}`;
       return `<td><input type="checkbox"
                 data-uid="${esc(uid)}"
                 data-tool="${esc(t.key)}"
+                aria-label="${esc(ariaLabel)}"
                 ${checked}></td>`;
     }).join('');
 
