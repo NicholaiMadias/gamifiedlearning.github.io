@@ -87,7 +87,18 @@ function seedDemoUsers() {
   saveDemoUsers(seed);
 }
 
-seedDemoUsers();
+/**
+ * True when running on a local/dev/preview host.
+ * Demo seeding and the permissive demo-login path are disabled on production
+ * hostnames (e.g. admin.gamifiedlearning.org) so demo credentials are never
+ * available on the live site.
+ */
+const IS_DEMO_HOST = (() => {
+  const h = location.hostname;
+  return h === 'localhost' || h === '127.0.0.1' || h === '' || h.endsWith('.github.io');
+})();
+
+if (IS_DEMO_HOST) seedDemoUsers();
 
 /** Firebase-compatible database shim */
 export const db = {
@@ -125,7 +136,8 @@ export const db = {
         const parts = path.split('/');
         if (parts[0] === 'users' && parts[1]) {
           const users = getDemoUsers();
-          users[parts[1]] = { ...users[parts[1]], ...updates };
+          const existingUser = users[parts[1]] || {};
+          users[parts[1]] = { ...existingUser, ...updates };
           saveDemoUsers(users);
         }
       },
@@ -144,6 +156,12 @@ export const db = {
  * @returns {Promise<{ uid: string, email: string, role: string }>}
  */
 export async function loginWithEmail(email, password) {
+  // Demo path: only active on local/preview hosts.
+  // On production, this path is disabled so the shim accounts are never accessible.
+  if (!IS_DEMO_HOST) {
+    throw new Error('Live Firebase Auth is required on this host. Configure firebase-config.js.');
+  }
+
   // Demo: accept any non-empty password for seeded accounts
   const users = getDemoUsers();
   const entry = Object.entries(users).find(

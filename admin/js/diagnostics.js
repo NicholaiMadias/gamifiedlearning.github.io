@@ -39,6 +39,20 @@ export function runBrowserDiagnostics() {
   };
 }
 
+/**
+ * Create an AbortSignal that fires after `ms` milliseconds.
+ * Uses AbortSignal.timeout() when available, falls back to AbortController + setTimeout.
+ *
+ * @param {number} ms
+ * @returns {AbortSignal}
+ */
+function timeoutSignal(ms) {
+  if (typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
+
 /** Well-known hostnames to probe */
 const DNS_TARGETS = [
   { host: 'gamifiedlearning.org',       label: 'Main site' },
@@ -64,7 +78,7 @@ export async function runDnsTests() {
           method: 'HEAD',
           mode:   'no-cors',
           cache:  'no-store',
-          signal: AbortSignal.timeout(5000),
+          signal: timeoutSignal(5000),
         });
         return { host, label, reachable: true, latencyMs: Math.round(performance.now() - t0), error: null };
       } catch (err) {

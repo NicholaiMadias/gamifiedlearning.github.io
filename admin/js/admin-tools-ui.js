@@ -64,10 +64,10 @@ export async function renderToolAssignment(db) {
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving…';
     try {
-      const boxes = document.querySelectorAll('input[data-tool]');
-      for (const box of boxes) {
-        await setUserTool(db, box.dataset.uid, box.dataset.tool, box.checked);
-      }
+      const boxes = Array.from(document.querySelectorAll('input[data-tool]'));
+      await Promise.all(
+        boxes.map(box => setUserTool(db, box.dataset.uid, box.dataset.tool, box.checked))
+      );
       showStatus('Tool assignments saved.');
     } catch (err) {
       showStatus(`Error: ${err.message}`, true);

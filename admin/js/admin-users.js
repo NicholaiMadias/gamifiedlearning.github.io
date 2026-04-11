@@ -8,6 +8,9 @@
 
 const ROLE_ORDER = ['owner', 'superAdmin', 'admin', 'user'];
 
+/** Tracks whether the delegated change listener has been attached */
+let _changeListenerAttached = false;
+
 /**
  * Build a role badge HTML string.
  */
@@ -18,7 +21,10 @@ function roleBadge(role) {
     admin:      'role-admin',
     user:       'role-user',
   }[role] || 'role-user';
-  return `<span class="role-badge ${cls}">${role}</span>`;
+  const span = document.createElement('span');
+  span.className = `role-badge ${cls}`;
+  span.textContent = role;
+  return span.outerHTML;
 }
 
 /**
@@ -27,10 +33,10 @@ function roleBadge(role) {
 function roleSelect(uid, currentRole, editable) {
   if (!editable) return roleBadge(currentRole);
   const options = ROLE_ORDER.map(r =>
-    `<option value="${r}" ${r === currentRole ? 'selected' : ''}>${r}</option>`
+    `<option value="${escapeHtml(r)}" ${r === currentRole ? 'selected' : ''}>${escapeHtml(r)}</option>`
   ).join('');
   return `<select class="matrix-input" style="max-width:130px;margin:0;padding:0.25rem 0.5rem"
-            data-uid="${uid}" data-field="role">${options}</select>`;
+            data-uid="${escapeHtml(uid)}" data-field="role">${options}</select>`;
 }
 
 /**
@@ -69,8 +75,9 @@ export async function renderUserTable(db, currentUser) {
     tbody.appendChild(row);
   });
 
-  // Inline role-change handler
-  if (canEditRole) {
+  // Attach the delegated role-change handler only once per page lifetime
+  if (canEditRole && !_changeListenerAttached) {
+    _changeListenerAttached = true;
     tbody.addEventListener('change', async e => {
       const sel = e.target;
       if (sel.dataset.field !== 'role') return;
@@ -81,7 +88,7 @@ export async function renderUserTable(db, currentUser) {
         showStatus(`Role updated for ${uid}.`);
       } catch (err) {
         showStatus(`Error: ${err.message}`, true);
-        await renderUserTable(db, currentUser); // revert
+        await renderUserTable(db, currentUser); // revert UI
       }
     });
   }
