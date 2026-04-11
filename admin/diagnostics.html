@@ -51,9 +51,9 @@
 </div>
 
 <script type="module">
-  import { requireRole, getCurrentUser, logout, ROLES } from '/admin/js/admin-router.js';
-  import { db }                                          from '/admin/js/auth.js';
-  import { runBrowserDiagnostics, runDnsTests }          from '/admin/js/diagnostics.js';
+  import { getCurrentUser, logout, ROLES } from '/admin/js/admin-router.js';
+  import { db }                            from '/admin/js/auth.js';
+  import { runBrowserDiagnostics, runDnsTests } from '/admin/js/diagnostics.js';
 
   // Page is accessible to all admin roles OR regular users who have
   // diagnostics tool assigned.  We check both conditions.
