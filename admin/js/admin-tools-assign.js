@@ -23,7 +23,37 @@ export async function setUserTool(db, uid, tool, enabled) {
  * @param {Record<string, boolean>} toolMap - e.g. { networkDefense: true, diagnostics: false }
  */
 export async function setUserTools(db, uid, toolMap) {
+  const updates = {};
   for (const [tool, enabled] of Object.entries(toolMap)) {
-    await setUserTool(db, uid, tool, enabled);
+    updates[`${uid}/tools/${tool}`] = enabled;
+  }
+  await setUserToolsBatch(db, updates);
+}
+
+/**
+ * Apply multiple tool updates across users using a single multipath update
+ * when available, falling back to small concurrent sets to avoid rate limits.
+ *
+ * @param {object} db
+ * @param {Record<string, boolean>} updates - keys relative to "users/", e.g. { "uid/tools/diagnostics": true }
+ */
+export async function setUserToolsBatch(db, updates) {
+  const entries = Object.entries(updates);
+  if (entries.length === 0) return;
+
+  const ref = db.ref ? db.ref('users') : null;
+  if (ref && typeof ref.update === 'function') {
+    await ref.update(updates);
+    return;
+  }
+
+  const chunkSize = 10;
+  for (let i = 0; i < entries.length; i += chunkSize) {
+    const chunk = entries.slice(i, i + chunkSize);
+    await Promise.all(
+      chunk.map(([relPath, value]) =>
+        db.ref(relPath.startsWith('users/') ? relPath : `users/${relPath}`).set(value)
+      )
+    );
   }
 }

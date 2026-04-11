@@ -164,13 +164,37 @@ export const db = {
         }
       },
       async update(updates) {
-        const parts = path.split('/');
-        if (parts[0] === 'users' && parts[1]) {
-          const users = getDemoUsers();
-          const existingUser = users[parts[1]] || {};
-          users[parts[1]] = { ...existingUser, ...updates };
-          saveDemoUsers(users);
-        }
+        const baseParts = (path || '').split('/').filter(Boolean);
+        const users = getDemoUsers();
+
+        const applyUpdate = (relPath, value) => {
+          const relParts = relPath.split('/').filter(Boolean);
+          let segments;
+
+          if (relParts[0] === 'users') {
+            segments = relParts;
+          } else if (baseParts[0] === 'users') {
+            segments = [...baseParts, ...relParts];
+          } else {
+            segments = ['users', ...relParts];
+          }
+
+          if (segments[0] !== 'users' || !segments[1]) return;
+
+          let node = users;
+          for (let i = 1; i < segments.length; i++) {
+            const key = segments[i];
+            if (i === segments.length - 1) {
+              node[key] = value;
+            } else {
+              node[key] = node[key] || {};
+              node = node[key];
+            }
+          }
+        };
+
+        Object.entries(updates).forEach(([relPath, value]) => applyUpdate(relPath, value));
+        saveDemoUsers(users);
       },
     };
   },
