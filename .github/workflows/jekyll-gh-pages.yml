@@ -27,7 +27,8 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+        uses: actions/jekyll-build-pages@v4
+    
         with:
           source: ./
           destination: ./_site
@@ -51,3 +52,119 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+name: Dual Deploy to gamifiedlearning.org and amazinggracehomeliving.com
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Validate CNAME for this repository
+        run: |
+          REPO="${{ github.repository }}"
+
+          case "$REPO" in
+            "NicholaiMadias/gamifiedlearning.github.io")
+              EXPECTED="gamifiedlearning.org"
+              SECONDARY="amazinggracehomeliving.com"
+              ;;
+            "NicholaiMadias/Amazing-Grace")
+              EXPECTED="amazinggracehomeliving.com"
+              ;;
+            *)
+              echo "Unknown repository: $REPO"
+              exit 1
+              ;;
+          esac
+
+          if [ -f docs/CNAME ]; then
+            ACTUAL=$(cat docs/CNAME)
+            if [ "$ACTUAL" != "$EXPECTED" ] && [ "$ACTUAL" != "$SECONDARY" ]; then
+              echo "CNAME mismatch: expected '$EXPECTED' or '$SECONDARY' but found '$ACTUAL'"
+              exit 1
+            fi
+          fi
+
+      - name: Prepare deployment for gamifiedlearning.org
+        run: |
+          mkdir -p deploy-glo
+          cp -R dist/* deploy-glo/
+          echo "gamifiedlearning.org" > deploy-glo/CNAME
+
+      - name: Prepare deployment for amazinggracehomeliving.com (redirect)
+        run: |
+          mkdir -p deploy-aghl
+          cp -R dist/* deploy-aghl/
+          echo "amazinggracehomeliving.com" > deploy-aghl/CNAME
+
+          cat > deploy-aghl/index.html <<EOF
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0; url=https://gamifiedlearning.org">
+  </head>
+  <body></body>
+</html>
+EOF
+
+      - name: Upload artifact for gamifiedlearning.org
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy-glo
+          name: gamifiedlearning
+
+      - name: Upload artifact for amazinggracehomeliving.com
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy-aghl
+          name: aghl
+
+  deploy-glo:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production-glo
+      url: https://gamifiedlearning.org
+
+    steps:
+      - name: Deploy gamifiedlearning.org
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: gamifiedlearning
+
+  deploy-aghl:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production-aghl
+      url: https://amazinggracehomeliving.com
+
+    steps:
+      - name: Deploy amazinggracehomeliving.com
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: aghl
