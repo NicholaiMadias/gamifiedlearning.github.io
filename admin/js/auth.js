@@ -106,15 +106,46 @@ export const db = {
     return {
       async get() {
         const users = getDemoUsers();
-        // Only 'users' path is supported in the shim
-        const data = path === 'users' ? users : {};
+        const parts = path.split('/');
+
+        if (parts[0] !== 'users') {
+          return { forEach() {}, val: () => null, exists: () => false };
+        }
+
+        // db.ref('users').get() — return all users
+        if (parts.length === 1) {
+          return {
+            forEach(cb) {
+              Object.entries(users).forEach(([key, val]) =>
+                cb({ key, val: () => val })
+              );
+            },
+            val: () => users,
+            exists: () => Object.keys(users).length > 0,
+          };
+        }
+
+        // db.ref('users/uid').get() — return single user
+        const uid = parts[1];
+        if (parts.length === 2) {
+          const data = users[uid] ?? null;
+          return {
+            forEach(cb) { if (data) cb({ key: uid, val: () => data }); },
+            val: () => data,
+            exists: () => data !== null,
+          };
+        }
+
+        // db.ref('users/uid/field/…').get() — walk nested properties
+        let node = users[uid];
+        for (let i = 2; i < parts.length && node !== undefined; i++) {
+          node = node[parts[i]];
+        }
+        const value = node ?? null;
         return {
-          forEach(cb) {
-            Object.entries(data).forEach(([key, val]) =>
-              cb({ key, val: () => val })
-            );
-          },
-          val: () => data,
+          forEach() {},
+          val: () => value,
+          exists: () => value !== null,
         };
       },
       async set(value) {
@@ -171,11 +202,10 @@ export async function loginWithEmail(email, password) {
   if (!entry) throw new Error('No account found for that email.');
   if (!password || password.length < 4) throw new Error('Invalid password.');
 
-  // Only allow admin-level roles to access the dashboard
+  // Allow any role to create a session; page-level guards and tool checks
+  // enforce access after login (e.g. a 'user' with the diagnostics tool assigned
+  // can log in here and be admitted by canAccessDiagnostics on that page).
   const [uid, user] = entry;
-  if (!['admin', 'superAdmin', 'owner'].includes(user.role)) {
-    throw new Error('Access denied: insufficient role.');
-  }
 
   const session = { uid, email: user.email, role: user.role };
   setCurrentUser(session);

@@ -63,13 +63,9 @@
   // Determine if this user can access diagnostics
   async function canAccessDiagnostics(u) {
     if (ROLES.ALL_ADMIN.includes(u.role)) return true;
-    // Check tool assignment in db
-    const snap = await db.ref('users').get();
-    let allowed = false;
-    snap.forEach(child => {
-      if (child.key === u.uid && child.val().tools?.diagnostics) allowed = true;
-    });
-    return allowed;
+    // Read only this user's diagnostics tool flag — O(1), no data leakage
+    const snap = await db.ref(`users/${u.uid}/tools/diagnostics`).get();
+    return snap.exists() && snap.val() === true;
   }
 
   document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
