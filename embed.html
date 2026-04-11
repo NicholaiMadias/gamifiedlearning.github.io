@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Maker – Gamified Learning</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0f;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    h1.app-title {
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #00ff41;
+      text-shadow: 0 0 10px #00ff4180;
+    }
+
+    /* ── Match Maker ──────────────────────────────── */
+    .match-card {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .match-card h2 {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #00ff41;
+      margin-bottom: 0.6rem;
+    }
+
+    .match-stats {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 0.8rem;
+    }
+
+    .match-stats span { color: #00ff41; font-weight: 700; }
+
+    .match-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.4rem;
+      padding: 0.8rem;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .match-cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      background: #111;
+      box-shadow: 0 0 6px rgba(0,0,0,0.6);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      user-select: none;
+    }
+
+    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .match-cell:active { transform: scale(0.94); }
+
+    .match-badge-banner {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #00ff41;
+      background: #001a00;
+      border: 1px solid #00ff4160;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      margin-top: 0.6rem;
+    }
+
+    .match-badge-banner.hidden { display: none; }
+
+    .match-restart-btn {
+      display: block;
+      margin: 0.8rem auto 0;
+      background: transparent;
+      border: 1px solid #00ff41;
+      color: #00ff41;
+      padding: 0.4rem 1.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s;
+    }
+
+    .match-restart-btn:hover { background: #00ff4120; }
+
+    /* ── Matrix of Conscience ─────────────────────── */
+    .matrix-card {
+      background: #0d0d1a;
+      border-radius: 12px;
+      padding: 1.2rem;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .matrix-border { border: 1px solid #1a2a3a; }
+
+    .matrix-heading {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #4fc3f7;
+      margin-bottom: 1rem;
+    }
+
+    .matrix-economy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .matrix-cell {
+      background: #111827;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .matrix-cell .icon { font-size: 1.6rem; }
+
+    .matrix-cell .label {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64b5f6;
+    }
+
+    .matrix-cell .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e0e0e0;
+    }
+
+    .matrix-cell .bar-track {
+      width: 100%;
+      height: 4px;
+      background: #1e3a5f;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .matrix-cell .bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #1565c0, #4fc3f7);
+      transition: width 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="app-title">Gamified Learning</h1>
+
+  <!-- ══ Match Maker ══════════════════════════════════ -->
+  <section class="match-card" id="match-maker-screen">
+    <h2>Match Maker</h2>
+
+    <div class="match-stats">
+      <div>Score: <span id="match-score">0</span></div>
+      <div>Moves: <span id="match-moves">20</span></div>
+      <div>Level: <span id="match-level">1</span></div>
+    </div>
+
+    <div class="match-grid" id="match-grid"></div>
+
+    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
+  </section>
+
+  <!-- ══ Matrix of Conscience ════════════════════════ -->
+  <section class="matrix-card matrix-border" id="matrix-economy-screen">
+    <h2 class="matrix-heading">Matrix of Conscience</h2>
+
+    <div class="matrix-economy-grid">
+      <div class="matrix-cell">
+        <span class="icon">💖</span>
+        <span class="label">Empathy</span>
+        <span class="value" id="mc-empathy">72</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
+      </div>
+
+      <div class="matrix-cell">
+        <span class="icon">⚖️</span>
+        <span class="label">Justice</span>
+        <span class="value" id="mc-justice">58</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
+      </div>
+
+      <div class="matrix-cell">
+        <span class="icon">🧠</span>
+        <span class="label">Wisdom</span>
+        <span class="value" id="mc-wisdom">45</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
+      </div>
+
+      <div class="matrix-cell">
+        <span class="icon">🌱</span>
+        <span class="label">Growth</span>
+        <span class="value" id="mc-growth">83</span>
+        <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // ── matchMakerState.js (inlined) ─────────────────────────────────────────
+    const GRID_SIZE = 7;
+    const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+
+    function randomGem() {
+      return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+    }
+
+    function createInitialGrid() {
+      const grid = [];
+      for (let r = 0; r < GRID_SIZE; r++) {
+        grid[r] = [];
+        for (let c = 0; c < GRID_SIZE; c++) {
+          let gem;
+          do {
+            gem = randomGem();
+          } while (
+            (c >= 2 && grid[r][c - 1] === gem && grid[r][c - 2] === gem) ||
+            (r >= 2 && grid[r - 1][c] === gem && grid[r - 2][c] === gem)
+          );
+          grid[r][c] = gem;
+        }
+      }
+      return grid;
+    }
+
+    function canSwap(grid, r1, c1, r2, c2) {
+      const rowDiff = Math.abs(r1 - r2);
+      const colDiff = Math.abs(c1 - c2);
+      return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+    }
+
+    function applySwap(grid, r1, c1, r2, c2) {
+      const next = grid.map(row => [...row]);
+      const tmp = next[r1][c1];
+      next[r1][c1] = next[r2][c2];
+      next[r2][c2] = tmp;
+      return next;
+    }
+
+    function findMatches(grid) {
+      const matched = new Set();
+      const key = (r, c) => `${r},${c}`;
+
+      for (let r = 0; r < GRID_SIZE; r++) {
+        let run = 1;
+        for (let c = 1; c <= GRID_SIZE; c++) {
+          if (c < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r][c - 1]) {
+            run++;
+          } else {
+            if (run >= 3) {
+              for (let k = c - run; k < c; k++) matched.add(key(r, k));
+            }
+            run = 1;
+          }
+        }
+      }
+
+      for (let c = 0; c < GRID_SIZE; c++) {
+        let run = 1;
+        for (let r = 1; r <= GRID_SIZE; r++) {
+          if (r < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r - 1][c]) {
+            run++;
+          } else {
+            if (run >= 3) {
+              for (let k = r - run; k < r; k++) matched.add(key(k, c));
+            }
+            run = 1;
+          }
+        }
+      }
+
+      if (matched.size === 0) return [];
+
+      return [[...matched].map(k => {
+        const [r, c] = k.split(',').map(Number);
+        return { r, c };
+      })];
+    }
+
+    function clearMatches(grid, matches) {
+      const next = grid.map(row => [...row]);
+      matches.forEach(group => {
+        group.forEach(({ r, c }) => {
+          next[r][c] = null;
+        });
+      });
+      return next;
+    }
+
+    function applyGravity(grid) {
+      const next = grid.map(row => [...row]);
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const gems = [];
+        for (let r = GRID_SIZE - 1; r >= 0; r--) {
+          if (next[r][c] !== null) gems.push(next[r][c]);
+        }
+        for (let r = GRID_SIZE - 1; r >= 0; r--) {
+          next[r][c] = gems.length > 0 ? gems.shift() : randomGem();
+        }
+      }
+      return next;
+    }
+
+    // ── badges.js (inlined) ──────────────────────────────────────────────────
+    const LEVEL_BADGES = {
+      1: { icon: '🌱', label: 'Seedling' },
+      2: { icon: '⚡', label: 'Charged' },
+      3: { icon: '🔥', label: 'On Fire' },
+      4: { icon: '💎', label: 'Diamond' },
+      5: { icon: '👑', label: 'Champion' },
+    };
+
+    function onLevelComplete(level, score, db, user) {
+      const badge = LEVEL_BADGES[level] || { icon: '🏅', label: `Level ${level}` };
+
+      const banner = document.getElementById('match-badge-banner');
+      if (banner) {
+        banner.textContent = `${badge.icon} ${badge.label} badge unlocked! Score: ${score}`;
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.add('hidden'), 3000);
+      }
+
+      if (db && user) {
+        try {
+          const ref = db.ref(`users/${user.uid}/badges/level_${level}`);
+          ref.set({ level, badge: badge.label, score, earnedAt: Date.now() });
+        } catch (e) {
+          console.warn('Badge save failed:', e);
+        }
+      }
+    }
+
+    // ── match-maker-ui.js (inlined) ──────────────────────────────────────────
+    const SCORE_PER_LEVEL = 500;
+    const CHAIN_REACTION_DELAY_MS = 200;
+
+    let grid;
+    let selected = null;
+    let score = 0;
+    let moves = 20;
+    let level = 1;
+
+    function initMatchMaker() {
+      score = 0;
+      moves = 20;
+      level = 1;
+      selected = null;
+      grid = createInitialGrid();
+      renderGrid();
+
+      document.getElementById('match-score').textContent = score;
+      document.getElementById('match-moves').textContent = moves;
+      document.getElementById('match-level').textContent = level;
+    }
+
+    function renderGrid() {
+      const container = document.getElementById('match-grid');
+      container.innerHTML = '';
+
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'match-cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.textContent = gemIcon(grid[r][c]);
+          cell.onclick = () => onCellClick(r, c);
+          container.appendChild(cell);
+        }
+      }
+    }
+
+    function gemIcon(type) {
+      switch (type) {
+        case 'heart': return '💖';
+        case 'star':  return '⭐';
+        case 'cross': return '✝️';
+        case 'flame': return '🔥';
+        case 'drop':  return '💧';
+        default:      return '⬛';
+      }
+    }
+
+    function onCellClick(r, c) {
+      if (moves <= 0) return;
+
+      if (!selected) {
+        selected = { r, c };
+        highlightCell(r, c, true);
+        return;
+      }
+
+      const { r: r1, c: c1 } = selected;
+      if (r === r1 && c === c1) {
+        highlightCell(r, c, false);
+        selected = null;
+        return;
+      }
+
+      if (!canSwap(grid, r1, c1, r, c)) {
+        highlightCell(r1, c1, false);
+        selected = { r, c };
+        highlightCell(r, c, true);
+        return;
+      }
+
+      const swapped = applySwap(grid, r1, c1, r, c);
+      const matches = findMatches(swapped);
+
+      if (matches.length === 0) {
+        highlightCell(r1, c1, false);
+        selected = null;
+        return;
+      }
+
+      grid = swapped;
+      highlightCell(r1, c1, false);
+      selected = null;
+      moves--;
+      document.getElementById('match-moves').textContent = moves;
+
+      resolveMatches();
+    }
+
+    function highlightCell(r, c, on) {
+      const cell = document.querySelector(`.match-cell[data-row="${r}"][data-col="${c}"]`);
+      if (!cell) return;
+      cell.style.outline = on ? '2px solid #00ff41' : 'none';
+    }
+
+    function resolveMatches() {
+      const matches = findMatches(grid);
+      if (matches.length === 0) {
+        renderGrid();
+        checkLevelUp();
+        checkGameOver();
+        return;
+      }
+
+      matches.forEach(m => {
+        score += m.length * 10;
+      });
+      document.getElementById('match-score').textContent = score;
+
+      grid = clearMatches(grid, matches);
+      grid = applyGravity(grid);
+      renderGrid();
+
+      setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+    }
+
+    function checkLevelUp() {
+      const threshold = level * SCORE_PER_LEVEL;
+      if (score >= threshold) {
+        onLevelComplete(level, score, null, null);
+        level++;
+        moves += 10;
+        document.getElementById('match-level').textContent = level;
+        document.getElementById('match-moves').textContent = moves;
+      }
+    }
+
+    function checkGameOver() {
+      if (moves <= 0) {
+        const banner = document.getElementById('match-badge-banner');
+        if (banner) {
+          banner.textContent = `Game Over! Final score: ${score}`;
+          banner.classList.remove('hidden');
+        }
+      }
+    }
+
+    // ── main.js (inlined) ────────────────────────────────────────────────────
+    initMatchMaker();
+
+    document.getElementById('match-restart-btn').addEventListener('click', () => {
+      document.getElementById('match-badge-banner').classList.add('hidden');
+      initMatchMaker();
+    });
+  </script>
+</body>
+</html>

@@ -30,8 +30,8 @@ jobs:
         env:
           WP_API_KEY: ${{ secrets.WP_API_KEY }}
         run: |
-          test -f dist/index.html
-          CONTENT=$(jq -Rs . < dist/index.html)
+          test -f dist/embed.html
+          CONTENT=$(jq -Rs . < dist/embed.html)
           curl -sSf \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${WP_API_KEY}" \
