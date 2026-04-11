@@ -379,8 +379,11 @@
     let score = 0;
     let moves = 20;
     let level = 1;
+    let chainTimer = null;
 
     function initMatchMaker() {
+      clearTimeout(chainTimer);
+      chainTimer = null;
       score = 0;
       moves = 20;
       level = 1;
@@ -486,7 +489,7 @@
       grid = applyGravity(grid);
       renderGrid();
 
-      setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+      chainTimer = setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
     }
 
     function checkLevelUp() {
