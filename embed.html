@@ -372,18 +372,14 @@
 
     // ── match-maker-ui.js (inlined) ──────────────────────────────────────────
     const SCORE_PER_LEVEL = 500;
-    const CHAIN_REACTION_DELAY_MS = 200;
 
     let grid;
     let selected = null;
     let score = 0;
     let moves = 20;
     let level = 1;
-    let chainTimer = null;
 
     function initMatchMaker() {
-      clearTimeout(chainTimer);
-      chainTimer = null;
       score = 0;
       moves = 20;
       level = 1;
@@ -472,24 +468,17 @@
     }
 
     function resolveMatches() {
-      const matches = findMatches(grid);
-      if (matches.length === 0) {
-        renderGrid();
-        checkLevelUp();
-        checkGameOver();
-        return;
+      let matches = findMatches(grid);
+      while (matches.length > 0) {
+        matches.forEach(m => { score += m.length * 10; });
+        document.getElementById('match-score').textContent = score;
+        grid = clearMatches(grid, matches);
+        grid = applyGravity(grid);
+        matches = findMatches(grid);
       }
-
-      matches.forEach(m => {
-        score += m.length * 10;
-      });
-      document.getElementById('match-score').textContent = score;
-
-      grid = clearMatches(grid, matches);
-      grid = applyGravity(grid);
       renderGrid();
-
-      chainTimer = setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+      checkLevelUp();
+      checkGameOver();
     }
 
     function checkLevelUp() {
