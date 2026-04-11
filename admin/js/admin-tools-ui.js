@@ -3,7 +3,7 @@
  * Renders the Super Admin Tool Assignment panel and persists changes.
  */
 
-import { setUserTool } from './admin-tools-assign.js';
+import { setUserToolsBatch } from './admin-tools-assign.js';
 
 const TOOLS = [
   { key: 'networkDefense', label: 'Network Defense' },
@@ -32,11 +32,13 @@ export async function renderToolAssignment(db) {
   if (!tbody) return;
 
   tbody.innerHTML = '';
+  const initialTools = {};
 
   snap.forEach(child => {
     const u   = child.val();
     const uid = child.key;
     const userIdentifier = u.email || uid;
+    initialTools[uid] = { ...(u.tools || {}) };
 
     const checkboxes = TOOLS.map(t => {
       const checked = u.tools?.[t.key] ? 'checked' : '';
@@ -65,9 +67,31 @@ export async function renderToolAssignment(db) {
     saveBtn.textContent = 'Saving…';
     try {
       const boxes = Array.from(document.querySelectorAll('input[data-tool]'));
-      await Promise.all(
-        boxes.map(box => setUserTool(db, box.dataset.uid, box.dataset.tool, box.checked))
-      );
+      const updates = {};
+
+      boxes.forEach(box => {
+        const uid = box.dataset.uid;
+        const tool = box.dataset.tool;
+        const next = box.checked;
+        const prev = Boolean(initialTools[uid]?.[tool]);
+        if (prev !== next) {
+          updates[`${uid}/tools/${tool}`] = next;
+        }
+      });
+
+      if (Object.keys(updates).length === 0) {
+        showStatus('No changes to save.');
+        return;
+      }
+
+      await setUserToolsBatch(db, updates);
+
+      Object.entries(updates).forEach(([path, value]) => {
+        const [uid, , tool] = path.split('/');
+        initialTools[uid] = initialTools[uid] || {};
+        initialTools[uid][tool] = value;
+      });
+
       showStatus('Tool assignments saved.');
     } catch (err) {
       showStatus(`Error: ${err.message}`, true);
