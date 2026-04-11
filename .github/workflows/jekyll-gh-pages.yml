@@ -131,40 +131,7 @@ jobs:
 </html>
 EOF
 
-      - name: Upload artifact for gamifiedlearning.org
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: deploy-glo
-          name: gamifiedlearning
-
-      - name: Upload artifact for amazinggracehomeliving.com
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: deploy-aghl
-          name: aghl
-
-  deploy-glo:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: production-glo
-      url: https://gamifiedlearning.org
-
-    steps:
-      - name: Deploy gamifiedlearning.org
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: gamifiedlearning
-
-  deploy-aghl:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: production-aghl
-      url: https://amazinggracehomeliving.com
-
-    steps:
-      - name: Deploy amazinggracehomeliving.com
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: aghl
+      # GitHub Pages supports only one deployed site per repository.
+      # Keep the single default Pages artifact upload above (`path: ./_site`)
+      # and handle any redirect/secondary domain from a separate Pages repo
+      # or via DNS/CDN configuration instead of a second deploy here.
