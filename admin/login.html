@@ -65,7 +65,7 @@
   // Show demo or production credential hint depending on the host
   const isDemoHost = (() => {
     const h = location.hostname;
-    return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.github.io');
+    return h === '' || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.github.io');
   })();
   document.getElementById(isDemoHost ? 'demo-hint' : 'prod-hint').style.display = 'block';
 
