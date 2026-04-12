@@ -48,10 +48,11 @@ jobs:
 
           for p in "${PATHS[@]}"; do
             url="${BASE_URL}${p}"
-            code=$(curl -o /dev/null -s -w "%{http_code}" "$url")
+            code=$(curl -o /dev/null -sS --connect-timeout 10 --max-time 30 --retry 2 --retry-delay 2 -w "%{http_code}" "$url")
+            curl_status=$?
             echo "[$code] $url"
 
-            if [ "$code" -ge 400 ]; then
+            if [ "$curl_status" -ne 0 ] || [ "$code" = "000" ] || [ "$code" -ge 400 ]; then
               has_issues=1
             fi
           done
