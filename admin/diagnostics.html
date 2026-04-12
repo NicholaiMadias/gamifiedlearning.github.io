@@ -94,14 +94,20 @@
 
     document.getElementById('run-dns-test').addEventListener('click', async () => {
       const btn = document.getElementById('run-dns-test');
+      const dnsResults = document.getElementById('dns-results');
       btn.disabled    = true;
       btn.textContent = 'Running…';
-      document.getElementById('dns-results').textContent = '// Probing hosts…';
-      const results = await runDnsTests();
-      document.getElementById('dns-results').textContent =
-        JSON.stringify(results, null, 2);
-      btn.disabled    = false;
-      btn.textContent = 'Run DNS Tests';
+      dnsResults.textContent = '// Probing hosts…';
+      try {
+        const results = await runDnsTests();
+        dnsResults.textContent = JSON.stringify(results, null, 2);
+      } catch (error) {
+        dnsResults.textContent =
+          `// DNS tests failed: ${error instanceof Error ? error.message : String(error)}`;
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Run DNS Tests';
+      }
     });
   });
 </script>
