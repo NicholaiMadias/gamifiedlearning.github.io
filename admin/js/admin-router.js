@@ -63,7 +63,11 @@ export function logout() {
 export function requireRole(allowedRoles) {
   // Warn developers when this client-side guard runs in a production context.
   const h = location.hostname;
-  const isProduction = h !== 'localhost' && h !== '127.0.0.1' && !h.endsWith('.github.io');
+  const isProduction =
+    h !== '' &&
+    h !== 'localhost' &&
+    h !== '127.0.0.1' &&
+    !h.endsWith('.github.io');
   if (isProduction) {
     console.warn(
       '[admin-router] requireRole() is a client-side demo guard. ' +
