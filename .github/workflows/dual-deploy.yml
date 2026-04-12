@@ -34,11 +34,27 @@ jobs:
           mkdir -p dist
           rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' ./ dist/
 
+      - name: Prepare dual-domain directories
+        if: github.repository == 'NicholaiMadias/gamifiedlearning.github.io'
+        run: |
+          # Clean up old primary-domain folder if present
+          rm -rf public-aghl
+
+          # amazinggracehomeliving.com — primary
+          mkdir -p public
+          cp -R dist/* public/
+          echo "amazinggracehomeliving.com" > public/CNAME
+
+          # gamifiedlearning.org — secondary/staged
+          mkdir -p public-gl
+          cp -R dist/* public-gl/
+          echo "gamifiedlearning.org" > public-gl/CNAME
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./public
 
       - name: Sync to WordPress (Gamified Learning)
         env:
