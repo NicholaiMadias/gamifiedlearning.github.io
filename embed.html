@@ -160,6 +160,8 @@
       var GEM_TYPES           = ['heart', 'star', 'cross', 'flame', 'drop'];
       var SCORE_PER_LEVEL     = 500;
       var CHAIN_DELAY_MS      = 200;
+      /* Badges are defined for levels 1-5. Beyond level 5 the fallback
+         { icon: '🏅', label: 'Level N' } in checkLevelUp() applies. */
       var LEVEL_BADGES = {
         1: { icon: '🌱', label: 'Seedling' },
         2: { icon: '⚡', label: 'Charged' },
