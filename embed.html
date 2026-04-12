@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Maker – Embed</title>
+  <!--
+    embed.html — self-contained Match Maker widget.
+
+    Multi-instance safe: drop as many copies of the .mm-embed block
+    (from <div class="mm-embed"> through its closing </div>) into the
+    same WordPress page and each instance runs independently.
+
+    How it works:
+    • Every game element is identified by a CLASS, never a document-global ID.
+    • All DOM queries go through `root` — the nearest .mm-embed ancestor.
+    • `document.currentScript.closest('.mm-embed')` captures `root` at
+      evaluation time, so later event handlers close over the correct element.
+    • All game state (grid, score, moves …) lives inside the IIFE, fully
+      instance-local.
+  -->
+  <style>
+    /* ── Embed host ───────────────────────────────────────────────────────── */
+    .mm-embed {
+      display: block;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e0e0e0;
+      background: #0a0a0f;
+    }
+
+    /* ── Card shell ───────────────────────────────────────────────────────── */
+    .mm-embed .mm-card {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 100%;
+      max-width: 460px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .mm-embed .mm-title {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #00ff41;
+      margin: 0 0 0.6rem;
+    }
+
+    /* ── Stats bar ────────────────────────────────────────────────────────── */
+    .mm-embed .mm-stats {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 0.8rem;
+    }
+
+    .mm-embed .mm-stats .mm-val { color: #00ff41; font-weight: 700; }
+
+    /* ── Grid ─────────────────────────────────────────────────────────────── */
+    .mm-embed .mm-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.4rem;
+      padding: 0.8rem;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .mm-embed .mm-cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      background: #111;
+      box-shadow: 0 0 6px rgba(0,0,0,0.6);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      user-select: none;
+    }
+
+    .mm-embed .mm-cell:hover  { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .mm-embed .mm-cell:active { transform: scale(0.94); }
+
+    /* ── Badge banner ─────────────────────────────────────────────────────── */
+    .mm-embed .mm-banner {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #00ff41;
+      background: #001a00;
+      border: 1px solid #00ff4160;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      margin-top: 0.6rem;
+    }
+
+    .mm-embed .mm-banner.mm-hidden { display: none; }
+
+    /* ── Restart button ───────────────────────────────────────────────────── */
+    .mm-embed .mm-restart-btn {
+      display: block;
+      margin: 0.8rem auto 0;
+      background: transparent;
+      border: 1px solid #00ff41;
+      color: #00ff41;
+      padding: 0.4rem 1.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s;
+    }
+
+    .mm-embed .mm-restart-btn:hover { background: #00ff4120; }
+  </style>
+</head>
+<body>
+
+  <!--
+    ════════════════════════════════════════════════════════════════════════
+    EMBED WIDGET
+    When injecting into WordPress: copy from <div class="mm-embed"> through
+    its closing </div> (inclusive). Repeat as many times as needed on one
+    page — each copy is fully independent.
+    ════════════════════════════════════════════════════════════════════════
+  -->
+  <div class="mm-embed" data-mm-instance>
+    <div class="mm-card">
+      <h2 class="mm-title">Match Maker</h2>
+
+      <div class="mm-stats">
+        <div>Score: <span class="mm-val mm-score">0</span></div>
+        <div>Moves: <span class="mm-val mm-moves">20</span></div>
+        <div>Level: <span class="mm-val mm-level">1</span></div>
+      </div>
+
+      <div class="mm-grid"></div>
+
+      <div class="mm-banner mm-hidden"></div>
+
+      <button class="mm-restart-btn">↺ Restart</button>
+    </div>
+
+    <script>
+    (function () {
+      /* ── Root: every DOM operation goes through this reference ── */
+      var root = document.currentScript.closest('[data-mm-instance]');
+      function q(sel)  { return root.querySelector(sel); }
+      function qa(sel) { return root.querySelectorAll(sel); }
+
+      /* ── Constants ─────────────────────────────────────────────── */
+      var GRID_SIZE           = 7;
+      var GEM_TYPES           = ['heart', 'star', 'cross', 'flame', 'drop'];
+      var SCORE_PER_LEVEL     = 500;
+      var CHAIN_DELAY_MS      = 200;
+      var LEVEL_BADGES = {
+        1: { icon: '🌱', label: 'Seedling' },
+        2: { icon: '⚡', label: 'Charged' },
+        3: { icon: '🔥', label: 'On Fire' },
+        4: { icon: '💎', label: 'Diamond' },
+        5: { icon: '👑', label: 'Champion' },
+      };
+
+      /* ── Instance state ────────────────────────────────────────── */
+      var grid, selected, score, moves, level;
+
+      /* ── Helpers ───────────────────────────────────────────────── */
+      function randomGem() {
+        return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+      }
+
+      function gemIcon(type) {
+        switch (type) {
+          case 'heart': return '💖';
+          case 'star':  return '⭐';
+          case 'cross': return '✝️';
+          case 'flame': return '🔥';
+          case 'drop':  return '💧';
+          default:      return '⬛';
+        }
+      }
+
+      /* ── Grid logic (inlined from matchMakerState.js) ──────────── */
+      function createInitialGrid() {
+        var g = [];
+        for (var r = 0; r < GRID_SIZE; r++) {
+          g[r] = [];
+          for (var c = 0; c < GRID_SIZE; c++) {
+            var gem;
+            do {
+              gem = randomGem();
+            } while (
+              (c >= 2 && g[r][c-1] === gem && g[r][c-2] === gem) ||
+              (r >= 2 && g[r-1][c] === gem && g[r-2][c] === gem)
+            );
+            g[r][c] = gem;
+          }
+        }
+        return g;
+      }
+
+      function canSwap(r1, c1, r2, c2) {
+        var rd = Math.abs(r1 - r2), cd = Math.abs(c1 - c2);
+        return (rd === 1 && cd === 0) || (rd === 0 && cd === 1);
+      }
+
+      function applySwap(g, r1, c1, r2, c2) {
+        var next = g.map(function(row) { return row.slice(); });
+        var tmp = next[r1][c1];
+        next[r1][c1] = next[r2][c2];
+        next[r2][c2] = tmp;
+        return next;
+      }
+
+      function findMatches(g) {
+        var matched = {};
+        function key(r, c) { return r + ',' + c; }
+
+        for (var r = 0; r < GRID_SIZE; r++) {
+          var run = 1;
+          for (var c = 1; c <= GRID_SIZE; c++) {
+            if (c < GRID_SIZE && g[r][c] && g[r][c] === g[r][c-1]) {
+              run++;
+            } else {
+              if (run >= 3) for (var k = c - run; k < c; k++) matched[key(r, k)] = true;
+              run = 1;
+            }
+          }
+        }
+        for (var c2 = 0; c2 < GRID_SIZE; c2++) {
+          var run2 = 1;
+          for (var r2 = 1; r2 <= GRID_SIZE; r2++) {
+            if (r2 < GRID_SIZE && g[r2][c2] && g[r2][c2] === g[r2-1][c2]) {
+              run2++;
+            } else {
+              if (run2 >= 3) for (var k2 = r2 - run2; k2 < r2; k2++) matched[key(k2, c2)] = true;
+              run2 = 1;
+            }
+          }
+        }
+
+        var keys = Object.keys(matched);
+        if (keys.length === 0) return [];
+        return [keys.map(function(k) {
+          var parts = k.split(',');
+          return { r: +parts[0], c: +parts[1] };
+        })];
+      }
+
+      function clearMatches(g, matches) {
+        var next = g.map(function(row) { return row.slice(); });
+        matches.forEach(function(group) {
+          group.forEach(function(p) { next[p.r][p.c] = null; });
+        });
+        return next;
+      }
+
+      function applyGravity(g) {
+        var next = g.map(function(row) { return row.slice(); });
+        for (var c = 0; c < GRID_SIZE; c++) {
+          var gems = [];
+          for (var r = GRID_SIZE - 1; r >= 0; r--) {
+            if (next[r][c] !== null) gems.push(next[r][c]);
+          }
+          for (var r2 = GRID_SIZE - 1; r2 >= 0; r2--) {
+            next[r2][c] = gems.length > 0 ? gems.shift() : randomGem();
+          }
+        }
+        return next;
+      }
+
+      /* ── UI helpers ────────────────────────────────────────────── */
+      function renderGrid() {
+        var container = q('.mm-grid');
+        container.innerHTML = '';
+        for (var r = 0; r < GRID_SIZE; r++) {
+          for (var c = 0; c < GRID_SIZE; c++) {
+            var cell = document.createElement('div');
+            cell.className = 'mm-cell';
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            cell.textContent = gemIcon(grid[r][c]);
+            cell.addEventListener('click', makeCellHandler(r, c));
+            container.appendChild(cell);
+          }
+        }
+      }
+
+      function highlightCell(r, c, on) {
+        var cell = q('.mm-cell[data-row="' + r + '"][data-col="' + c + '"]');
+        if (cell) cell.style.outline = on ? '2px solid #00ff41' : 'none';
+      }
+
+      function showBanner(text, autohideMs) {
+        var banner = q('.mm-banner');
+        banner.textContent = text;
+        banner.classList.remove('mm-hidden');
+        if (autohideMs) setTimeout(function() { banner.classList.add('mm-hidden'); }, autohideMs);
+      }
+
+      function hideBanner() {
+        q('.mm-banner').classList.add('mm-hidden');
+      }
+
+      function updateStats() {
+        q('.mm-score').textContent = score;
+        q('.mm-moves').textContent = moves;
+        q('.mm-level').textContent = level;
+      }
+
+      /* ── Game logic ────────────────────────────────────────────── */
+      function makeCellHandler(r, c) {
+        return function() { onCellClick(r, c); };
+      }
+
+      function onCellClick(r, c) {
+        if (moves <= 0) return;
+
+        if (!selected) {
+          selected = { r: r, c: c };
+          highlightCell(r, c, true);
+          return;
+        }
+
+        var r1 = selected.r, c1 = selected.c;
+
+        if (r === r1 && c === c1) {
+          highlightCell(r, c, false);
+          selected = null;
+          return;
+        }
+
+        if (!canSwap(r1, c1, r, c)) {
+          highlightCell(r1, c1, false);
+          selected = { r: r, c: c };
+          highlightCell(r, c, true);
+          return;
+        }
+
+        var swapped = applySwap(grid, r1, c1, r, c);
+        var matches = findMatches(swapped);
+
+        if (matches.length === 0) {
+          highlightCell(r1, c1, false);
+          selected = null;
+          return;
+        }
+
+        grid = swapped;
+        highlightCell(r1, c1, false);
+        selected = null;
+        moves--;
+        updateStats();
+        resolveMatches();
+      }
+
+      function resolveMatches() {
+        var matches = findMatches(grid);
+        if (matches.length === 0) {
+          renderGrid();
+          checkLevelUp();
+          checkGameOver();
+          return;
+        }
+
+        matches.forEach(function(m) { score += m.length * 10; });
+        updateStats();
+
+        grid = clearMatches(grid, matches);
+        grid = applyGravity(grid);
+        renderGrid();
+
+        setTimeout(resolveMatches, CHAIN_DELAY_MS);
+      }
+
+      function checkLevelUp() {
+        if (score >= level * SCORE_PER_LEVEL) {
+          var badge = LEVEL_BADGES[level] || { icon: '🏅', label: 'Level ' + level };
+          showBanner(badge.icon + ' ' + badge.label + ' badge unlocked! Score: ' + score, 3000);
+          level++;
+          moves += 10;
+          updateStats();
+        }
+      }
+
+      function checkGameOver() {
+        if (moves <= 0) {
+          showBanner('Game Over! Final score: ' + score);
+        }
+      }
+
+      /* ── Init / restart ────────────────────────────────────────── */
+      function init() {
+        grid     = createInitialGrid();
+        selected = null;
+        score    = 0;
+        moves    = 20;
+        level    = 1;
+        hideBanner();
+        updateStats();
+        renderGrid();
+      }
+
+      q('.mm-restart-btn').addEventListener('click', init);
+      init();
+    }());
+    </script>
+  </div>
+
+</body>
+</html>
