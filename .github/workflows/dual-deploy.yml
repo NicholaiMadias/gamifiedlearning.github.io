@@ -17,16 +17,32 @@ jobs:
       - name: Validate CNAME
         run: |
           if [ ! -f CNAME ]; then
-            echo "CNAME file not found at repo root"
+            echo "❌ CNAME file not found at repo root"
             exit 1
           fi
           ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="amazinggracehomeliving.com"
+          case "${{ github.repository }}" in
+            "NicholaiMadias/gamifiedlearning.github.io" | \
+            "NicholaiMadias/Amazing-Grace")
+              EXPECTED="amazinggracehomeliving.com"
+              ;;
+            "Gamified-Learning-Matrix/gamifiedlearning.github.io" | \
+            "Gamified-Learning-Matrix/Gamified-Learning")
+              EXPECTED="gamifiedlearning.org"
+              ;;
+            "Gamified-Learning-Matrix/Limitless-Nexus")
+              EXPECTED="limitlessnexus.com"
+              ;;
+            *)
+              echo "❌ No expected CNAME configured for repository '${{ github.repository }}'"
+              exit 1
+              ;;
+          esac
           if [ "$ACTUAL" != "$EXPECTED" ]; then
-            echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
+            echo "❌ CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
             exit 1
           fi
-          echo "CNAME validated: $ACTUAL"
+          echo "✅ CNAME validated: $ACTUAL"
 
       - name: Build static site
         run: |
