@@ -21,10 +21,17 @@
   <?php wp_head(); ?>
   <style>
   /* ── Lightning Page reset ──────────────────────────────────────────── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #050508; color: #e0e0e0;
+  .lp-hero, .lp-hero *, .lp-hero *::before, .lp-hero *::after,
+  .lp-game, .lp-game *, .lp-game *::before, .lp-game *::after,
+  .lp-features, .lp-features *, .lp-features *::before, .lp-features *::after,
+  .lp-cta-strip, .lp-cta-strip *, .lp-cta-strip *::before, .lp-cta-strip *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body.gl-lightning-page { background: #050508; color: #e0e0e0;
          font-family: 'Segoe UI', system-ui, sans-serif; }
-  a { color: #00ff41; }
+  .lp-hero a, .lp-game a, .lp-features a, .lp-cta-strip a { color: #00ff41; }
 
   /* ── Hero ──────────────────────────────────────────────────────────── */
   .lp-hero {
@@ -160,7 +167,11 @@
 <!-- ── CTA strip ─────────────────────────────────────────────────────────── -->
 <div class="lp-cta-strip">
   <p>Want more games and learning tools?</p>
-  <a href="<?php echo esc_url( get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/blog/' ) ); ?>">
+  <?php
+  $posts_page_id = (int) get_option( 'page_for_posts' );
+  $blog_url      = $posts_page_id > 0 ? get_permalink( $posts_page_id ) : home_url( '/blog/' );
+  ?>
+  <a href="<?php echo esc_url( $blog_url ); ?>">
     Read the Blog &#8594;
   </a>
 </div>

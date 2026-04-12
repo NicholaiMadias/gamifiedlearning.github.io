@@ -5,9 +5,9 @@
  * Description:  Embeds the Match Maker gem-swap game via the [gamified_learning]
  *               shortcode. Multiple instances on the same page are fully scoped —
  *               each runs in its own IIFE with unique DOM IDs so there are no
- *               global-scope collisions. Also registers "Gamified Learning – Index"
- *               and "Gamified Learning – Blog" page templates selectable from
- *               Page › Attributes › Template.
+ *               global-scope collisions. Also registers "Gamified Learning – Index",
+ *               "Gamified Learning – Blog", and "Gamified Learning – Lightning Page"
+ *               page templates selectable from Page › Attributes › Template.
  * Version:      1.0.0
  * Author:       NicholaiMadias
  * License:      GPL-2.0+

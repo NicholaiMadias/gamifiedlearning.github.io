@@ -51,7 +51,7 @@ get_header();
     ?>
     <a href="<?php echo esc_url( $blog_page_url ); ?>"
        class="gl-btn gl-btn--secondary">
-      &#128214; Blog
+      &#9654; Blog
     </a>
   </section>
 
