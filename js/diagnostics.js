@@ -12,8 +12,8 @@ function timeoutSignal(ms) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), ms);
 
-  // Cleanup to prevent orphan timers
-  controller.signal.addEventListener("abort", () => clearTimeout(id));
+  // Cleanup to prevent orphan timers; { once: true } removes the listener after it fires
+  controller.signal.addEventListener("abort", () => clearTimeout(id), { once: true });
 
   return controller.signal;
 }
