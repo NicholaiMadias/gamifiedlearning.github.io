@@ -43,7 +43,7 @@ export function logout() {
  * or /admin/forbidden.html if the user lacks the required role.
  *
  * @param {string[]} allowedRoles - Array of roles that may access this page.
- * @returns {{ uid: string, email: string, role: string }} The authenticated user.
+ * @returns {{ uid: string, email: string, role: string } | null} The authenticated user, or null if redirected.
  */
 export function requireRole(allowedRoles) {
   const user = getCurrentUser();
