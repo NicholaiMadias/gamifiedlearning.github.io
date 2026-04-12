@@ -36,7 +36,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${WP_API_KEY}" \
             -d "{\"content\": ${CONTENT}}" \
-            https://www.amazinggracehomeliving.com/wp-json/nexus-sync/v1/update
+            https://www.gamifiedlearning.org/wp-json/nexus-sync/v1/update
 
       - name: Sync to WordPress (Amazing Grace Home Living)
         env:
