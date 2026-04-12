@@ -27,7 +27,7 @@ jobs:
               ;;
           esac
 
-          ACTUAL=$(cat docs/CNAME)
+          ACTUAL=$(tr -d '\r' < docs/CNAME)
 
           if [ "$EXPECTED" != "$ACTUAL" ]; then
             echo "❌ CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
