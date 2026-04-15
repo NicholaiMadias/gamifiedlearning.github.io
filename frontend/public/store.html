@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmazingGraceHomeLiving – Store</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f6f9;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a3a5c 0%, #2d6a9f 100%);
+      color: #fff;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    header h1 { font-size: 1.4rem; font-weight: 700; }
+
+    #credits-display {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 2rem;
+      padding: 0.4rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    #credits-display span { color: #ffe066; }
+
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+
+    h2 { font-size: 1.2rem; color: #1a3a5c; margin-bottom: 1rem; }
+
+    /* ---- Store grid ---- */
+    #store-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .item-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .item-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
+
+    .item-name { font-size: 1.05rem; font-weight: 700; color: #1a3a5c; }
+    .item-description { font-size: 0.9rem; color: #555; flex: 1; }
+    .item-cost { font-size: 1rem; font-weight: 600; color: #2d6a9f; }
+
+    .buy-btn {
+      margin-top: 0.5rem;
+      background: #2d6a9f;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.55rem 1rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .buy-btn:hover:not(:disabled) { background: #1a3a5c; }
+    .buy-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    /* ---- Notification toast ---- */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a3a5c;
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      z-index: 999;
+      min-width: 260px;
+      text-align: center;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.error { background: #c0392b; }
+    #toast.success { background: #27ae60; }
+
+    /* ---- Loading placeholder ---- */
+    .placeholder {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #888;
+      padding: 2rem;
+    }
+
+    /* ---- Responsive tweaks ---- */
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.1rem; }
+      #store-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>✨ Amazing Grace Store</h1>
+  <div id="credits-display">Credits: <span id="credits-value">—</span></div>
+</header>
+
+<main>
+  <h2>Available Items</h2>
+  <div id="store-grid">
+    <p class="placeholder" id="loading-msg">Loading store items…</p>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+  /* ------------------------------------------------------------------ *
+   * Configuration — set PLAYER_ID and API_BASE to match your backend.  *
+   * ------------------------------------------------------------------ */
+  const API_BASE = (window.STORE_API_BASE || 'http://localhost:3000').replace(/\/$/, '');
+  const PLAYER_ID = window.STORE_PLAYER_ID || 'guest';
+
+  /* ------------------------------------------------------------------ */
+  let currentCredits = 0;
+
+  /* Show a brief toast notification */
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `show ${type}`;
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.className = ''; }, 3200);
+  }
+
+  /* Update the credits counter in the header */
+  function setCreditsDisplay(credits) {
+    currentCredits = credits;
+    document.getElementById('credits-value').textContent = credits.toLocaleString();
+  }
+
+  /* Load player credits */
+  async function loadCredits() {
+    try {
+      const res = await fetch(`${API_BASE}/update-credits`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: PLAYER_ID }),
+      });
+      if (!res.ok) throw new Error('Failed to load credits');
+      const data = await res.json();
+      setCreditsDisplay(data.player.credits);
+    } catch {
+      document.getElementById('credits-value').textContent = 'N/A';
+    }
+  }
+
+  /* Render a single item card */
+  function renderItem(item) {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.dataset.itemId = item.id;
+
+    card.innerHTML = `
+      <div class="item-name">${escHtml(item.name)}</div>
+      <div class="item-description">${escHtml(item.description || '')}</div>
+      <div class="item-cost">🪙 ${item.cost.toLocaleString()} credits</div>
+      <button class="buy-btn" data-item-id="${item.id}" data-item-cost="${item.cost}">Buy</button>
+    `;
+
+    card.querySelector('.buy-btn').addEventListener('click', handleBuy);
+    return card;
+  }
+
+  /* Load and render store items */
+  async function loadItems() {
+    const grid = document.getElementById('store-grid');
+    try {
+      const res = await fetch(`${API_BASE}/admin/store-items`);
+      if (!res.ok) throw new Error('Could not load store items');
+      const data = await res.json();
+
+      grid.innerHTML = '';
+      if (!data.items || data.items.length === 0) {
+        grid.innerHTML = '<p class="placeholder">No items available yet.</p>';
+        return;
+      }
+      data.items.forEach(item => grid.appendChild(renderItem(item)));
+    } catch (err) {
+      grid.innerHTML = `<p class="placeholder">Unable to load store items. Please try again later.</p>`;
+    }
+  }
+
+  /* Handle purchase */
+  async function handleBuy(e) {
+    const btn = e.currentTarget;
+    const itemId = btn.dataset.itemId;
+    const itemCost = Number(btn.dataset.itemCost);
+
+    if (currentCredits < itemCost) {
+      showToast('Not enough credits!', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API_BASE}/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: PLAYER_ID, itemId: Number(itemId) }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || 'Purchase failed', 'error');
+        return;
+      }
+
+      setCreditsDisplay(data.player.credits);
+      showToast(`✅ Purchase complete! ${data.player.credits.toLocaleString()} credits remaining.`, 'success');
+    } catch {
+      showToast('Network error — please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  /* Simple HTML escape */
+  function escHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* Init */
+  (async () => {
+    await loadCredits();
+    await loadItems();
+    document.getElementById('loading-msg')?.remove();
+  })();
+</script>
+
+</body>
+</html>

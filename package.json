@@ -1,0 +1,13 @@
+{
+  "name": "gamifiedlearning-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --forceExit",
+    "test:store": "jest tests/store.test.js --forceExit"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
+  }
+}
