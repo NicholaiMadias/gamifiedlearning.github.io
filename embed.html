@@ -13,8 +13,8 @@
 
     How it works:
     • Every game element is identified by a CLASS, never a document-global ID.
-    • All DOM queries go through `root` — the nearest .mm-embed ancestor.
-    • `document.currentScript.closest('.mm-embed')` captures `root` at
+    • All DOM queries go through `root` — the nearest `[data-mm-instance]` ancestor.
+    • `document.currentScript.closest('[data-mm-instance]')` captures `root` at
       evaluation time, so later event handlers close over the correct element.
     • All game state (grid, score, moves …) lives inside the IIFE, fully
       instance-local.
@@ -84,6 +84,11 @@
       box-shadow: 0 0 6px rgba(0,0,0,0.6);
       transition: transform 0.1s ease, box-shadow 0.1s ease;
       user-select: none;
+      /* reset browser <button> defaults */
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-family: inherit;
     }
 
     .mm-embed .mm-cell:hover  { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
@@ -126,9 +131,15 @@
   <!--
     ════════════════════════════════════════════════════════════════════════
     EMBED WIDGET
-    When injecting into WordPress: copy from <div class="mm-embed"> through
-    its closing </div> (inclusive). Repeat as many times as needed on one
-    page — each copy is fully independent.
+    When injecting into WordPress you need TWO things:
+
+    1. STYLES (once per page) — copy the entire <style> … </style> block
+       from this file's <head> into your theme's Custom CSS or a Custom HTML
+       block that appears before any widget instance.
+
+    2. WIDGET INSTANCE (repeat as needed) — copy from
+       <div class="mm-embed" data-mm-instance> through its closing </div>
+       (inclusive). Each copy is a fully independent game instance.
     ════════════════════════════════════════════════════════════════════════
   -->
   <div class="mm-embed" data-mm-instance>
@@ -151,8 +162,13 @@
     <script>
     (function () {
       /* ── Root: every DOM operation goes through this reference ── */
-      var root = document.currentScript.closest('[data-mm-instance]');
-      function q(sel)  { return root.querySelector(sel); }
+      var currentScript = document.currentScript;
+      var root = currentScript ? currentScript.closest('[data-mm-instance]') : null;
+      if (!root) {
+        console.error('Match Maker embed: failed to initialize because the widget root ([data-mm-instance]) could not be found for the current script.');
+        return;
+      }
+      function q(sel) { return root.querySelector(sel); }
 
       /* ── Constants ─────────────────────────────────────────────── */
       var GRID_SIZE           = 7;
@@ -171,6 +187,8 @@
 
       /* ── Instance state ────────────────────────────────────────── */
       var grid, selected, score, moves, level;
+      var bannerAutohideTimeoutId = null;
+      var chainTimeoutId = null;
 
       /* ── Helpers ───────────────────────────────────────────────── */
       function randomGem() {
@@ -283,11 +301,14 @@
         container.innerHTML = '';
         for (var r = 0; r < GRID_SIZE; r++) {
           for (var c = 0; c < GRID_SIZE; c++) {
-            var cell = document.createElement('div');
+            var gem = grid[r][c];
+            var cell = document.createElement('button');
+            cell.type = 'button';
             cell.className = 'mm-cell';
             cell.dataset.row = r;
             cell.dataset.col = c;
-            cell.textContent = gemIcon(grid[r][c]);
+            cell.setAttribute('aria-label', gem + ' gem at row ' + (r + 1) + ', column ' + (c + 1));
+            cell.textContent = gemIcon(gem);
             cell.addEventListener('click', makeCellHandler(r, c));
             container.appendChild(cell);
           }
@@ -301,12 +322,25 @@
 
       function showBanner(text, autohideMs) {
         var banner = q('.mm-banner');
+        if (bannerAutohideTimeoutId !== null) {
+          clearTimeout(bannerAutohideTimeoutId);
+          bannerAutohideTimeoutId = null;
+        }
         banner.textContent = text;
         banner.classList.remove('mm-hidden');
-        if (autohideMs) setTimeout(function() { banner.classList.add('mm-hidden'); }, autohideMs);
+        if (autohideMs) {
+          bannerAutohideTimeoutId = setTimeout(function() {
+            banner.classList.add('mm-hidden');
+            bannerAutohideTimeoutId = null;
+          }, autohideMs);
+        }
       }
 
       function hideBanner() {
+        if (bannerAutohideTimeoutId !== null) {
+          clearTimeout(bannerAutohideTimeoutId);
+          bannerAutohideTimeoutId = null;
+        }
         q('.mm-banner').classList.add('mm-hidden');
       }
 
@@ -378,7 +412,7 @@
         grid = applyGravity(grid);
         renderGrid();
 
-        setTimeout(resolveMatches, CHAIN_DELAY_MS);
+        chainTimeoutId = setTimeout(resolveMatches, CHAIN_DELAY_MS);
       }
 
       function checkLevelUp() {
@@ -399,6 +433,12 @@
 
       /* ── Init / restart ────────────────────────────────────────── */
       function init() {
+        /* Cancel any in-flight chain-reaction or banner autohide from the
+           previous game so they don't mutate fresh state. */
+        if (chainTimeoutId !== null) {
+          clearTimeout(chainTimeoutId);
+          chainTimeoutId = null;
+        }
         grid     = createInitialGrid();
         selected = null;
         score    = 0;
