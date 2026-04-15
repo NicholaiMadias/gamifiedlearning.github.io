@@ -25,7 +25,7 @@ jobs:
 
           case "$REPO" in
             "NicholaiMadias/gamifiedlearning.github.io")
-              EXPECTED="gamifiedlearning.org"
+              EXPECTED="amazinggracehomeliving.com"
               ;;
             "NicholaiMadias/amazinggracehomeliving.github.io")
               EXPECTED="amazinggracehomeliving.com"
