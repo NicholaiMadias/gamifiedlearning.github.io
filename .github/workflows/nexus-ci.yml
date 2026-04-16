@@ -7,6 +7,9 @@ on:
       - staging
   pull_request:
 
+permissions:
+  contents: read
+
 defaults:
   run:
     working-directory: nexus
