@@ -1,0 +1,116 @@
+/* guide.css — Nexus Guide module styles */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.guide {
+  padding: 1rem;
+  background: #020617;
+  color: #e5e7eb;
+  font-family: system-ui, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.guide-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #22c55e;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 8px #22c55e60;
+}
+
+#guide-log {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  background: #020617;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  scroll-behavior: smooth;
+}
+
+#guide-log::-webkit-scrollbar {
+  width: 4px;
+}
+
+#guide-log::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+#guide-log::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 2px;
+}
+
+.guide-msg {
+  margin-bottom: 0.45rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.guide-msg.system {
+  color: #22c55e;
+}
+
+.guide-msg.user {
+  color: #60a5fa;
+}
+
+.guide-msg.event {
+  color: #f59e0b;
+  font-style: italic;
+}
+
+.guide-input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+#guide-input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  background: #020617;
+  border: 1px solid #374151;
+  border-radius: 0.375rem;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#guide-input:focus {
+  border-color: #22c55e;
+}
+
+#guide-send {
+  padding: 0.4rem 0.8rem;
+  background: #22c55e;
+  border-radius: 0.375rem;
+  border: none;
+  color: #020617;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+#guide-send:hover {
+  background: #16a34a;
+}
+
+#guide-send:active {
+  transform: scale(0.95);
+}

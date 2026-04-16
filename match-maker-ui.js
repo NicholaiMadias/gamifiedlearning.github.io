@@ -113,9 +113,18 @@ function highlightCell(r, c, on) {
   cell.style.outline = on ? '2px solid #00ff41' : 'none';
 }
 
-function resolveMatches() {
+function resolveMatches(chain) {
+  chain = chain || 0;
   const matches = findMatches(grid);
   if (matches.length === 0) {
+    // Emit combo event when the chain has at least two successive reactions.
+    if (chain >= 2) {
+      const tier = chain >= 5 ? 4 : chain >= 4 ? 3 : chain >= 3 ? 2 : 1;
+      window.NexusOS?.emit('arcade-combo', { tier, chain });
+      if (tier >= 4) {
+        window.NexusOS?.emit('combo-tier4', { chain });
+      }
+    }
     renderGrid();
     checkLevelUp();
     checkGameOver();
@@ -132,7 +141,7 @@ function resolveMatches() {
   renderGrid();
 
   // chain reactions
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  setTimeout(() => resolveMatches(chain + 1), CHAIN_REACTION_DELAY_MS);
 }
 
 function checkLevelUp() {

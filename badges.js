@@ -30,6 +30,9 @@ export function onLevelComplete(level, score, db, user) {
     setTimeout(() => banner.classList.add('hidden'), 3000);
   }
 
+  // Notify the NexusOS event bus (when available, e.g. inside os-shell.html).
+  window.NexusOS?.emit('badge-earned', { badgeId: badge.label, level, icon: badge.icon, score });
+
   // Persist if db and user are available
   if (db && user) {
     try {
