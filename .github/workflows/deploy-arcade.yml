@@ -1,0 +1,43 @@
+name: Deploy Arcade Engine
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "src/arcade/**"
+      - "src/config/gameConfig.json"
+      - "public/assets/**"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Arcade
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+
+      - name: Log Matrix Bridge Sync
+        run: |
+          curl -X POST https://api.nicholai.org/matrix/sync \
+          -H "Content-Type: application/json" \
+          -d '{"module":"arcade","event":"deploy"}'
