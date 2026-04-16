@@ -17,6 +17,8 @@ let moves = 20;
 let level = 1;
 let db = null;
 let user = null;
+let resolveTimeoutId = null;
+let runId = 0;
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 200;
@@ -28,6 +30,8 @@ export function initMatchMaker(dbRef, userRef) {
   moves = 20;
   level = 1;
   selected = null;
+  runId++;
+  clearPendingResolve();
   grid = createInitialGrid();
   renderGrid();
 
@@ -112,9 +116,21 @@ function highlightCell(r, c, on) {
   cell.style.outline = on ? '2px solid #00ff41' : 'none';
 }
 
-function resolveMatches() {
+function clearPendingResolve() {
+  if (resolveTimeoutId !== null) {
+    clearTimeout(resolveTimeoutId);
+    resolveTimeoutId = null;
+  }
+}
+
+function resolveMatches(activeRunId = runId) {
+  if (activeRunId !== runId) return;
+
+  clearPendingResolve();
+
   const matches = findMatches(grid);
   if (matches.length === 0) {
+    clearPendingResolve();
     renderGrid();
     checkLevelUp();
     checkGameOver();
@@ -131,7 +147,10 @@ function resolveMatches() {
   renderGrid();
 
   // chain reactions
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  resolveTimeoutId = setTimeout(() => {
+    resolveTimeoutId = null;
+    resolveMatches(activeRunId);
+  }, CHAIN_REACTION_DELAY_MS);
 }
 
 function checkLevelUp() {
