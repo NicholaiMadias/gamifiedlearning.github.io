@@ -1,0 +1,33 @@
+<section class="module-grid">
+  <div class="card">
+    <h2 class="module-heading">Overworld Nexus</h2>
+    <p class="muted">Route between Seven Stars, Arcade, Ministry, and Listings. Watch the Mystery Meter climb as you explore.</p>
+    <div class="badge">Mystery Meter: <span id="mystery-meter-value">0%</span></div>
+    <div class="grid-2" style="margin-top:12px;">
+      <button class="btn" data-module-target="seven-stars">Jump to Seven Stars</button>
+      <button class="btn secondary" data-module-target="arcade">Jump to Arcade</button>
+      <button class="btn" data-module-target="lore-codex">Open Lore Codex</button>
+      <button class="btn secondary" data-module-target="listings">Visit Listings</button>
+    </div>
+  </div>
+
+  <div class="map-wrap">
+    <svg class="overworld" viewBox="0 0 600 260" role="img" aria-label="Nexus Overworld Map">
+      <line id="line-stars-arcade" class="map-line" x1="150" y1="120" x2="300" y2="80" />
+      <line id="line-arcade-ministry" class="map-line" x1="300" y1="80" x2="450" y2="120" />
+      <line id="line-ministry-listings" class="map-line" x1="450" y1="120" x2="520" y2="200" />
+
+      <circle id="node-seven-stars" class="node-btn unlocked" cx="150" cy="120" r="22" />
+      <text x="150" y="160" fill="#e5e7eb" text-anchor="middle" font-size="14">Seven Stars</text>
+
+      <circle id="node-arcade" class="node-btn" cx="300" cy="80" r="22" />
+      <text x="300" y="120" fill="#e5e7eb" text-anchor="middle" font-size="14">Arcade</text>
+
+      <circle id="node-ministry" class="node-btn" cx="450" cy="120" r="22" />
+      <text x="450" y="160" fill="#e5e7eb" text-anchor="middle" font-size="14">Ministry</text>
+
+      <circle id="node-listings" class="node-btn" cx="520" cy="200" r="22" />
+      <text x="520" y="240" fill="#e5e7eb" text-anchor="middle" font-size="14">Listings</text>
+    </svg>
+  </div>
+</section>

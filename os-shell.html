@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Arcade OS</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;600&display=swap');
+
+    :root {
+      --bg: #05060d;
+      --panel: #0d1020;
+      --panel-strong: #12162d;
+      --accent: #12c2e9;
+      --accent-2: #22c55e;
+      --accent-3: #f97316;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --outline: #1f2937;
+      --glow: 0 0 22px rgba(18, 194, 233, 0.3);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 20%, #0b1a32 0, transparent 26%), radial-gradient(circle at 80% 0%, #1b0f2c 0, transparent 30%), var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', 'Manrope', system-ui, -apple-system, sans-serif;
+      padding: 20px;
+    }
+
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .shell-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: linear-gradient(120deg, rgba(18, 194, 233, 0.12), rgba(34, 197, 94, 0.12));
+      border: 1px solid var(--outline);
+      border-radius: 16px;
+      box-shadow: var(--glow);
+    }
+
+    .shell-title {
+      font-size: 20px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .shell-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      border: 1px solid var(--outline);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: transform 0.1s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .pill-btn:hover { transform: translateY(-1px); border-color: var(--accent); background: rgba(18, 194, 233, 0.08); }
+    .pill-btn.active { border-color: var(--accent-2); background: rgba(34, 197, 94, 0.1); color: #eafff2; }
+
+    .shell-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--panel) 0%, var(--panel-strong) 100%);
+      border: 1px solid var(--outline);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+    }
+
+    .panel h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #a5f3fc;
+    }
+
+    .main-panel {
+      min-height: 540px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #main-content { min-height: 520px; }
+
+    .meter {
+      background: #0b1022;
+      border: 1px solid var(--outline);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .meter-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 10px;
+      background: #0f172a;
+      overflow: hidden;
+      border: 1px solid #111827;
+    }
+    .meter-fill {
+      height: 100%;
+      width: 20%;
+      background: linear-gradient(90deg, #22d3ee, #22c55e);
+      transition: width 0.4s ease;
+      box-shadow: var(--glow);
+    }
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .feed-card {
+      padding: 10px;
+      border: 1px solid var(--outline);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      color: #d1d5db;
+    }
+    .feed-card small { color: var(--muted); display: block; margin-top: 2px; }
+
+    .inline-link { color: #7dd3fc; cursor: pointer; text-decoration: none; }
+    .inline-link:hover { color: #a5f3fc; }
+
+    /* Module shared styles */
+    .module-grid { display: grid; gap: 14px; }
+    .module-heading { margin: 0 0 8px; font-size: 18px; letter-spacing: 0.04em; text-transform: uppercase; color: #a5f3fc; }
+    .muted { color: var(--muted); }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--outline); background: rgba(255,255,255,0.04); font-size: 13px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .card { padding: 14px; border: 1px solid var(--outline); border-radius: 12px; background: rgba(255,255,255,0.02); }
+    .btn {
+      border: 1px solid var(--outline);
+      background: rgba(18, 194, 233, 0.12);
+      color: #e5f6ff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: transform 0.1s ease, border-color 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .btn.secondary { background: rgba(34, 197, 94, 0.12); color: #d1fae5; }
+
+    /* Combo timeline */
+    #combo-timeline {
+      display: flex;
+      gap: 4px;
+      padding: 6px;
+      background: #0b1022;
+      border: 1px solid var(--outline);
+      border-radius: 10px;
+      min-height: 28px;
+      overflow-x: auto;
+    }
+    .combo-dot { width: 8px; height: 16px; border-radius: 4px; background: #4b5563; }
+    .combo-dot.tier-1 { background: #22c55e; }
+    .combo-dot.tier-2 { background: #3b82f6; }
+    .combo-dot.tier-3 { background: #f97316; }
+    .combo-dot.tier-4 { background: #e11d48; }
+
+    /* Overworld map */
+    .map-wrap { background: #0b1022; border: 1px solid var(--outline); border-radius: 14px; padding: 12px; }
+    svg.overworld { width: 100%; height: 260px; }
+    .node-btn { fill: #0ea5e9; cursor: pointer; transition: transform 0.2s, filter 0.2s, fill 0.2s; }
+    .node-btn.unlocked { fill: #22c55e; }
+    .node-btn:hover { transform: scale(1.12); filter: drop-shadow(0 0 8px #22c55e); }
+    .map-line { stroke: #6b7280; stroke-width: 3; opacity: 0.35; transition: opacity 0.2s, stroke 0.2s; }
+    .map-line.active { stroke: #22c55e; opacity: 1; }
+
+    /* Lore codex */
+    .codex-layout { display: grid; grid-template-columns: 240px 1fr; gap: 14px; }
+    .codex-list { display: flex; flex-direction: column; gap: 8px; }
+    .codex-item { padding: 10px; border-radius: 10px; border: 1px solid var(--outline); cursor: pointer; background: rgba(255,255,255,0.02); }
+    .codex-item.locked { color: var(--muted); }
+    .codex-item.active { border-color: var(--accent-2); box-shadow: var(--glow); }
+    .codex-body h4 { margin: 0 0 8px; font-size: 17px; }
+    .codex-body p { color: var(--muted); line-height: 1.5; }
+
+    /* Seven stars quiz */
+    .quiz-card { padding: 16px; border-radius: 12px; border: 1px solid var(--outline); background: rgba(255,255,255,0.02); }
+    .choices { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+    .choice-btn { padding: 10px; border-radius: 10px; background: #0f172a; border: 1px solid var(--outline); color: var(--text); text-align: left; cursor: pointer; }
+    .choice-btn:hover { border-color: var(--accent); }
+    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(34, 197, 94, 0.14); color: #bbf7d0; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .locked-pill { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #fecdd3; }
+
+    /* Match maker module layout */
+    .match-card { background: #0d0d1a; border: 1px solid #1a1a2e; border-radius: 12px; padding: 1rem; width: 100%; }
+    .match-card h2 { text-align: center; font-size: 1.1rem; letter-spacing: 0.1em; text-transform: uppercase; color: #00ff41; margin-bottom: 0.6rem; }
+    .match-stats { display: flex; justify-content: space-around; font-size: 0.85rem; color: #aaa; margin-bottom: 0.8rem; }
+    .match-stats span { color: #00ff41; font-weight: 700; }
+    .match-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; padding: 0.8rem; width: 100%; max-width: 420px; margin: 0 auto; }
+    .match-cell { aspect-ratio: 1 / 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; background: #111; box-shadow: 0 0 6px rgba(0,0,0,0.6); transition: transform 0.1s ease, box-shadow 0.1s ease; user-select: none; }
+    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .match-cell:active { transform: scale(0.94); }
+    .match-badge-banner { text-align: center; font-size: 0.9rem; color: #00ff41; background: #001a00; border: 1px solid #00ff4160; border-radius: 8px; padding: 0.5rem 1rem; margin-top: 0.6rem; }
+    .match-badge-banner.hidden { display: none; }
+    .match-restart-btn { display: block; margin: 0.8rem auto 0; background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 0.4rem 1.4rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; letter-spacing: 0.08em; transition: background 0.15s; }
+    .match-restart-btn:hover { background: #00ff4120; }
+
+    @media (max-width: 960px) {
+      .shell-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="shell-header">
+      <div class="shell-title">Nexus Arcade OS</div>
+      <div class="shell-nav">
+        <button class="pill-btn active" data-load="overworld">Overworld</button>
+        <button class="pill-btn" data-load="seven-stars">Seven Stars</button>
+        <button class="pill-btn" data-load="arcade">Arcade</button>
+        <button class="pill-btn" data-load="lore-codex">Lore Codex</button>
+        <button class="pill-btn" data-load="listings">Listings</button>
+        <button class="pill-btn" data-load="ministry">Ministry</button>
+        <button class="pill-btn" data-load="badges">Badges</button>
+      </div>
+    </header>
+
+    <div class="shell-grid">
+      <aside class="panel">
+        <h3>OS Status</h3>
+        <div class="meter">
+          <div class="meter-label">
+            <span>Mystery Meter</span>
+            <strong id="mystery-meter-label">0%</strong>
+          </div>
+          <div class="meter-track">
+            <div id="mystery-meter-fill" class="meter-fill"></div>
+          </div>
+        </div>
+
+        <h3>Reward Feed</h3>
+        <div id="reward-feed" class="feed"></div>
+      </aside>
+
+      <main class="panel main-panel">
+        <div id="main-content">
+          <div class="muted">Loading module…</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initMatchMaker } from './match-maker-ui.js';
+
+    const nexus = window.NexusOS = window.NexusOS || {};
+    nexus.events = nexus.events || {};
+    nexus.namedListeners = nexus.namedListeners || {};
+    nexus.state = nexus.state || {
+      mysteryMeter: clamp(Number(localStorage.getItem('nexus_mystery_meter') || 18), 0, 100),
+      loreUnlocked: new Set(JSON.parse(localStorage.getItem('nexus_lore_unlocked') || '[]')),
+      unlockedNodes: { sevenStars: true, arcade: false, ministry: false, listings: false },
+      rewards: [],
+      inventory: { items: new Set(), badges: new Set() },
+      arcadeCombos: [],
+      listingViews: new Set(),
+      starsEarned: new Set(),
+      sevenStars: { answered: {}, current: 0 },
+    };
+
+    nexus.on = function(event, fn) {
+      (this.events[event] ||= []).push(fn);
+    };
+    nexus.emit = function(event, data) {
+      (this.events[event] || []).forEach(fn => fn(data));
+    };
+    nexus.listen = function(key, event, fn) {
+      if (this.namedListeners[key]) return;
+      this.namedListeners[key] = { event, fn };
+      this.on(event, fn);
+    };
+
+    const moduleInitializers = {
+      overworld: initOverworld,
+      'seven-stars': initSevenStars,
+      arcade: initArcade,
+      ministry: initMinistry,
+      listings: initListings,
+      badges: initBadges,
+      'lore-codex': initLoreCodex,
+    };
+
+    const loreEntries = {
+      spark_initiate: { title: 'First Light', church: 'Ephesus', body: 'You remember your first love and reclaim the ember that began the journey.' },
+      shooting_star_adept: { title: 'Paths of Illumination', church: 'Smyrna', body: 'You endure refining fire and learn to see in the dark corridors.' },
+      ruby_catalyst_master: { title: 'The Ember of Resolve', church: 'Pergamum', body: 'Discernment sharpens; you separate truth from daggered whispers.' },
+      supernova_ascendant: { title: 'The Shattering of Darkness', church: 'Sardis', body: 'Dead works fall away as you spark a revival of what remains.' },
+      revelation_bearer: { title: 'The Seven Stars Awaken', church: 'Laodicea', body: 'Lukewarm turns luminous; the full constellation is now in your grasp.' },
+    };
+
+    const sevenStarQuestions = [
+      {
+        id: 'spark_initiate',
+        church: 'Ephesus',
+        prompt: 'Which church is called back to its first love?',
+        options: ['Smyrna', 'Ephesus', 'Pergamum', 'Laodicea'],
+        answer: 'Ephesus',
+      },
+      {
+        id: 'shooting_star_adept',
+        church: 'Smyrna',
+        prompt: 'Who is told to be faithful unto death and receive a crown of life?',
+        options: ['Thyatira', 'Smyrna', 'Sardis', 'Philadelphia'],
+        answer: 'Smyrna',
+      },
+      {
+        id: 'ruby_catalyst_master',
+        church: 'Pergamum',
+        prompt: 'Which church is warned about teachings of Balaam and the Nicolaitans?',
+        options: ['Pergamum', 'Ephesus', 'Sardis', 'Laodicea'],
+        answer: 'Pergamum',
+      },
+      {
+        id: 'supernova_ascendant',
+        church: 'Sardis',
+        prompt: 'Who is called to wake up and strengthen what remains?',
+        options: ['Sardis', 'Thyatira', 'Philadelphia', 'Smyrna'],
+        answer: 'Sardis',
+      },
+      {
+        id: 'revelation_bearer',
+        church: 'Laodicea',
+        prompt: 'Who is invited to open the door so the Spirit may dine with them?',
+        options: ['Ephesus', 'Smyrna', 'Laodicea', 'Pergamum'],
+        answer: 'Laodicea',
+      },
+    ];
+
+    const rewards = {
+      'listing-viewed:tampa': { item: 'housing_key_tampa' },
+      'listing-viewed:largo': { item: 'housing_key_largo' },
+      'star-collected:Ephesus': { item: 'ministry_scroll' },
+      'combo-tier4': { badge: 'revelation_bearer' },
+    };
+
+    function clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
+    function persistMystery() { localStorage.setItem('nexus_mystery_meter', nexus.state.mysteryMeter); }
+    function persistLore() { localStorage.setItem('nexus_lore_unlocked', JSON.stringify([...nexus.state.loreUnlocked])); }
+
+    async function loadModule(id, target = 'main-content') {
+      const container = document.getElementById(target);
+      if (!container) return;
+      try {
+        const res = await fetch(`./modules/${id}.html`);
+        if (!res.ok) throw new Error(`Failed to load ${id}`);
+        const html = await res.text();
+        container.innerHTML = html;
+        moduleInitializers[id]?.();
+        markActiveNav(id);
+      } catch (e) {
+        container.innerHTML = `<div class="feed-card">Module failed to load: ${e.message}</div>`;
+      }
+    }
+
+    function markActiveNav(id) {
+      document.querySelectorAll('.pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.load === id);
+      });
+    }
+
+    document.querySelectorAll('[data-load]').forEach(btn => {
+      btn.addEventListener('click', () => loadModule(btn.dataset.load));
+    });
+
+    // Reward engine listeners
+    nexus.listen('reward-listings', 'listing-viewed', ({ city }) => grantReward(`listing-viewed:${city}`));
+    nexus.listen('reward-stars', 'star-collected', ({ church }) => grantReward(`star-collected:${church}`));
+    nexus.listen('reward-combo', 'combo-tier4', () => grantReward('combo-tier4'));
+
+    function grantReward(key) {
+      const reward = rewards[key];
+      if (!reward) return;
+      nexus.emit('reward-granted', reward);
+    }
+
+    // Shared state listeners
+    nexus.listen('state-listings', 'listing-viewed', ({ city }) => {
+      nexus.state.listingViews.add(city);
+      bumpMysteryMeter(4);
+      unlockNode('listings');
+      renderOverworld();
+    });
+
+    nexus.listen('state-star', 'star-collected', ({ church }) => {
+      if (church) nexus.state.starsEarned.add(church);
+      bumpMysteryMeter(6);
+      unlockNode('arcade');
+      renderOverworld();
+    });
+
+    nexus.listen('state-lore', 'lore-unlocked', ({ badgeId }) => {
+      if (!badgeId) return;
+      nexus.state.loreUnlocked.add(badgeId);
+      persistLore();
+      renderLoreCodex();
+    });
+
+    nexus.listen('state-combo', 'arcade-combo', payload => {
+      nexus.state.arcadeCombos.push({ ...payload, ts: Date.now() });
+      if (nexus.state.arcadeCombos.length > 80) nexus.state.arcadeCombos.shift();
+      bumpMysteryMeter(payload?.tier || 1);
+      renderComboTimeline();
+    });
+
+    nexus.listen('state-tier4', 'combo-tier4', () => {
+      unlockNode('ministry');
+      renderOverworld();
+    });
+
+    nexus.listen('state-rewards', 'reward-granted', reward => {
+      if (reward?.item) nexus.state.inventory.items.add(reward.item);
+      if (reward?.badge) nexus.state.inventory.badges.add(reward.badge);
+      nexus.state.rewards.unshift({ ...reward, ts: Date.now() });
+      if (nexus.state.rewards.length > 20) nexus.state.rewards.pop();
+      if (reward?.badge && loreEntries[reward.badge]) {
+        nexus.state.loreUnlocked.add(reward.badge);
+        persistLore();
+      }
+      renderRewardFeed();
+      renderBadges();
+      renderMinistry();
+
+      const banner = document.getElementById('match-badge-banner');
+      if (banner && reward?.item) {
+        banner.textContent = `New item granted: ${reward.item}`;
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.add('hidden'), 2500);
+      }
+    });
+
+    function bumpMysteryMeter(delta) {
+      nexus.state.mysteryMeter = clamp(nexus.state.mysteryMeter + delta, 0, 100);
+      persistMystery();
+      renderMysteryMeter();
+    }
+
+    function unlockNode(key) {
+      if (!nexus.state.unlockedNodes[key]) {
+        nexus.state.unlockedNodes[key] = true;
+      }
+    }
+
+    // --- Module initializers -------------------------------------------------
+    function initOverworld() {
+      renderMysteryMeter();
+      renderOverworld();
+      document.querySelectorAll('[data-module-target]').forEach(btn => {
+        btn.addEventListener('click', () => loadModule(btn.dataset.moduleTarget));
+      });
+
+      const nodes = {
+        'node-seven-stars': 'seven-stars',
+        'node-arcade': 'arcade',
+        'node-ministry': 'ministry',
+        'node-listings': 'listings',
+      };
+      Object.entries(nodes).forEach(([id, module]) => {
+        const el = document.getElementById(id);
+        if (el) el.onclick = () => loadModule(module);
+      });
+    }
+
+    function initSevenStars() {
+      renderSevenStars();
+    }
+
+    function initArcade() {
+      initMatchMaker(null, null);
+      const restart = document.getElementById('match-restart-btn');
+      if (restart) restart.onclick = () => {
+        document.getElementById('match-badge-banner')?.classList.add('hidden');
+        initMatchMaker(null, null);
+      };
+      renderComboTimeline();
+    }
+
+    function initMinistry() {
+      renderMinistry();
+    }
+
+    function initListings() {
+      document.querySelectorAll('[data-city]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const city = btn.dataset.city;
+          nexus.emit('listing-viewed', { city });
+          btn.textContent = `${city} — logged`;
+        });
+      });
+    }
+
+    function initBadges() {
+      renderBadges();
+    }
+
+    function initLoreCodex() {
+      renderLoreCodex();
+    }
+
+    // --- Render helpers ------------------------------------------------------
+    function renderMysteryMeter() {
+      const fill = document.getElementById('mystery-meter-fill');
+      const label = document.getElementById('mystery-meter-label');
+      if (fill) fill.style.width = `${nexus.state.mysteryMeter}%`;
+      if (label) label.textContent = `${nexus.state.mysteryMeter}%`;
+      const meterLabel = document.getElementById('mystery-meter-value');
+      if (meterLabel) meterLabel.textContent = `${nexus.state.mysteryMeter}% resonance`;
+    }
+
+    function renderOverworld() {
+      const pairs = [
+        ['node-seven-stars', nexus.state.unlockedNodes.sevenStars],
+        ['node-arcade', nexus.state.unlockedNodes.arcade],
+        ['node-ministry', nexus.state.unlockedNodes.ministry],
+        ['node-listings', nexus.state.unlockedNodes.listings],
+      ];
+      pairs.forEach(([id, unlocked]) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('unlocked', !!unlocked);
+      });
+
+      const lineStarsArcade = document.getElementById('line-stars-arcade');
+      if (lineStarsArcade) lineStarsArcade.classList.toggle('active', nexus.state.unlockedNodes.arcade);
+      const lineArcadeMinistry = document.getElementById('line-arcade-ministry');
+      if (lineArcadeMinistry) lineArcadeMinistry.classList.toggle('active', nexus.state.unlockedNodes.ministry);
+      const lineMinistryListings = document.getElementById('line-ministry-listings');
+      if (lineMinistryListings) lineMinistryListings.classList.toggle('active', nexus.state.unlockedNodes.listings);
+    }
+
+    function renderSevenStars() {
+      const container = document.getElementById('seven-stars-quiz');
+      if (!container) return;
+      const progress = document.getElementById('seven-progress');
+      const currentQuestion = sevenStarQuestions[nexus.state.sevenStars.current];
+
+      if (!currentQuestion) {
+        container.innerHTML = `
+          <div class="quiz-card">
+            <div class="status-pill">All seven stars aligned</div>
+            <p class="muted">You completed every prompt. Trigger the Lore Codex or run the Arcade to push the constellation further.</p>
+            <button class="btn secondary" id="open-codex">Open Lore Codex</button>
+          </div>
+        `;
+        document.getElementById('open-codex')?.addEventListener('click', () => loadModule('lore-codex'));
+        if (progress) progress.textContent = `5 / 5 stars awakened`;
+        return;
+      }
+
+      if (progress) {
+        const unlockedCount = Object.keys(nexus.state.sevenStars.answered).length;
+        progress.textContent = `${unlockedCount} / 5 stars awakened`;
+      }
+
+      container.innerHTML = `
+        <div class="quiz-card">
+          <div class="badge">Church: ${currentQuestion.church}</div>
+          <h4>${currentQuestion.prompt}</h4>
+          <div class="choices">
+            ${currentQuestion.options.map(opt => `<button class="choice-btn" data-choice="${opt}">${opt}</button>`).join('')}
+          </div>
+          <div id="quiz-feedback" class="muted"></div>
+        </div>
+      `;
+
+      container.querySelectorAll('[data-choice]').forEach(btn => {
+        btn.addEventListener('click', () => gradeAnswer(currentQuestion, btn.dataset.choice));
+      });
+    }
+
+    function gradeAnswer(question, selected) {
+      const feedback = document.getElementById('quiz-feedback');
+      if (selected !== question.answer) {
+        if (feedback) feedback.textContent = 'Not quite. Trace the seven flames again.';
+        bumpMysteryMeter(1);
+        return;
+      }
+
+      if (!nexus.state.sevenStars.answered[question.id]) {
+        nexus.state.sevenStars.answered[question.id] = true;
+        nexus.state.sevenStars.current += 1;
+        nexus.emit('lore-unlocked', { badgeId: question.id });
+        nexus.emit('star-collected', { church: question.church });
+      }
+      if (feedback) feedback.textContent = 'Aligned! Star captured and logged.';
+      bumpMysteryMeter(5);
+      setTimeout(renderSevenStars, 400);
+    }
+
+    function renderComboTimeline() {
+      const timeline = document.getElementById('combo-timeline');
+      if (!timeline) return;
+      timeline.innerHTML = '';
+      nexus.state.arcadeCombos.forEach(evt => {
+        const dot = document.createElement('div');
+        dot.className = `combo-dot tier-${evt.tier || 1}`;
+        dot.title = `Chain ${evt.chain}${evt.powerUp ? ' – ' + evt.powerUp : ''}`;
+        timeline.appendChild(dot);
+      });
+    }
+
+    function renderMinistry() {
+      const list = document.getElementById('ministry-feed');
+      if (!list) return;
+      const badges = [...nexus.state.inventory.badges];
+      const items = [...nexus.state.inventory.items];
+      list.innerHTML = `
+        <div class="feed-card">Badges: ${badges.length ? badges.join(', ') : 'None yet'}</div>
+        <div class="feed-card">Items: ${items.length ? items.join(', ') : 'Awaiting drops'}</div>
+      `;
+    }
+
+    function renderBadges() {
+      const target = document.getElementById('badge-inventory');
+      if (!target) return;
+      const rewards = nexus.state.rewards.map(r => {
+        const label = r.badge ? `Badge: ${r.badge}` : `Item: ${r.item}`;
+        const ts = r.ts ? new Date(r.ts).toLocaleTimeString() : 'Now';
+        return `<div class="feed-card">${label}<small>${ts}</small></div>`;
+      }).join('') || '<div class="muted">Earn rewards by playing modules.</div>';
+      target.innerHTML = rewards;
+    }
+
+    function renderLoreCodex() {
+      const list = document.getElementById('codex-list');
+      const body = document.getElementById('codex-body');
+      if (!list || !body) return;
+
+      const unlocked = nexus.state.loreUnlocked;
+      list.innerHTML = Object.entries(loreEntries).map(([id, entry]) => {
+        const isUnlocked = unlocked.has(id);
+        return `
+          <div class="codex-item ${isUnlocked ? 'active' : 'locked'}" data-entry="${id}">
+            <div>${entry.title}</div>
+            <small class="muted">${entry.church}</small>
+          </div>
+        `;
+      }).join('');
+
+      const firstUnlocked = [...unlocked][0] || Object.keys(loreEntries)[0];
+      renderCodexBody(firstUnlocked);
+
+      list.querySelectorAll('[data-entry]').forEach(btn => {
+        btn.addEventListener('click', () => renderCodexBody(btn.dataset.entry));
+      });
+    }
+
+    function renderCodexBody(id) {
+      const body = document.getElementById('codex-body');
+      if (!body) return;
+      const entry = loreEntries[id];
+      if (!entry) {
+        body.innerHTML = '<div class="muted">Select a lore entry to view its text.</div>';
+        return;
+      }
+      const unlocked = nexus.state.loreUnlocked.has(id);
+      body.innerHTML = `
+        <div class="codex-body">
+          <h4>${entry.title}</h4>
+          <div class="muted">${entry.church}</div>
+          <p>${entry.body}</p>
+          <div class="badge ${unlocked ? '' : 'locked-pill'}">
+            ${unlocked ? 'Unlocked via Seven Stars' : 'Locked – clear quiz prompts'}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRewardFeed() {
+      const container = document.getElementById('reward-feed');
+      if (!container) return;
+      container.innerHTML = nexus.state.rewards.map(r => {
+        const label = r.badge ? `Badge granted: ${r.badge}` : `Item granted: ${r.item}`;
+        return `<div class="feed-card">${label}<small>${new Date(r.ts).toLocaleTimeString()}</small></div>`;
+      }).join('') || '<div class="muted">Play a module to earn your first reward.</div>';
+    }
+
+    // --- Boot ---------------------------------------------------------------
+    loadModule('overworld');
+    renderMysteryMeter();
+    renderRewardFeed();
+  </script>
+</body>
+</html>
