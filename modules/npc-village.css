@@ -1,0 +1,89 @@
+.npc-hub {
+  margin-bottom: 1.5rem;
+}
+
+.npc-row {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.npc-btn {
+  background: #111;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  color: #ccc;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.npc-btn:hover {
+  border-color: #7c4dff;
+  color: #e0e0e0;
+  background: #0d0d2a;
+}
+
+.npc-btn--active {
+  border-color: #7c4dff;
+  background: #0d0d2a;
+  color: #b39ddb;
+}
+
+.npc-dialogue-box {
+  background: #0a0a1a;
+  border: 1px solid #1a1a3a;
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 80px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #d0d0e0;
+}
+
+.npc-placeholder {
+  color: #444;
+  font-style: italic;
+}
+
+.npc-section-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #7c4dff;
+  margin-bottom: 0.6rem;
+}
+
+.npc-no-quests {
+  font-size: 0.8rem;
+  color: #555;
+  font-style: italic;
+}
+
+.npc-quest-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.npc-quest-item {
+  background: #111;
+  border: 1px solid #2a1a4a;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.82rem;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.npc-quest-item::before {
+  content: '🗝';
+  font-size: 1rem;
+}

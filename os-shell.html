@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Arcade OS v2.0</title>
+  <link rel="stylesheet" href="os.css" />
+</head>
+<body>
+
+  <!-- CRT overlay -->
+  <div class="crt-overlay" id="crt-overlay" aria-hidden="true"></div>
+
+  <!-- Particle layer -->
+  <div id="particle-layer" aria-hidden="true"></div>
+
+  <!-- OS Shell -->
+  <header class="os-header">
+    <span class="os-logo">⬡ Nexus Arcade OS</span>
+    <span class="os-version">v2.0</span>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="os-nav" id="os-nav" aria-label="Module navigation">
+    <button class="os-nav-btn os-nav-btn--active" data-module="overworld">🗺 Overworld</button>
+    <button class="os-nav-btn" data-module="seven-stars">⭐ Seven Stars</button>
+    <button class="os-nav-btn" data-module="arcade">🔮 Revelation Engine</button>
+    <button class="os-nav-btn" data-module="lore-codex">📖 Lore Codex</button>
+    <button class="os-nav-btn" data-module="mystery-meter">🌀 Mystery Meter</button>
+    <button class="os-nav-btn" data-module="badges">🏅 Badges</button>
+    <button class="os-nav-btn" data-module="npc-village">🏘 NPC Village</button>
+  </nav>
+
+  <!-- Main content area — modules load here -->
+  <main id="main-content" class="os-main" aria-live="polite">
+    <p class="os-loading">Loading module…</p>
+  </main>
+
+  <script src="os.js"></script>
+</body>
+</html>

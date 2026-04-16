@@ -1,0 +1,32 @@
+{
+  "version": "2.0",
+  "name": "Nexus Arcade OS",
+  "arcade": {
+    "cols": 7,
+    "rows": 7,
+    "gems": ["💎", "🔴", "💚", "💜", "🔵", "⚪", "🟡"],
+    "comboTiers": [1, 2, 3, 4],
+    "chargePerMatch": 5,
+    "revelationThreshold": 100
+  },
+  "sevenStars": {
+    "churches": ["Ephesus", "Smyrna", "Pergamum", "Thyatira", "Sardis", "Philadelphia", "Laodicea"]
+  },
+  "mysteryMeter": {
+    "increments": {
+      "star-collected": 5,
+      "badge-earned": 15,
+      "combo-tier4": 20,
+      "revelation-achieved": 30,
+      "lore-unlock": 5
+    },
+    "unlockThreshold": 100
+  },
+  "unlockChain": [
+    { "trigger": "star-collected-all", "unlocks": "arcade" },
+    { "trigger": "revelation-achieved", "unlocks": "lore-codex" },
+    { "trigger": "badge-earned:ruby_catalyst_master", "unlocks": "lore-codex" },
+    { "trigger": "combo-tier4", "unlocks": "mystery-meter" },
+    { "trigger": "mystery-meter-full", "unlocks": "npc-village" }
+  ]
+}

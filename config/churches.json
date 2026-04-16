@@ -1,0 +1,60 @@
+{
+  "churches": [
+    {
+      "id": "ephesus",
+      "name": "Ephesus",
+      "star": "⭐",
+      "virtue": "First Love",
+      "reward": { "item": "ministry_scroll" },
+      "description": "Return to your first love — the foundation of all spiritual work."
+    },
+    {
+      "id": "smyrna",
+      "name": "Smyrna",
+      "star": "⭐",
+      "virtue": "Faithfulness Under Persecution",
+      "reward": { "item": "crown_of_life" },
+      "description": "Be faithful, even unto death, and receive the crown of life."
+    },
+    {
+      "id": "pergamum",
+      "name": "Pergamum",
+      "star": "⭐",
+      "virtue": "Holding Fast",
+      "reward": { "item": "hidden_manna" },
+      "description": "Hold fast to the name, and receive the hidden manna and white stone."
+    },
+    {
+      "id": "thyatira",
+      "name": "Thyatira",
+      "star": "⭐",
+      "virtue": "Love and Service",
+      "reward": { "item": "morning_star" },
+      "description": "The one who overcomes will receive power over the nations."
+    },
+    {
+      "id": "sardis",
+      "name": "Sardis",
+      "star": "⭐",
+      "virtue": "Spiritual Alertness",
+      "reward": { "item": "white_garment" },
+      "description": "Wake up. Strengthen what remains. The faithful will walk in white."
+    },
+    {
+      "id": "philadelphia",
+      "name": "Philadelphia",
+      "star": "⭐",
+      "virtue": "Patient Endurance",
+      "reward": { "item": "open_door" },
+      "description": "An open door no one can shut. A pillar in the temple of God."
+    },
+    {
+      "id": "laodicea",
+      "name": "Laodicea",
+      "star": "⭐",
+      "virtue": "Wholehearted Commitment",
+      "reward": { "item": "throne_seat" },
+      "description": "Be either hot or cold. The overcomer will sit with the Lamb on his throne."
+    }
+  ]
+}

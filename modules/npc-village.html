@@ -1,0 +1,22 @@
+<div class="module-container" id="npc-village-module">
+  <h2 class="module-title">🏘 NPC Village</h2>
+  <p class="module-status" id="npc-status">Speak with the villagers to unlock quests and lore.</p>
+
+  <div class="npc-hub">
+    <div class="npc-row">
+      <button class="npc-btn" data-npc="sage"     aria-label="Speak to the Sage">🧙 Sage</button>
+      <button class="npc-btn" data-npc="merchant" aria-label="Speak to the Merchant">🛒 Merchant</button>
+      <button class="npc-btn" data-npc="scribe"   aria-label="Speak to the Scribe">📜 Scribe</button>
+    </div>
+
+    <div class="npc-dialogue-box" id="npc-dialogue" aria-live="polite">
+      <p class="npc-placeholder">Choose a character to speak with…</p>
+    </div>
+  </div>
+
+  <div class="npc-quests" id="npc-quests">
+    <h3 class="npc-section-title">Active Quests</h3>
+    <p class="npc-no-quests" id="npc-no-quests">No active quests. Talk to the Sage to begin.</p>
+    <ul class="npc-quest-list" id="npc-quest-list"></ul>
+  </div>
+</div>
