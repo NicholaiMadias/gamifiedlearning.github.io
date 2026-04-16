@@ -1,0 +1,44 @@
+{
+  "spark_initiate": {
+    "title": "Spark Initiate",
+    "icon": "✨",
+    "desc": "First match made in the Arcade.",
+    "trigger": "arcade-first-match"
+  },
+  "shooting_star_adept": {
+    "title": "Shooting Star Adept",
+    "icon": "🌟",
+    "desc": "Collected 3 of the Seven Stars.",
+    "trigger": "star-collected-3"
+  },
+  "ruby_catalyst_master": {
+    "title": "Ruby Catalyst Master",
+    "icon": "🔴",
+    "desc": "Reached Combo Tier 3 in the Arcade.",
+    "trigger": "combo-tier3"
+  },
+  "supernova_ascendant": {
+    "title": "Supernova Ascendant",
+    "icon": "💥",
+    "desc": "Achieved Combo Tier 4.",
+    "trigger": "combo-tier4"
+  },
+  "revelation_bearer": {
+    "title": "Revelation Bearer",
+    "icon": "🔮",
+    "desc": "Fully charged the Divine Revelation Engine.",
+    "trigger": "revelation-achieved"
+  },
+  "codex_scholar": {
+    "title": "Codex Scholar",
+    "icon": "📖",
+    "desc": "Unlocked 5 Lore Codex entries.",
+    "trigger": "lore-entries-5"
+  },
+  "mystery_master": {
+    "title": "Mystery Master",
+    "icon": "🌀",
+    "desc": "Filled the Mystery Meter to 100%.",
+    "trigger": "mystery-meter-full"
+  }
+}

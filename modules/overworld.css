@@ -1,0 +1,58 @@
+.overworld-map {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #1a2a1a;
+  border-radius: 10px;
+  background: #060f06;
+}
+
+.overworld-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ow-path {
+  stroke: #1a3a1a;
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.ow-circle {
+  fill: #111;
+  stroke: #333;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: stroke 0.2s, fill 0.2s;
+}
+
+.ow-circle.ow-unlocked {
+  stroke: #00ff41;
+  fill: #001a00;
+}
+
+.ow-node:hover .ow-circle {
+  fill: #002a00;
+  stroke: #00ff41;
+}
+
+.ow-locked .ow-circle {
+  stroke: #444;
+  fill: #111;
+  cursor: not-allowed;
+}
+
+.ow-icon {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.ow-label {
+  text-anchor: middle;
+  fill: #aaa;
+  font-size: 9px;
+  font-family: 'Courier New', monospace;
+  pointer-events: none;
+}

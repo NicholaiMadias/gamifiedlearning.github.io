@@ -1,0 +1,52 @@
+.mm-gauge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+
+.mm-gauge-track {
+  flex: 1;
+  height: 18px;
+  background: #1a1a2e;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid #2a2a4a;
+}
+
+.mm-gauge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1a0044, #9b59b6, #e040fb);
+  border-radius: 9px;
+  transition: width 0.5s ease;
+}
+
+.mm-gauge-label {
+  font-size: 0.85rem;
+  color: #e040fb;
+  font-weight: 700;
+  min-width: 3em;
+  text-align: right;
+}
+
+.mm-events {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.mm-hint {
+  font-style: italic;
+  color: #555;
+}
+
+.mm-event-item {
+  padding: 0.3rem 0.6rem;
+  background: #111;
+  border-left: 3px solid #9b59b6;
+  border-radius: 0 4px 4px 0;
+  color: #ccc;
+}

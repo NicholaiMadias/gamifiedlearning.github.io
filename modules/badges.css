@@ -1,0 +1,55 @@
+.badge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.badge-card {
+  width: 120px;
+  text-align: center;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 0.8rem 0.6rem;
+  opacity: 0.35;
+  transition: transform 0.2s, opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.badge-card.unlocked {
+  opacity: 1;
+  transform: scale(1.05);
+  border-color: #ffd700;
+  box-shadow: 0 0 12px #ffd70040;
+}
+
+.badge-card .badge-icon {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.badge-card h3 {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: #ccc;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.badge-card.unlocked h3 {
+  color: #ffd700;
+}
+
+.badge-card .badge-desc {
+  font-size: 0.65rem;
+  color: #666;
+  margin-top: 0.3rem;
+  line-height: 1.4;
+}
+
+.badge-card.unlocked .badge-desc {
+  color: #aaa;
+}

@@ -1,0 +1,58 @@
+.ss-progress {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+
+.ss-progress span {
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.ss-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.ss-star {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 0.8rem 0.6rem;
+  min-width: 80px;
+  cursor: pointer;
+  font-size: 1.8rem;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  font-family: inherit;
+  color: #ccc;
+}
+
+.ss-star span {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: #aaa;
+}
+
+.ss-star:hover {
+  border-color: #ffd700;
+  background: #1a1500;
+  transform: scale(1.06);
+}
+
+.ss-star--collected {
+  border-color: #ffd700;
+  background: #1a1500;
+  color: #ffd700;
+  box-shadow: 0 0 10px #ffd70060;
+}
+
+.ss-star--collected span {
+  color: #ffd700;
+}

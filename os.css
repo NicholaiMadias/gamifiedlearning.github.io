@@ -1,0 +1,207 @@
+/* ── Reset & Base ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:     #00ff41;
+  --green-dim: #00ff4180;
+  --bg:        #0a0a0f;
+  --surface:   #0d0d1a;
+  --border:    #1a1a2e;
+  --text:      #e0e0e0;
+  --muted:     #aaa;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', Courier, monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ── CRT Overlay ───────────────────────────────────── */
+.crt-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: repeating-linear-gradient(
+    rgba(255, 255, 255, 0.03) 0px,
+    rgba(255, 255, 255, 0.03) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: crt-move 6s linear infinite;
+}
+
+@keyframes crt-move {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 4px; }
+}
+
+/* ── Particle Layer ─────────────────────────────────── */
+#particle-layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--green);
+  opacity: 0.7;
+  animation: particle-fall 3s linear forwards;
+}
+
+@keyframes particle-fall {
+  to { transform: translateY(110vh); opacity: 0; }
+}
+
+/* ── OS Header ─────────────────────────────────────── */
+.os-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.os-logo {
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  text-shadow: 0 0 10px var(--green-dim);
+}
+
+.os-version {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+/* ── Navigation ────────────────────────────────────── */
+.os-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.os-nav-btn {
+  background: transparent;
+  border: 1px solid #333;
+  color: var(--muted);
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: inherit;
+  letter-spacing: 0.06em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.os-nav-btn:hover {
+  background: #111;
+  color: var(--text);
+}
+
+.os-nav-btn--active {
+  border-color: var(--green);
+  color: var(--green);
+  background: #001a00;
+}
+
+/* ── Main Content ───────────────────────────────────── */
+.os-main {
+  flex: 1;
+  padding: 1.5rem 1rem;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.os-loading {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 2rem;
+  animation: blink 1.2s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Module containers (shared) ─────────────────────── */
+.module-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.module-title {
+  font-size: 1.4rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+  text-shadow: 0 0 8px var(--green-dim);
+  margin-bottom: 1rem;
+}
+
+.module-status {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+  min-height: 1.4em;
+}
+
+/* ── Utility ────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+.primary-btn {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--green);
+  color: var(--green);
+  padding: 0.4rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+  letter-spacing: 0.07em;
+  transition: background 0.15s;
+}
+
+.primary-btn:hover { background: #00ff4115; }
+
+.badge-banner {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--green);
+  background: #001a00;
+  border: 1px solid var(--green-dim);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-top: 0.6rem;
+}

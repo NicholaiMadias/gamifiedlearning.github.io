@@ -1,0 +1,71 @@
+.arcade-stats {
+  display: flex;
+  justify-content: space-around;
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-bottom: 0.8rem;
+}
+
+.arcade-stats span {
+  color: #00ff41;
+  font-weight: 700;
+}
+
+.arcade-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+  padding: 0.6rem;
+  max-width: 420px;
+  margin: 0 auto 1rem;
+}
+
+.arcade-gem {
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  cursor: pointer;
+  background: #111;
+  border: 1px solid transparent;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  user-select: none;
+}
+
+.arcade-gem:hover { transform: scale(1.08); border-color: #333; }
+.arcade-gem:active { transform: scale(0.94); }
+.arcade-gem--selected { border-color: #00ff41; box-shadow: 0 0 8px #00ff4160; }
+
+.arcade-charge {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.charge-track {
+  flex: 1;
+  height: 8px;
+  background: #1a1a2e;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.charge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #003300, #00ff41);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+#charge-label {
+  font-size: 0.75rem;
+  color: #aaa;
+  white-space: nowrap;
+}

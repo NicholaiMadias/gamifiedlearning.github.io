@@ -1,0 +1,52 @@
+<div class="module-container" id="overworld-module">
+  <h2 class="module-title">🗺 Overworld Map</h2>
+  <p class="module-status" id="overworld-status">Select a node to travel to a new region.</p>
+
+  <div class="overworld-map" id="overworld-map" aria-label="Overworld map with travel nodes">
+    <svg viewBox="0 0 600 400" class="overworld-svg" role="img" aria-label="Overworld SVG map">
+      <!-- Connections -->
+      <line x1="100" y1="200" x2="220" y2="130" class="ow-path" />
+      <line x1="220" y1="130" x2="360" y2="160" class="ow-path" />
+      <line x1="360" y1="160" x2="480" y2="100" class="ow-path" />
+      <line x1="360" y1="160" x2="420" y2="280" class="ow-path" />
+      <line x1="220" y1="130" x2="180" y2="300" class="ow-path" />
+
+      <!-- Nodes -->
+      <g class="ow-node" data-node="seven-stars" data-label="Seven Stars">
+        <circle cx="100" cy="200" r="22" class="ow-circle ow-unlocked" />
+        <text x="100" y="205" class="ow-icon">⭐</text>
+        <text x="100" y="232" class="ow-label">Seven Stars</text>
+      </g>
+
+      <g class="ow-node" data-node="arcade" data-label="Revelation Engine">
+        <circle cx="220" cy="130" r="22" class="ow-circle ow-unlocked" />
+        <text x="220" y="135" class="ow-icon">🔮</text>
+        <text x="220" y="162" class="ow-label">Revelation</text>
+      </g>
+
+      <g class="ow-node ow-locked" data-node="lore-codex" data-label="Lore Codex">
+        <circle cx="360" cy="160" r="22" class="ow-circle" />
+        <text x="360" y="165" class="ow-icon">📖</text>
+        <text x="360" y="192" class="ow-label">Lore Codex</text>
+      </g>
+
+      <g class="ow-node ow-locked" data-node="mystery-meter" data-label="Mystery Meter">
+        <circle cx="480" cy="100" r="22" class="ow-circle" />
+        <text x="480" y="105" class="ow-icon">🌀</text>
+        <text x="480" y="132" class="ow-label">Mystery</text>
+      </g>
+
+      <g class="ow-node ow-locked" data-node="npc-village" data-label="NPC Village">
+        <circle cx="420" cy="280" r="22" class="ow-circle" />
+        <text x="420" y="285" class="ow-icon">🏘</text>
+        <text x="420" y="312" class="ow-label">NPC Village</text>
+      </g>
+
+      <g class="ow-node" data-node="badges" data-label="Badge Room">
+        <circle cx="180" cy="300" r="22" class="ow-circle ow-unlocked" />
+        <text x="180" y="305" class="ow-icon">🏅</text>
+        <text x="180" y="332" class="ow-label">Badges</text>
+      </g>
+    </svg>
+  </div>
+</div>

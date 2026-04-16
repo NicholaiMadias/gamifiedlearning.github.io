@@ -28,6 +28,41 @@
       text-shadow: 0 0 10px #00ff4180;
     }
 
+    /* ── Tab navigation ───────────────────────────── */
+    .tab-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid #333;
+      color: #aaa;
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .tab-btn:hover { background: #111; color: #e0e0e0; }
+
+    .tab-btn.tab-btn--active {
+      border-color: #00ff41;
+      color: #00ff41;
+      background: #001a00;
+    }
+
+    .screen { display: none; width: 100%; max-width: 520px; }
+    .screen.screen--active { display: block; }
+
+    .hidden { display: none !important; }
+
     /* ── Match Maker ──────────────────────────────── */
     .match-card {
       background: #0d0d1a;
@@ -179,61 +214,368 @@
       background: linear-gradient(90deg, #1565c0, #4fc3f7);
       transition: width 0.4s ease;
     }
+
+    /* ── Shared location card ─────────────────────── */
+    .location-card {
+      background: #0d0d1a;
+      border-radius: 14px;
+      padding: 1.2rem;
+      width: 100%;
+    }
+
+    .location-card h2 {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .location-status {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #aaa;
+      min-height: 2.4em;
+      margin-bottom: 0.8rem;
+    }
+
+    .primary-btn {
+      display: block;
+      margin: 0.8rem auto 0;
+      background: transparent;
+      padding: 0.45rem 1.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.07em;
+      transition: background 0.15s;
+    }
+
+    /* ── Raven's Message ──────────────────────────── */
+    .ravens-message-card { border: 1px solid #2a1a3a; }
+    .ravens-message-card h2 { color: #9b59b6; }
+
+    .rm-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 0.8rem;
+    }
+
+    .rm-stats span { color: #9b59b6; font-weight: 700; }
+
+    .rm-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 0.3rem;
+      padding: 0.6rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .rm-cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      background: #111;
+      box-shadow: 0 0 4px rgba(0,0,0,0.6);
+      transition: transform 0.1s ease;
+      user-select: none;
+    }
+
+    .rm-cell:hover { transform: scale(1.08); }
+    .rm-cell:active { transform: scale(0.94); }
+
+    .rm-restart-btn {
+      border: 1px solid #9b59b6;
+      color: #9b59b6;
+    }
+    .rm-restart-btn:hover { background: #2a1a3a; }
+
+    /* ── Whispering Pines ─────────────────────────── */
+    .wp-card { border: 1px solid #1a2e1a; }
+    .wp-card h2 { color: #5dba6e; }
+
+    .wp-bg {
+      background: url('./assets/whispering-pines.png') center/cover no-repeat, #0d1a0d;
+      width: 100%;
+      height: 200px;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .wp-stone-ring {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .wp-stone {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #2a2a2a 0%, #111 70%);
+      color: #ccc;
+      border: 1px solid #555;
+      font-size: 1.6rem;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .wp-stone:hover { transform: scale(1.1); }
+
+    .wp-stone--active {
+      border-color: #5dba6e;
+      box-shadow: 0 0 12px #5dba6e80;
+      color: #5dba6e;
+    }
+
+    .wp-align-btn {
+      border: 1px solid #5dba6e;
+      color: #5dba6e;
+    }
+    .wp-align-btn:hover { background: #0d1a0d; }
+
+    /* ── Third-Star Altar ─────────────────────────── */
+    .altar-card { border: 1px solid #2e2a0a; }
+    .altar-card h2 { color: #d4af37; }
+
+    .altar-platform {
+      background: url('./assets/third-star-altar.png') center/cover no-repeat, #1a1500;
+      width: 100%;
+      height: 140px;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .altar-slots {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.6rem;
+    }
+
+    .altar-slot {
+      min-width: 110px;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      text-align: center;
+      font-size: 0.85rem;
+      cursor: grab;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+
+    .altar-slot:active { cursor: grabbing; }
+    .altar-slot--dragging { opacity: 0.45; }
+    .altar-slot--over { border-color: #d4af37; background: rgba(212,175,55,0.1); }
+
+    .altar-slots--complete .altar-slot {
+      border-color: #d4af37;
+      box-shadow: 0 0 8px #d4af3760;
+    }
+
+    .altar-ritual-btn {
+      border: 1px solid #d4af37;
+      color: #d4af37;
+    }
+    .altar-ritual-btn:hover { background: #1a1500; }
+
+    /* ── Library of Still Waters ──────────────────── */
+    .lsw-card { border: 1px solid #1a1a3a; }
+    .lsw-card h2 { color: #7c9fcf; }
+
+    .lsw-bg {
+      background: url('./assets/library-of-still-waters.png') center/cover no-repeat, #0a0a1a;
+      width: 100%;
+      height: 180px;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .lsw-prompt {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #d0d8e8;
+      margin-bottom: 0.5rem;
+      min-height: 3em;
+    }
+
+    .lsw-progress {
+      font-size: 0.75rem;
+      color: #666;
+      text-align: right;
+      margin-bottom: 0.8rem;
+    }
+
+    .lsw-choice-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .lsw-wise-btn {
+      border: 1px solid #7c9fcf;
+      color: #7c9fcf;
+      text-align: left;
+      white-space: normal;
+      line-height: 1.4;
+    }
+    .lsw-wise-btn:hover { background: #0a1220; }
+
+    .lsw-unwise-btn {
+      border: 1px solid #555;
+      color: #888;
+      text-align: left;
+      white-space: normal;
+      line-height: 1.4;
+    }
+    .lsw-unwise-btn:hover { background: #111; }
+
+    .lsw-retry-btn {
+      border: 1px solid #7c9fcf;
+      color: #7c9fcf;
+    }
+    .lsw-retry-btn:hover { background: #0a1220; }
   </style>
 </head>
 <body>
 
   <h1 class="app-title">Gamified Learning</h1>
 
-  <!-- ══ Match Maker ══════════════════════════════════ -->
-  <section class="match-card" id="match-maker-screen">
-    <h2>Match Maker</h2>
+  <!-- ══ Tab navigation ══════════════════════════════ -->
+  <nav class="tab-nav" id="tab-nav">
+    <button class="tab-btn tab-btn--active" data-tab="match-maker">Match Maker</button>
+    <button class="tab-btn" data-tab="ravens-message">Raven's Message</button>
+    <button class="tab-btn" data-tab="whispering-pines">Whispering Pines</button>
+    <button class="tab-btn" data-tab="third-star-altar">Third-Star Altar</button>
+    <button class="tab-btn" data-tab="library-still-waters">Library of Still Waters</button>
+  </nav>
 
-    <div class="match-stats">
-      <div>Score: <span id="match-score">0</span></div>
-      <div>Moves: <span id="match-moves">20</span></div>
-      <div>Level: <span id="match-level">1</span></div>
+  <!-- ══ Match Maker ══════════════════════════════════ -->
+  <section class="screen screen--active" id="tab-match-maker">
+    <div class="match-card" id="match-maker-screen">
+      <h2>Match Maker</h2>
+
+      <div class="match-stats">
+        <div>Score: <span id="match-score">0</span></div>
+        <div>Moves: <span id="match-moves">20</span></div>
+        <div>Level: <span id="match-level">1</span></div>
+      </div>
+
+      <div class="match-grid" id="match-grid"></div>
+
+      <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+      <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
     </div>
 
-    <div class="match-grid" id="match-grid"></div>
+    <!-- ══ Matrix of Conscience ══════════════════════ -->
+    <div class="matrix-card matrix-border" id="matrix-economy-screen" style="margin-top:2rem;">
+      <h2 class="matrix-heading">Matrix of Conscience</h2>
 
-    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+      <div class="matrix-economy-grid">
+        <div class="matrix-cell">
+          <span class="icon">💖</span>
+          <span class="label">Empathy</span>
+          <span class="value" id="mc-empathy">72</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
+        </div>
 
-    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
+        <div class="matrix-cell">
+          <span class="icon">⚖️</span>
+          <span class="label">Justice</span>
+          <span class="value" id="mc-justice">58</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
+        </div>
+
+        <div class="matrix-cell">
+          <span class="icon">🧠</span>
+          <span class="label">Wisdom</span>
+          <span class="value" id="mc-wisdom">45</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
+        </div>
+
+        <div class="matrix-cell">
+          <span class="icon">🌱</span>
+          <span class="label">Growth</span>
+          <span class="value" id="mc-growth">83</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- ══ Matrix of Conscience ════════════════════════ -->
-  <section class="matrix-card matrix-border" id="matrix-economy-screen">
-    <h2 class="matrix-heading">Matrix of Conscience</h2>
+  <!-- ══ Raven's Message ══════════════════════════════ -->
+  <section class="screen" id="tab-ravens-message">
+    <div class="location-card ravens-message-card">
+      <h2>🐦 The Raven's Message</h2>
+      <p class="location-status" id="rm-status">Solve the pattern to reveal the message.</p>
 
-    <div class="matrix-economy-grid">
-      <div class="matrix-cell">
-        <span class="icon">💖</span>
-        <span class="label">Empathy</span>
-        <span class="value" id="mc-empathy">72</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
+      <div class="rm-stats">
+        <div>Score: <span id="rm-score">0</span></div>
+        <div>Moves: <span id="rm-moves">25</span></div>
       </div>
 
-      <div class="matrix-cell">
-        <span class="icon">⚖️</span>
-        <span class="label">Justice</span>
-        <span class="value" id="mc-justice">58</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
+      <div class="rm-grid" id="rm-grid"></div>
+
+      <button class="primary-btn rm-restart-btn" id="rm-restart-btn">↺ New Board</button>
+    </div>
+  </section>
+
+  <!-- ══ Whispering Pines ══════════════════════════════ -->
+  <section class="screen" id="tab-whispering-pines">
+    <div class="location-card wp-card">
+      <h2>🌲 Whispering Pines</h2>
+      <div class="wp-bg" role="img" aria-label="Dense pine forest at twilight"></div>
+      <p class="location-status" id="wp-status">Select each symbol stone, then align them.</p>
+
+      <div class="wp-stone-ring" id="wp-stone-ring"></div>
+
+      <button class="primary-btn wp-align-btn" id="wp-align-btn">Align the Symbols</button>
+    </div>
+  </section>
+
+  <!-- ══ Third-Star Altar ══════════════════════════════ -->
+  <section class="screen" id="tab-third-star-altar">
+    <div class="location-card altar-card">
+      <h2>⭐ The Third-Star Altar</h2>
+      <div class="altar-platform" role="img" aria-label="Stone altar in a forest clearing"></div>
+      <p class="location-status" id="altar-status">Arrange the artifacts in their proper order, then perform the ritual.</p>
+
+      <div class="altar-slots" id="altar-slots"></div>
+
+      <button class="primary-btn altar-ritual-btn" id="altar-ritual-btn">Perform Ritual</button>
+    </div>
+  </section>
+
+  <!-- ══ Library of Still Waters ══════════════════════ -->
+  <section class="screen" id="tab-library-still-waters">
+    <div class="location-card lsw-card">
+      <h2>📚 Library of Still Waters</h2>
+      <div class="lsw-bg" role="img" aria-label="Vast circular library around a central reflective pool"></div>
+
+      <p class="lsw-prompt" id="lsw-prompt">Your choices ripple across the surface of the pool.</p>
+      <p class="lsw-progress" id="lsw-progress"></p>
+      <p class="location-status" id="lsw-status"></p>
+
+      <div class="lsw-choice-row" id="lsw-choice-row">
+        <button class="primary-btn lsw-wise-btn" id="lsw-wise-btn"></button>
+        <button class="primary-btn lsw-unwise-btn" id="lsw-unwise-btn"></button>
       </div>
 
-      <div class="matrix-cell">
-        <span class="icon">🧠</span>
-        <span class="label">Wisdom</span>
-        <span class="value" id="mc-wisdom">45</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
-      </div>
-
-      <div class="matrix-cell">
-        <span class="icon">🌱</span>
-        <span class="label">Growth</span>
-        <span class="value" id="mc-growth">83</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
-      </div>
+      <button class="primary-btn lsw-retry-btn hidden" id="lsw-retry-btn">↺ Try Again</button>
     </div>
   </section>
 

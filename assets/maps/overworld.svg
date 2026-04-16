@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#060f06"/>
+      <stop offset="100%" stop-color="#030703"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="url(#bgGrad)"/>
+
+  <!-- Grid lines (subtle) -->
+  <g stroke="#0a1a0a" stroke-width="0.5" opacity="0.6">
+    <line x1="0" y1="100" x2="800" y2="100"/>
+    <line x1="0" y1="200" x2="800" y2="200"/>
+    <line x1="0" y1="300" x2="800" y2="300"/>
+    <line x1="0" y1="400" x2="800" y2="400"/>
+    <line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="600" y1="0" x2="600" y2="500"/>
+  </g>
+
+  <!-- Paths between nodes -->
+  <g stroke="#1a3a1a" stroke-width="2" stroke-dasharray="8 5" fill="none" opacity="0.8">
+    <path d="M 130 250 Q 200 180 260 170"/>
+    <path d="M 260 170 Q 370 160 430 190"/>
+    <path d="M 430 190 Q 530 160 590 130"/>
+    <path d="M 430 190 Q 480 260 510 320"/>
+    <path d="M 260 170 Q 240 280 230 360"/>
+  </g>
+
+  <!-- Node: Seven Stars -->
+  <g filter="url(#glow)">
+    <circle cx="130" cy="250" r="28" fill="#001a00" stroke="#00ff41" stroke-width="2"/>
+    <text x="130" y="256" text-anchor="middle" font-size="18">⭐</text>
+    <text x="130" y="290" text-anchor="middle" fill="#aaa" font-size="10" font-family="monospace">Seven Stars</text>
+  </g>
+
+  <!-- Node: Revelation Engine -->
+  <g>
+    <circle cx="260" cy="170" r="28" fill="#001a00" stroke="#00ff41" stroke-width="2"/>
+    <text x="260" y="176" text-anchor="middle" font-size="18">🔮</text>
+    <text x="260" y="210" text-anchor="middle" fill="#aaa" font-size="10" font-family="monospace">Revelation</text>
+  </g>
+
+  <!-- Node: Lore Codex (locked) -->
+  <g opacity="0.5">
+    <circle cx="430" cy="190" r="28" fill="#111" stroke="#444" stroke-width="2"/>
+    <text x="430" y="196" text-anchor="middle" font-size="18">📖</text>
+    <text x="430" y="230" text-anchor="middle" fill="#555" font-size="10" font-family="monospace">Lore Codex</text>
+  </g>
+
+  <!-- Node: Mystery Meter (locked) -->
+  <g opacity="0.5">
+    <circle cx="590" cy="130" r="28" fill="#111" stroke="#444" stroke-width="2"/>
+    <text x="590" y="136" text-anchor="middle" font-size="18">🌀</text>
+    <text x="590" y="170" text-anchor="middle" fill="#555" font-size="10" font-family="monospace">Mystery</text>
+  </g>
+
+  <!-- Node: NPC Village (locked) -->
+  <g opacity="0.5">
+    <circle cx="510" cy="320" r="28" fill="#111" stroke="#444" stroke-width="2"/>
+    <text x="510" y="326" text-anchor="middle" font-size="18">🏘</text>
+    <text x="510" y="360" text-anchor="middle" fill="#555" font-size="10" font-family="monospace">NPC Village</text>
+  </g>
+
+  <!-- Node: Badge Room -->
+  <g>
+    <circle cx="230" cy="360" r="28" fill="#001a00" stroke="#00ff41" stroke-width="2"/>
+    <text x="230" y="366" text-anchor="middle" font-size="18">🏅</text>
+    <text x="230" y="400" text-anchor="middle" fill="#aaa" font-size="10" font-family="monospace">Badges</text>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="470" text-anchor="middle" fill="#00ff4160" font-size="11" font-family="monospace" letter-spacing="4">NEXUS ARCADE OS · OVERWORLD MAP v2.0</text>
+</svg>
