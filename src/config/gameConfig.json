@@ -1,0 +1,100 @@
+{
+  "graphics": {
+    "gems": {
+      "sapphire": "sprites/gems/sapphire_128.png",
+      "emerald": "sprites/gems/emerald_128.png",
+      "ruby": "sprites/gems/ruby_128.png",
+      "amethyst": "sprites/gems/amethyst_128.png",
+      "platinum": "sprites/gems/platinum_128.png"
+    },
+    "fx": {
+      "sparkBurst": "sprites/fx/fx_sparkburst_192.png",
+      "shootingStar": "sprites/fx/fx_shootingstar_192.png",
+      "rubyCatalyst": "sprites/fx/fx_rubycatalyst_192.png",
+      "supernova": "sprites/fx/fx_supernova_192.png",
+      "divineRevelation": "sprites/fx/fx_revelation_256.png"
+    },
+    "badges": {
+      "spark_initiate": "sprites/badges/spark_initiate.png",
+      "shooting_star_adept": "sprites/badges/shooting_star_adept.png",
+      "ruby_catalyst_master": "sprites/badges/ruby_catalyst_master.png",
+      "supernova_ascendant": "sprites/badges/supernova_ascendant.png",
+      "revelation_bearer": "sprites/badges/revelation_bearer.png"
+    }
+  },
+
+  "powerUps": {
+    "shootingStar": {
+      "trigger": ["match4", "comboTier2"],
+      "effect": "lineClear",
+      "fx": "shootingStar"
+    },
+    "rubyCatalyst": {
+      "trigger": ["match5", "comboTier3"],
+      "effect": "crossExplosion",
+      "fx": "rubyCatalyst"
+    },
+    "supernova": {
+      "trigger": ["Tshape", "Lshape", "comboTier3"],
+      "effect": "colorClear",
+      "fx": "supernova"
+    },
+    "divineRevelation": {
+      "trigger": ["comboTier4"],
+      "effect": "boardTransform",
+      "fx": "divineRevelation"
+    }
+  },
+
+  "items": {
+    "housing_key_tampa": {
+      "source": "listings.tampa",
+      "grants": ["extraLife", "bonusXP"]
+    },
+    "housing_key_largo": {
+      "source": "listings.largo",
+      "grants": ["comboBoost"]
+    },
+    "ministry_scroll": {
+      "source": "ministry.content_read",
+      "grants": ["loreUnlock", "badgeBoost"]
+    }
+  },
+
+  "combos": {
+    "tier1": {
+      "chain": 3,
+      "reward": { "xpMultiplier": 1.2, "fx": "sparkBurst" }
+    },
+    "tier2": {
+      "chain": 5,
+      "reward": { "xpMultiplier": 1.5, "powerUp": "shootingStar" }
+    },
+    "tier3": {
+      "chain": 7,
+      "reward": { "xpMultiplier": 2.0, "powerUp": "rubyCatalyst" }
+    },
+    "tier4": {
+      "chain": 10,
+      "reward": { "xpMultiplier": 3.0, "powerUp": "divineRevelation" }
+    }
+  },
+
+  "badges": {
+    "spark_initiate": {
+      "condition": { "combos": { "tier1": 10 } }
+    },
+    "shooting_star_adept": {
+      "condition": { "powerUps": { "shootingStar": 10 } }
+    },
+    "ruby_catalyst_master": {
+      "condition": { "powerUps": { "rubyCatalyst": 5 } }
+    },
+    "supernova_ascendant": {
+      "condition": { "powerUps": { "supernova": 20 } }
+    },
+    "revelation_bearer": {
+      "condition": { "powerUps": { "divineRevelation": 3 } }
+    }
+  }
+}
