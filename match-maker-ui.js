@@ -17,17 +17,25 @@ let moves = 20;
 let level = 1;
 let db = null;
 let user = null;
+let comboChain = 0;
+const DEFAULT_HOOKS = {
+  onCombo: null,
+  onGameOver: null,
+};
+let hooks = { ...DEFAULT_HOOKS };
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 200;
 
-export function initMatchMaker(dbRef, userRef) {
+export function initMatchMaker(dbRef, userRef, hookOverrides = {}) {
   db = dbRef;
   user = userRef;
+  hooks = { ...DEFAULT_HOOKS, ...hookOverrides };
   score = 0;
   moves = 20;
   level = 1;
   selected = null;
+  comboChain = 0;
   grid = createInitialGrid();
   renderGrid();
 
@@ -115,11 +123,17 @@ function highlightCell(r, c, on) {
 function resolveMatches() {
   const matches = findMatches(grid);
   if (matches.length === 0) {
+    comboChain = 0;
     renderGrid();
     checkLevelUp();
     checkGameOver();
     return;
   }
+
+  comboChain += 1;
+  const largestMatch = Math.max(...matches.map(m => m.length));
+  const tier = determineTier(largestMatch, comboChain);
+  emitCombo(comboChain, tier, null);
 
   matches.forEach(m => {
     score += m.length * 10;
@@ -151,6 +165,32 @@ function checkGameOver() {
     if (banner) {
       banner.textContent = `Game Over! Final score: ${score}`;
       banner.classList.remove('hidden');
+    }
+
+    if (hooks.onGameOver) {
+      hooks.onGameOver({ score });
+    }
+    if (window.NexusOS && typeof window.NexusOS.emit === 'function') {
+      window.NexusOS.emit('arcade-gameover', { score });
+    }
+  }
+}
+
+function determineTier(matchSize, chainCount) {
+  if (matchSize >= 7 || chainCount >= 4) return 4;
+  if (matchSize >= 6 || chainCount >= 3) return 3;
+  if (matchSize >= 4) return 2;
+  return 1;
+}
+
+function emitCombo(chain, tier, powerUp) {
+  if (hooks.onCombo) {
+    hooks.onCombo({ chain, tier, powerUp });
+  }
+  if (window.NexusOS && typeof window.NexusOS.emit === 'function') {
+    window.NexusOS.emit('arcade-combo', { chain, tier, powerUp });
+    if (tier >= 4) {
+      window.NexusOS.emit('combo-tier4', {});
     }
   }
 }
