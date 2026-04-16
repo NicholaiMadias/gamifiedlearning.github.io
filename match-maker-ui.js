@@ -17,11 +17,14 @@ let moves = 20;
 let level = 1;
 let db = null;
 let user = null;
+let pendingResolveTimeout = null;
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 200;
 
 export function initMatchMaker(dbRef, userRef) {
+  clearTimeout(pendingResolveTimeout);
+  pendingResolveTimeout = null;
   db = dbRef;
   user = userRef;
   score = 0;
@@ -131,7 +134,7 @@ function resolveMatches() {
   renderGrid();
 
   // chain reactions
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  pendingResolveTimeout = setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
 }
 
 function checkLevelUp() {
