@@ -98,6 +98,7 @@
     }
 
     .match-grid {
+      position: relative;
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 0.4rem;
@@ -121,19 +122,49 @@
       cursor: pointer;
       background: linear-gradient(135deg, #0c1b24, #112436);
       box-shadow: 0 0 6px rgba(0,0,0,0.6), 0 0 16px rgba(126, 255, 216, 0.05);
-      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, opacity 0.2s ease;
       user-select: none;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid rgba(126, 255, 216, 0.05);
     }
 
     .match-cell:hover { transform: scale(1.05); box-shadow: 0 0 18px rgba(126, 255, 216, 0.18); }
     .match-cell:active { transform: scale(0.94); }
 
-    .match-cell.selected { box-shadow: 0 0 0 2px #7effd8, 0 0 14px rgba(126, 255, 216, 0.4); }
-    .match-cell.matching { animation: pop 0.28s ease; filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3)); }
+    .match-cell.selected {
+      box-shadow: 0 0 0 3px #7effd8, 0 0 20px rgba(126, 255, 216, 0.6);
+      transform: scale(1.08);
+    }
 
-    .glyph { position: relative; z-index: 1; }
+    .match-cell.matching {
+      animation: pop 0.28s ease;
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.5));
+    }
+
+    .match-cell.clearing {
+      animation: clearGem 0.4s ease forwards;
+    }
+
+    .match-cell.falling {
+      animation: fallGem 0.3s ease;
+    }
+
+    .glyph {
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+      width: 80%;
+      height: 80%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .glyph.emoji {
+      width: auto;
+      height: auto;
+      background: none;
+    }
 
     .special-chip {
       position: absolute;
@@ -148,16 +179,17 @@
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
     }
 
-    .gem-heart { background: linear-gradient(135deg, #1b0e18, #2a1322); }
-    .gem-star { background: linear-gradient(135deg, #201c0f, #2a2213); }
-    .gem-cross { background: linear-gradient(135deg, #12141f, #1c2033); }
-    .gem-flame { background: linear-gradient(135deg, #24130f, #35180f); }
-    .gem-drop { background: linear-gradient(135deg, #0f1b24, #0f2432); }
-    .gem-wild { background: linear-gradient(135deg, #1a1030, #10301a); }
+    .gem-heart { background: linear-gradient(135deg, #1b0e18, #2a1322); border-color: rgba(255, 107, 157, 0.2); }
+    .gem-star { background: linear-gradient(135deg, #201c0f, #2a2213); border-color: rgba(255, 215, 0, 0.2); }
+    .gem-cross { background: linear-gradient(135deg, #12141f, #1c2033); border-color: rgba(126, 166, 255, 0.2); }
+    .gem-flame { background: linear-gradient(135deg, #24130f, #35180f); border-color: rgba(255, 99, 71, 0.2); }
+    .gem-drop { background: linear-gradient(135deg, #0f1b24, #0f2432); border-color: rgba(79, 195, 247, 0.2); }
+    .gem-wild { background: linear-gradient(135deg, #1a1030, #10301a); border-color: rgba(126, 255, 216, 0.3); }
 
     .special-row, .special-col, .special-bomb, .special-wild {
       box-shadow: 0 0 18px rgba(126, 255, 216, 0.25), inset 0 0 12px rgba(126, 255, 216, 0.1);
       border-color: rgba(126, 255, 216, 0.5);
+      animation: specialPulse 2s ease-in-out infinite;
     }
 
     .match-badge-banner {
@@ -314,11 +346,68 @@
       transition: width 0.4s ease;
     }
 
+    /* ── Particles ────────────────────────────────── */
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: particleFloat 0.8s ease-out forwards;
+      z-index: 100;
+    }
+
     /* ── Animations ───────────────────────────────── */
     @keyframes pop {
       0% { transform: scale(1); }
       35% { transform: scale(1.12); }
       100% { transform: scale(1); }
+    }
+
+    @keyframes clearGem {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(1.2) rotate(10deg);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.5) rotate(20deg);
+      }
+    }
+
+    @keyframes fallGem {
+      0% {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes particleFloat {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+      }
+    }
+
+    @keyframes specialPulse {
+      0%, 100% {
+        box-shadow: 0 0 18px rgba(126, 255, 216, 0.25), inset 0 0 12px rgba(126, 255, 216, 0.1);
+      }
+      50% {
+        box-shadow: 0 0 25px rgba(126, 255, 216, 0.4), inset 0 0 18px rgba(126, 255, 216, 0.2);
+      }
     }
   </style>
 </head>
