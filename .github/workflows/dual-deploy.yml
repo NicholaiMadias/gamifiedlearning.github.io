@@ -21,7 +21,7 @@ jobs:
             exit 1
           fi
           ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="amazinggracehomeliving.com"
+          EXPECTED="www.voiceofJesusministry.org"
           if [ "$ACTUAL" != "$EXPECTED" ]; then
             echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
             exit 1
@@ -50,4 +50,4 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${WP_API_KEY}" \
             -d "{\"content\": ${CONTENT}}" \
-            https://www.gamifiedlearning.org/wp-json/nexus-sync/v1/update
+            https://www.voiceofJesusministry.org/wp-json/nexus-sync/v1/update
