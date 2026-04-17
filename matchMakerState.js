@@ -137,6 +137,7 @@ export function applyRainbowClear(grid, targetType) {
 
 /**
  * Returns the regular gem type that appears most often on the board.
+ * Falls back to the first GEM_TYPES entry if no regular gems are present.
  */
 export function findMostCommonType(grid) {
   const counts = {};
@@ -146,7 +147,8 @@ export function findMostCommonType(grid) {
       if (GEM_TYPES.includes(grid[r][c])) counts[grid[r][c]]++;
     }
   }
-  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+  const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  return best ? best[0] : GEM_TYPES[0];
 }
 
 /**

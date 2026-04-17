@@ -105,6 +105,16 @@
          2% 35%, 39% 35%
       );
       filter: drop-shadow(0 2px 3px rgba(0,0,0,0.55));
+    }
+
+    /* Allow a subtle scale on hover, but only for non-animated gems */
+    .match-cell:hover .gem-heart,
+    .match-cell:hover .gem-star,
+    .match-cell:hover .gem-cross,
+    .match-cell:hover .gem-flame,
+    .match-cell:hover .gem-drop,
+    .match-cell:hover .gem-gem {
+      transform: scale(1.08);
       transition: transform 0.12s;
     }
 

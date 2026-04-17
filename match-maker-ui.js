@@ -28,8 +28,10 @@ let db = null;
 let user = null;
 let runId = 0;
 let pendingTimeout = null;
+let bannerHideTimer = null;
 
 const SCORE_PER_LEVEL = 500;
+// 350 ms matches the gem-pop animation duration (320 ms) plus a small buffer
 const CHAIN_REACTION_DELAY_MS = 380;
 
 const GEM_LABELS = {
@@ -261,7 +263,7 @@ function resolveMatches(myRunId) {
 
   // Detect largest group for potential special gem creation (first move only)
   let specialPlacement = null;
-  if (chainDepth === 0 && lastSwap) {
+  if (chainDepth === 0 && lastSwap && groups.length > 0) {
     const largestGroup = groups.reduce((best, g) => g.length > best.length ? g : best, groups[0]);
     if (largestGroup.length >= 4) {
       // Place at the swap-destination cell if it's in the group; else group's midpoint
@@ -356,10 +358,10 @@ function showChainEffect(combo) {
 function showBanner(msg, cls) {
   const banner = document.getElementById('match-badge-banner');
   if (!banner) return;
-  clearTimeout(banner._hideTimer);
+  clearTimeout(bannerHideTimer);
   banner.textContent = msg;
   banner.className = `match-badge-banner ${cls}`;
-  banner._hideTimer = setTimeout(() => banner.classList.add('hidden'), 2200);
+  bannerHideTimer = setTimeout(() => banner.classList.add('hidden'), 2200);
 }
 
 // ── Level / game-over ────────────────────────────────────
@@ -378,7 +380,7 @@ function checkGameOver() {
   if (moves <= 0) {
     const banner = document.getElementById('match-badge-banner');
     if (banner) {
-      clearTimeout(banner._hideTimer);
+      clearTimeout(bannerHideTimer);
       banner.textContent = `Game Over! Final score: ${score} 🏅`;
       banner.className = 'match-badge-banner banner--gameover';
     }
