@@ -37,6 +37,16 @@ const STORE_ITEMS = [
   { id: 'wild', label: 'Rainbow Wild', cost: 4, detail: 'Adds a wild gem that links any combo.', action: () => injectSpecial('wild') },
 ];
 
+// Gem image mapping
+const GEM_IMAGES = {
+  'heart': 'IMG_2669.png',
+  'star': 'IMG_2670.png',
+  'cross': 'IMG_2671.png',
+  'flame': 'IMG_2673.png',
+  'drop': 'IMG_2674.png',
+  'wild': null // Will use emoji for wild
+};
+
 export function initMatchMaker(dbRef, userRef) {
   db = dbRef;
   user = userRef;
@@ -80,7 +90,15 @@ function renderGrid(highlightSet = new Set()) {
 
       const glyph = document.createElement('div');
       glyph.className = 'glyph';
-      glyph.textContent = gemIcon(cellData);
+
+      // Use PNG image for regular gems, emoji for wild
+      if (GEM_IMAGES[cellData.kind]) {
+        glyph.style.backgroundImage = `url('${GEM_IMAGES[cellData.kind]}')`;
+      } else {
+        glyph.classList.add('emoji');
+        glyph.textContent = gemIcon(cellData);
+      }
+
       cell.appendChild(glyph);
 
       if (cellData.special) {
@@ -183,6 +201,9 @@ function resolveMatches() {
   flashStatus(`Chain x${comboChain}! +${shardGain} shards`);
   updateStats();
   renderGrid(explodedSet);
+
+  // Create particle effects for matched gems
+  createParticles(matchCells);
 
   grid = clearMatches(grid, matchCells, spawns);
   grid = applyGravity(grid);
@@ -357,4 +378,56 @@ function key(r, c) {
 function fromKey(k) {
   const [r, c] = k.split(':').map(Number);
   return { r, c };
+}
+
+function createParticles(matchCells) {
+  const container = document.getElementById('match-grid');
+  if (!container) return;
+
+  matchCells.forEach(({ r, c }) => {
+    const cellEl = container.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+    if (!cellEl) return;
+
+    const rect = cellEl.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // Create 6-8 particles per gem
+    const particleCount = 6 + Math.floor(Math.random() * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+
+      // Random color based on gem type
+      const cell = grid[r][c];
+      const colors = {
+        'heart': '#ff6b9d',
+        'star': '#ffd700',
+        'cross': '#7ea6ff',
+        'flame': '#ff6347',
+        'drop': '#4fc3f7',
+        'wild': '#7effd8'
+      };
+      particle.style.background = colors[cell?.kind] || '#7effd8';
+
+      // Position relative to cell
+      const offsetX = rect.left - containerRect.left + rect.width / 2;
+      const offsetY = rect.top - containerRect.top + rect.height / 2;
+      particle.style.left = offsetX + 'px';
+      particle.style.top = offsetY + 'px';
+
+      // Random trajectory
+      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+      const distance = 30 + Math.random() * 40;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.setProperty('--ty', ty + 'px');
+
+      container.appendChild(particle);
+
+      // Remove after animation
+      setTimeout(() => particle.remove(), 800);
+    }
+  });
 }
