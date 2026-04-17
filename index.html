@@ -28,7 +28,7 @@
       text-shadow: 0 0 10px #00ff4180;
     }
 
-    /* ── Match Maker ──────────────────────────────── */
+    /* ── Match Maker card ────────────────────────── */
     .match-card {
       background: #0d0d1a;
       border: 1px solid #1a1a2e;
@@ -47,56 +47,182 @@
       margin-bottom: 0.6rem;
     }
 
+    /* ── Stats bar ───────────────────────────────── */
     .match-stats {
       display: flex;
       justify-content: space-around;
-      font-size: 0.85rem;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      font-size: 0.82rem;
       color: #aaa;
       margin-bottom: 0.8rem;
     }
 
     .match-stats span { color: #00ff41; font-weight: 700; }
+    .match-stats .stat-coins span { color: #ffd700; }
 
+    /* ── Grid ────────────────────────────────────── */
     .match-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      padding: 0.8rem;
+      gap: 0.35rem;
+      padding: 0.6rem;
       width: 100%;
       max-width: 420px;
       margin: 0 auto;
+      position: relative; /* anchor for floating score / chain effects */
     }
 
+    /* ── Cells ───────────────────────────────────── */
     .match-cell {
       aspect-ratio: 1 / 1;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
       cursor: pointer;
-      background: #111;
-      box-shadow: 0 0 6px rgba(0,0,0,0.6);
+      background: #0e0e1c;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.7);
       transition: transform 0.1s ease, box-shadow 0.1s ease;
       user-select: none;
+      overflow: hidden;
     }
 
-    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
-    .match-cell:active { transform: scale(0.94); }
+    .match-cell:hover  { transform: scale(1.1);  box-shadow: 0 0 10px rgba(0,255,65,0.25); }
+    .match-cell:active { transform: scale(0.92); }
+
+    .match-cell.selected {
+      box-shadow: 0 0 0 2px #00ff41, 0 0 12px #00ff4160;
+    }
+
+    /* ── Gem shapes (CSS star, clip-path polygon) ── */
+    .gem {
+      width: 82%;
+      height: 82%;
+      clip-path: polygon(
+        50% 0%,  61% 35%, 98% 35%, 68% 57%,
+        79% 91%, 50% 70%, 21% 91%, 32% 57%,
+         2% 35%, 39% 35%
+      );
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.55));
+      transition: transform 0.12s;
+    }
+
+    /* Regular gem colours */
+    .gem-heart  { background: radial-gradient(circle at 38% 32%, #ff8ab4, #e91e63 55%, #880e4f); }
+    .gem-star   { background: radial-gradient(circle at 38% 32%, #fff9c4, #ffd700 55%, #e65100); }
+    .gem-cross  { background: radial-gradient(circle at 38% 32%, #e040fb, #9c27b0 55%, #4a148c); }
+    .gem-flame  { background: radial-gradient(circle at 38% 32%, #ffcc80, #ff6b35 55%, #bf360c); }
+    .gem-drop   { background: radial-gradient(circle at 38% 32%, #80d8ff, #2196f3 55%, #0d47a1); }
+    .gem-gem    { background: radial-gradient(circle at 38% 32%, #b9f6ca, #4caf50 55%, #1b5e20); }
+
+    /* Special gem: bomb */
+    .gem-bomb {
+      background: radial-gradient(circle at 38% 32%, #ffffff, #aaaaaa 50%, #222222);
+      animation: gem-pulse 1.4s ease-in-out infinite;
+    }
+
+    /* Special gem: rainbow / crystal */
+    .gem-rainbow {
+      background: conic-gradient(
+        from 0deg,
+        #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff0000
+      );
+      animation: gem-spin 2.2s linear infinite;
+    }
+
+    /* ── Cell animations ─────────────────────────── */
+    .match-cell.popping .gem {
+      animation: gem-pop 0.32s ease-out forwards;
+    }
+
+    .match-cell.bomb-flash {
+      animation: bomb-flash 0.35s ease-out;
+    }
+
+    /* ── Floating score label ────────────────────── */
+    .float-score {
+      position: absolute;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #00ff41;
+      pointer-events: none;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      animation: float-up 0.95s ease-out forwards;
+      z-index: 20;
+    }
+
+    .float-score--combo {
+      color: #ffd700;
+      font-size: 1.05rem;
+      text-shadow: 0 0 8px #ffd700;
+    }
+
+    /* ── Chain effects ───────────────────────────── */
+    .shooting-star {
+      position: absolute;
+      width: 70px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, transparent, #fff9c4, #ffd700 70%, transparent);
+      top: 45%;
+      left: -20px;
+      pointer-events: none;
+      animation: shoot-across 0.55s ease-out forwards;
+      z-index: 15;
+    }
+
+    .shooting-star::after {
+      content: '★';
+      position: absolute;
+      right: -4px;
+      top: -10px;
+      font-size: 1.3rem;
+      color: #ffd700;
+      filter: drop-shadow(0 0 5px #ffd700);
+    }
+
+    .supernova {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 5%, #ffd700 30%, #ff8800 60%, transparent 75%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      pointer-events: none;
+      animation: supernova-burst 0.75s ease-out forwards;
+      z-index: 15;
+    }
 
     .match-badge-banner {
       text-align: center;
-      font-size: 0.9rem;
-      color: #00ff41;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.45rem 1rem;
+      margin-top: 0.6rem;
+      transition: opacity 0.3s;
+      /* default (badge/level-up) style */
       background: #001a00;
       border: 1px solid #00ff4160;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      margin-top: 0.6rem;
+      color: #00ff41;
     }
 
-    .match-badge-banner.hidden { display: none; }
+    .match-badge-banner.hidden       { display: none; }
+    .match-badge-banner.banner--badge {
+      background: #001a00; border: 1px solid #00ff4160; color: #00ff41;
+    }
+    .match-badge-banner.banner--combo {
+      background: #1a1200; border: 1px solid #ffd70080; color: #ffd700;
+    }
+    .match-badge-banner.banner--gameover {
+      background: #1a0000; border: 1px solid #ff446680; color: #ff4466;
+    }
 
+    /* ── Restart button ──────────────────────────── */
     .match-restart-btn {
       display: block;
       margin: 0.8rem auto 0;
@@ -110,8 +236,53 @@
       letter-spacing: 0.08em;
       transition: background 0.15s;
     }
-
     .match-restart-btn:hover { background: #00ff4120; }
+
+    /* ── Star Store ──────────────────────────────── */
+    .match-store {
+      margin-top: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      background: #09091a;
+      border: 1px solid #2a1a4e;
+      border-radius: 10px;
+    }
+
+    .store-title {
+      text-align: center;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ffd700;
+      margin-bottom: 0.5rem;
+    }
+
+    .store-items {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .store-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      background: #12122a;
+      border: 1px solid #3a2a6e;
+      border-radius: 8px;
+      padding: 0.5rem 0.6rem;
+      cursor: pointer;
+      color: #ddd;
+      transition: background 0.15s, border-color 0.15s;
+      min-width: 74px;
+    }
+
+    .store-btn:hover:not(:disabled) { background: #221a40; border-color: #ffd700; }
+    .store-btn:disabled             { opacity: 0.38; cursor: not-allowed; }
+
+    .store-btn__icon  { font-size: 1.25rem; }
+    .store-btn__label { font-size: 0.68rem; color: #bbb; }
+    .store-btn__cost  { font-size: 0.68rem; color: #ffd700; font-weight: 700; }
 
     /* ── Matrix of Conscience ─────────────────────── */
     .matrix-card {
@@ -179,6 +350,45 @@
       background: linear-gradient(90deg, #1565c0, #4fc3f7);
       transition: width 0.4s ease;
     }
+
+    /* ── Keyframe animations ─────────────────────── */
+    @keyframes gem-pulse {
+      0%, 100% { filter: drop-shadow(0 0 3px #fff6) brightness(1);   }
+      50%       { filter: drop-shadow(0 0 8px #fffa) brightness(1.35); transform: scale(1.08); }
+    }
+
+    @keyframes gem-spin {
+      from { transform: rotate(0deg);   }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes gem-pop {
+      0%   { transform: scale(1);   opacity: 1; }
+      55%  { transform: scale(1.5); opacity: 0.7; }
+      100% { transform: scale(0);   opacity: 0; }
+    }
+
+    @keyframes bomb-flash {
+      0%   { background: #0e0e1c; box-shadow: none; }
+      45%  { background: #ff6a00; box-shadow: 0 0 18px #ff6a00; }
+      100% { background: #0e0e1c; box-shadow: none; }
+    }
+
+    @keyframes float-up {
+      0%   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+      100% { transform: translateX(-50%) translateY(-58px); opacity: 0; }
+    }
+
+    @keyframes shoot-across {
+      0%   { left: -20px;  opacity: 1; }
+      100% { left: 110%;   opacity: 0; }
+    }
+
+    @keyframes supernova-burst {
+      0%   { transform: translate(-50%, -50%) scale(0);   opacity: 1; }
+      60%  { transform: translate(-50%, -50%) scale(1.6); opacity: 0.85; }
+      100% { transform: translate(-50%, -50%) scale(3.2); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -187,17 +397,44 @@
 
   <!-- ══ Match Maker ══════════════════════════════════ -->
   <section class="match-card" id="match-maker-screen">
-    <h2>Match Maker</h2>
+    <h2>⭐ Match Maker</h2>
 
     <div class="match-stats">
       <div>Score: <span id="match-score">0</span></div>
       <div>Moves: <span id="match-moves">20</span></div>
       <div>Level: <span id="match-level">1</span></div>
+      <div class="stat-coins">⭐ <span id="match-coins">0</span></div>
     </div>
 
     <div class="match-grid" id="match-grid"></div>
 
     <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+    <!-- ✨ Star Store -->
+    <div class="match-store">
+      <div class="store-title">✨ Star Store</div>
+      <div class="store-items">
+
+        <button class="store-btn" id="store-btn-extra-moves" disabled>
+          <span class="store-btn__icon">🎯</span>
+          <span class="store-btn__label">+5 Moves</span>
+          <span class="store-btn__cost">100 ⭐</span>
+        </button>
+
+        <button class="store-btn" id="store-btn-shuffle" disabled>
+          <span class="store-btn__icon">🔀</span>
+          <span class="store-btn__label">Shuffle</span>
+          <span class="store-btn__cost">150 ⭐</span>
+        </button>
+
+        <button class="store-btn" id="store-btn-place-bomb" disabled>
+          <span class="store-btn__icon">💣</span>
+          <span class="store-btn__label">Bomb</span>
+          <span class="store-btn__cost">200 ⭐</span>
+        </button>
+
+      </div>
+    </div>
 
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>

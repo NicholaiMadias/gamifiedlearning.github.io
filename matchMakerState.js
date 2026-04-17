@@ -1,6 +1,10 @@
 export const GRID_SIZE = 7;
 
-const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+/** The six regular gem types. */
+export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop', 'gem'];
+
+/** Special power-up gem types (never fill in randomly). */
+export const SPECIAL_GEM_TYPES = ['bomb', 'rainbow'];
 
 function randomGem() {
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
@@ -48,78 +52,113 @@ export function applySwap(grid, r1, c1, r2, c2) {
 }
 
 /**
- * Finds all horizontal and vertical matches of 3 or more.
- * Returns an array of match arrays, each match being an array of {r, c} objects.
+ * Finds all horizontal and vertical runs of 3+ matching gems.
+ * Returns an array of groups; each group is [{r, c}, …].
+ * A cell may appear in more than one group (e.g. L- / T-shape intersections) —
+ * clearMatches handles the overlap safely by setting cells to null idempotently.
  */
 export function findMatches(grid) {
-  const matched = new Set();
+  const groups = [];
 
-  const key = (r, c) => `${r},${c}`;
-
-  // Horizontal — null guard handles grids mid-resolution (between clearMatches and applyGravity)
+  // Horizontal runs
   for (let r = 0; r < GRID_SIZE; r++) {
-    let run = 1;
+    let runStart = 0;
     for (let c = 1; c <= GRID_SIZE; c++) {
-      if (c < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r][c - 1]) {
-        run++;
-      } else {
-        if (run >= 3) {
-          for (let k = c - run; k < c; k++) matched.add(key(r, k));
+      const cont = c < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r][c - 1];
+      if (!cont) {
+        if (c - runStart >= 3) {
+          const group = [];
+          for (let k = runStart; k < c; k++) group.push({ r, c: k });
+          groups.push(group);
         }
-        run = 1;
+        runStart = c;
       }
     }
   }
 
-  // Vertical — same null guard as above
+  // Vertical runs
   for (let c = 0; c < GRID_SIZE; c++) {
-    let run = 1;
+    let runStart = 0;
     for (let r = 1; r <= GRID_SIZE; r++) {
-      if (r < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r - 1][c]) {
-        run++;
-      } else {
-        if (run >= 3) {
-          for (let k = r - run; k < r; k++) matched.add(key(k, c));
+      const cont = r < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r - 1][c];
+      if (!cont) {
+        if (r - runStart >= 3) {
+          const group = [];
+          for (let k = runStart; k < r; k++) group.push({ r: k, c });
+          groups.push(group);
         }
-        run = 1;
+        runStart = r;
       }
     }
   }
 
-  if (matched.size === 0) return [];
-
-  // Return as a single match group (for simpler scoring)
-  return [[...matched].map(k => {
-    const [r, c] = k.split(',').map(Number);
-    return { r, c };
-  })];
+  return groups;
 }
 
 /**
- * Returns a new grid with matched cells set to null.
+ * Returns a new grid with all cells referenced by the match groups set to null.
  */
 export function clearMatches(grid, matches) {
   const next = grid.map(row => [...row]);
   matches.forEach(group => {
-    group.forEach(({ r, c }) => {
-      next[r][c] = null;
-    });
+    group.forEach(({ r, c }) => { next[r][c] = null; });
   });
   return next;
 }
 
 /**
- * Applies gravity: shifts non-null cells down, fills top with new random gems.
+ * Clears a 3×3 area centred on (r, c) — triggered when a bomb gem detonates.
+ */
+export function applyBombExplosion(grid, r, c) {
+  const next = grid.map(row => [...row]);
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+        next[nr][nc] = null;
+      }
+    }
+  }
+  return next;
+}
+
+/**
+ * Sets every cell whose type === targetType to null — triggered by a rainbow gem.
+ */
+export function applyRainbowClear(grid, targetType) {
+  const next = grid.map(row => [...row]);
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (next[r][c] === targetType) next[r][c] = null;
+    }
+  }
+  return next;
+}
+
+/**
+ * Returns the regular gem type that appears most often on the board.
+ */
+export function findMostCommonType(grid) {
+  const counts = {};
+  GEM_TYPES.forEach(t => { counts[t] = 0; });
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (GEM_TYPES.includes(grid[r][c])) counts[grid[r][c]]++;
+    }
+  }
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+/**
+ * Applies gravity: shifts non-null cells downward, fills gaps with new random gems.
  */
 export function applyGravity(grid) {
   const next = grid.map(row => [...row]);
   for (let c = 0; c < GRID_SIZE; c++) {
-    // Collect non-null gems bottom-to-top; shift() later returns the bottom-most gem first
     const gems = [];
     for (let r = GRID_SIZE - 1; r >= 0; r--) {
       if (next[r][c] !== null) gems.push(next[r][c]);
     }
-    // Fill column from bottom upward: existing gems settle down, new random gems fill the top
     for (let r = GRID_SIZE - 1; r >= 0; r--) {
       next[r][c] = gems.length > 0 ? gems.shift() : randomGem();
     }
