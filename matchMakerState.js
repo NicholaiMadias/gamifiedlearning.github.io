@@ -114,6 +114,64 @@ export function clearMatches(grid, matches) {
 }
 
 /**
+ * Applies special gem effects to the grid
+ * @param {Array} grid - Current game grid
+ * @param {string} gemType - Type of special gem (bomb, lightning, rainbow)
+ * @param {number} r - Row position
+ * @param {number} c - Column position
+ * @returns {Object} { grid, clearedCells } - Updated grid and array of cleared cell positions
+ */
+export function applySpecialGem(grid, gemType, r, c) {
+  const next = grid.map(row => [...row]);
+  const clearedCells = [];
+
+  if (gemType === SPECIAL_GEM_TYPES.BOMB) {
+    // Bomb clears 3x3 area around the cell
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+          if (next[nr][nc] !== null) {
+            clearedCells.push({ r: nr, c: nc });
+            next[nr][nc] = null;
+          }
+        }
+      }
+    }
+  } else if (gemType === SPECIAL_GEM_TYPES.LIGHTNING) {
+    // Lightning clears entire row and column
+    for (let i = 0; i < GRID_SIZE; i++) {
+      // Clear row
+      if (next[r][i] !== null) {
+        clearedCells.push({ r, c: i });
+        next[r][i] = null;
+      }
+      // Clear column
+      if (next[i][c] !== null) {
+        clearedCells.push({ r: i, c });
+        next[i][c] = null;
+      }
+    }
+  } else if (gemType === SPECIAL_GEM_TYPES.RAINBOW) {
+    // Rainbow clears all gems of the same type as the selected cell
+    const targetType = grid[r][c];
+    if (targetType) {
+      for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+          if (next[row][col] === targetType) {
+            clearedCells.push({ r: row, c: col });
+            next[row][col] = null;
+          }
+        }
+      }
+    }
+  }
+
+  return { grid: next, clearedCells };
+}
+
+/**
  * Applies gravity: shifts non-null cells down, fills top with new random gems.
  */
 export function applyGravity(grid) {

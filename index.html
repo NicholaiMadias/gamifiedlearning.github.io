@@ -267,6 +267,69 @@
 
     .store-toggle-btn:hover { background: #ffaa0020; }
 
+    /* Power-up use buttons */
+    .power-up-panel {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .power-up-btn {
+      background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
+      border: 1px solid #00ff41;
+      color: #00ff41;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .power-up-btn:hover:not(:disabled) {
+      background: #00ff4110;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,65,0.3);
+    }
+
+    .power-up-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: #555;
+      color: #555;
+    }
+
+    .power-up-btn.power-up-active {
+      background: #00ff4130;
+      border-color: #ffaa00;
+      color: #ffaa00;
+      box-shadow: 0 0 15px rgba(255,170,0,0.5);
+      animation: pulse-glow 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,170,0,0.5); }
+      50% { box-shadow: 0 0 20px rgba(255,170,0,0.8); }
+    }
+
+    .power-up-count {
+      background: #00ff4120;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.7rem;
+    }
+
+    .power-up-active .power-up-count {
+      background: #ffaa0030;
+      color: #ffaa00;
+    }
+
     .match-restart-btn {
       display: block;
       margin: 0.8rem auto 0;
@@ -371,6 +434,25 @@
 
     <div id="match-combo-banner" class="match-combo-banner hidden"></div>
     <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+    <!-- Power-up Use Buttons -->
+    <div class="power-up-panel">
+      <button class="power-up-btn" id="use-bomb" onclick="activatePowerUp('bomb')">
+        <span>💣</span>
+        <span>Bomb</span>
+        <span class="power-up-count" id="use-bomb-count">0</span>
+      </button>
+      <button class="power-up-btn" id="use-lightning" onclick="activatePowerUp('lightning')">
+        <span>⚡</span>
+        <span>Lightning</span>
+        <span class="power-up-count" id="use-lightning-count">0</span>
+      </button>
+      <button class="power-up-btn" id="use-rainbow" onclick="activatePowerUp('rainbow')">
+        <span>🌈</span>
+        <span>Rainbow</span>
+        <span class="power-up-count" id="use-rainbow-count">0</span>
+      </button>
+    </div>
 
     <button class="store-toggle-btn" onclick="toggleStore()">🛒 Store</button>
 

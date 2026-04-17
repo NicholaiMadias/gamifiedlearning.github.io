@@ -6,7 +6,9 @@ import {
   findMatches,
   clearMatches,
   applyGravity,
+  applySpecialGem,
   GRID_SIZE,
+  SPECIAL_GEM_TYPES,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
@@ -20,6 +22,7 @@ let user = null;
 let combo = 0;
 let coins = 100; // Starting coins for the store
 let powerUps = { bomb: 0, lightning: 0, rainbow: 0 };
+let activePowerUp = null; // Currently selected power-up to use
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 300;
@@ -31,11 +34,13 @@ export function initMatchMaker(dbRef, userRef) {
   moves = 20;
   level = 1;
   combo = 0;
+  activePowerUp = null;
   selected = null;
   grid = createInitialGrid();
   renderGrid();
   updateStats();
   updateStoreDisplay();
+  updatePowerUpButtons();
 }
 
 function updateStats() {
@@ -104,6 +109,12 @@ function gemIcon(type) {
 function onCellClick(r, c) {
   if (moves <= 0) return;
 
+  // If a power-up is active, use it on this cell
+  if (activePowerUp) {
+    usePowerUp(r, c);
+    return;
+  }
+
   if (!selected) {
     selected = { r, c };
     highlightCell(r, c, true);
@@ -142,6 +153,43 @@ function onCellClick(r, c) {
   updateStats();
 
   resolveMatches();
+}
+
+function usePowerUp(r, c) {
+  if (!activePowerUp || powerUps[activePowerUp] <= 0) {
+    activePowerUp = null;
+    updatePowerUpButtons();
+    return;
+  }
+
+  // Apply the special gem effect
+  const result = applySpecialGem(grid, SPECIAL_GEM_TYPES[activePowerUp.toUpperCase()], r, c);
+  grid = result.grid;
+
+  // Animate the cleared cells
+  if (result.clearedCells.length > 0) {
+    const matches = [result.clearedCells];
+    animateMatches(matches);
+
+    // Award points for special gem usage
+    score += result.clearedCells.length * 15; // Bonus points for power-ups
+    coins += Math.floor(result.clearedCells.length / 3); // Earn some coins back
+  }
+
+  // Consume the power-up
+  powerUps[activePowerUp]--;
+  activePowerUp = null;
+  updateStats();
+  updateStoreDisplay();
+  updatePowerUpButtons();
+
+  // Apply gravity and resolve any new matches
+  setTimeout(() => {
+    grid = applyGravity(grid);
+    renderGrid();
+    combo = 0; // Power-ups start fresh combo
+    setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  }, 400);
 }
 
 function highlightCell(r, c, on) {
@@ -289,6 +337,7 @@ export function purchasePowerUp(type, cost) {
   powerUps[type]++;
   updateStats();
   updateStoreDisplay();
+  updatePowerUpButtons();
 
   const storeItem = document.getElementById(`store-${type}`);
   if (storeItem) {
@@ -297,12 +346,63 @@ export function purchasePowerUp(type, cost) {
   }
 }
 
+export function activatePowerUp(type) {
+  if (powerUps[type] <= 0) {
+    alert(`No ${type} power-ups available! Purchase from the store.`);
+    return;
+  }
+
+  activePowerUp = type;
+  updatePowerUpButtons();
+
+  // Show instruction banner
+  const banner = document.getElementById('match-combo-banner');
+  if (banner) {
+    banner.textContent = `Click any gem to use ${type.toUpperCase()} power-up!`;
+    banner.classList.remove('hidden');
+    setTimeout(() => banner.classList.add('hidden'), 2000);
+  }
+}
+
+function updatePowerUpButtons() {
+  // Update visual state of power-up buttons
+  ['bomb', 'lightning', 'rainbow'].forEach(type => {
+    const btn = document.getElementById(`use-${type}`);
+    if (btn) {
+      if (activePowerUp === type) {
+        btn.classList.add('power-up-active');
+      } else {
+        btn.classList.remove('power-up-active');
+      }
+
+      btn.disabled = powerUps[type] <= 0;
+    }
+  });
+}
+
 function updateStoreDisplay() {
-  document.getElementById('store-bomb-count').textContent = powerUps.bomb;
-  document.getElementById('store-lightning-count').textContent = powerUps.lightning;
-  document.getElementById('store-rainbow-count').textContent = powerUps.rainbow;
+  const elements = {
+    bomb: document.getElementById('store-bomb-count'),
+    lightning: document.getElementById('store-lightning-count'),
+    rainbow: document.getElementById('store-rainbow-count'),
+  };
+
+  Object.keys(elements).forEach(type => {
+    if (elements[type]) {
+      elements[type].textContent = powerUps[type];
+    }
+  });
+
+  // Also update use button counts
+  ['bomb', 'lightning', 'rainbow'].forEach(type => {
+    const countElem = document.getElementById(`use-${type}-count`);
+    if (countElem) {
+      countElem.textContent = powerUps[type];
+    }
+  });
 }
 
 // Make functions globally accessible
 window.toggleStore = toggleStore;
 window.purchasePowerUp = purchasePowerUp;
+window.activatePowerUp = activatePowerUp;
