@@ -21,6 +21,10 @@ let comboMultiplier = 1;
 let db = null;
 let user = null;
 let storeBound = false;
+let resolveTimeoutId = null;
+let statusTimeoutId = null;
+let runId = 0;
+let resolving = false;
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 320;
@@ -36,6 +40,7 @@ const STORE_ITEMS = [
 export function initMatchMaker(dbRef, userRef) {
   db = dbRef;
   user = userRef;
+  runId++;
   score = 0;
   moves = 20;
   level = 1;
@@ -43,6 +48,11 @@ export function initMatchMaker(dbRef, userRef) {
   comboChain = 0;
   comboMultiplier = 1;
   selected = null;
+  resolving = false;
+  if (resolveTimeoutId) {
+    clearTimeout(resolveTimeoutId);
+    resolveTimeoutId = null;
+  }
   grid = createInitialGrid();
   renderGrid();
   renderStore();
@@ -106,7 +116,7 @@ function specialBadge(special) {
 }
 
 function onCellClick(r, c) {
-  if (moves <= 0) return;
+  if (moves <= 0 || resolving) return;
 
   if (!selected) {
     selected = { r, c };
@@ -145,10 +155,13 @@ function onCellClick(r, c) {
 }
 
 function resolveMatches() {
+  const currentRun = runId;
+  resolving = true;
   const groups = findMatches(grid);
   if (groups.length === 0) {
     comboChain = 0;
     comboMultiplier = 1;
+    resolving = false;
     renderGrid();
     checkLevelUp();
     checkGameOver();
@@ -174,7 +187,11 @@ function resolveMatches() {
   grid = clearMatches(grid, matchCells, spawns);
   grid = applyGravity(grid);
 
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  if (resolveTimeoutId) clearTimeout(resolveTimeoutId);
+  resolveTimeoutId = setTimeout(() => {
+    if (currentRun !== runId) return;
+    resolveMatches();
+  }, CHAIN_REACTION_DELAY_MS);
 }
 
 function deriveSpecialSpawns(groups) {
@@ -328,7 +345,8 @@ function flashStatus(text) {
   if (banner) {
     banner.textContent = text;
     banner.classList.remove('hidden');
-    setTimeout(() => banner.classList.add('hidden'), 2000);
+    if (statusTimeoutId) clearTimeout(statusTimeoutId);
+    statusTimeoutId = setTimeout(() => banner.classList.add('hidden'), 2000);
   }
 }
 
