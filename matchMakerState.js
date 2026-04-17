@@ -1,6 +1,11 @@
 export const GRID_SIZE = 7;
 
-const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+const GEM_TYPES = ['yellow', 'white', 'blue', 'green', 'red', 'purple'];
+export const SPECIAL_GEM_TYPES = {
+  BOMB: 'bomb',
+  LIGHTNING: 'lightning',
+  RAINBOW: 'rainbow'
+};
 
 function randomGem() {
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
