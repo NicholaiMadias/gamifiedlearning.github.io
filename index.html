@@ -179,6 +179,286 @@
       background: linear-gradient(90deg, #1565c0, #4fc3f7);
       transition: width 0.4s ease;
     }
+
+    /* ── Concordance Lens ─────────────────────────────── */
+    .cl-card {
+      background: #0a0a12;
+      border: 1px solid #1a1a30;
+      border-radius: 12px;
+      padding: 1.2rem;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .cl-heading {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a78bfa;
+      margin-bottom: 0.3rem;
+    }
+
+    .cl-subheading {
+      text-align: center;
+      font-size: 0.72rem;
+      color: #5b5b8a;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    .cl-controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .cl-btn {
+      background: transparent;
+      border: 1px solid #4c4c7a;
+      color: #a78bfa;
+      padding: 0.3rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .cl-btn:hover:not(:disabled) { background: #a78bfa18; border-color: #a78bfa; }
+    .cl-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .cl-btn.lens-btn-active { background: #a78bfa22; border-color: #a78bfa; color: #c4b5fd; }
+    .cl-btn.vm-archivist { border-color: #38bdf8; color: #38bdf8; }
+    .cl-btn.cl-contest-btn { border-color: #f59e0b; color: #f59e0b; font-size: 0.74rem; padding: 0.25rem 0.7rem; }
+    .cl-btn.cl-contest-btn:hover { background: #f59e0b18; }
+    .cl-btn.cl-name-btn { border-color: #34d399; color: #34d399; font-size: 0.74rem; padding: 0.25rem 0.7rem; }
+    .cl-btn.cl-name-btn:hover { background: #34d39918; }
+
+    .cl-seven-seats {
+      text-align: center;
+      font-size: 0.68rem;
+      color: #6366f1;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+
+    /* Narrative message */
+    .cl-narrative {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #c4b5fd;
+      font-style: italic;
+      min-height: 1.4em;
+      margin-bottom: 0.8rem;
+      transition: opacity 0.4s ease;
+    }
+
+    .cl-narrative.hidden { opacity: 0; pointer-events: none; }
+    .cl-narrative.cl-narrative-fade {
+      animation: clNarrativeFade 4s ease forwards;
+    }
+
+    @keyframes clNarrativeFade {
+      0%   { opacity: 1; }
+      70%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* Codex entry cards */
+    .cl-entry {
+      background: #0d0d1e;
+      border: 1px solid #1e1e38;
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      margin-bottom: 0.6rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cl-entry:hover { border-color: #3a3a60; }
+    .cl-entry.cl-contested { border-color: #f59e0b55; }
+
+    .cl-entry-star {
+      font-size: 0.64rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #5b5b8a;
+      margin-bottom: 0.15rem;
+    }
+
+    .cl-entry-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #c4b5fd;
+      margin-bottom: 0.35rem;
+    }
+
+    .cl-entry-text {
+      font-size: 0.82rem;
+      color: #9090b8;
+      line-height: 1.5;
+    }
+
+    .cl-marginal-titles {
+      font-size: 0.7rem;
+      color: #34d399;
+      font-style: italic;
+      margin-bottom: 0.35rem;
+    }
+
+    .cl-contested-marker {
+      font-size: 0.72rem;
+      color: #f59e0b;
+      margin-top: 0.4rem;
+    }
+
+    .cl-entry-controls {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    /* Ghost text — Seven Seats parallax layer */
+    .cl-ghost-text {
+      font-size: 0.74rem;
+      color: #4a4a6a;
+      font-style: italic;
+      margin-top: 0.3rem;
+      border-left: 2px solid #2a2a48;
+      padding-left: 0.5rem;
+    }
+
+    /* Alignment indicator */
+    .cl-alignment-indicator {
+      text-align: center;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      padding: 0.4rem 0;
+      margin-top: 0.2rem;
+    }
+
+    .cl-alignment-solid  { color: #34d399; }
+    .cl-alignment-dashed { color: #f59e0b; }
+    .cl-alignment-snapped { color: #f87171; }
+
+    /* ── Lens pulse animations ────────────────────────── */
+
+    /* Stable: clean, slow glow pulse */
+    @keyframes lensSync {
+      0%, 100% { box-shadow: 0 0 6px #a78bfa30; }
+      50%       { box-shadow: 0 0 14px #a78bfa60; }
+    }
+
+    .lens-pulse-sync { animation: lensSync 2.4s ease-in-out infinite; }
+
+    /* Diverging: jittery, amber-tinted */
+    @keyframes lensJitter {
+      0%   { transform: translate(0,   0);   box-shadow: 0 0 8px #f59e0b40; }
+      20%  { transform: translate(-1px, 1px); }
+      40%  { transform: translate(1px, -1px); box-shadow: 0 0 12px #f59e0b60; }
+      60%  { transform: translate(0,   1px);  }
+      80%  { transform: translate(-1px, 0);  box-shadow: 0 0 6px #f59e0b30; }
+      100% { transform: translate(0,   0);   }
+    }
+
+    .lens-pulse-jitter { animation: lensJitter 0.9s ease-in-out infinite; }
+
+    /* Schism forming: fracture effect, orange–red */
+    @keyframes lensSplit {
+      0%   { transform: skewX(0);    box-shadow: 0 0 10px #fb923c50; opacity: 1; }
+      25%  { transform: skewX(1.5deg);  opacity: 0.85; }
+      50%  { transform: skewX(0);    box-shadow: 0 0 18px #ef444480; opacity: 1; }
+      75%  { transform: skewX(-1deg); opacity: 0.9; }
+      100% { transform: skewX(0);    box-shadow: 0 0 10px #fb923c50; }
+    }
+
+    .lens-pulse-split { animation: lensSplit 0.6s ease-in-out infinite; border-color: #ef444450 !important; }
+
+    /* Hardened schism: dim, almost static */
+    @keyframes lensCollapse {
+      0%, 100% { opacity: 0.55; filter: grayscale(0.6); }
+      50%       { opacity: 0.4;  filter: grayscale(0.9); }
+    }
+
+    .lens-pulse-collapse { animation: lensCollapse 3s ease-in-out infinite; border-color: #44444480 !important; }
+    .lens-pulse-collapse .cl-entry-text { color: #555570; }
+
+    /* ── Concordance failure ──────────────────────────── */
+    @keyframes concordanceFail {
+      0%   { transform: translate(0, 0);   filter: none; }
+      10%  { transform: translate(-2px, 1px); filter: hue-rotate(15deg) brightness(1.2); }
+      20%  { transform: translate(2px, -1px); filter: hue-rotate(-10deg); }
+      30%  { transform: translate(-1px, 2px); filter: brightness(0.8); }
+      40%  { transform: translate(0, 0);   filter: none; }
+      55%  { transform: translate(1px, -2px); filter: hue-rotate(20deg) brightness(1.1); }
+      70%  { transform: translate(-1px, 0);   filter: none; }
+      80%  { transform: translate(2px, 1px);  filter: brightness(0.9); }
+      100% { transform: translate(0, 0);   filter: none; }
+    }
+
+    .concordance-failure {
+      animation: concordanceFail 2.2s ease-in-out 1;
+    }
+
+    /* ── Naming modal ─────────────────────────────────── */
+    .cl-naming-modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #00000088;
+      z-index: 100;
+    }
+
+    .cl-naming-modal.hidden { display: none; }
+
+    .cl-naming-box {
+      background: #0d0d1e;
+      border: 1px solid #3a3a60;
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      max-width: 340px;
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .cl-naming-label {
+      font-size: 0.82rem;
+      color: #a78bfa;
+    }
+
+    .cl-naming-input {
+      background: #07071a;
+      border: 1px solid #3a3a60;
+      border-radius: 6px;
+      color: #e0e0e0;
+      padding: 0.45rem 0.7rem;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    .cl-naming-input:focus { outline: none; border-color: #a78bfa; }
+
+    .cl-naming-hint {
+      font-size: 0.7rem;
+      color: #5b5b8a;
+      font-style: italic;
+    }
+
+    .cl-naming-actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+    }
   </style>
 </head>
 <body>
@@ -236,6 +516,45 @@
       </div>
     </div>
   </section>
+
+  <!-- ══ Concordance Lens ════════════════════════════ -->
+  <section class="cl-card" id="cl-section">
+    <h2 class="cl-heading">Concordance Lens</h2>
+    <p class="cl-subheading">When meanings disagree, patterns begin to shimmer.</p>
+
+    <div class="cl-controls">
+      <button class="cl-btn" id="cl-view-mode-btn">🌿 Sage</button>
+      <button class="cl-btn" id="cl-lens-toggle" disabled>◎ Lens (locked)</button>
+    </div>
+
+    <div id="cl-seven-seats-indicator" class="cl-seven-seats hidden">
+      🔭 Historical Overlay: Parallax Mode
+    </div>
+
+    <div id="cl-narrative" class="cl-narrative hidden"></div>
+
+    <div id="cl-codex-entries"></div>
+  </section>
+
+  <!-- ══ Marginal Title modal ════════════════════════ -->
+  <div id="cl-naming-modal" class="cl-naming-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cl-naming-modal-label">
+    <div class="cl-naming-box">
+      <div id="cl-naming-modal-label" class="cl-naming-label">Add a marginal title</div>
+      <input
+        id="cl-naming-input"
+        class="cl-naming-input"
+        type="text"
+        maxlength="40"
+        placeholder="3–5 words"
+        autocomplete="off"
+      />
+      <div class="cl-naming-hint">Names are suggested, not declared. Max 40 characters.</div>
+      <div class="cl-naming-actions">
+        <button class="cl-btn" id="cl-naming-cancel">Cancel</button>
+        <button class="cl-btn cl-name-btn" id="cl-naming-submit">Add title</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="./main.js"></script>
 </body>

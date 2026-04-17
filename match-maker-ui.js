@@ -146,6 +146,7 @@ function checkLevelUp() {
   const threshold = level * SCORE_PER_LEVEL;
   if (score >= threshold) {
     onLevelComplete(level, score, db, user);
+    window.dispatchEvent(new CustomEvent('matchmaker-level-complete', { detail: { level } }));
     level++;
     moves += 10;
     document.getElementById('match-level').textContent = level;
