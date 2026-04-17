@@ -65,7 +65,10 @@ function renderGrid() {
       const gemType = grid[r][c];
       const img = document.createElement('div');
       img.className = 'gem-icon';
-      img.style.backgroundImage = `url(${getGemImage(gemType)})`;
+      const gemStyle = getGemStyle(gemType);
+      img.style.backgroundImage = gemStyle.backgroundImage;
+      img.style.backgroundSize = gemStyle.backgroundSize;
+      img.style.backgroundPosition = gemStyle.backgroundPosition;
       img.dataset.gemType = gemType;
       cell.appendChild(img);
 
@@ -75,19 +78,25 @@ function renderGrid() {
   }
 }
 
-function getGemImage(type) {
-  const gemMap = {
-    'yellow': 'IMG_2669.png',    // Yellow star
-    'white': 'IMG_2671.png',     // White/silver star
-    'blue': 'IMG_2671.png',      // Blue star (using 2671 which has multiple colors)
-    'green': 'IMG_2671.png',     // Green star (using 2671 which has multiple colors)
-    'red': 'IMG_2673.png',       // Red star
-    'purple': 'IMG_2673.png',    // Purple star (using 2673 which has red/purple)
-    'bomb': 'IMG_2674.png',      // Explosion effect for bombs
-    'lightning': 'IMG_2675.png', // Shooting star for lightning
-    'rainbow': 'IMG_2676.png'    // Multi-star progression for rainbow
+// IMG_2671.png contains 3 stars side-by-side (white, blue, green).
+// IMG_2673.png contains 2 stars side-by-side (red, purple).
+// IMG_2674.png contains 2 explosion graphics; show only the first (left half).
+// IMG_2675.png has one large star in the left half (~pixels 32-770 of 1536) and
+//   three smaller stars in the right half; backgroundSize 200% shows only the large star.
+// All other images contain a single graphic and use normal contain sizing.
+function getGemStyle(type) {
+  const styleMap = {
+    'yellow':    { backgroundImage: 'url(IMG_2669.png)', backgroundSize: 'contain',   backgroundPosition: '50% 50%' },
+    'white':     { backgroundImage: 'url(IMG_2671.png)', backgroundSize: '300% 100%', backgroundPosition: '0% 50%'  },
+    'blue':      { backgroundImage: 'url(IMG_2671.png)', backgroundSize: '300% 100%', backgroundPosition: '50% 50%' },
+    'green':     { backgroundImage: 'url(IMG_2671.png)', backgroundSize: '300% 100%', backgroundPosition: '100% 50%'},
+    'red':       { backgroundImage: 'url(IMG_2673.png)', backgroundSize: '200% 100%', backgroundPosition: '0% 50%'  },
+    'purple':    { backgroundImage: 'url(IMG_2673.png)', backgroundSize: '200% 100%', backgroundPosition: '100% 50%'},
+    'bomb':      { backgroundImage: 'url(IMG_2674.png)', backgroundSize: '200% 100%', backgroundPosition: '0% 50%'  },
+    'lightning': { backgroundImage: 'url(IMG_2675.png)', backgroundSize: '200% 100%', backgroundPosition: '0% 50%'  },
+    'rainbow':   { backgroundImage: 'url(IMG_2676.png)', backgroundSize: 'contain',   backgroundPosition: '50% 50%' },
   };
-  return gemMap[type] || 'IMG_2669.png';
+  return styleMap[type] || styleMap['yellow'];
 }
 
 function gemIcon(type) {
