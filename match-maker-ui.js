@@ -9,17 +9,26 @@ import {
   GRID_SIZE,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
+import {
+  markGuideActivity,
+  recordComboState,
+  recordMysteryProgress,
+} from './modules/guide.js';
 
 let grid;
 let selected = null;
 let score = 0;
 let moves = 20;
 let level = 1;
+let comboMultiplier = 1;
+let comboThreshold = 500;
+let comboProgress = 0;
 let db = null;
 let user = null;
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 200;
+const MAX_COMBO_MULTIPLIER = 5;
 
 export function initMatchMaker(dbRef, userRef) {
   db = dbRef;
@@ -27,6 +36,9 @@ export function initMatchMaker(dbRef, userRef) {
   score = 0;
   moves = 20;
   level = 1;
+  comboMultiplier = 1;
+  comboThreshold = 500;
+  comboProgress = 0;
   selected = null;
   grid = createInitialGrid();
   renderGrid();
@@ -34,6 +46,9 @@ export function initMatchMaker(dbRef, userRef) {
   document.getElementById('match-score').textContent = score;
   document.getElementById('match-moves').textContent = moves;
   document.getElementById('match-level').textContent = level;
+  recordMysteryProgress(0);
+  recordComboState(comboMultiplier, comboThreshold);
+  markGuideActivity();
 }
 
 function renderGrid() {
@@ -66,6 +81,8 @@ function gemIcon(type) {
 
 function onCellClick(r, c) {
   if (moves <= 0) return;
+
+  markGuideActivity();
 
   if (!selected) {
     selected = { r, c };
@@ -118,13 +135,18 @@ function resolveMatches() {
     renderGrid();
     checkLevelUp();
     checkGameOver();
+    const thresholdRemaining =
+      comboMultiplier >= MAX_COMBO_MULTIPLIER ? 0 : Math.max(0, comboThreshold - comboProgress);
+    recordComboState(comboMultiplier, thresholdRemaining);
     return;
   }
 
-  matches.forEach(m => {
-    score += m.length * 10;
-  });
+  const gainedScore = matches.reduce((sum, m) => sum + m.length * 10, 0);
+  score += gainedScore;
   document.getElementById('match-score').textContent = score;
+
+  updateComboTelemetry(gainedScore);
+  markGuideActivity();
 
   grid = clearMatches(grid, matches);
   grid = applyGravity(grid);
@@ -142,6 +164,7 @@ function checkLevelUp() {
     moves += 10;
     document.getElementById('match-level').textContent = level;
     document.getElementById('match-moves').textContent = moves;
+    recordMysteryProgress(Math.min(level - 1, 7));
   }
 }
 
@@ -153,4 +176,18 @@ function checkGameOver() {
       banner.classList.remove('hidden');
     }
   }
+}
+
+function updateComboTelemetry(gainedScore) {
+  comboProgress += gainedScore;
+
+  while (comboProgress >= comboThreshold && comboMultiplier < MAX_COMBO_MULTIPLIER) {
+    comboProgress -= comboThreshold;
+    comboMultiplier = parseFloat((comboMultiplier + 0.5).toFixed(1));
+    comboThreshold = Math.round(comboThreshold * 1.2);
+  }
+
+  const thresholdRemaining =
+    comboMultiplier >= MAX_COMBO_MULTIPLIER ? 0 : Math.max(0, comboThreshold - comboProgress);
+  recordComboState(comboMultiplier, thresholdRemaining);
 }

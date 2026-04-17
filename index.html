@@ -28,6 +28,104 @@
       text-shadow: 0 0 10px #00ff4180;
     }
 
+    /* ── Guide HUD ───────────────────────────────── */
+    .guide-card {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .guide-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .guide-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.7rem;
+      background: radial-gradient(circle, #0f172a 0%, #0a0f1d 100%);
+      border: 1px solid #1f2a44;
+      box-shadow: 0 0 12px rgba(0, 255, 65, 0.15);
+    }
+
+    .guide-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .guide-title {
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #00ff41;
+    }
+
+    .guide-mode-label {
+      font-size: 0.82rem;
+      color: #b3b3c2;
+    }
+
+    .guide-mode-btn {
+      margin-left: auto;
+      background: linear-gradient(90deg, #0f2f1f, #0f2f2f);
+      border: 1px solid #00ff4160;
+      color: #e0ffe4;
+      padding: 0.35rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+    }
+
+    .guide-mode-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 255, 65, 0.18);
+      background: linear-gradient(90deg, #134e4a, #0f2f2f);
+    }
+
+    .guide-log {
+      background: #0b1020;
+      border: 1px solid #1c2a3c;
+      border-radius: 10px;
+      padding: 0.75rem;
+      min-height: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.85rem;
+    }
+
+    .guide-log-line {
+      color: #e5e7eb;
+      line-height: 1.3;
+    }
+
+    .archivist-glitch {
+      filter: hue-rotate(180deg) brightness(1.2) contrast(1.2);
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(59, 130, 246, 0.1),
+        rgba(59, 130, 246, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      border-radius: 50%;
+    }
+
     /* ── Match Maker ──────────────────────────────── */
     .match-card {
       background: #0d0d1a;
@@ -184,6 +282,21 @@
 <body>
 
   <h1 class="app-title">Gamified Learning</h1>
+
+  <!-- ══ Guide HUD ══════════════════════════════════ -->
+  <section class="guide-card" id="guide-panel">
+    <div class="guide-header">
+      <div id="guide-avatar" class="guide-avatar" aria-label="Guide avatar">🛰️</div>
+      <div class="guide-info">
+        <div class="guide-title">Guide</div>
+        <div class="guide-mode-label" id="guide-mode-label">Mode: Sage</div>
+        <button class="guide-mode-btn" id="guide-mode-toggle" type="button">Switch Mode</button>
+      </div>
+    </div>
+    <div class="guide-log" id="guide-log">
+      <div class="guide-log-line">Guide initializing...</div>
+    </div>
+  </section>
 
   <!-- ══ Match Maker ══════════════════════════════════ -->
   <section class="match-card" id="match-maker-screen">
