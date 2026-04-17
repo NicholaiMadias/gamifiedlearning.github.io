@@ -332,12 +332,35 @@ function updateStats() {
   const chainEl = document.getElementById('match-chain');
   const shardEl = document.getElementById('match-shards');
 
-  if (scoreEl) scoreEl.textContent = score;
+  // Trigger score pop animation on significant score changes
+  const prevScore = parseInt(scoreEl?.textContent || '0');
+  const scoreChange = score - prevScore;
+
+  if (scoreEl) {
+    scoreEl.textContent = score;
+    if (scoreChange > 20) {
+      const scoreDiv = scoreEl.parentElement;
+      scoreDiv?.classList.add('score-pop');
+      setTimeout(() => scoreDiv?.classList.remove('score-pop'), 500);
+    }
+  }
+
   if (movesEl) movesEl.textContent = moves;
   if (levelEl) levelEl.textContent = level;
   if (comboEl) comboEl.textContent = `${comboMultiplier.toFixed(1)}x`;
   if (chainEl) chainEl.textContent = comboChain > 0 ? `Chain ${comboChain}` : 'Chain 0';
   if (shardEl) shardEl.textContent = shards;
+
+  // Add visual feedback for active combos
+  const comboChip = comboEl?.closest('.momentum-chip');
+  const chainChip = chainEl?.closest('.momentum-chip');
+
+  if (comboChip) {
+    comboChip.classList.toggle('active', comboMultiplier > 1);
+  }
+  if (chainChip) {
+    chainChip.classList.toggle('active', comboChain > 0);
+  }
 }
 
 function checkLevelUp() {

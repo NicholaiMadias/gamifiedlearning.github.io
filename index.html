@@ -66,6 +66,14 @@
       margin-bottom: 0.65rem;
     }
 
+    .match-stats > div {
+      transition: all 0.3s ease;
+    }
+
+    .match-stats > div.score-pop {
+      animation: scorePop 0.5s ease;
+    }
+
     .match-stats span { color: #7effd8; font-weight: 700; }
 
     .match-momentum {
@@ -85,9 +93,18 @@
       display: inline-flex;
       gap: 0.3rem;
       align-items: center;
+      transition: all 0.3s ease;
     }
 
-    .momentum-chip strong { color: #7effd8; }
+    .momentum-chip.active {
+      background: linear-gradient(135deg, #1a2e3b, #1c3544);
+      border-color: #7effd8;
+      box-shadow: 0 0 12px rgba(126, 255, 216, 0.3);
+      transform: scale(1.05);
+    }
+
+    .momentum-chip strong { color: #7effd8; transition: color 0.3s ease; }
+    .momentum-chip.active strong { color: #fff; text-shadow: 0 0 8px rgba(126, 255, 216, 0.6); }
 
     .board-wrap {
       background: linear-gradient(145deg, #0b0f1c, #0f1324);
@@ -408,6 +425,12 @@
       50% {
         box-shadow: 0 0 25px rgba(126, 255, 216, 0.4), inset 0 0 18px rgba(126, 255, 216, 0.2);
       }
+    }
+
+    @keyframes scorePop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); color: #7effd8; }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
