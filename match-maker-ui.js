@@ -365,6 +365,8 @@ export function activatePowerUp(type) {
 }
 
 function updatePowerUpButtons() {
+  const gridContainer = document.getElementById('match-grid');
+
   // Update visual state of power-up buttons
   ['bomb', 'lightning', 'rainbow'].forEach(type => {
     const btn = document.getElementById(`use-${type}`);
@@ -378,6 +380,15 @@ function updatePowerUpButtons() {
       btn.disabled = powerUps[type] <= 0;
     }
   });
+
+  // Update grid cursor style
+  if (gridContainer) {
+    if (activePowerUp) {
+      gridContainer.classList.add('power-up-mode');
+    } else {
+      gridContainer.classList.remove('power-up-mode');
+    }
+  }
 }
 
 function updateStoreDisplay() {
