@@ -9,9 +9,9 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0a0a0f;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(0, 255, 65, 0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(79, 195, 247, 0.12), transparent 30%), #05060b;
+      color: #e4ecf1;
+      font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -21,78 +21,204 @@
     }
 
     h1.app-title {
-      font-size: 1.6rem;
-      letter-spacing: 0.12em;
+      font-size: 1.7rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #00ff41;
-      text-shadow: 0 0 10px #00ff4180;
+      color: #7effd8;
+      text-shadow: 0 0 12px #00ff4175, 0 0 30px #7effd855;
     }
 
     /* ── Match Maker ──────────────────────────────── */
     .match-card {
-      background: #0d0d1a;
-      border: 1px solid #1a1a2e;
-      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(10, 14, 30, 0.95), rgba(8, 10, 22, 0.92));
+      border: 1px solid #1d3042;
+      border-radius: 16px;
       padding: 1rem;
       width: 100%;
-      max-width: 460px;
+      max-width: 900px;
+      box-shadow: 0 12px 50px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(126, 255, 216, 0.05);
     }
 
     .match-card h2 {
       text-align: center;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #00ff41;
+      color: #7effd8;
       margin-bottom: 0.6rem;
+    }
+
+    .match-shell {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 860px) {
+      .match-shell { grid-template-columns: 1fr; }
     }
 
     .match-stats {
       display: flex;
       justify-content: space-around;
       font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 0.8rem;
+      color: #a6b7c6;
+      margin-bottom: 0.65rem;
     }
 
-    .match-stats span { color: #00ff41; font-weight: 700; }
+    .match-stats > div {
+      transition: all 0.3s ease;
+    }
+
+    .match-stats > div.score-pop {
+      animation: scorePop 0.5s ease;
+    }
+
+    .match-stats span { color: #7effd8; font-weight: 700; }
+
+    .match-momentum {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+
+    .momentum-chip {
+      background: linear-gradient(135deg, #0e1a2b, #0c1b24);
+      border: 1px solid #12324b;
+      border-radius: 10px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      color: #d9f5ff;
+      display: inline-flex;
+      gap: 0.3rem;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .momentum-chip.active {
+      background: linear-gradient(135deg, #1a2e3b, #1c3544);
+      border-color: #7effd8;
+      box-shadow: 0 0 12px rgba(126, 255, 216, 0.3);
+      transform: scale(1.05);
+    }
+
+    .momentum-chip strong { color: #7effd8; transition: color 0.3s ease; }
+    .momentum-chip.active strong { color: #fff; text-shadow: 0 0 8px rgba(126, 255, 216, 0.6); }
+
+    .board-wrap {
+      background: linear-gradient(145deg, #0b0f1c, #0f1324);
+      border-radius: 14px;
+      border: 1px solid #18283a;
+      padding: 0.8rem;
+      box-shadow: inset 0 0 0 1px rgba(126, 255, 216, 0.05);
+    }
 
     .match-grid {
+      position: relative;
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 0.4rem;
       padding: 0.8rem;
       width: 100%;
-      max-width: 420px;
+      max-width: 480px;
       margin: 0 auto;
+      background: url('./tiles.PNG') center/cover, radial-gradient(circle at 40% 20%, rgba(126, 255, 216, 0.12), transparent 45%), #0b0f1c;
+      border-radius: 12px;
+      border: 1px solid #12324b;
     }
 
     .match-cell {
+      position: relative;
       aspect-ratio: 1 / 1;
-      border-radius: 8px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       cursor: pointer;
-      background: #111;
-      box-shadow: 0 0 6px rgba(0,0,0,0.6);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      background: linear-gradient(135deg, #0c1b24, #112436);
+      box-shadow: 0 0 6px rgba(0,0,0,0.6), 0 0 16px rgba(126, 255, 216, 0.05);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, opacity 0.2s ease;
       user-select: none;
+      overflow: visible;
+      border: 1px solid rgba(126, 255, 216, 0.05);
     }
 
-    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .match-cell:hover { transform: scale(1.05); box-shadow: 0 0 18px rgba(126, 255, 216, 0.18); }
     .match-cell:active { transform: scale(0.94); }
+
+    .match-cell.selected {
+      box-shadow: 0 0 0 3px #7effd8, 0 0 20px rgba(126, 255, 216, 0.6);
+      transform: scale(1.08);
+    }
+
+    .match-cell.matching {
+      animation: pop 0.28s ease;
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.5));
+    }
+
+    .match-cell.clearing {
+      animation: clearGem 0.4s ease forwards;
+    }
+
+    .match-cell.falling {
+      animation: fallGem 0.3s ease;
+    }
+
+    .glyph {
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+      width: 80%;
+      height: 80%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .glyph.emoji {
+      width: auto;
+      height: auto;
+      background: none;
+    }
+
+    .special-chip {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-radius: 6px;
+      padding: 0.1rem 0.35rem;
+      font-size: 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+    }
+
+    .gem-heart { background: linear-gradient(135deg, #1b0e18, #2a1322); border-color: rgba(255, 107, 157, 0.2); }
+    .gem-star { background: linear-gradient(135deg, #201c0f, #2a2213); border-color: rgba(255, 215, 0, 0.2); }
+    .gem-cross { background: linear-gradient(135deg, #12141f, #1c2033); border-color: rgba(126, 166, 255, 0.2); }
+    .gem-flame { background: linear-gradient(135deg, #24130f, #35180f); border-color: rgba(255, 99, 71, 0.2); }
+    .gem-drop { background: linear-gradient(135deg, #0f1b24, #0f2432); border-color: rgba(79, 195, 247, 0.2); }
+    .gem-wild { background: linear-gradient(135deg, #1a1030, #10301a); border-color: rgba(126, 255, 216, 0.3); }
+
+    .special-row, .special-col, .special-bomb, .special-wild {
+      box-shadow: 0 0 18px rgba(126, 255, 216, 0.25), inset 0 0 12px rgba(126, 255, 216, 0.1);
+      border-color: rgba(126, 255, 216, 0.5);
+      animation: specialPulse 2s ease-in-out infinite;
+    }
 
     .match-badge-banner {
       text-align: center;
-      font-size: 0.9rem;
-      color: #00ff41;
-      background: #001a00;
+      font-size: 0.92rem;
+      color: #7effd8;
+      background: #0d2a19;
       border: 1px solid #00ff4160;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
       margin-top: 0.6rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     }
 
     .match-badge-banner.hidden { display: none; }
@@ -100,18 +226,75 @@
     .match-restart-btn {
       display: block;
       margin: 0.8rem auto 0;
-      background: transparent;
-      border: 1px solid #00ff41;
-      color: #00ff41;
-      padding: 0.4rem 1.4rem;
-      border-radius: 6px;
+      background: linear-gradient(135deg, #0c1c2a, #0f2536);
+      border: 1px solid #7effd8;
+      color: #7effd8;
+      padding: 0.45rem 1.4rem;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       letter-spacing: 0.08em;
-      transition: background 0.15s;
+      transition: transform 0.15s, box-shadow 0.2s, background 0.15s;
+      box-shadow: 0 8px 18px rgba(0, 255, 65, 0.12);
     }
 
-    .match-restart-btn:hover { background: #00ff4120; }
+    .match-restart-btn:hover { background: #113042; transform: translateY(-1px); }
+    .match-restart-btn:active { transform: translateY(1px); }
+
+    .store {
+      background: linear-gradient(135deg, #0c1324, #0f1a2f);
+      border: 1px solid #18283a;
+      border-radius: 12px;
+      padding: 0.75rem;
+      box-shadow: inset 0 0 0 1px rgba(126, 255, 216, 0.05);
+      height: 100%;
+    }
+
+    .store-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      color: #d9f5ff;
+    }
+
+    .store-head h3 {
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7effd8;
+    }
+
+    .store-currency {
+      background: rgba(126, 255, 216, 0.08);
+      border: 1px solid rgba(126, 255, 216, 0.3);
+      padding: 0.35rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .store-items {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .store-item {
+      background: linear-gradient(135deg, #0f1f33, #0f2742);
+      color: #d9f5ff;
+      border: 1px solid rgba(126, 255, 216, 0.25);
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+      width: 100%;
+    }
+
+    .store-item:hover { transform: translateY(-1px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35); }
+    .store-item:active { transform: translateY(1px); }
+
+    .store-title { font-weight: 700; color: #7effd8; }
+    .store-meta { font-size: 0.82rem; color: #a6b7c6; margin-top: 0.1rem; }
 
     /* ── Matrix of Conscience ─────────────────────── */
     .matrix-card {
@@ -179,6 +362,76 @@
       background: linear-gradient(90deg, #1565c0, #4fc3f7);
       transition: width 0.4s ease;
     }
+
+    /* ── Particles ────────────────────────────────── */
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: particleFloat 0.8s ease-out forwards;
+      z-index: 100;
+    }
+
+    /* ── Animations ───────────────────────────────── */
+    @keyframes pop {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes clearGem {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(1.2) rotate(10deg);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.5) rotate(20deg);
+      }
+    }
+
+    @keyframes fallGem {
+      0% {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes particleFloat {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+      }
+    }
+
+    @keyframes specialPulse {
+      0%, 100% {
+        box-shadow: 0 0 18px rgba(126, 255, 216, 0.25), inset 0 0 12px rgba(126, 255, 216, 0.1);
+      }
+      50% {
+        box-shadow: 0 0 25px rgba(126, 255, 216, 0.4), inset 0 0 18px rgba(126, 255, 216, 0.2);
+      }
+    }
+
+    @keyframes scorePop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); color: #7effd8; }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -195,11 +448,26 @@
       <div>Level: <span id="match-level">1</span></div>
     </div>
 
-    <div class="match-grid" id="match-grid"></div>
+    <div class="match-momentum">
+      <div class="momentum-chip">Combo <strong id="match-combo">1.0x</strong></div>
+      <div class="momentum-chip">Chain <strong id="match-chain">Chain 0</strong></div>
+    </div>
 
-    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+    <div class="match-shell">
+      <div class="board-wrap">
+        <div class="match-grid" id="match-grid"></div>
+        <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+      </div>
 
-    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
+      <div class="store">
+        <div class="store-head">
+          <h3>Arcade Store</h3>
+          <div class="store-currency">Shards: <span id="match-shards">0</span></div>
+        </div>
+        <div class="store-items" id="match-store-items"></div>
+        <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
+      </div>
+    </div>
   </section>
 
   <!-- ══ Matrix of Conscience ════════════════════════ -->
