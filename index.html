@@ -224,6 +224,102 @@
 
     .match-restart-btn:hover { background: #00ff4120; }
 
+    /* ── Moves warning states ────────────────────────── */
+    .moves-warn   { color: #ff9800 !important; text-shadow: 0 0 6px #ff980060; }
+    .moves-danger { color: #ff4444 !important; text-shadow: 0 0 8px #ff444480;
+                    animation: moves-pulse 0.8s ease-in-out infinite; }
+
+    @keyframes moves-pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.55; }
+    }
+
+    /* ── Restart confirmation modal ──────────────────── */
+    .restart-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.72);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 900;
+    }
+
+    .restart-modal-overlay.hidden { display: none; }
+
+    .restart-modal {
+      background: #0d1117;
+      border: 1px solid #00ff4160;
+      border-radius: 12px;
+      padding: 1.6rem 2rem;
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+      animation: modal-in 0.22s ease-out;
+    }
+
+    @keyframes modal-in {
+      from { transform: scale(0.88); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .restart-modal p, .restart-modal .restart-modal-body {
+      font-size: 0.95rem;
+      color: #c9d1d9;
+      margin-bottom: 1.2rem;
+      line-height: 1.5;
+    }
+
+    .restart-modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e6edf3;
+      margin-bottom: 0.6rem;
+    }
+
+    .restart-modal-actions {
+      display: flex; gap: 0.75rem; justify-content: center;
+    }
+
+    .restart-modal-actions button {
+      padding: 0.45rem 1.3rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      border: 1px solid;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .restart-modal-actions button:active { transform: scale(0.96); }
+
+    #restart-confirm-yes {
+      background: transparent;
+      border-color: #00ff41;
+      color: #00ff41;
+    }
+
+    #restart-confirm-yes:hover { background: #00ff4120; }
+
+    #restart-confirm-no {
+      background: transparent;
+      border-color: #555;
+      color: #8b949e;
+    }
+
+    #restart-confirm-no:hover { background: #ffffff10; }
+
+    /* ── Clue reveal shake + glow ────────────────────── */
+    .clue-shake {
+      animation: clue-reveal 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    @keyframes clue-reveal {
+      0%,  100% { transform: translateX(0);   box-shadow: 0 0 0   #9c4dcc00; }
+      15%        { transform: translateX(-5px); box-shadow: 0 0 16px #9c4dcc; }
+      30%        { transform: translateX(5px);  box-shadow: 0 0 22px #ce93d8; }
+      45%        { transform: translateX(-4px); box-shadow: 0 0 18px #9c4dcc; }
+      60%        { transform: translateX(3px);  box-shadow: 0 0 14px #ce93d8; }
+      75%        { transform: translateX(-2px); box-shadow: 0 0 10px #9c4dcc; }
+    }
+
     /* ── Matrix of Conscience ─────────────────────── */
     .matrix-card {
       background: #0d0d1a;
@@ -327,6 +423,18 @@
 
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>
+
+  <!-- Restart confirmation modal -->
+  <div id="restart-modal-overlay" class="restart-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="restart-modal-title">
+    <div class="restart-modal" tabindex="-1">
+      <h2 id="restart-modal-title" class="restart-modal-title">Restart Level?</h2>
+      <p class="restart-modal-body">Your current score and progress will be lost.</p>
+      <div class="restart-modal-actions">
+        <button id="restart-confirm-yes">Restart Level</button>
+        <button id="restart-confirm-no">Keep Playing</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ Matrix of Conscience ════════════════════════ -->
   <section class="matrix-card matrix-border" id="matrix-economy-screen">

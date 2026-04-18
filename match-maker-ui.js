@@ -73,6 +73,7 @@ function cacheDom() {
   dom.buffBadge  = document.getElementById('match-buffs');
   dom.banner     = document.getElementById('match-badge-banner');
   dom.suspect    = document.getElementById('match-suspect');
+  dom.restartModal = document.getElementById('restart-modal-overlay');
 
   // Matrix of Conscience
   dom.mcEmpathy  = document.getElementById('mc-empathy');
@@ -124,7 +125,11 @@ function updateBuffBadge() {
 function updateHUD() {
   if (dom.score) dom.score.textContent = score;
   if (dom.level) dom.level.textContent = level;
-  if (dom.moves) dom.moves.textContent = movesLeft;
+  if (dom.moves) {
+    dom.moves.textContent = movesLeft;
+    dom.moves.classList.toggle('moves-danger', movesLeft <= 5);
+    dom.moves.classList.toggle('moves-warn',   movesLeft > 5 && movesLeft <= 10);
+  }
   if (dom.clues) dom.clues.textContent = clueFragments;
   updateBuffBadge();
 }
@@ -363,9 +368,16 @@ function revealClue(n) {
   if (n <= CLUE_TEXTS.length) {
     showMsg(CLUE_TEXTS[n - 1], 3500);
   }
-  // After 3 clues, prompt the suspect choice
+  // After 3 clues, show the suspect panel, then shake + glow it
   if (n === CLUE_TEXTS.length && !chosenSuspect && dom.suspect) {
     dom.suspect.style.display = '';
+  }
+  // Shake + glow only when the panel is actually visible
+  if (dom.suspect && dom.suspect.style.display !== 'none') {
+    dom.suspect.classList.remove('clue-shake');
+    void dom.suspect.offsetWidth; // force reflow to restart animation
+    dom.suspect.classList.add('clue-shake');
+    dom.suspect.addEventListener('animationend', () => dom.suspect.classList.remove('clue-shake'), { once: true });
   }
 }
 
@@ -431,12 +443,39 @@ export function initMatchMaker(db, user) {
   if (dom.suspect) dom.suspect.style.display = 'none';
   if (dom.combo)   { dom.combo.textContent = ''; dom.combo.classList.remove('combo-pop'); }
   if (dom.msg)     dom.msg.textContent = '';
+  if (dom.moves)   { dom.moves.classList.remove('moves-warn', 'moves-danger'); }
+  if (dom.restartModal) dom.restartModal.classList.add('hidden');
 
   // Wire suspect-choice buttons
   const reedBtn       = document.getElementById('suspect-reed');
   const blackwoodBtn  = document.getElementById('suspect-blackwood');
   if (reedBtn)      reedBtn.onclick      = () => chooseSuspect('reed');
   if (blackwoodBtn) blackwoodBtn.onclick = () => chooseSuspect('blackwood');
+
+  // Wire restart button — show confirmation modal instead of immediately restarting
+  const restartBtn    = document.getElementById('match-restart-btn');
+  const confirmYes    = document.getElementById('restart-confirm-yes');
+  const confirmNo     = document.getElementById('restart-confirm-no');
+  const modalInner    = dom.restartModal ? dom.restartModal.querySelector('[tabindex="-1"]') : null;
+
+  if (restartBtn && dom.restartModal) {
+    restartBtn.onclick = () => {
+      dom.restartModal.classList.remove('hidden');
+      if (modalInner) modalInner.focus();
+    };
+  }
+  if (confirmYes) {
+    confirmYes.onclick = () => {
+      if (dom.restartModal) dom.restartModal.classList.add('hidden');
+      initMatchMaker(db, user);
+    };
+  }
+  if (confirmNo && dom.restartModal) {
+    confirmNo.onclick = () => {
+      dom.restartModal.classList.add('hidden');
+      if (restartBtn) restartBtn.focus();
+    };
+  }
 
   updateHUD();
   updateConscience();
