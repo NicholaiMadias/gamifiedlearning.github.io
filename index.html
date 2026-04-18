@@ -4,364 +4,169 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gamified Learning</title>
-  <style>
-    /* ── Base ─────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0a0a0f;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      padding: 1.5rem 1rem 3rem;
-    }
-
-    h1.app-title {
-      font-size: 1.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #00ff41;
-      text-shadow: 0 0 10px #00ff4180;
-    }
-
-    /* ── Match Maker ──────────────────────────────── */
-    .match-card {
-      background: #0d0d1a;
-      border: 1px solid #1a1a2e;
-      border-radius: 12px;
-      padding: 1rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .match-card h2 {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #00ff41;
-      margin-bottom: 0.6rem;
-    }
-
-    .match-stats {
-      display: flex;
-      justify-content: space-around;
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 0.8rem;
-    }
-
-    .match-stats span { color: #00ff41; font-weight: 700; }
-
-    .match-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      padding: 0.8rem;
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-    }
-
-    .match-cell {
-      aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      cursor: pointer;
-      background: #111;
-      box-shadow: 0 0 6px rgba(0,0,0,0.6);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-      user-select: none;
-    }
-
-    .match-cell:hover  { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
-    .match-cell:active { transform: scale(0.94); }
-
-    .match-cell.selected {
-      transform: scale(1.12);
-      box-shadow: 0 0 14px rgba(0,255,65,0.7);
-      border: 1px solid #00ff41;
-      z-index: 1;
-    }
-
-    .match-cell.matched {
-      animation: gem-pop 0.28s ease forwards;
-    }
-
-    @keyframes gem-pop {
-      0%   { transform: scale(1.0); }
-      55%  { transform: scale(1.3); filter: brightness(1.8); }
-      100% { transform: scale(0.0); opacity: 0; }
-    }
-
-    /* Lavender gem ─────────────────────────────── */
-    .gem-lavender {
-      background: #2a1a3e !important;
-      box-shadow: 0 0 8px #9c4dcc60;
-    }
-
-    .match-cell.lavender-match {
-      animation: lavender-pop 0.35s ease forwards;
-    }
-
-    @keyframes lavender-pop {
-      0%   { transform: scale(1.0); box-shadow: 0 0 4px #9c4dcc; }
-      50%  { transform: scale(1.35); box-shadow: 0 0 20px #ce93d8; filter: brightness(1.6); }
-      100% { transform: scale(0.0); opacity: 0; }
-    }
-
-    /* Combo display ────────────────────────────── */
-    .match-combo {
-      min-height: 1.8em;
-      text-align: center;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #ffeb3b;
-      text-shadow: 0 0 10px #ffeb3b90;
-      letter-spacing: 0.06em;
-    }
-
-    .combo-pop {
-      animation: combo-burst 0.55s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    }
-
-    @keyframes combo-burst {
-      0%   { transform: scale(0.4); opacity: 0; }
-      65%  { transform: scale(1.25); opacity: 1; }
-      100% { transform: scale(1.0);  opacity: 1; }
-    }
-
-    /* Buff badge ────────────────────────────────── */
-    .match-buffs {
-      text-align: center;
-      font-size: 0.75rem;
-      color: #4fc3f7;
-      background: #0a1f30;
-      border: 1px solid #1e3a5f;
-      border-radius: 6px;
-      padding: 0.2rem 0.6rem;
-      margin-bottom: 0.4rem;
-    }
-
-    /* Match message ─────────────────────────────── */
-    .match-msg {
-      min-height: 1.3em;
-      text-align: center;
-      font-size: 0.82rem;
-      color: #aaa;
-      margin: 0.3rem 0;
-    }
-
-    /* Seven Stars suspect panel ─────────────────── */
-    .suspect-panel {
-      background: #1a0a2e;
-      border: 1px solid #7c4dff60;
-      border-radius: 8px;
-      padding: 0.8rem;
-      margin: 0.4rem 0;
-      text-align: center;
-    }
-
-    .suspect-question {
-      font-size: 0.82rem;
-      color: #ce93d8;
-      margin-bottom: 0.6rem;
-    }
-
-    .suspect-choices {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .suspect-btn {
-      background: transparent;
-      border: 1px solid #7c4dff;
-      color: #ce93d8;
-      padding: 0.35rem 0.9rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: background 0.15s;
-    }
-
-    .suspect-btn:hover { background: #7c4dff30; }
-
-    .match-badge-banner {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #00ff41;
-      background: #001a00;
-      border: 1px solid #00ff4160;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      margin-top: 0.6rem;
-    }
-
-    .match-badge-banner.hidden { display: none; }
-
-    .match-restart-btn {
-      display: block;
-      margin: 0.8rem auto 0;
-      background: transparent;
-      border: 1px solid #00ff41;
-      color: #00ff41;
-      padding: 0.4rem 1.4rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      transition: background 0.15s;
-    }
-
-    .match-restart-btn:hover { background: #00ff4120; }
-
-    /* ── Matrix of Conscience ─────────────────────── */
-    .matrix-card {
-      background: #0d0d1a;
-      border-radius: 12px;
-      padding: 1.2rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .matrix-border { border: 1px solid #1a2a3a; }
-
-    .matrix-heading {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #4fc3f7;
-      margin-bottom: 1rem;
-    }
-
-    .matrix-economy-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
-    .matrix-cell {
-      background: #111827;
-      border: 1px solid #1e3a5f;
-      border-radius: 8px;
-      padding: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .matrix-cell .icon { font-size: 1.6rem; }
-
-    .matrix-cell .label {
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #64b5f6;
-    }
-
-    .matrix-cell .value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #e0e0e0;
-    }
-
-    .matrix-cell .bar-track {
-      width: 100%;
-      height: 4px;
-      background: #1e3a5f;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .matrix-cell .bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: linear-gradient(90deg, #1565c0, #4fc3f7);
-      transition: width 0.4s ease;
-    }
-  </style>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
-  <h1 class="app-title">Gamified Learning</h1>
+  <a class="skip-link" href="#match-grid">Skip to game board</a>
 
-  <!-- ══ Match Maker ══════════════════════════════════ -->
-  <section class="match-card" id="match-maker-screen">
-    <h2>Match Maker</h2>
+  <header class="app-header">
+    <h1 class="app-title">Gamified Learning</h1>
+  </header>
 
-    <div class="match-stats">
-      <div>Score: <span id="match-score">0</span></div>
-      <div>Moves: <span id="match-moves">20</span></div>
-      <div>Level: <span id="match-level">1</span></div>
-      <div>🌸 Clues: <span id="match-clues">0</span></div>
-    </div>
+  <!-- ══ Game layout: three panels on desktop ════════════════════════════ -->
+  <div class="game-layout">
 
-    <div id="match-buffs" class="match-buffs" style="display:none"></div>
-    <div id="match-combo" class="match-combo"></div>
+    <!-- ── Left panel: Matrix of Conscience ──────────────────────────── -->
+    <aside class="panel panel-matrix" aria-label="Matrix of Conscience">
+      <h2 class="panel-title">Matrix of Conscience</h2>
+      <div class="conscience-list">
 
-    <div class="match-grid" id="match-grid"></div>
+        <div class="conscience-row" id="mc-row-empathy">
+          <div class="conscience-header">
+            <span class="conscience-icon">💖</span>
+            <span class="conscience-name">Empathy</span>
+            <span class="conscience-val" id="mc-empathy">72</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-empathy" id="mc-empathy-bar" style="width:72%"></div>
+          </div>
+        </div>
 
-    <div id="match-msg" class="match-msg"></div>
+        <div class="conscience-row" id="mc-row-justice">
+          <div class="conscience-header">
+            <span class="conscience-icon">⚖️</span>
+            <span class="conscience-name">Justice</span>
+            <span class="conscience-val" id="mc-justice">58</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-justice" id="mc-justice-bar" style="width:58%"></div>
+          </div>
+        </div>
 
-    <!-- Seven Stars: suspect choice panel (hidden until enough clues collected) -->
-    <div id="match-suspect" class="suspect-panel" style="display:none">
-      <div class="suspect-question">🌸 The Seven Stars lens is gone… Who wore lavender?</div>
-      <div class="suspect-choices">
-        <button class="suspect-btn" id="suspect-reed">Dr. Reed → 🧠 Wisdom</button>
-        <button class="suspect-btn" id="suspect-blackwood">Lord Blackwood → ⚖️ Justice</button>
+        <div class="conscience-row" id="mc-row-wisdom">
+          <div class="conscience-header">
+            <span class="conscience-icon">🧠</span>
+            <span class="conscience-name">Wisdom</span>
+            <span class="conscience-val" id="mc-wisdom">45</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-wisdom" id="mc-wisdom-bar" style="width:45%"></div>
+          </div>
+        </div>
+
+        <div class="conscience-row" id="mc-row-growth">
+          <div class="conscience-header">
+            <span class="conscience-icon">🌱</span>
+            <span class="conscience-name">Growth</span>
+            <span class="conscience-val" id="mc-growth">83</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-growth" id="mc-growth-bar" style="width:83%"></div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ── Center panel: Match Maker board ───────────────────────────── -->
+    <main class="panel panel-board" id="match-maker-screen">
+
+      <h2 class="panel-title panel-title-center">Match Maker</h2>
+
+      <!-- HUD: Score / Moves / Level -->
+      <div class="game-hud" role="status" aria-live="polite" aria-atomic="true">
+        <div class="hud-stat">
+          <div class="hud-label">Score</div>
+          <div class="hud-value" id="match-score">0</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-label">Moves</div>
+          <div class="hud-value" id="match-moves">20</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-label">Level</div>
+          <div class="hud-value hud-badge" id="match-level">1</div>
+        </div>
+      </div>
+
+      <div id="match-buffs" class="match-buffs" style="display:none"></div>
+      <div id="match-combo" class="match-combo" aria-live="polite"></div>
+
+      <div class="match-grid" id="match-grid" role="grid" aria-label="Match Maker grid"></div>
+
+      <div id="match-msg" class="match-msg" aria-live="polite"></div>
+
+      <div id="match-badge-banner" class="match-badge-banner hidden" aria-live="assertive"></div>
+
+    </main>
+
+    <!-- ── Right panel: Seven Stars Mystery ──────────────────────────── -->
+    <aside class="panel panel-mystery" aria-label="Seven Stars Mystery">
+
+      <div class="clue-card" id="clue-card">
+        <h2 class="panel-title">Seven Stars</h2>
+        <p class="clue-intro">The Seven Stars lens is missing. A lavender scent lingers at the Observatory.</p>
+
+        <!-- Lavender tile progress toward next clue fragment -->
+        <div class="clue-progress-section">
+          <div class="clue-progress-label">
+            Lavender collected: <strong><span id="clue-lavender-pending">0</span> / 3</strong>
+          </div>
+          <div class="bar-track clue-bar-track">
+            <div class="bar-fill bar-lavender" id="clue-progress-fill" style="width:0%"></div>
+          </div>
+          <div class="clue-next-reward">Next reward: Memory Fragment</div>
+        </div>
+
+        <!-- Suspects -->
+        <div class="clue-suspects-static">
+          <div class="clue-suspect-item">🔍 Dr. Reed</div>
+          <div class="clue-suspect-item">🔍 Lord Blackwood</div>
+        </div>
+
+        <!-- Clue fragment count -->
+        <div class="clue-count">
+          🌸 Clues found: <strong id="match-clues">0</strong>
+        </div>
+
+        <!-- Discovered clue history -->
+        <div class="clue-history" id="clue-history" aria-live="polite"></div>
+      </div>
+
+      <!-- Suspect choice panel (shown after 3 clue fragments) -->
+      <div id="match-suspect" class="suspect-panel" style="display:none">
+        <div class="suspect-question">🌸 The Seven Stars lens is gone… Who wore lavender?</div>
+        <div class="suspect-choices">
+          <button class="suspect-btn" id="suspect-reed">Dr. Reed → 🧠 Wisdom</button>
+          <button class="suspect-btn" id="suspect-blackwood">Lord Blackwood → ⚖️ Justice</button>
+        </div>
+      </div>
+
+    </aside>
+  </div><!-- /game-layout -->
+
+  <!-- ── Restart button ──────────────────────────────────────────────── -->
+  <div class="restart-area">
+    <button class="btn btn-restart" id="match-restart-btn">Restart Level</button>
+  </div>
+
+  <!-- ── Restart confirmation modal ─────────────────────────────────── -->
+  <div class="confirm-modal hidden" id="confirm-modal"
+       role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="confirm-dialog">
+      <p id="confirm-title" class="confirm-title">Restart this level?</p>
+      <p class="confirm-body">Your current progress will be lost.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-confirm-yes" id="confirm-yes">Restart</button>
+        <button class="btn btn-confirm-no"  id="confirm-no">Cancel</button>
       </div>
     </div>
+  </div>
 
-    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
-
-    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
-  </section>
-
-  <!-- ══ Matrix of Conscience ════════════════════════ -->
-  <section class="matrix-card matrix-border" id="matrix-economy-screen">
-    <h2 class="matrix-heading">Matrix of Conscience</h2>
-
-    <div class="matrix-economy-grid">
-      <div class="matrix-cell">
-        <span class="icon">💖</span>
-        <span class="label">Empathy</span>
-        <span class="value" id="mc-empathy">72</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
-      </div>
-
-      <div class="matrix-cell">
-        <span class="icon">⚖️</span>
-        <span class="label">Justice</span>
-        <span class="value" id="mc-justice">58</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
-      </div>
-
-      <div class="matrix-cell">
-        <span class="icon">🧠</span>
-        <span class="label">Wisdom</span>
-        <span class="value" id="mc-wisdom">45</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
-      </div>
-
-      <div class="matrix-cell">
-        <span class="icon">🌱</span>
-        <span class="label">Growth</span>
-        <span class="value" id="mc-growth">83</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
-      </div>
-    </div>
-  </section>
+  <footer class="site-footer">
+    <span>© 2026 NicholaiMadias · Gamified Learning · MIT License</span>
+  </footer>
 
   <script type="module" src="./main.js"></script>
 </body>

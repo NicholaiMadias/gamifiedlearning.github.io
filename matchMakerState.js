@@ -4,8 +4,11 @@ export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
 // Lavender is a rare narrative tile that spawns at ~4% rate
 const LAVENDER_CHANCE = 0.04;
+// When heartBoost buff is active, heart tiles get an extra 10% spawn chance
+const HEART_BOOST_CHANCE = 0.10;
 
-function randomGem() {
+function randomGem(buffs = {}) {
+  if (buffs.heartBoost && Math.random() < HEART_BOOST_CHANCE) return 'heart';
   if (Math.random() < LAVENDER_CHANCE) return 'lavender';
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
 }
@@ -113,9 +116,11 @@ export function clearMatches(grid, matches) {
 }
 
 /**
- * Applies gravity: shifts non-null cells down, fills top with new random gems.
+ * Applies gravity: shifts non-null cells down, fills top with buff-aware random gems.
+ * @param {string[][]} grid
+ * @param {{ heartBoost?: boolean }} [buffs]
  */
-export function applyGravity(grid) {
+export function applyGravityWithBuffs(grid, buffs = {}) {
   const next = grid.map(row => [...row]);
   for (let c = 0; c < GRID_SIZE; c++) {
     // Collect non-null gems bottom-to-top; shift() later returns the bottom-most gem first
@@ -125,8 +130,15 @@ export function applyGravity(grid) {
     }
     // Fill column from bottom upward: existing gems settle down, new random gems fill the top
     for (let r = GRID_SIZE - 1; r >= 0; r--) {
-      next[r][c] = gems.length > 0 ? gems.shift() : randomGem();
+      next[r][c] = gems.length > 0 ? gems.shift() : randomGem(buffs);
     }
   }
   return next;
+}
+
+/**
+ * Applies gravity: shifts non-null cells down, fills top with new random gems.
+ */
+export function applyGravity(grid) {
+  return applyGravityWithBuffs(grid, {});
 }

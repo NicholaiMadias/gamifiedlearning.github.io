@@ -6,7 +6,7 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
+import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravityWithBuffs } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
 const COLS                    = 7;
@@ -58,6 +58,9 @@ let conscience = { empathy: 72, justice: 58, wisdom: 45, growth: 83 };
 let msgTimer   = null;
 let comboTimer = null;
 
+// Previous buff state — used to detect newly-activated buffs for pulse animation
+let prevBuffs = { heartBoost: false, autoResolve: false, hintReady: false, xpBoost: false };
+
 const dom = {};
 
 // ── DOM cache ──────────────────────────────────────────────────────────────
@@ -73,6 +76,10 @@ function cacheDom() {
   dom.buffBadge  = document.getElementById('match-buffs');
   dom.banner     = document.getElementById('match-badge-banner');
   dom.suspect    = document.getElementById('match-suspect');
+  dom.clueCard   = document.getElementById('clue-card');
+  dom.clueHistory = document.getElementById('clue-history');
+  dom.lavPending  = document.getElementById('clue-lavender-pending');
+  dom.lavFill     = document.getElementById('clue-progress-fill');
 
   // Matrix of Conscience
   dom.mcEmpathy  = document.getElementById('mc-empathy');
@@ -83,6 +90,12 @@ function cacheDom() {
   dom.barJustice = document.getElementById('mc-justice-bar');
   dom.barWisdom  = document.getElementById('mc-wisdom-bar');
   dom.barGrowth  = document.getElementById('mc-growth-bar');
+
+  // Matrix stat rows (for pulse animation)
+  dom.rowEmpathy = document.getElementById('mc-row-empathy');
+  dom.rowJustice = document.getElementById('mc-row-justice');
+  dom.rowWisdom  = document.getElementById('mc-row-wisdom');
+  dom.rowGrowth  = document.getElementById('mc-row-growth');
 }
 
 // ── Matrix buffs ───────────────────────────────────────────────────────────
@@ -124,17 +137,21 @@ function updateBuffBadge() {
 function updateHUD() {
   if (dom.score) dom.score.textContent = score;
   if (dom.level) dom.level.textContent = level;
-  if (dom.moves) dom.moves.textContent = movesLeft;
+  if (dom.moves) {
+    dom.moves.textContent = movesLeft;
+    dom.moves.classList.toggle('moves-warn',     movesLeft <= 10 && movesLeft > 5);
+    dom.moves.classList.toggle('moves-critical', movesLeft <= 5);
+  }
   if (dom.clues) dom.clues.textContent = clueFragments;
   updateBuffBadge();
 }
 
 function updateConscience() {
   const map = {
-    empathy: { val: dom.mcEmpathy, bar: dom.barEmpathy },
-    justice: { val: dom.mcJustice, bar: dom.barJustice },
-    wisdom:  { val: dom.mcWisdom,  bar: dom.barWisdom  },
-    growth:  { val: dom.mcGrowth,  bar: dom.barGrowth  },
+    empathy: { val: dom.mcEmpathy, bar: dom.barEmpathy, row: dom.rowEmpathy },
+    justice: { val: dom.mcJustice, bar: dom.barJustice, row: dom.rowJustice },
+    wisdom:  { val: dom.mcWisdom,  bar: dom.barWisdom,  row: dom.rowWisdom  },
+    growth:  { val: dom.mcGrowth,  bar: dom.barGrowth,  row: dom.rowGrowth  },
   };
   Object.entries(map).forEach(([key, el]) => {
     const v = Math.min(conscience[key], 100);
@@ -144,6 +161,13 @@ function updateConscience() {
   updateBuffBadge();
 }
 
+function pulseBuffRow(rowEl) {
+  if (!rowEl) return;
+  rowEl.classList.remove('buff-pulse');
+  void rowEl.offsetWidth; // restart animation
+  rowEl.classList.add('buff-pulse');
+}
+
 function bumpConscience(matchCount) {
   const boost = Math.ceil(matchCount * 1.5);
   conscience.empathy = Math.min(100, conscience.empathy + boost + Math.floor(Math.random() * 3));
@@ -151,6 +175,14 @@ function bumpConscience(matchCount) {
   conscience.wisdom  = Math.min(100, conscience.wisdom  + Math.floor(boost * 0.8));
   conscience.growth  = Math.min(100, conscience.growth  + Math.floor(boost * 1.2));
   updateConscience();
+
+  // Pulse newly activated buff rows
+  const curr = getActiveBuffs();
+  if (curr.heartBoost  && !prevBuffs.heartBoost)  pulseBuffRow(dom.rowEmpathy);
+  if (curr.autoResolve && !prevBuffs.autoResolve) pulseBuffRow(dom.rowJustice);
+  if (curr.hintReady   && !prevBuffs.hintReady)   pulseBuffRow(dom.rowWisdom);
+  if (curr.xpBoost     && !prevBuffs.xpBoost)     pulseBuffRow(dom.rowGrowth);
+  prevBuffs = curr;
 }
 
 // ── Messages ──────────────────────────────────────────────────────────────
@@ -323,7 +355,7 @@ function processCascade(chain, rid) {
     if (lavenderCount > 0) handleLavenderMatch(lavenderCount);
 
     grid = clearMatches(grid, matches);
-    grid = applyGravity(grid);
+    grid = applyGravityWithBuffs(grid, getActiveBuffs());
     updateHUD();
     renderBoard();
     setTimeout(() => processCascade(chain + 1, rid), CASCADE_DELAY);
@@ -343,11 +375,19 @@ function highlightMatched(cells) {
 
 // ── Seven Stars — lavender clue system ────────────────────────────────────
 
+function updateLavenderProgress() {
+  const pct = Math.min(lavenderPending / LAVENDER_CLUE_THRESHOLD, 1) * 100;
+  if (dom.lavPending) dom.lavPending.textContent = lavenderPending;
+  if (dom.lavFill)    dom.lavFill.style.width = pct + '%';
+}
+
 function handleLavenderMatch(count) {
   lavenderPending += count;
+  updateLavenderProgress();
   while (lavenderPending >= LAVENDER_CLUE_THRESHOLD) {
     lavenderPending -= LAVENDER_CLUE_THRESHOLD;
     clueFragments++;
+    updateLavenderProgress();
     updateHUD();
     revealClue(clueFragments);
   }
@@ -361,7 +401,21 @@ const CLUE_TEXTS = [
 
 function revealClue(n) {
   if (n <= CLUE_TEXTS.length) {
-    showMsg(CLUE_TEXTS[n - 1], 3500);
+    const text = CLUE_TEXTS[n - 1];
+    showMsg(text, 3500);
+    // Append to clue history log
+    if (dom.clueHistory) {
+      const entry = document.createElement('p');
+      entry.className = 'clue-entry';
+      entry.textContent = text;
+      dom.clueHistory.appendChild(entry);
+    }
+    // Shake the clue card
+    if (dom.clueCard) {
+      dom.clueCard.classList.remove('clue-shake');
+      void dom.clueCard.offsetWidth;
+      dom.clueCard.classList.add('clue-shake');
+    }
   }
   // After 3 clues, prompt the suspect choice
   if (n === CLUE_TEXTS.length && !chosenSuspect && dom.suspect) {
@@ -426,11 +480,14 @@ export function initMatchMaker(db, user) {
   clueFragments   = 0;
   chosenSuspect   = null;
   conscience      = { empathy: 72, justice: 58, wisdom: 45, growth: 83 };
+  prevBuffs       = { heartBoost: false, autoResolve: false, hintReady: false, xpBoost: false };
 
   if (dom.banner)  dom.banner.classList.add('hidden');
   if (dom.suspect) dom.suspect.style.display = 'none';
   if (dom.combo)   { dom.combo.textContent = ''; dom.combo.classList.remove('combo-pop'); }
   if (dom.msg)     dom.msg.textContent = '';
+  if (dom.clueHistory) dom.clueHistory.innerHTML = '';
+  updateLavenderProgress();
 
   // Wire suspect-choice buttons
   const reedBtn       = document.getElementById('suspect-reed');
