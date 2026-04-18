@@ -1,156 +1,238 @@
-// match-maker-ui.js
-import {
-  createInitialGrid,
-  canSwap,
-  applySwap,
-  findMatches,
-  clearMatches,
-  applyGravity,
-  GRID_SIZE,
-} from './matchMakerState.js';
+/**
+ * match-maker-ui.js — Game UI Layer for Match Maker
+ * Renders the 7×7 grid, handles input (click, touch, keyboard),
+ * animates cascades, manages levels, and updates the HUD + Conscience bars.
+ * (c) 2026 NicholaiMadias — MIT License
+ */
+
+import { createGrid, isAdjacent, swapGems, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
-let grid;
-let selected = null;
-let score = 0;
-let moves = 20;
-let level = 1;
-let db = null;
-let user = null;
+const COLS          = 7;
+const ROWS          = 7;
+const CASCADE_DELAY = 200;
+const BASE_POINTS   = 50;
+const CHAIN_BONUS   = 25;
+const CONSCIENCE_KEYS = ['empathy', 'justice', 'wisdom', 'growth'];
 
-const SCORE_PER_LEVEL = 500;
-const CHAIN_REACTION_DELAY_MS = 200;
+const GEM_DISPLAY = {
+  heart: { emoji: '❤️', cls: 'gem-heart', label: 'Heart' },
+  star:  { emoji: '⭐', cls: 'gem-star',  label: 'Star'  },
+  cross: { emoji: '✝️', cls: 'gem-cross', label: 'Cross' },
+  flame: { emoji: '🔥', cls: 'gem-flame', label: 'Flame' },
+  drop:  { emoji: '💧', cls: 'gem-drop',  label: 'Drop'  }
+};
 
-export function initMatchMaker(dbRef, userRef) {
-  db = dbRef;
-  user = userRef;
-  score = 0;
-  moves = 20;
-  level = 1;
-  selected = null;
-  grid = createInitialGrid();
-  renderGrid();
+let grid       = [];
+let score      = 0;
+let moves      = 0;
+let level      = 1;
+let selected   = null;
+let locked     = false;
+let conscience = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
 
-  document.getElementById('match-score').textContent = score;
-  document.getElementById('match-moves').textContent = moves;
-  document.getElementById('match-level').textContent = level;
+const dom = {};
+
+function cacheDom() {
+  dom.board      = document.getElementById('match-board');
+  dom.score      = document.getElementById('hud-score');
+  dom.level      = document.getElementById('hud-level');
+  dom.moves      = document.getElementById('hud-moves');
+  dom.msg        = document.getElementById('match-msg');
+  dom.barEmpathy = document.getElementById('bar-empathy');
+  dom.barJustice = document.getElementById('bar-justice');
+  dom.barWisdom  = document.getElementById('bar-wisdom');
+  dom.barGrowth  = document.getElementById('bar-growth');
+  dom.pctEmpathy = document.getElementById('pct-empathy');
+  dom.pctJustice = document.getElementById('pct-justice');
+  dom.pctWisdom  = document.getElementById('pct-wisdom');
+  dom.pctGrowth  = document.getElementById('pct-growth');
 }
 
-function renderGrid() {
-  const container = document.getElementById('match-grid');
-  container.innerHTML = '';
+function updateHUD() {
+  if (dom.score) dom.score.textContent = score;
+  if (dom.level) dom.level.textContent = level;
+  if (dom.moves) dom.moves.textContent = moves;
+}
 
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
-      const cell = document.createElement('div');
-      cell.className = 'match-cell';
+function showMsg(text) {
+  if (dom.msg) dom.msg.textContent = text;
+}
+
+function updateConscience() {
+  CONSCIENCE_KEYS.forEach(key => {
+    const val  = Math.min(conscience[key], 100);
+    const bar  = dom['bar' + key.charAt(0).toUpperCase() + key.slice(1)];
+    const pct  = dom['pct' + key.charAt(0).toUpperCase() + key.slice(1)];
+    if (bar) bar.style.width = val + '%';
+    if (pct) pct.textContent = val + '%';
+    const track = bar?.parentElement;
+    if (track) track.setAttribute('aria-valuenow', val);
+  });
+}
+
+function bumpConscience(matchCount) {
+  const boost = Math.ceil(matchCount * 1.5);
+  conscience.empathy = Math.min(100, conscience.empathy + boost + Math.floor(Math.random() * 3));
+  conscience.justice = Math.min(100, conscience.justice + boost + Math.floor(Math.random() * 2));
+  conscience.wisdom  = Math.min(100, conscience.wisdom  + Math.floor(boost * 0.8));
+  conscience.growth  = Math.min(100, conscience.growth  + Math.floor(boost * 1.2));
+  updateConscience();
+}
+
+function renderBoard() {
+  if (!dom.board) return;
+  dom.board.innerHTML = '';
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const gemType = grid[r][c];
+      const info    = GEM_DISPLAY[gemType] || { emoji: '?', cls: '', label: gemType };
+      const cell    = document.createElement('button');
+      const idx     = r * COLS + c;
+
+      cell.className = 'gem-cell ' + info.cls;
+      cell.textContent = info.emoji;
       cell.dataset.row = r;
       cell.dataset.col = c;
-      cell.textContent = gemIcon(grid[r][c]);
-      cell.onclick = () => onCellClick(r, c);
-      container.appendChild(cell);
+      cell.setAttribute('role', 'gridcell');
+      cell.setAttribute('aria-label', info.label + ', row ' + (r + 1) + ' column ' + (c + 1));
+      cell.setAttribute('tabindex', idx === 0 ? '0' : '-1');
+
+      if (selected && selected.row === r && selected.col === c) {
+        cell.classList.add('selected');
+      }
+
+      cell.addEventListener('click', () => onCellClick(r, c));
+      cell.addEventListener('keydown', (e) => onCellKey(e, r, c));
+      dom.board.appendChild(cell);
     }
   }
 }
 
-function gemIcon(type) {
-  switch (type) {
-    case 'heart': return '💖';
-    case 'star':  return '⭐';
-    case 'cross': return '✝️';
-    case 'flame': return '🔥';
-    case 'drop':  return '💧';
-    default:      return '⬛';
-  }
-}
-
-function onCellClick(r, c) {
-  if (moves <= 0) return;
-
+function onCellClick(row, col) {
+  if (locked) return;
   if (!selected) {
-    selected = { r, c };
-    highlightCell(r, c, true);
-    return;
-  }
-
-  const { r: r1, c: c1 } = selected;
-  if (r === r1 && c === c1) {
-    highlightCell(r, c, false);
+    selected = { row, col };
+    renderBoard();
+  } else if (selected.row === row && selected.col === col) {
     selected = null;
-    return;
+    renderBoard();
+  } else if (isAdjacent(selected.row, selected.col, row, col)) {
+    attemptSwap(selected.row, selected.col, row, col);
+  } else {
+    selected = { row, col };
+    renderBoard();
+  }
+}
+
+function onCellKey(e, row, col) {
+  let targetR = row;
+  let targetC = col;
+
+  switch (e.key) {
+    case 'ArrowUp':    targetR = Math.max(0, row - 1); break;
+    case 'ArrowDown':  targetR = Math.min(ROWS - 1, row + 1); break;
+    case 'ArrowLeft':  targetC = Math.max(0, col - 1); break;
+    case 'ArrowRight': targetC = Math.min(COLS - 1, col + 1); break;
+    case 'Enter':
+    case ' ':
+      e.preventDefault();
+      onCellClick(row, col);
+      return;
+    case 'Escape':
+      selected = null;
+      renderBoard();
+      return;
+    default:
+      return;
   }
 
-  if (!canSwap(grid, r1, c1, r, c)) {
-    highlightCell(r1, c1, false);
-    selected = { r, c };
-    highlightCell(r, c, true);
-    return;
-  }
+  e.preventDefault();
+  const idx = targetR * COLS + targetC;
+  const cells = dom.board.querySelectorAll('.gem-cell');
+  if (cells[idx]) cells[idx].focus();
+}
 
-  const swapped = applySwap(grid, r1, c1, r, c);
-  const matches = findMatches(swapped);
-
-  if (matches.length === 0) {
-    // Invalid swap — no match produced, revert selection
-    highlightCell(r1, c1, false);
-    selected = null;
-    return;
-  }
-
-  grid = swapped;
-  highlightCell(r1, c1, false);
+function attemptSwap(r1, c1, r2, c2) {
+  locked = true;
   selected = null;
-  moves--;
-  document.getElementById('match-moves').textContent = moves;
+  grid = swapGems(grid, r1, c1, r2, c2);
+  moves++;
+  updateHUD();
+  renderBoard();
 
-  resolveMatches();
-}
-
-function highlightCell(r, c, on) {
-  const cell = document.querySelector(`.match-cell[data-row="${r}"][data-col="${c}"]`);
-  if (!cell) return;
-  cell.style.outline = on ? '2px solid #00ff41' : 'none';
-}
-
-function resolveMatches() {
   const matches = findMatches(grid);
   if (matches.length === 0) {
-    renderGrid();
+    setTimeout(() => {
+      grid = swapGems(grid, r1, c1, r2, c2);
+      showMsg('No match — try again');
+      renderBoard();
+      setTimeout(() => showMsg(''), 1200);
+      locked = false;
+    }, CASCADE_DELAY);
+  } else {
+    processCascade(1);
+  }
+}
+
+function processCascade(chain) {
+  const matches = findMatches(grid);
+  if (matches.length === 0) {
     checkLevelUp();
-    checkGameOver();
+    locked = false;
     return;
   }
 
-  matches.forEach(m => {
-    score += m.length * 10;
+  const points = matches.length * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
+  score += points;
+
+  if (chain > 1) {
+    showMsg('Chain x' + chain + '! +' + points);
+  }
+
+  bumpConscience(matches.length);
+  highlightMatched(matches);
+
+  setTimeout(() => {
+    grid = clearMatches(grid, matches);
+    grid = applyGravity(grid);
+    updateHUD();
+    renderBoard();
+    setTimeout(() => processCascade(chain + 1), CASCADE_DELAY);
+  }, CASCADE_DELAY);
+}
+
+function highlightMatched(matches) {
+  const cells = dom.board.querySelectorAll('.gem-cell');
+  matches.forEach(({ row, col }) => {
+    const idx = row * COLS + col;
+    if (cells[idx]) cells[idx].classList.add('matched');
   });
-  document.getElementById('match-score').textContent = score;
-
-  grid = clearMatches(grid, matches);
-  grid = applyGravity(grid);
-  renderGrid();
-
-  // chain reactions
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
 }
 
 function checkLevelUp() {
-  const threshold = level * SCORE_PER_LEVEL;
+  const threshold = 500 * level;
   if (score >= threshold) {
-    onLevelComplete(level, score, db, user);
     level++;
-    moves += 10;
-    document.getElementById('match-level').textContent = level;
-    document.getElementById('match-moves').textContent = moves;
+    updateHUD();
+    showMsg('Level ' + level + ' — Keep going!');
+    onLevelComplete(level - 1, score, null, null);
   }
 }
 
-function checkGameOver() {
-  if (moves <= 0) {
-    const banner = document.getElementById('match-badge-banner');
-    if (banner) {
-      banner.textContent = `Game Over! Final score: ${score}`;
-      banner.classList.remove('hidden');
-    }
-  }
+export function initMatchMaker(db, user) {
+  cacheDom();
+  grid       = createGrid(ROWS, COLS);
+  score      = 0;
+  moves      = 0;
+  level      = 1;
+  selected   = null;
+  locked     = false;
+  conscience = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
+
+  updateHUD();
+  updateConscience();
+  renderBoard();
+  showMsg('Match the gems — align your conscience');
 }
