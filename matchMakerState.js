@@ -1,8 +1,12 @@
 export const GRID_SIZE = 7;
 
-const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+
+// Lavender is a rare narrative tile that spawns at ~4% rate
+const LAVENDER_CHANCE = 0.04;
 
 function randomGem() {
+  if (Math.random() < LAVENDER_CHANCE) return 'lavender';
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
 }
 
