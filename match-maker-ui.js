@@ -80,6 +80,7 @@ function cacheDom() {
   dom.clueHistory = document.getElementById('clue-history');
   dom.lavPending  = document.getElementById('clue-lavender-pending');
   dom.lavFill     = document.getElementById('clue-progress-fill');
+  dom.restartModal = document.getElementById('restart-modal-overlay');
 
   // Matrix of Conscience
   dom.mcEmpathy  = document.getElementById('mc-empathy');
@@ -417,9 +418,16 @@ function revealClue(n) {
       dom.clueCard.classList.add('clue-shake');
     }
   }
-  // After 3 clues, prompt the suspect choice
+  // After 3 clues, show the suspect panel, then shake + glow it
   if (n === CLUE_TEXTS.length && !chosenSuspect && dom.suspect) {
     dom.suspect.style.display = '';
+  }
+  // Shake + glow only when the panel is actually visible
+  if (dom.suspect && dom.suspect.style.display !== 'none') {
+    dom.suspect.classList.remove('clue-shake');
+    void dom.suspect.offsetWidth; // force reflow to restart animation
+    dom.suspect.classList.add('clue-shake');
+    dom.suspect.addEventListener('animationend', () => dom.suspect.classList.remove('clue-shake'), { once: true });
   }
 }
 
@@ -488,12 +496,39 @@ export function initMatchMaker(db, user) {
   if (dom.msg)     dom.msg.textContent = '';
   if (dom.clueHistory) dom.clueHistory.innerHTML = '';
   updateLavenderProgress();
+  if (dom.moves)       { dom.moves.classList.remove('moves-warn', 'moves-critical'); }
+  if (dom.restartModal) dom.restartModal.classList.add('hidden');
 
   // Wire suspect-choice buttons
   const reedBtn       = document.getElementById('suspect-reed');
   const blackwoodBtn  = document.getElementById('suspect-blackwood');
   if (reedBtn)      reedBtn.onclick      = () => chooseSuspect('reed');
   if (blackwoodBtn) blackwoodBtn.onclick = () => chooseSuspect('blackwood');
+
+  // Wire restart button — show confirmation modal instead of immediately restarting
+  const restartBtn    = document.getElementById('match-restart-btn');
+  const confirmYes    = document.getElementById('restart-confirm-yes');
+  const confirmNo     = document.getElementById('restart-confirm-no');
+  const modalInner    = dom.restartModal ? dom.restartModal.querySelector('[tabindex="-1"]') : null;
+
+  if (restartBtn && dom.restartModal) {
+    restartBtn.onclick = () => {
+      dom.restartModal.classList.remove('hidden');
+      if (modalInner) modalInner.focus();
+    };
+  }
+  if (confirmYes) {
+    confirmYes.onclick = () => {
+      if (dom.restartModal) dom.restartModal.classList.add('hidden');
+      initMatchMaker(db, user);
+    };
+  }
+  if (confirmNo && dom.restartModal) {
+    confirmNo.onclick = () => {
+      dom.restartModal.classList.add('hidden');
+      if (restartBtn) restartBtn.focus();
+    };
+  }
 
   updateHUD();
   updateConscience();
