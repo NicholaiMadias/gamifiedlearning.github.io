@@ -152,14 +152,14 @@
   </div>
 
   <!-- ── Restart confirmation modal ─────────────────────────────────── -->
-  <div class="confirm-modal hidden" id="confirm-modal"
+  <div class="confirm-modal hidden" id="restart-modal-overlay"
        role="dialog" aria-modal="true" aria-labelledby="confirm-title">
-    <div class="confirm-dialog">
+    <div class="confirm-dialog" tabindex="-1">
       <p id="confirm-title" class="confirm-title">Restart this level?</p>
       <p class="confirm-body">Your current progress will be lost.</p>
       <div class="confirm-actions">
-        <button class="btn btn-confirm-yes" id="confirm-yes">Restart</button>
-        <button class="btn btn-confirm-no"  id="confirm-no">Cancel</button>
+        <button class="btn btn-confirm-yes" id="restart-confirm-yes">Restart</button>
+        <button class="btn btn-confirm-no"  id="restart-confirm-no">Cancel</button>
       </div>
     </div>
   </div>
