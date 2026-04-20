@@ -13,7 +13,7 @@ export const ELEMENT_TYPES = ['radiant', 'tide', 'verdant', 'forge', 'aether', '
 /** The 6 regular elements placed randomly on the board */
 export const REGULAR_ELEMENTS = ['radiant', 'tide', 'verdant', 'forge', 'aether', 'umbra'];
 
-/** The universal wild element */
+/** The universal wild element (reserved; not placed on the board during normal play) */
 export const WILD_ELEMENT = 'void';
 
 /** Special tile type constants */
@@ -35,7 +35,8 @@ export function makeGem(kind, special = null) {
 }
 
 /**
- * Returns a random regular element (never void — void only appears via spawn).
+ * Returns a random regular element (never void — void is reserved and not
+ * placed on the board during normal play).
  * @returns {string}
  */
 function randomElement() {

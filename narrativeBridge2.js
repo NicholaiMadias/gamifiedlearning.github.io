@@ -35,7 +35,12 @@ const BEAT_MESSAGES = {
 };
 
 /**
- * Creates an immutable beat object.
+ * Creates a beat object with shallow immutability.
+ * The returned beat and its `ctx` property are both frozen via Object.freeze,
+ * preventing addition, removal, or reassignment of their top-level keys.
+ * If any ctx value is itself an object its internal properties remain mutable.
+ * In practice, all ctx values are primitives (strings/numbers) so this is
+ * effectively deep-immutable for all current beat types.
  * @param {string} type - One of BEAT_TYPE values
  * @param {object} [ctx] - Context data for the beat message
  * @returns {{ type: string, message: string, ctx: object, timestamp: number }}

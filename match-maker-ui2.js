@@ -7,7 +7,7 @@
 
 import {
   GRID_SIZE, createInitialGrid, canSwap, applySwap,
-  findMatches, clearMatches, applyGravity, makeGem, SPECIAL,
+  findMatches, clearMatches, applyGravity, SPECIAL,
 } from './matchMakerState2.js';
 import { computeScore }                                from './scoring2.js';
 import {
@@ -309,6 +309,16 @@ function resolveCleared(clearedCells, chain) {
     updateHUD();
     updateConscienceBars();
     renderBoard();
+
+    // Board-clear bonus: a special tile (e.g. SUPERNOVA) may clear the entire board
+    const isBoardClear = clearedCells.length === GRID_SIZE * GRID_SIZE;
+    if (isBoardClear) {
+      conscience = applyBoardClearBonus(conscience);
+      bridge.emit(BEAT_TYPE.BOARD_CLEAR);
+      flashBoard(dom.board, 'rgba(255,255,255,0.2)', 600);
+      updateConscienceBars();
+    }
+
     sevenStar.checkThresholds(conscience);
     checkLevelUp();
     locked = false;

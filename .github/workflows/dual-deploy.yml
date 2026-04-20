@@ -101,11 +101,15 @@ Be concise and actionable. If there are no issues, say so."
             --arg diff "$DIFF" \
             '{contents:[{parts:[{text: ($prompt + "\n\n```diff\n" + $diff + "\n```")}]}]}')
 
-          RESPONSE=$(curl -sSf \
+          RESPONSE=$(curl -sS \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}" \
-            | jq -r '.candidates[0].content.parts[0].text // "Review unavailable — check Gemini API key."')
+            | jq -r '.candidates[0].content.parts[0].text // empty') || RESPONSE="Review unavailable — check Gemini API key."
+
+          if [ -z "$RESPONSE" ]; then
+            RESPONSE="Review unavailable — check Gemini API key."
+          fi
 
           gh pr comment "$PR_NUMBER" --body "## 🤖 Gemini AI Code Review
 
