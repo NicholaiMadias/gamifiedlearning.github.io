@@ -1,0 +1,15 @@
+{
+  "name": "gamifiedlearning",
+  "version": "2.0.0",
+  "description": "Gamified Learning Matrix — mobile-first educational gaming platform",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint *.js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "build": "rm -rf dist && mkdir -p dist && rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' --exclude 'node_modules' ./ dist/"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0"
+  }
+}
