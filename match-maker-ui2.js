@@ -25,11 +25,21 @@ const CASCADE_DELAY = 220;
 /** Schedules a timeout and tracks it so initMatchMakerV2 can cancel stale callbacks. */
 function scheduleTimeout(fn, ms) {
   const id = setTimeout(() => {
-    pendingTimeouts = pendingTimeouts.filter(t => t !== id);
+    pendingTimeouts.delete(id);
     fn();
   }, ms);
-  pendingTimeouts.push(id);
+  pendingTimeouts.add(id);
   return id;
+}
+
+/** Returns the valid [r,c] neighbors of a grid cell. */
+function getAdjacentCoords(r, c) {
+  return [
+    [r - 1, c],
+    [r + 1, c],
+    [r, c - 1],
+    [r, c + 1],
+  ].filter(([row, col]) => row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE);
 }
 
 /** Visual display metadata for each element type */
@@ -64,7 +74,7 @@ let bridge          = null;
 let sevenStar       = null;
 let particles       = null;
 let pendingTimeout  = null;
-let pendingTimeouts = [];
+let pendingTimeouts = new Set();
 
 const dom = {};
 
@@ -362,12 +372,13 @@ function processCascade(chain) {
 
   // Determine special tile spawn (4+ match) from the largest contiguous match group
   const spawnedSpecial = (() => {
-    // Build connected components from matchCells
-    const byPos = new Map(matchCells.map(cell => [`${cell.r},${cell.c}`, cell]));
+    // Use numeric keys (r * GRID_SIZE + c) for O(1) map lookups without string allocation
+    const cellKey = (r, c) => r * GRID_SIZE + c;
+    const byKey = new Map(matchCells.map(cell => [cellKey(cell.r, cell.c), cell]));
     const visited = new Set();
     const groups = [];
     matchCells.forEach(cell => {
-      const startKey = `${cell.r},${cell.c}`;
+      const startKey = cellKey(cell.r, cell.c);
       if (visited.has(startKey)) return;
       const stack = [cell];
       const group = [];
@@ -375,11 +386,10 @@ function processCascade(chain) {
       while (stack.length) {
         const cur = stack.pop();
         group.push(cur);
-        [[cur.r - 1, cur.c], [cur.r + 1, cur.c], [cur.r, cur.c - 1], [cur.r, cur.c + 1]]
-          .forEach(([r, c]) => {
-            const key = `${r},${c}`;
-            if (byPos.has(key) && !visited.has(key)) { visited.add(key); stack.push(byPos.get(key)); }
-          });
+        getAdjacentCoords(cur.r, cur.c).forEach(([r, c]) => {
+          const key = cellKey(r, c);
+          if (byKey.has(key) && !visited.has(key)) { visited.add(key); stack.push(byKey.get(key)); }
+        });
       }
       groups.push(group);
     });
@@ -445,7 +455,7 @@ export function initMatchMakerV2(db, user) {
 
   // Clear all outstanding timers to prevent stale callbacks from mutating new game state
   pendingTimeouts.forEach(id => clearTimeout(id));
-  pendingTimeouts = [];
+  pendingTimeouts.clear();
   if (pendingTimeout !== null) {
     clearTimeout(pendingTimeout);
     pendingTimeout = null;
