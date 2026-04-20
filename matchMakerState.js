@@ -55,7 +55,7 @@ export function findMatches(grid) {
   for (let r = 0; r < rows; r++) {
     let start = 0;
     for (let c = 1; c <= cols; c++) {
-      if (c < cols && grid[r][c] === grid[r][start] && grid[r][c] !== POWER_UP) continue;
+      if (c < cols && grid[r][c] !== null && grid[r][c] === grid[r][start] && grid[r][c] !== POWER_UP) continue;
       if (c - start >= 3) for (let k = start; k < c; k++) mark(r, k, 'h');
       start = c;
     }
@@ -64,7 +64,7 @@ export function findMatches(grid) {
   for (let c = 0; c < cols; c++) {
     let start = 0;
     for (let r = 1; r <= rows; r++) {
-      if (r < rows && grid[r][c] === grid[start][c] && grid[r][c] !== POWER_UP) continue;
+      if (r < rows && grid[r][c] !== null && grid[r][c] === grid[r - 1][c] && grid[r][c] !== POWER_UP) continue;
       if (r - start >= 3) for (let k = start; k < r; k++) mark(k, c, 'v');
       start = r;
     }
