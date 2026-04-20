@@ -1,0 +1,97 @@
+name: pages-availability-check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+jobs:
+  check-pages:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        site:
+          - name: gamifiedlearning
+            base_url: https://gamifiedlearning.org
+          - name: amazinggrace
+            base_url: https://amazinggracehomeliving.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check key routes for 404s
+        id: check_routes
+        run: |
+          BASE_URL="${{ matrix.site.base_url }}"
+          echo "Checking site: $BASE_URL"
+
+          PATHS=(
+            "/"
+            "/index.html"
+            "/games/"
+            "/listings/"
+            "/blog/"
+            "/lightning/"
+            "/embed/"
+          )
+
+          has_issues=0
+
+          for p in "${PATHS[@]}"; do
+            url="${BASE_URL}${p}"
+            code=$(curl -o /dev/null -sS --connect-timeout 10 --max-time 30 --retry 2 --retry-delay 2 -w "%{http_code}" "$url")
+            curl_status=$?
+            echo "[$code] $url"
+
+            if [ "$curl_status" -ne 0 ] || [ "$code" = "000" ] || [ "$code" -ge 400 ]; then
+              has_issues=1
+            fi
+          done
+
+          echo "has_issues=$has_issues" >> "$GITHUB_OUTPUT"
+
+      - name: Summarize results in logs
+        run: |
+          echo "Matrix site: ${{ matrix.site.name }} (${{ matrix.site.base_url }})"
+          echo "Route check completed."
+
+      - name: Comment on PR when issues found
+        if: github.event_name == 'pull_request' && steps.check_routes.outputs.has_issues == '1'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const baseUrl = "${{ matrix.site.base_url }}";
+            const body = `### 🔎 Pages availability triage for **${{ matrix.site.name }}**
+
+One or more routes returned HTTP 4xx/5xx on **${baseUrl}**.
+
+**Operator-grade Copilot prompt:**
+
+> Analyze why some routes on ${baseUrl} are returning 4xx/5xx after the latest deploy.
+> Repo: ${context.repo.owner}/${context.repo.repo}
+> PR: #${context.issue.number}
+> Focus on:
+> - Missing or misnamed \`index.html\` or \`404.html\`
+> - Wrong build output path or \`baseurl\` config
+> - GitHub Pages / custom domain DNS or HTTPS misconfiguration
+> - Any client-side routing (SPA) that needs a catch-all 404
+
+Ensure:
+- \`/\`, \`/games/\`, and \`/listings/\` are publicly accessible without authentication.
+- No auth middleware or redirects are wrapping core static routes.`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            })
