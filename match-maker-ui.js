@@ -5,7 +5,7 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { createGrid, isAdjacent, swapGems, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
+import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
 const COLS          = 7;
@@ -118,7 +118,7 @@ function onCellClick(row, col) {
   } else if (selected.row === row && selected.col === col) {
     selected = null;
     renderBoard();
-  } else if (isAdjacent(selected.row, selected.col, row, col)) {
+  } else if (canSwap(grid, selected.row, selected.col, row, col)) {
     attemptSwap(selected.row, selected.col, row, col);
   } else {
     selected = { row, col };
@@ -157,7 +157,7 @@ function onCellKey(e, row, col) {
 function attemptSwap(r1, c1, r2, c2) {
   locked = true;
   selected = null;
-  grid = swapGems(grid, r1, c1, r2, c2);
+  grid = applySwap(grid, r1, c1, r2, c2);
   moves++;
   updateHUD();
   renderBoard();
@@ -165,7 +165,7 @@ function attemptSwap(r1, c1, r2, c2) {
   const matches = findMatches(grid);
   if (matches.length === 0) {
     setTimeout(() => {
-      grid = swapGems(grid, r1, c1, r2, c2);
+      grid = applySwap(grid, r1, c1, r2, c2);
       showMsg('No match — try again');
       renderBoard();
       setTimeout(() => showMsg(''), 1200);
@@ -184,14 +184,15 @@ function processCascade(chain) {
     return;
   }
 
-  const points = matches.length * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
+  const matchedCells = matches.reduce((sum, group) => sum + group.length, 0);
+  const points = matchedCells * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
   score += points;
 
   if (chain > 1) {
     showMsg('Chain x' + chain + '! +' + points);
   }
 
-  bumpConscience(matches.length);
+  bumpConscience(matchedCells);
   highlightMatched(matches);
 
   setTimeout(() => {
@@ -205,9 +206,11 @@ function processCascade(chain) {
 
 function highlightMatched(matches) {
   const cells = dom.board.querySelectorAll('.gem-cell');
-  matches.forEach(({ row, col }) => {
-    const idx = row * COLS + col;
-    if (cells[idx]) cells[idx].classList.add('matched');
+  matches.forEach(group => {
+    group.forEach(({ r, c }) => {
+      const idx = r * COLS + c;
+      if (cells[idx]) cells[idx].classList.add('matched');
+    });
   });
 }
 
@@ -223,7 +226,7 @@ function checkLevelUp() {
 
 export function initMatchMaker(db, user) {
   cacheDom();
-  grid       = createGrid(ROWS, COLS);
+  grid       = createInitialGrid();
   score      = 0;
   moves      = 0;
   level      = 1;
