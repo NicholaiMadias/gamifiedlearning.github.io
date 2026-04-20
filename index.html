@@ -28,7 +28,9 @@
       text-shadow: 0 0 10px #00ff4180;
     }
 
-    /* ── Match Maker ──────────────────────────────── */
+    .hidden { display: none !important; }
+
+    /* ── Match Maker (V1) ─────────────────────────── */
     .match-card {
       background: #0d0d1a;
       border: 1px solid #1a1a2e;
@@ -113,7 +115,7 @@
 
     .match-restart-btn:hover { background: #00ff4120; }
 
-    /* ── Matrix of Conscience ─────────────────────── */
+    /* ── Matrix of Conscience (V1) ────────────────── */
     .matrix-card {
       background: #0d0d1a;
       border-radius: 12px;
@@ -179,63 +181,389 @@
       background: linear-gradient(90deg, #1565c0, #4fc3f7);
       transition: width 0.4s ease;
     }
+
+    /* ══ V2 Nexus Arcade Styles ════════════════════════════════════════════════ */
+
+    /* ── V2 Game Board ────────────────────────────── */
+    .v2-card {
+      background: #08080f;
+      border: 1px solid #1a1a3a;
+      border-radius: 14px;
+      padding: 1.2rem;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+    }
+
+    .v2-card h2 {
+      text-align: center;
+      font-size: 1.15rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c084fc;
+      text-shadow: 0 0 10px #c084fc80;
+      margin-bottom: 0.7rem;
+    }
+
+    .v2-stats {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 0.8rem;
+    }
+
+    .v2-stats span { color: #c084fc; font-weight: 700; }
+
+    /* Canvas particle overlay — sits above the board, pointer-events off */
+    #fx-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      border-radius: 14px;
+      z-index: 10;
+    }
+
+    /* V2 board grid */
+    #v2-board {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.35rem;
+      padding: 0.7rem;
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* V2 gem cells */
+    .gem-cell-v2 {
+      aspect-ratio: 1 / 1;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+      background: #111122;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .gem-cell-v2:hover   { transform: scale(1.1); z-index: 2; }
+    .gem-cell-v2:focus-visible { outline: 2px solid #c084fc; outline-offset: 2px; z-index: 3; }
+    .gem-cell-v2.selected {
+      box-shadow: 0 0 0 2px #c084fc, 0 0 18px rgba(192,132,252,0.5);
+      transform: scale(1.13);
+      z-index: 3;
+    }
+    .gem-cell-v2.matched { animation: v2GemExplode 0.35s ease-out forwards; }
+
+    @keyframes v2GemExplode {
+      0%   { transform: scale(1);   opacity: 1; }
+      50%  { transform: scale(1.35); opacity: 0.6; }
+      100% { transform: scale(0);   opacity: 0; }
+    }
+
+    .gem-emoji { font-size: clamp(1rem, 4.5vw, 1.6rem); line-height: 1; }
+
+    .gem-special-glyph {
+      position: absolute;
+      bottom: 1px;
+      right: 3px;
+      font-size: 0.55rem;
+      color: #fff;
+      text-shadow: 0 0 4px #000;
+      pointer-events: none;
+    }
+
+    /* Element type backgrounds */
+    .gem-radiant { background: rgba(255,215,0,0.18); }
+    .gem-tide    { background: rgba(0,191,255,0.18); }
+    .gem-verdant { background: rgba(50,205,50,0.18); }
+    .gem-forge   { background: rgba(255,69,0,0.18); }
+    .gem-aether  { background: rgba(147,112,219,0.18); }
+    .gem-umbra   { background: rgba(75,0,130,0.22); }
+    .gem-void    { background: rgba(200,200,200,0.1); }
+
+    /* DOM pulse animations */
+    .pulse-match   { animation: pulseMatch 0.4s ease-out; }
+    .pulse-ley     { animation: pulseLey   0.5s ease-out; }
+    .pulse-special { animation: pulseSpec  0.4s ease-out; }
+
+    @keyframes pulseMatch { 0%,100% { filter: brightness(1); } 50% { filter: brightness(2); } }
+    @keyframes pulseLey   { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 20px rgba(192,132,252,0.8); } }
+    @keyframes pulseSpec  { 0%,100% { filter: brightness(1); } 50% { filter: brightness(3); } }
+
+    /* V2 message + narrative display */
+    .v2-msg {
+      min-height: 1.4em;
+      text-align: center;
+      font-size: 0.88rem;
+      color: #c084fc;
+      font-weight: 600;
+      padding: 4px 0;
+    }
+
+    .v2-narrative {
+      min-height: 1.3em;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      font-style: italic;
+      padding: 2px 6px;
+      transition: opacity 0.3s;
+    }
+
+    .v2-narrative.narrative-fade { animation: narrativeFade 0.5s ease-out; }
+
+    @keyframes narrativeFade {
+      0%   { opacity: 0; transform: translateY(-4px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* V2 badge banner */
+    .v2-badge-banner {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #c084fc;
+      background: #1a0a2a;
+      border: 1px solid #c084fc60;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      margin-top: 0.6rem;
+    }
+
+    /* V2 restart button */
+    .v2-restart-btn {
+      display: block;
+      margin: 0.8rem auto 0;
+      background: transparent;
+      border: 1px solid #c084fc;
+      color: #c084fc;
+      padding: 0.4rem 1.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s;
+    }
+
+    .v2-restart-btn:hover { background: #c084fc18; }
+
+    /* ── V2 Conscience Panel ──────────────────────── */
+    .v2-conscience-card {
+      background: #08080f;
+      border: 1px solid #1a1a3a;
+      border-radius: 14px;
+      padding: 1.2rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .v2-conscience-card h2 {
+      text-align: center;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    .v2-conscience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .v2-conscience-cell {
+      background: #0f0f1e;
+      border: 1px solid #1e1e4a;
+      border-radius: 8px;
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .v2-conscience-cell .icon  { font-size: 1.5rem; }
+    .v2-conscience-cell .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .v2-bar-track {
+      width: 100%;
+      height: 5px;
+      background: #1e1e4a;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .v2-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    .v2-bar-fill-karma     { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .v2-bar-fill-wisdom    { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
+    .v2-bar-fill-integrity { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .v2-bar-fill-community { background: linear-gradient(90deg, #22c55e, #4ade80); }
+
+    .v2-bar-pct {
+      font-size: 0.72rem;
+      color: #64748b;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 </head>
 <body>
 
   <h1 class="app-title">Gamified Learning</h1>
 
-  <!-- ══ Match Maker ══════════════════════════════════ -->
-  <section class="match-card" id="match-maker-screen">
-    <h2>Match Maker</h2>
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       V1 Section (original engine — shown when V2 flag is off)
+       ══════════════════════════════════════════════════════════════════════════ -->
+  <div id="v1-section">
 
-    <div class="match-stats">
-      <div>Score: <span id="match-score">0</span></div>
-      <div>Moves: <span id="match-moves">20</span></div>
-      <div>Level: <span id="match-level">1</span></div>
-    </div>
+    <!-- Match Maker V1 -->
+    <section class="match-card" id="match-maker-screen">
+      <h2>Match Maker</h2>
 
-    <div class="match-grid" id="match-grid"></div>
-
-    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
-
-    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
-  </section>
-
-  <!-- ══ Matrix of Conscience ════════════════════════ -->
-  <section class="matrix-card matrix-border" id="matrix-economy-screen">
-    <h2 class="matrix-heading">Matrix of Conscience</h2>
-
-    <div class="matrix-economy-grid">
-      <div class="matrix-cell">
-        <span class="icon">💖</span>
-        <span class="label">Empathy</span>
-        <span class="value" id="mc-empathy">72</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
+      <div class="match-stats">
+        <div>Score: <span id="match-score">0</span></div>
+        <div>Moves: <span id="match-moves">20</span></div>
+        <div>Level: <span id="match-level">1</span></div>
       </div>
 
-      <div class="matrix-cell">
-        <span class="icon">⚖️</span>
-        <span class="label">Justice</span>
-        <span class="value" id="mc-justice">58</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
+      <div class="match-grid" id="match-grid"></div>
+
+      <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+      <button class="match-restart-btn" id="restart-btn">↺ Restart</button>
+    </section>
+
+    <!-- Matrix of Conscience V1 -->
+    <section class="matrix-card matrix-border" id="matrix-economy-screen" style="margin-top:1.5rem;">
+      <h2 class="matrix-heading">Matrix of Conscience</h2>
+
+      <div class="matrix-economy-grid">
+        <div class="matrix-cell">
+          <span class="icon">💖</span>
+          <span class="label">Empathy</span>
+          <span class="value" id="mc-empathy">72</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
+        </div>
+
+        <div class="matrix-cell">
+          <span class="icon">⚖️</span>
+          <span class="label">Justice</span>
+          <span class="value" id="mc-justice">58</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
+        </div>
+
+        <div class="matrix-cell">
+          <span class="icon">🧠</span>
+          <span class="label">Wisdom</span>
+          <span class="value" id="mc-wisdom">45</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
+        </div>
+
+        <div class="matrix-cell">
+          <span class="icon">🌱</span>
+          <span class="label">Growth</span>
+          <span class="value" id="mc-growth">83</span>
+          <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /#v1-section -->
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       V2 Section (Nexus Arcade V2 — shown when REACT_APP_V2_ENABLED is set)
+       ══════════════════════════════════════════════════════════════════════════ -->
+  <div id="v2-section" class="hidden">
+
+    <!-- V2 Game Board -->
+    <section class="v2-card" id="v2-match-screen">
+      <!-- Canvas overlay for heavy particle FX -->
+      <canvas id="fx-overlay" aria-hidden="true"></canvas>
+
+      <h2>Nexus Arcade V2</h2>
+
+      <div class="v2-stats">
+        <div>Score: <span id="v2-score">0</span></div>
+        <div>Moves: <span id="v2-moves">0</span></div>
+        <div>Level: <span id="v2-level">1</span></div>
       </div>
 
-      <div class="matrix-cell">
-        <span class="icon">🧠</span>
-        <span class="label">Wisdom</span>
-        <span class="value" id="mc-wisdom">45</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
-      </div>
+      <div id="v2-board" role="grid" aria-label="Nexus Arcade game board"></div>
 
-      <div class="matrix-cell">
-        <span class="icon">🌱</span>
-        <span class="label">Growth</span>
-        <span class="value" id="mc-growth">83</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
+      <p class="v2-msg"   id="v2-msg"      aria-live="polite"></p>
+      <p class="v2-narrative" id="v2-narrative" aria-live="polite"></p>
+
+      <div id="v2-badge-banner" class="v2-badge-banner hidden" aria-live="assertive"></div>
+
+      <button class="v2-restart-btn" id="v2-restart-btn">↺ New Game</button>
+    </section>
+
+    <!-- V2 Conscience Deltas Panel -->
+    <section class="v2-conscience-card" id="v2-conscience-screen" style="margin-top:1.5rem;">
+      <h2>Conscience Lattice</h2>
+
+      <div class="v2-conscience-grid">
+
+        <div class="v2-conscience-cell">
+          <span class="icon">☀️</span>
+          <span class="label">Karma</span>
+          <div class="v2-bar-track">
+            <div class="v2-bar-fill v2-bar-fill-karma" id="v2-bar-karma" style="width:0%"></div>
+          </div>
+          <span class="v2-bar-pct" id="v2-pct-karma">0%</span>
+        </div>
+
+        <div class="v2-conscience-cell">
+          <span class="icon">🌊</span>
+          <span class="label">Wisdom</span>
+          <div class="v2-bar-track">
+            <div class="v2-bar-fill v2-bar-fill-wisdom" id="v2-bar-wisdom" style="width:0%"></div>
+          </div>
+          <span class="v2-bar-pct" id="v2-pct-wisdom">0%</span>
+        </div>
+
+        <div class="v2-conscience-cell">
+          <span class="icon">🔥</span>
+          <span class="label">Integrity</span>
+          <div class="v2-bar-track">
+            <div class="v2-bar-fill v2-bar-fill-integrity" id="v2-bar-integrity" style="width:0%"></div>
+          </div>
+          <span class="v2-bar-pct" id="v2-pct-integrity">0%</span>
+        </div>
+
+        <div class="v2-conscience-cell">
+          <span class="icon">🌿</span>
+          <span class="label">Community</span>
+          <div class="v2-bar-track">
+            <div class="v2-bar-fill v2-bar-fill-community" id="v2-bar-community" style="width:0%"></div>
+          </div>
+          <span class="v2-bar-pct" id="v2-pct-community">0%</span>
+        </div>
+
       </div>
-    </div>
-  </section>
+    </section>
+
+  </div><!-- /#v2-section -->
 
   <script type="module" src="./main.js"></script>
 </body>

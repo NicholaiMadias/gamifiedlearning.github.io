@@ -1,0 +1,16 @@
+{
+  "name": "gamifiedlearning",
+  "version": "2.0.0",
+  "description": "Gamified Learning — Nexus Arcade V2",
+  "private": true,
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}
