@@ -135,9 +135,9 @@ function updateConscienceBars() {
 
 function getCellCanvasCenter(r, c) {
   if (!dom.board || !dom.canvas) return { x: 0, y: 0 };
-  const cells      = dom.board.querySelectorAll('.gem-cell-v2');
+  // dom.board.children contains only gem-cell-v2 buttons in row-major grid order
   const idx        = r * GRID_SIZE + c;
-  const cell       = cells[idx];
+  const cell       = dom.board.children[idx];
   if (!cell) return { x: 0, y: 0 };
   const cellRect   = cell.getBoundingClientRect();
   const canvasRect = dom.canvas.getBoundingClientRect();
