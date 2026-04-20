@@ -15,7 +15,10 @@ import { initMatchMakerV2 } from './match-maker-ui2.js';
 
 /** Returns true when the V2 engine should be used. */
 function isV2Enabled() {
-  if (typeof window !== 'undefined' && window.REACT_APP_V2_ENABLED) return true;
+  if (typeof window !== 'undefined') {
+    const v2Flag = window.REACT_APP_V2_ENABLED;
+    if (v2Flag === true || v2Flag === 'true' || v2Flag === '1') return true;
+  }
   try {
     return localStorage.getItem('glm_v2_enabled') === 'true';
   } catch {
@@ -54,6 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dev hotkey: Ctrl+Shift+V — toggle V2 mode and reload
   document.addEventListener('keydown', e => {
     if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+      // Ignore when focus is inside an editable element
+      const tag = document.activeElement && document.activeElement.tagName;
+      const isEditable = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+        || (document.activeElement && document.activeElement.isContentEditable);
+      if (isEditable) return;
+      e.preventDefault();
       try {
         const current = localStorage.getItem('glm_v2_enabled') === 'true';
         localStorage.setItem('glm_v2_enabled', String(!current));

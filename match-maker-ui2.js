@@ -22,6 +22,16 @@ import { pulse, flashBoard }                           from './fx/domPulse2.js';
 
 const CASCADE_DELAY = 220;
 
+/** Schedules a timeout and tracks it so initMatchMakerV2 can cancel stale callbacks. */
+function scheduleTimeout(fn, ms) {
+  const id = setTimeout(() => {
+    pendingTimeouts = pendingTimeouts.filter(t => t !== id);
+    fn();
+  }, ms);
+  pendingTimeouts.push(id);
+  return id;
+}
+
 /** Visual display metadata for each element type */
 const ELEMENT_DISPLAY = {
   radiant: { emoji: '☀️',  cls: 'gem-radiant', label: 'Radiant' },
@@ -54,6 +64,7 @@ let bridge          = null;
 let sevenStar       = null;
 let particles       = null;
 let pendingTimeout  = null;
+let pendingTimeouts = [];
 
 const dom = {};
 
@@ -87,7 +98,7 @@ function updateHUD() {
 function showMsg(text, clearAfterMs = 0) {
   if (dom.msg) dom.msg.textContent = text;
   if (clearAfterMs > 0) {
-    setTimeout(() => { if (dom.msg) dom.msg.textContent = ''; }, clearAfterMs);
+    scheduleTimeout(() => { if (dom.msg) dom.msg.textContent = ''; }, clearAfterMs);
   }
 }
 
@@ -230,18 +241,20 @@ function attemptSwap(r1, c1, r2, c2) {
   updateHUD();
   renderBoard();
 
-  // Check if the moved-to cell holds a special tile to trigger immediately
-  const movedGem = grid[r2][c2];
-  if (movedGem && movedGem.special) {
-    const { clearedCells } = activateSpecial(grid, r2, c2);
-    bridge.emit(BEAT_TYPE.SPECIAL_TRIGGER, { special: movedGem.special });
-    resolveCleared(clearedCells, 1);
-    return;
+  // Check both swapped cells — a special tile triggers regardless of which side it started on
+  for (const [row, col] of [[r1, c1], [r2, c2]]) {
+    const gem = grid[row][col];
+    if (gem && gem.special) {
+      const { clearedCells } = activateSpecial(grid, row, col);
+      bridge.emit(BEAT_TYPE.SPECIAL_TRIGGER, { special: gem.special });
+      resolveCleared(clearedCells, 1);
+      return;
+    }
   }
 
   const matches = findMatches(grid);
   if (matches.length === 0) {
-    pendingTimeout = setTimeout(() => {
+    pendingTimeout = scheduleTimeout(() => {
       grid = applySwap(grid, r1, c1, r2, c2);
       showMsg('No match — try again', 1200);
       renderBoard();
@@ -280,7 +293,7 @@ function resolveCleared(clearedCells, chain) {
   });
   score += pts;
 
-  setTimeout(() => {
+  scheduleTimeout(() => {
     grid = clearMatches(grid, clearedCells);
     grid = applyGravity(grid);
     updateHUD();
@@ -347,16 +360,45 @@ function processCascade(chain) {
     .filter(Boolean);
   pulse(matchedEls, 'match', CASCADE_DELAY);
 
-  // Determine special tile spawn (4+ match)
-  const spawnedSpecial = getSpawnedSpecial(matchCells);
+  // Determine special tile spawn (4+ match) from the largest contiguous match group
+  const spawnedSpecial = (() => {
+    // Build connected components from matchCells
+    const byPos = new Map(matchCells.map(cell => [`${cell.r},${cell.c}`, cell]));
+    const visited = new Set();
+    const groups = [];
+    matchCells.forEach(cell => {
+      const startKey = `${cell.r},${cell.c}`;
+      if (visited.has(startKey)) return;
+      const stack = [cell];
+      const group = [];
+      visited.add(startKey);
+      while (stack.length) {
+        const cur = stack.pop();
+        group.push(cur);
+        [[cur.r - 1, cur.c], [cur.r + 1, cur.c], [cur.r, cur.c - 1], [cur.r, cur.c + 1]]
+          .forEach(([r, c]) => {
+            const key = `${r},${c}`;
+            if (byPos.has(key) && !visited.has(key)) { visited.add(key); stack.push(byPos.get(key)); }
+          });
+      }
+      groups.push(group);
+    });
+    // Pick the highest-priority special from the largest group
+    const candidates = groups
+      .map(group => ({ group, special: getSpawnedSpecial(group) }))
+      .filter(c => c.special)
+      .sort((a, b) => b.group.length - a.group.length);
+    return candidates[0] || null;
+  })();
   let replacements = [];
   if (spawnedSpecial) {
-    const mid = matchCells[Math.floor(matchCells.length / 2)];
-    replacements = [{ r: mid.r, c: mid.c, kind: dominantElement || 'aether', special: spawnedSpecial }];
-    bridge.emit(BEAT_TYPE.SPECIAL_SPAWN, { special: spawnedSpecial });
+    const { group, special } = spawnedSpecial;
+    const mid = group[Math.floor(group.length / 2)];
+    replacements = [{ r: mid.r, c: mid.c, kind: dominantElement || 'aether', special }];
+    bridge.emit(BEAT_TYPE.SPECIAL_SPAWN, { special });
   }
 
-  setTimeout(() => {
+  scheduleTimeout(() => {
     grid = clearMatches(grid, matchCells, replacements);
     grid = applyGravity(grid);
     updateHUD();
@@ -373,7 +415,7 @@ function processCascade(chain) {
     }
 
     sevenStar.checkThresholds(conscience);
-    setTimeout(() => processCascade(chain + 1), CASCADE_DELAY);
+    scheduleTimeout(() => processCascade(chain + 1), CASCADE_DELAY);
   }, CASCADE_DELAY);
 }
 
@@ -386,7 +428,7 @@ function checkLevelUp() {
     if (dom.banner) {
       dom.banner.textContent = `⭐ Level ${level} reached!`;
       dom.banner.classList.remove('hidden');
-      setTimeout(() => dom.banner.classList.add('hidden'), 3000);
+      scheduleTimeout(() => dom.banner.classList.add('hidden'), 3000);
     }
   }
 }
@@ -401,6 +443,9 @@ function checkLevelUp() {
 export function initMatchMakerV2(db, user) {
   cacheDom();
 
+  // Clear all outstanding timers to prevent stale callbacks from mutating new game state
+  pendingTimeouts.forEach(id => clearTimeout(id));
+  pendingTimeouts = [];
   if (pendingTimeout !== null) {
     clearTimeout(pendingTimeout);
     pendingTimeout = null;
