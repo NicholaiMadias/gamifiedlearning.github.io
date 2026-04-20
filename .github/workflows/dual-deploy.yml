@@ -80,7 +80,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           # Collect the diff (JS, HTML, CSS only; cap at 30 000 chars for the API)
-          DIFF=$(git diff "origin/${BASE_REF}...HEAD" -- '*.js' '*.html' '*.css' \
+          DIFF=$(git diff "origin/${BASE_REF}..HEAD" -- '*.js' '*.html' '*.css' \
                  | head -c 30000)
 
           if [ -z "$DIFF" ]; then
@@ -92,8 +92,7 @@ jobs:
 Review the following git diff for: \
 1) Security vulnerabilities (XSS, injection, etc.) \
 2) Performance issues (unnecessary reflows, large loops, memory leaks) \
-3) React hook compliance (if any hooks are present) \
-4) General code quality (naming, logic, error handling). \
+3) General code quality (naming, logic, error handling). \
 Be concise and actionable. If there are no issues, say so."
 
           # Combine prompt and diff, then JSON-encode with jq for safety

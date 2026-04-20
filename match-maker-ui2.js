@@ -363,10 +363,8 @@ function processCascade(chain) {
     updateConscienceBars();
     renderBoard();
 
-    // Check for board-clear achievement (all matched → board refills automatically,
-    // so detect by checking if entire pre-gravity board was null)
-    const isBoardClear = grid.every(row => row.every(cell => cell !== null)) &&
-                         matchCells.length === GRID_SIZE * GRID_SIZE;
+    // Check for board-clear achievement: all cells in this match = full board
+    const isBoardClear = matchCells.length === GRID_SIZE * GRID_SIZE;
     if (isBoardClear) {
       conscience = applyBoardClearBonus(conscience);
       bridge.emit(BEAT_TYPE.BOARD_CLEAR);
