@@ -44,8 +44,9 @@ export function createBeat(type, ctx = {}) {
   if (!ALL_BEAT_TYPES.has(type)) {
     throw new Error(`Unknown beat type: "${type}"`);
   }
-  const message = BEAT_MESSAGES[type](ctx);
-  return Object.freeze({ type, message, ctx, timestamp: Date.now() });
+  const frozenCtx = Object.freeze(Object.assign({}, ctx));
+  const message = BEAT_MESSAGES[type](frozenCtx);
+  return Object.freeze({ type, message, ctx: frozenCtx, timestamp: Date.now() });
 }
 
 /**

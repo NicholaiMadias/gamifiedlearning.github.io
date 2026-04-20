@@ -441,13 +441,14 @@
       <h2>Match Maker</h2>
 
       <div class="match-stats">
-        <div>Score: <span id="match-score">0</span></div>
-        <div>Moves: <span id="match-moves">20</span></div>
-        <div>Level: <span id="match-level">1</span></div>
+        <div>Score: <span id="hud-score">0</span></div>
+        <div>Moves: <span id="hud-moves">20</span></div>
+        <div>Level: <span id="hud-level">1</span></div>
       </div>
 
-      <div class="match-grid" id="match-grid"></div>
+      <div class="match-grid" id="match-board"></div>
 
+      <div id="match-msg" class="match-msg"></div>
       <div id="match-badge-banner" class="match-badge-banner hidden"></div>
 
       <button class="match-restart-btn" id="restart-btn" aria-label="Restart game">↺ Restart</button>
@@ -461,29 +462,29 @@
         <div class="matrix-cell">
           <span class="icon">💖</span>
           <span class="label">Empathy</span>
-          <span class="value" id="mc-empathy">72</span>
-          <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
+          <span class="value" id="pct-empathy">72</span>
+          <div class="bar-track"><div class="bar-fill" id="bar-empathy" style="width:72%"></div></div>
         </div>
 
         <div class="matrix-cell">
           <span class="icon">⚖️</span>
           <span class="label">Justice</span>
-          <span class="value" id="mc-justice">58</span>
-          <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
+          <span class="value" id="pct-justice">58</span>
+          <div class="bar-track"><div class="bar-fill" id="bar-justice" style="width:58%"></div></div>
         </div>
 
         <div class="matrix-cell">
           <span class="icon">🧠</span>
           <span class="label">Wisdom</span>
-          <span class="value" id="mc-wisdom">45</span>
-          <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
+          <span class="value" id="pct-wisdom">45</span>
+          <div class="bar-track"><div class="bar-fill" id="bar-wisdom" style="width:45%"></div></div>
         </div>
 
         <div class="matrix-cell">
           <span class="icon">🌱</span>
           <span class="label">Growth</span>
-          <span class="value" id="mc-growth">83</span>
-          <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
+          <span class="value" id="pct-growth">83</span>
+          <div class="bar-track"><div class="bar-fill" id="bar-growth" style="width:83%"></div></div>
         </div>
       </div>
     </section>
