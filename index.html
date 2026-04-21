@@ -179,6 +179,14 @@
       background: linear-gradient(90deg, #1565c0, #4fc3f7);
       transition: width 0.4s ease;
     }
+    /* ── Artifact Gallery ─────────────────────────────── */
+    .gallery-item {
+      width: 100%;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .gallery-item[src=""] { display: none; }
   </style>
 </head>
 <body>
@@ -198,6 +206,7 @@
     <div class="match-grid" id="match-grid"></div>
 
     <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+    <div id="match-msg" style="text-align:center;font-size:0.85rem;color:#aaa;min-height:1.2em;margin-top:0.4rem;"></div>
 
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>
@@ -235,6 +244,12 @@
         <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
       </div>
     </div>
+  </section>
+
+  <!-- ══ Artifact Gallery ═══════════════════════════════ -->
+  <section class="matrix-card" style="max-width:460px;width:100%;">
+    <h2 class="matrix-heading" style="color:#c792ea;">✦ Artifact Gallery</h2>
+    <div id="nexus-display-area"></div>
   </section>
 
   <script type="module" src="./main.js"></script>
