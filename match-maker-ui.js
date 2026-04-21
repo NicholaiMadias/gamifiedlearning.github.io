@@ -92,7 +92,7 @@ function renderBoard() {
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const gem  = grid[r][c];
-      const kind = gem?.kind ?? gem;          // support legacy string cells
+      const kind = gem.kind;
       const info = GEM_DISPLAY[kind] || { emoji: '?', cls: '', label: kind };
       const cell = document.createElement('button');
       const idx  = r * COLS + c;
@@ -233,11 +233,19 @@ function processCascade(chain) {
   bumpConscience(cellCount);
   highlightMatched(matches);
 
-  // Detect and handle star (supernova) tiles before clearing
+  // Detect and handle star (supernova) tiles before clearing.
+  // Collect unique rows+columns across all star cells to avoid double-scoring.
   const starCells = matches.flatMap(g => g.filter(cell => cell.star));
-  for (const { r, c } of starCells) {
-    grid = applySupernova(grid, r, c);
-    triggerSupernova(r, c);
+  if (starCells.length > 0) {
+    const seen = new Set();
+    for (const { r, c } of starCells) {
+      const key = `${r},${c}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        grid = applySupernova(grid, r, c);
+        triggerSupernova(r, c);
+      }
+    }
   }
 
   setTimeout(() => {
