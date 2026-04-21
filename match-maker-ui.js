@@ -1,238 +1,304 @@
-/**
- * match-maker-ui.js — Game UI Layer for Match Maker
- * Renders the 7×7 grid, handles input (click, touch, keyboard),
- * animates cascades, manages levels, and updates the HUD + Conscience bars.
- * (c) 2026 NicholaiMadias — MIT License
- */
+// matchMakerState.js
 
-import { createGrid, isAdjacent, swapGems, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
-import { onLevelComplete } from './badges.js';
+const ROWS = 7;
+const COLS = 7;
+const GEM_TYPES = [0, 1, 2, 3, 4, 5]; // adjust as needed
 
-const COLS          = 7;
-const ROWS          = 7;
-const CASCADE_DELAY = 200;
-const BASE_POINTS   = 50;
-const CHAIN_BONUS   = 25;
-const CONSCIENCE_KEYS = ['empathy', 'justice', 'wisdom', 'growth'];
-
-const GEM_DISPLAY = {
-  heart: { emoji: '❤️', cls: 'gem-heart', label: 'Heart' },
-  star:  { emoji: '⭐', cls: 'gem-star',  label: 'Star'  },
-  cross: { emoji: '✝️', cls: 'gem-cross', label: 'Cross' },
-  flame: { emoji: '🔥', cls: 'gem-flame', label: 'Flame' },
-  drop:  { emoji: '💧', cls: 'gem-drop',  label: 'Drop'  }
-};
-
-let grid       = [];
-let score      = 0;
-let moves      = 0;
-let level      = 1;
-let selected   = null;
-let locked     = false;
-let conscience = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
-
-const dom = {};
-
-function cacheDom() {
-  dom.board      = document.getElementById('match-board');
-  dom.score      = document.getElementById('hud-score');
-  dom.level      = document.getElementById('hud-level');
-  dom.moves      = document.getElementById('hud-moves');
-  dom.msg        = document.getElementById('match-msg');
-  dom.barEmpathy = document.getElementById('bar-empathy');
-  dom.barJustice = document.getElementById('bar-justice');
-  dom.barWisdom  = document.getElementById('bar-wisdom');
-  dom.barGrowth  = document.getElementById('bar-growth');
-  dom.pctEmpathy = document.getElementById('pct-empathy');
-  dom.pctJustice = document.getElementById('pct-justice');
-  dom.pctWisdom  = document.getElementById('pct-wisdom');
-  dom.pctGrowth  = document.getElementById('pct-growth');
+function randomGemType() {
+  return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
 }
 
-function updateHUD() {
-  if (dom.score) dom.score.textContent = score;
-  if (dom.level) dom.level.textContent = level;
-  if (dom.moves) dom.moves.textContent = moves;
+function createGem(type = randomGemType()) {
+  return {
+    type,
+    special: null,      // 'supernova' | 'lineH' | 'lineV' | 'bomb'
+    createdBy: null,    // 'tShape' | 'lShape' | 'fiveLine' | 'combo'
+  };
 }
 
-function showMsg(text) {
-  if (dom.msg) dom.msg.textContent = text;
-}
+export function createInitialGrid(rows = ROWS, cols = COLS) {
+  const grid = Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => createGem())
+  );
 
-function updateConscience() {
-  CONSCIENCE_KEYS.forEach(key => {
-    const val  = Math.min(conscience[key], 100);
-    const bar  = dom['bar' + key.charAt(0).toUpperCase() + key.slice(1)];
-    const pct  = dom['pct' + key.charAt(0).toUpperCase() + key.slice(1)];
-    if (bar) bar.style.width = val + '%';
-    if (pct) pct.textContent = val + '%';
-    const track = bar?.parentElement;
-    if (track) track.setAttribute('aria-valuenow', val);
-  });
-}
-
-function bumpConscience(matchCount) {
-  const boost = Math.ceil(matchCount * 1.5);
-  conscience.empathy = Math.min(100, conscience.empathy + boost + Math.floor(Math.random() * 3));
-  conscience.justice = Math.min(100, conscience.justice + boost + Math.floor(Math.random() * 2));
-  conscience.wisdom  = Math.min(100, conscience.wisdom  + Math.floor(boost * 0.8));
-  conscience.growth  = Math.min(100, conscience.growth  + Math.floor(boost * 1.2));
-  updateConscience();
-}
-
-function renderBoard() {
-  if (!dom.board) return;
-  dom.board.innerHTML = '';
-
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const gemType = grid[r][c];
-      const info    = GEM_DISPLAY[gemType] || { emoji: '?', cls: '', label: gemType };
-      const cell    = document.createElement('button');
-      const idx     = r * COLS + c;
-
-      cell.className = 'gem-cell ' + info.cls;
-      cell.textContent = info.emoji;
-      cell.dataset.row = r;
-      cell.dataset.col = c;
-      cell.setAttribute('role', 'gridcell');
-      cell.setAttribute('aria-label', info.label + ', row ' + (r + 1) + ' column ' + (c + 1));
-      cell.setAttribute('tabindex', idx === 0 ? '0' : '-1');
-
-      if (selected && selected.row === r && selected.col === c) {
-        cell.classList.add('selected');
+  // Optional: ensure no initial matches
+  let changed = true;
+  while (changed) {
+    changed = false;
+    const result = findMatches(grid);
+    if (result.matches.length > 0) {
+      for (const { row, col } of result.matches) {
+        grid[row][col] = createGem();
+        changed = true;
       }
+    }
+  }
 
-      cell.addEventListener('click', () => onCellClick(r, c));
-      cell.addEventListener('keydown', (e) => onCellKey(e, r, c));
-      dom.board.appendChild(cell);
+  return grid;
+}
+
+export function canSwap(grid, r1, c1, r2, c2) {
+  const dr = Math.abs(r1 - r2);
+  const dc = Math.abs(c1 - c2);
+  if (dr + dc !== 1) return false;
+
+  const clone = cloneGrid(grid);
+  swapInPlace(clone, r1, c1, r2, c2);
+  const result = findMatches(clone);
+  return result.matches.length > 0;
+}
+
+export function swapGems(grid, r1, c1, r2, c2) {
+  const clone = cloneGrid(grid);
+  swapInPlace(clone, r1, c1, r2, c2);
+  return clone;
+}
+
+function swapInPlace(grid, r1, c1, r2, c2) {
+  const tmp = grid[r1][c1];
+  grid[r1][c1] = grid[r2][c2];
+  grid[r2][c2] = tmp;
+}
+
+export function applyGravity(grid) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+
+  for (let c = 0; c < cols; c++) {
+    let writeRow = rows - 1;
+    for (let r = rows - 1; r >= 0; r--) {
+      if (grid[r][c] !== null) {
+        grid[writeRow][c] = grid[r][c];
+        if (writeRow !== r) {
+          grid[r][c] = null;
+        }
+        writeRow--;
+      }
+    }
+    for (let r = writeRow; r >= 0; r--) {
+      grid[r][c] = createGem();
+    }
+  }
+
+  return grid;
+}
+
+// ---------- MATCH DETECTION (LINES + T/L SHAPES) ----------
+
+export function findMatches(grid) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const matches = new Set(); // "r,c"
+
+  // Horizontal segments
+  for (let r = 0; r < rows; r++) {
+    let runStart = 0;
+    for (let c = 1; c <= cols; c++) {
+      const prev = grid[r][c - 1];
+      const curr = c < cols ? grid[r][c] : null;
+      if (!curr || !prev || curr.type !== prev.type) {
+        const len = c - runStart;
+        if (len >= 3) {
+          for (let k = runStart; k < c; k++) {
+            matches.add(`${r},${k}`);
+          }
+        }
+        runStart = c;
+      }
+    }
+  }
+
+  // Vertical segments
+  for (let c = 0; c < cols; c++) {
+    let runStart = 0;
+    for (let r = 1; r <= rows; r++) {
+      const prev = grid[r - 1][c];
+      const curr = r < rows ? grid[r][c] : null;
+      if (!curr || !prev || curr.type !== prev.type) {
+        const len = r - runStart;
+        if (len >= 3) {
+          for (let k = runStart; k < r; k++) {
+            matches.add(`${k},${c}`);
+          }
+        }
+        runStart = r;
+      }
+    }
+  }
+
+  const basicMatches = Array.from(matches).map(s => {
+    const [row, col] = s.split(',').map(Number);
+    return { row, col };
+  });
+
+  return classifyShapes(grid, basicMatches);
+}
+
+function classifyShapes(grid, basicMatches) {
+  const byCell = new Map(); // "r,c" -> { row, col, neighbors }
+
+  for (const m of basicMatches) {
+    const key = `${m.row},${m.col}`;
+    byCell.set(key, { ...m, neighbors: [] });
+  }
+
+  // Build adjacency (4-neighbors)
+  for (const cell of byCell.values()) {
+    const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    for (const [dr, dc] of dirs) {
+      const nr = cell.row + dr;
+      const nc = cell.col + dc;
+      const key = `${nr},${nc}`;
+      if (byCell.has(key)) cell.neighbors.push(byCell.get(key));
+    }
+  }
+
+  const specials = [];
+  const visited = new Set();
+
+  for (const cell of byCell.values()) {
+    const key = `${cell.row},${cell.col}`;
+    if (visited.has(key)) continue;
+
+    const comp = [];
+    const queue = [cell];
+    visited.add(key);
+
+    while (queue.length) {
+      const cur = queue.pop();
+      comp.push(cur);
+      for (const n of cur.neighbors) {
+        const nk = `${n.row},${n.col}`;
+        if (!visited.has(nk)) {
+          visited.add(nk);
+          queue.push(n);
+        }
+      }
+    }
+
+    const shapeInfo = classifyComponent(grid, comp);
+    specials.push(...shapeInfo.specials);
+  }
+
+  return {
+    matches: basicMatches,
+    specials, // [{ row, col, specialType }]
+  };
+}
+
+function classifyComponent(grid, comp) {
+  const specials = [];
+  if (comp.length < 3) return { specials };
+
+  const rows = comp.map(c => c.row);
+  const cols = comp.map(c => c.col);
+  const minR = Math.min(...rows), maxR = Math.max(...rows);
+  const minC = Math.min(...cols), maxC = Math.max(...cols);
+
+  const height = maxR - minR + 1;
+  const width = maxC - minC + 1;
+
+  // 5-in-a-row → supernova
+  if (comp.length >= 5 && (height === 1 || width === 1)) {
+    const center = comp[Math.floor(comp.length / 2)];
+    specials.push({
+      row: center.row,
+      col: center.col,
+      specialType: 'supernova',
+    });
+    return { specials };
+  }
+
+  // T / L shape: bounding box > 2x2 and not pure line
+  if (comp.length >= 5 && height >= 2 && width >= 2) {
+    const center = comp[Math.floor(comp.length / 2)];
+    specials.push({
+      row: center.row,
+      col: center.col,
+      specialType: 'bomb',
+    });
+    return { specials };
+  }
+
+  // 4-in-a-row → line clear
+  if (comp.length === 4 && (height === 1 || width === 1)) {
+    const center = comp[1];
+    specials.push({
+      row: center.row,
+      col: center.col,
+      specialType: height === 1 ? 'lineH' : 'lineV',
+    });
+  }
+
+  return { specials };
+}
+
+// ---------- APPLY MATCHES + SPECIALS ----------
+
+export function applyMatches(grid, matchResult, comboLevel) {
+  const { matches, specials } = matchResult;
+  const toClear = new Set(matches.map(m => `${m.row},${m.col}`));
+
+  // Place specials
+  for (const s of specials) {
+    const key = `${s.row},${s.col}`;
+    if (toClear.has(key)) {
+      toClear.delete(key);
+      const cell = grid[s.row][s.col];
+      grid[s.row][s.col] = {
+        ...cell,
+        special: s.specialType,
+        createdBy: 'shape',
+      };
+    }
+  }
+
+  // Clear normal matched cells
+  for (const key of toClear) {
+    const [r, c] = key.split(',').map(Number);
+    grid[r][c] = null;
+  }
+
+  // Trigger specials
+  for (const s of specials) {
+    triggerSpecial(grid, s.row, s.col, s.specialType, comboLevel);
+  }
+
+  return grid;
+}
+
+export function triggerSpecial(grid, row, col, type, comboLevel) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+
+  const mark = (r, c) => {
+    if (r < 0 || r >= rows || c < 0 || c >= cols) return;
+    if (!grid[r][c]) return;
+    grid[r][c] = null;
+  };
+
+  if (type === 'lineH') {
+    for (let c = 0; c < cols; c++) mark(row, c);
+  } else if (type === 'lineV') {
+    for (let r = 0; r < rows; r++) mark(r, col);
+  } else if (type === 'bomb') {
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        mark(row + dr, col + dc);
+      }
+    }
+  } else if (type === 'supernova') {
+    const targetType = grid[row][col]?.type;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c]?.type === targetType) {
+          mark(r, c);
+        }
+      }
     }
   }
 }
 
-function onCellClick(row, col) {
-  if (locked) return;
-  if (!selected) {
-    selected = { row, col };
-    renderBoard();
-  } else if (selected.row === row && selected.col === col) {
-    selected = null;
-    renderBoard();
-  } else if (isAdjacent(selected.row, selected.col, row, col)) {
-    attemptSwap(selected.row, selected.col, row, col);
-  } else {
-    selected = { row, col };
-    renderBoard();
-  }
-}
-
-function onCellKey(e, row, col) {
-  let targetR = row;
-  let targetC = col;
-
-  switch (e.key) {
-    case 'ArrowUp':    targetR = Math.max(0, row - 1); break;
-    case 'ArrowDown':  targetR = Math.min(ROWS - 1, row + 1); break;
-    case 'ArrowLeft':  targetC = Math.max(0, col - 1); break;
-    case 'ArrowRight': targetC = Math.min(COLS - 1, col + 1); break;
-    case 'Enter':
-    case ' ':
-      e.preventDefault();
-      onCellClick(row, col);
-      return;
-    case 'Escape':
-      selected = null;
-      renderBoard();
-      return;
-    default:
-      return;
-  }
-
-  e.preventDefault();
-  const idx = targetR * COLS + targetC;
-  const cells = dom.board.querySelectorAll('.gem-cell');
-  if (cells[idx]) cells[idx].focus();
-}
-
-function attemptSwap(r1, c1, r2, c2) {
-  locked = true;
-  selected = null;
-  grid = swapGems(grid, r1, c1, r2, c2);
-  moves++;
-  updateHUD();
-  renderBoard();
-
-  const matches = findMatches(grid);
-  if (matches.length === 0) {
-    setTimeout(() => {
-      grid = swapGems(grid, r1, c1, r2, c2);
-      showMsg('No match — try again');
-      renderBoard();
-      setTimeout(() => showMsg(''), 1200);
-      locked = false;
-    }, CASCADE_DELAY);
-  } else {
-    processCascade(1);
-  }
-}
-
-function processCascade(chain) {
-  const matches = findMatches(grid);
-  if (matches.length === 0) {
-    checkLevelUp();
-    locked = false;
-    return;
-  }
-
-  const points = matches.length * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
-  score += points;
-
-  if (chain > 1) {
-    showMsg('Chain x' + chain + '! +' + points);
-  }
-
-  bumpConscience(matches.length);
-  highlightMatched(matches);
-
-  setTimeout(() => {
-    grid = clearMatches(grid, matches);
-    grid = applyGravity(grid);
-    updateHUD();
-    renderBoard();
-    setTimeout(() => processCascade(chain + 1), CASCADE_DELAY);
-  }, CASCADE_DELAY);
-}
-
-function highlightMatched(matches) {
-  const cells = dom.board.querySelectorAll('.gem-cell');
-  matches.forEach(({ row, col }) => {
-    const idx = row * COLS + col;
-    if (cells[idx]) cells[idx].classList.add('matched');
-  });
-}
-
-function checkLevelUp() {
-  const threshold = 500 * level;
-  if (score >= threshold) {
-    level++;
-    updateHUD();
-    showMsg('Level ' + level + ' — Keep going!');
-    onLevelComplete(level - 1, score, null, null);
-  }
-}
-
-export function initMatchMaker(db, user) {
-  cacheDom();
-  grid       = createGrid(ROWS, COLS);
-  score      = 0;
-  moves      = 0;
-  level      = 1;
-  selected   = null;
-  locked     = false;
-  conscience = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
-
-  updateHUD();
-  updateConscience();
-  renderBoard();
-  showMsg('Match the gems — align your conscience');
+function cloneGrid(grid) {
+  return grid.map(row => row.map(cell => (cell ? { ...cell } : null)));
 }
