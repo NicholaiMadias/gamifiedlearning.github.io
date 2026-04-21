@@ -46,6 +46,10 @@ function prepareSprites() {
       const tileH = img.height / SPRITE_SHEET.rows;
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(spriteCache);
+        return;
+      }
       canvas.width = tileW;
       canvas.height = tileH;
 
