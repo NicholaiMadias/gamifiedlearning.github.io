@@ -5,9 +5,17 @@
  */
 
 import { initMatchMaker } from './match-maker-ui.js';
+import { renderStarMap } from './star-map.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const starMapContainer = document.getElementById('star-map-container');
+
+  function refreshStarMap() {
+    if (starMapContainer) renderStarMap(starMapContainer);
+  }
+
   initMatchMaker(null, null);
+  refreshStarMap();
 
   const restartBtn = document.getElementById('restart-btn');
   if (restartBtn) {
@@ -15,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
       initMatchMaker(null, null);
     });
   }
+
+  // Refresh star map whenever a level is completed
+  window.addEventListener('matchmaker-level-complete', refreshStarMap);
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker

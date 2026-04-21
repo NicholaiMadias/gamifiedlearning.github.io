@@ -221,6 +221,7 @@ function checkLevelUp() {
     updateHUD();
     showMsg('Level ' + level + ' — Keep going!');
     onLevelComplete(level - 1, score, null, null);
+    window.dispatchEvent(new CustomEvent('matchmaker-level-complete', { detail: { level: level - 1 } }));
   }
 }
 

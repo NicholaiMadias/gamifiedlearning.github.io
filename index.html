@@ -124,6 +124,31 @@
 
     .match-restart-btn:hover { background: #00ff4120; }
 
+    /* ── Star Map ─────────────────────────────────── */
+    .star-map-card {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .star-map-card h2 {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ffd700;
+      margin-bottom: 0.4rem;
+      text-shadow: 0 0 8px #ffd70060;
+    }
+
+    #star-map-container {
+      display: flex;
+      justify-content: center;
+    }
+
     /* ── Matrix of Conscience ─────────────────────── */
     .matrix-card {
       background: #0d0d1a;
@@ -213,6 +238,12 @@
     <div id="match-badge-banner" class="match-badge-banner hidden" aria-live="polite"></div>
 
     <button class="match-restart-btn" id="restart-btn">↺ Restart</button>
+  </section>
+
+  <!-- ══ Mystery of the Seven Stars — Star Map ══════ -->
+  <section class="star-map-card" id="star-map-screen">
+    <h2>Mystery of the Seven Stars</h2>
+    <div id="star-map-container"></div>
   </section>
 
   <!-- ══ Matrix of Conscience ════════════════════════ -->
