@@ -11,7 +11,6 @@ import {
   applyRainbowClear,
   findMostCommonType,
   GEM_TYPES,
-  SPECIAL_GEM_TYPES,
   GRID_SIZE,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
@@ -87,9 +86,13 @@ function renderGrid() {
       cell.dataset.row = r;
       cell.dataset.col = c;
       const type = grid[r][c];
-      cell.innerHTML = type
-        ? `<div class="gem gem-${type}" aria-label="${GEM_LABELS[type] || type}"></div>`
-        : '';
+      if (type) {
+        const gem = document.createElement('div');
+        gem.className = `gem gem-${type}`;
+        gem.setAttribute('role', 'img');
+        gem.setAttribute('aria-label', GEM_LABELS[type] || type);
+        cell.appendChild(gem);
+      }
       cell.onclick = () => onCellClick(r, c);
       container.appendChild(cell);
     }
@@ -584,6 +587,19 @@ function checkGameOver() {
 }
 
 // ── Store ────────────────────────────────────────────────
+
+/**
+ * Cancels any in-flight cascade and clears all transient interaction state.
+ * Call before any store action that mutates the board.
+ */
+function resetCascadeState() {
+  runId++;
+  if (pendingTimeout) { clearTimeout(pendingTimeout); pendingTimeout = null; }
+  if (selected) { highlightCell(selected.r, selected.c, false); selected = null; }
+  chainDepth = 0;
+  lastSwap = null;
+}
+
 export function purchaseItem(itemId) {
   const item = STORE_ITEMS.find(i => i.id === itemId);
   if (!item || coins < item.cost) return;
@@ -600,12 +616,14 @@ export function purchaseItem(itemId) {
       break;
 
     case 'shuffle':
+      resetCascadeState();
       grid = createInitialGrid();
       renderGrid();
       showBanner('🔀 Board shuffled!', 'banner--badge');
       break;
 
     case 'place-bomb': {
+      resetCascadeState();
       const candidates = [];
       for (let r = 0; r < GRID_SIZE; r++) {
         for (let c = 0; c < GRID_SIZE; c++) {

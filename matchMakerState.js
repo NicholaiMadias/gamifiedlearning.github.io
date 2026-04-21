@@ -60,11 +60,11 @@ export function applySwap(grid, r1, c1, r2, c2) {
 export function findMatches(grid) {
   const groups = [];
 
-  // Horizontal runs
+  // Horizontal runs — only regular gem types can form matches
   for (let r = 0; r < GRID_SIZE; r++) {
     let runStart = 0;
     for (let c = 1; c <= GRID_SIZE; c++) {
-      const cont = c < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r][c - 1];
+      const cont = c < GRID_SIZE && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r][c - 1];
       if (!cont) {
         if (c - runStart >= 3) {
           const group = [];
@@ -76,11 +76,11 @@ export function findMatches(grid) {
     }
   }
 
-  // Vertical runs
+  // Vertical runs — only regular gem types can form matches
   for (let c = 0; c < GRID_SIZE; c++) {
     let runStart = 0;
     for (let r = 1; r <= GRID_SIZE; r++) {
-      const cont = r < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r - 1][c];
+      const cont = r < GRID_SIZE && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r - 1][c];
       if (!cont) {
         if (r - runStart >= 3) {
           const group = [];
