@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "Nexus-Security"
+
+  # Monitor NPM packages
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "D.D.T.O.-Optimization"

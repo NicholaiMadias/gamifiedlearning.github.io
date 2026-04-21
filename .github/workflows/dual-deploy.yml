@@ -21,7 +21,7 @@ jobs:
             exit 1
           fi
           ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="amazinggracehomeliving.com"
+          EXPECTED="gamifiedlearning.org"
           if [ "$ACTUAL" != "$EXPECTED" ]; then
             echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
             exit 1
