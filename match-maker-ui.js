@@ -178,6 +178,8 @@ function attemptSwap(r1, c1, r2, c2) {
   if (!result || !result.matches || result.matches.length === 0) {
     setTimeout(() => {
       grid = swapGems(grid, r1, c1, r2, c2);
+      streak = 0;
+      globalMultiplier = 1.0;
       showMsg('No match — try again');
       renderBoard();
       setTimeout(() => showMsg(''), 1200);
@@ -232,9 +234,9 @@ function processCascade(isFirstPass = false) {
   }, CASCADE_DELAY);
 }
 
-function highlightMatched(matchCells) {
+function highlightMatched(matches) {
   const cells = dom.board.querySelectorAll('.gem-cell');
-  matchCells.forEach(({ row, col }) => {
+  matches.forEach(({ row, col }) => {
     const idx = row * COLS + col;
     if (cells[idx]) cells[idx].classList.add('matched');
   });

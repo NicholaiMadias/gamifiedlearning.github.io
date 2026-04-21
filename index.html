@@ -116,6 +116,15 @@
 
     .match-restart-btn:hover { background: #00ff4120; }
 
+    /* ── Match message ────────────────────────────── */
+    .match-msg {
+      min-height: 1.2em;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #00ff41;
+      margin: 0.4rem 0;
+    }
+
     /* ── Special gem indicators ───────────────────── */
     .gem-supernova { box-shadow: 0 0 12px 4px #fff176, 0 0 6px #ff8f00 inset; }
     .gem-bomb      { box-shadow: 0 0 10px 3px #ef5350, 0 0 6px #b71c1c inset; }
@@ -206,7 +215,7 @@
 
     <div class="match-grid" id="match-grid"></div>
 
-    <p id="match-msg" style="min-height:1.2em;text-align:center;font-size:0.85rem;color:#00ff41;margin:0.4rem 0;"></p>
+    <p id="match-msg" class="match-msg"></p>
 
     <div id="match-badge-banner" class="match-badge-banner hidden"></div>
 

@@ -137,7 +137,7 @@ function classifyShapes(basicMatches) {
     const queue = [cell];
     visited.add(key);
     while (queue.length) {
-      const cur = queue.pop();
+      const cur = queue.shift();
       comp.push(cur);
       for (const n of cur.neighbors) {
         const nk = `${n.row},${n.col}`;
@@ -247,7 +247,9 @@ export function triggerSpecial(grid, row, col, type, comboLevel = 1) {
       }
     }
   } else if (type === 'supernova') {
+    // Capture the target type before any cells are cleared
     const targetType = grid[row][col]?.type;
+    if (!targetType) return;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         if (grid[r][c]?.type === targetType) mark(r, c);
