@@ -9,12 +9,17 @@ import { initMatchMaker } from './match-maker-ui.js';
 document.addEventListener('DOMContentLoaded', () => {
   initMatchMaker(null, null);
 
-  const restartBtn = document.getElementById('restart-btn');
+  const restartBtn = document.getElementById('match-restart-btn');
   if (restartBtn) {
     restartBtn.addEventListener('click', () => {
       initMatchMaker(null, null);
     });
   }
+
+  // Seven-Star narrative hook
+  window.addEventListener('nexus-seven-star', (e) => {
+    console.log('[Nexus] Seven Stars aligned — narrative trigger', e.detail);
+  });
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker

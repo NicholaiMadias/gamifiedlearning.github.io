@@ -2,12 +2,28 @@ export const GRID_SIZE = 7;
 
 const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
+/** Probability that any newly spawned gem is a star (supernova) tile. */
+const STAR_CHANCE = 0.03;
+
+/**
+ * Creates a new gem cell object.
+ * @param {string} kind - One of GEM_TYPES.
+ * @param {boolean} [star=false] - Whether this is a star (supernova) tile.
+ * @returns {{kind: string, star: boolean}}
+ */
+function makeGem(kind, star = false) {
+  return { kind, star };
+}
+
 function randomGem() {
-  return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+  const kind = GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+  const star  = Math.random() < STAR_CHANCE;
+  return makeGem(kind, star);
 }
 
 /**
  * Creates an initial 7×7 grid with no pre-existing matches.
+ * Each cell is {kind, star}.
  */
 export function createInitialGrid() {
   const grid = [];
@@ -18,8 +34,8 @@ export function createInitialGrid() {
       do {
         gem = randomGem();
       } while (
-        (c >= 2 && grid[r][c - 1] === gem && grid[r][c - 2] === gem) ||
-        (r >= 2 && grid[r - 1][c] === gem && grid[r - 2][c] === gem)
+        (c >= 2 && grid[r][c - 1]?.kind === gem.kind && grid[r][c - 2]?.kind === gem.kind) ||
+        (r >= 2 && grid[r - 1][c]?.kind === gem.kind && grid[r - 2][c]?.kind === gem.kind)
       );
       grid[r][c] = gem;
     }
@@ -49,22 +65,29 @@ export function applySwap(grid, r1, c1, r2, c2) {
 
 /**
  * Finds all horizontal and vertical matches of 3 or more.
- * Returns an array of match arrays, each match being an array of {r, c} objects.
+ * Returns an array of match arrays, each match being an array of {r, c, star} objects.
  */
 export function findMatches(grid) {
-  const matched = new Set();
+  const matched = new Map(); // key -> {r, c, star}
 
   const key = (r, c) => `${r},${c}`;
+  const addMatch = (r, c) => {
+    if (!matched.has(key(r, c))) {
+      matched.set(key(r, c), { r, c, star: grid[r][c]?.star ?? false });
+    }
+  };
 
-  // Horizontal — null guard handles grids mid-resolution (between clearMatches and applyGravity)
+  // Horizontal — null guard handles grids mid-resolution
   for (let r = 0; r < GRID_SIZE; r++) {
     let run = 1;
     for (let c = 1; c <= GRID_SIZE; c++) {
-      if (c < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r][c - 1]) {
+      const cur  = grid[r][c];
+      const prev = grid[r][c - 1];
+      if (c < GRID_SIZE && cur && prev && cur.kind === prev.kind) {
         run++;
       } else {
         if (run >= 3) {
-          for (let k = c - run; k < c; k++) matched.add(key(r, k));
+          for (let k = c - run; k < c; k++) addMatch(r, k);
         }
         run = 1;
       }
@@ -75,11 +98,13 @@ export function findMatches(grid) {
   for (let c = 0; c < GRID_SIZE; c++) {
     let run = 1;
     for (let r = 1; r <= GRID_SIZE; r++) {
-      if (r < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r - 1][c]) {
+      const cur  = grid[r]?.[c];
+      const prev = grid[r - 1]?.[c];
+      if (r < GRID_SIZE && cur && prev && cur.kind === prev.kind) {
         run++;
       } else {
         if (run >= 3) {
-          for (let k = r - run; k < r; k++) matched.add(key(k, c));
+          for (let k = r - run; k < r; k++) addMatch(k, c);
         }
         run = 1;
       }
@@ -89,10 +114,7 @@ export function findMatches(grid) {
   if (matched.size === 0) return [];
 
   // Return as a single match group (for simpler scoring)
-  return [[...matched].map(k => {
-    const [r, c] = k.split(',').map(Number);
-    return { r, c };
-  })];
+  return [[...matched.values()]];
 }
 
 /**
@@ -105,6 +127,19 @@ export function clearMatches(grid, matches) {
       next[r][c] = null;
     });
   });
+  return next;
+}
+
+/**
+ * Clears the entire row and column of a star tile (supernova effect).
+ * Returns a new grid with those cells set to null.
+ */
+export function applySupernova(grid, r, c) {
+  const next = grid.map(row => [...row]);
+  for (let i = 0; i < GRID_SIZE; i++) {
+    next[r][i] = null;
+    next[i][c] = null;
+  }
   return next;
 }
 
