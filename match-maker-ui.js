@@ -5,8 +5,20 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { createGrid, isAdjacent, swapGems, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
+import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
+
+const SFX = {
+  match:     'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+  explosion: 'https://assets.mixkit.co/active_storage/sfx/2575/2575-preview.mp3',
+  swap:      'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
+};
+
+function playSound(type) {
+  const audio = new Audio(SFX[type]);
+  audio.volume = 0.4;
+  audio.play().catch(() => console.log('Audio blocked by browser; click to enable.'));
+}
 
 const COLS          = 7;
 const ROWS          = 7;
@@ -34,19 +46,19 @@ let conscience = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
 const dom = {};
 
 function cacheDom() {
-  dom.board      = document.getElementById('match-board');
-  dom.score      = document.getElementById('hud-score');
-  dom.level      = document.getElementById('hud-level');
-  dom.moves      = document.getElementById('hud-moves');
+  dom.board      = document.getElementById('match-grid');
+  dom.score      = document.getElementById('match-score');
+  dom.level      = document.getElementById('match-level');
+  dom.moves      = document.getElementById('match-moves');
   dom.msg        = document.getElementById('match-msg');
-  dom.barEmpathy = document.getElementById('bar-empathy');
-  dom.barJustice = document.getElementById('bar-justice');
-  dom.barWisdom  = document.getElementById('bar-wisdom');
-  dom.barGrowth  = document.getElementById('bar-growth');
-  dom.pctEmpathy = document.getElementById('pct-empathy');
-  dom.pctJustice = document.getElementById('pct-justice');
-  dom.pctWisdom  = document.getElementById('pct-wisdom');
-  dom.pctGrowth  = document.getElementById('pct-growth');
+  dom.barEmpathy = document.getElementById('mc-empathy-bar');
+  dom.barJustice = document.getElementById('mc-justice-bar');
+  dom.barWisdom  = document.getElementById('mc-wisdom-bar');
+  dom.barGrowth  = document.getElementById('mc-growth-bar');
+  dom.pctEmpathy = document.getElementById('mc-empathy');
+  dom.pctJustice = document.getElementById('mc-justice');
+  dom.pctWisdom  = document.getElementById('mc-wisdom');
+  dom.pctGrowth  = document.getElementById('mc-growth');
 }
 
 function updateHUD() {
@@ -65,7 +77,7 @@ function updateConscience() {
     const bar  = dom['bar' + key.charAt(0).toUpperCase() + key.slice(1)];
     const pct  = dom['pct' + key.charAt(0).toUpperCase() + key.slice(1)];
     if (bar) bar.style.width = val + '%';
-    if (pct) pct.textContent = val + '%';
+    if (pct) pct.textContent = val;
     const track = bar?.parentElement;
     if (track) track.setAttribute('aria-valuenow', val);
   });
@@ -118,7 +130,7 @@ function onCellClick(row, col) {
   } else if (selected.row === row && selected.col === col) {
     selected = null;
     renderBoard();
-  } else if (isAdjacent(selected.row, selected.col, row, col)) {
+  } else if (canSwap(selected.row, selected.col, row, col)) {
     attemptSwap(selected.row, selected.col, row, col);
   } else {
     selected = { row, col };
@@ -157,15 +169,16 @@ function onCellKey(e, row, col) {
 function attemptSwap(r1, c1, r2, c2) {
   locked = true;
   selected = null;
-  grid = swapGems(grid, r1, c1, r2, c2);
+  grid = applySwap(grid, r1, c1, r2, c2);
   moves++;
+  playSound('swap');
   updateHUD();
   renderBoard();
 
   const matches = findMatches(grid);
   if (matches.length === 0) {
     setTimeout(() => {
-      grid = swapGems(grid, r1, c1, r2, c2);
+      grid = applySwap(grid, r1, c1, r2, c2);
       showMsg('No match — try again');
       renderBoard();
       setTimeout(() => showMsg(''), 1200);
@@ -184,14 +197,16 @@ function processCascade(chain) {
     return;
   }
 
-  const points = matches.length * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
+  const matchedCells = matches.reduce((sum, group) => sum + group.length, 0);
+  const points = matchedCells * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
   score += points;
 
   if (chain > 1) {
     showMsg('Chain x' + chain + '! +' + points);
   }
 
-  bumpConscience(matches.length);
+  playSound('match');
+  bumpConscience(matchedCells);
   highlightMatched(matches);
 
   setTimeout(() => {
@@ -205,9 +220,11 @@ function processCascade(chain) {
 
 function highlightMatched(matches) {
   const cells = dom.board.querySelectorAll('.gem-cell');
-  matches.forEach(({ row, col }) => {
-    const idx = row * COLS + col;
-    if (cells[idx]) cells[idx].classList.add('matched');
+  matches.forEach(group => {
+    group.forEach(({ r, c }) => {
+      const idx = r * COLS + c;
+      if (cells[idx]) cells[idx].classList.add('matched');
+    });
   });
 }
 
@@ -223,7 +240,7 @@ function checkLevelUp() {
 
 export function initMatchMaker(db, user) {
   cacheDom();
-  grid       = createGrid(ROWS, COLS);
+  grid       = createInitialGrid();
   score      = 0;
   moves      = 0;
   level      = 1;
