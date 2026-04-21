@@ -67,7 +67,7 @@
       margin: 0 auto;
     }
 
-    .match-cell {
+    .match-cell, .gem-cell {
       aspect-ratio: 1 / 1;
       border-radius: 8px;
       display: flex;
@@ -81,8 +81,11 @@
       user-select: none;
     }
 
-    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
-    .match-cell:active { transform: scale(0.94); }
+    .match-cell:hover, .gem-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .match-cell:active, .gem-cell:active { transform: scale(0.94); }
+
+    .gem-cell.selected { outline: 2px solid #00ff41; transform: scale(1.05); }
+    .gem-cell.matched  { opacity: 0.4; transform: scale(0.9); }
 
     .match-badge-banner {
       text-align: center;
@@ -112,6 +115,12 @@
     }
 
     .match-restart-btn:hover { background: #00ff4120; }
+
+    /* ── Special gem indicators ───────────────────── */
+    .gem-supernova { box-shadow: 0 0 12px 4px #fff176, 0 0 6px #ff8f00 inset; }
+    .gem-bomb      { box-shadow: 0 0 10px 3px #ef5350, 0 0 6px #b71c1c inset; }
+    .gem-lineH     { box-shadow: 0 0 10px 3px #42a5f5 inset; }
+    .gem-lineV     { box-shadow: 0 0 10px 3px #66bb6a inset; }
 
     /* ── Matrix of Conscience ─────────────────────── */
     .matrix-card {
@@ -196,6 +205,8 @@
     </div>
 
     <div class="match-grid" id="match-grid"></div>
+
+    <p id="match-msg" style="min-height:1.2em;text-align:center;font-size:0.85rem;color:#00ff41;margin:0.4rem 0;"></p>
 
     <div id="match-badge-banner" class="match-badge-banner hidden"></div>
 
