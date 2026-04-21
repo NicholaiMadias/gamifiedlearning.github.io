@@ -5,7 +5,7 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { createGrid, isAdjacent, swapGems, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
+import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity, isStar, applySupernova } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
 const COLS          = 7;
@@ -13,6 +13,7 @@ const ROWS          = 7;
 const CASCADE_DELAY = 200;
 const BASE_POINTS   = 50;
 const CHAIN_BONUS   = 25;
+const SUPERNOVA_POINTS = 500;
 const CONSCIENCE_KEYS = ['empathy', 'justice', 'wisdom', 'growth'];
 
 const GEM_DISPLAY = {
@@ -86,17 +87,18 @@ function renderBoard() {
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      const gemType = grid[r][c];
-      const info    = GEM_DISPLAY[gemType] || { emoji: '?', cls: '', label: gemType };
+      const cellVal = grid[r][c];
+      const baseType = cellVal ? cellVal.replace('*', '') : cellVal;
+      const info    = GEM_DISPLAY[baseType] || { emoji: '?', cls: '', label: baseType };
       const cell    = document.createElement('button');
       const idx     = r * COLS + c;
 
-      cell.className = 'gem-cell ' + info.cls;
+      cell.className = 'gem-cell ' + info.cls + (isStar(cellVal) ? ' star-power' : '');
       cell.textContent = info.emoji;
       cell.dataset.row = r;
       cell.dataset.col = c;
       cell.setAttribute('role', 'gridcell');
-      cell.setAttribute('aria-label', info.label + ', row ' + (r + 1) + ' column ' + (c + 1));
+      cell.setAttribute('aria-label', info.label + (isStar(cellVal) ? ' ★' : '') + ', row ' + (r + 1) + ' column ' + (c + 1));
       cell.setAttribute('tabindex', idx === 0 ? '0' : '-1');
 
       if (selected && selected.row === r && selected.col === c) {
@@ -118,7 +120,7 @@ function onCellClick(row, col) {
   } else if (selected.row === row && selected.col === col) {
     selected = null;
     renderBoard();
-  } else if (isAdjacent(selected.row, selected.col, row, col)) {
+  } else if (canSwap(grid, selected.row, selected.col, row, col)) {
     attemptSwap(selected.row, selected.col, row, col);
   } else {
     selected = { row, col };
@@ -157,7 +159,7 @@ function onCellKey(e, row, col) {
 function attemptSwap(r1, c1, r2, c2) {
   locked = true;
   selected = null;
-  grid = swapGems(grid, r1, c1, r2, c2);
+  grid = applySwap(grid, r1, c1, r2, c2);
   moves++;
   updateHUD();
   renderBoard();
@@ -165,7 +167,7 @@ function attemptSwap(r1, c1, r2, c2) {
   const matches = findMatches(grid);
   if (matches.length === 0) {
     setTimeout(() => {
-      grid = swapGems(grid, r1, c1, r2, c2);
+      grid = applySwap(grid, r1, c1, r2, c2);
       showMsg('No match — try again');
       renderBoard();
       setTimeout(() => showMsg(''), 1200);
@@ -184,18 +186,33 @@ function processCascade(chain) {
     return;
   }
 
-  const points = matches.length * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
-  score += points;
+  // Detect star (supernova) gems among the matched cells
+  const allMatchedCells = matches.flat();
+  const supernovas = allMatchedCells.filter(({ r, c }) => isStar(grid[r][c]));
 
-  if (chain > 1) {
-    showMsg('Chain x' + chain + '! +' + points);
+  const matchPoints     = matches.length * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
+  const supernovaBonus  = supernovas.length * SUPERNOVA_POINTS;
+  score += matchPoints + supernovaBonus;
+
+  if (supernovas.length > 0) {
+    showMsg('✨ Supernova! A Star erupts — the heavens shift in your favor!');
+  } else if (chain > 1) {
+    showMsg('Chain x' + chain + '! +' + matchPoints);
   }
 
   bumpConscience(matches.length);
   highlightMatched(matches);
 
+  const boardCells = dom.board ? dom.board.querySelectorAll('.gem-cell') : [];
+  if (supernovas.length > 0) {
+    highlightSupernova(boardCells, supernovas);
+  }
+
   setTimeout(() => {
     grid = clearMatches(grid, matches);
+    supernovas.forEach(({ r, c }) => {
+      grid = applySupernova(grid, r, c);
+    });
     grid = applyGravity(grid);
     updateHUD();
     renderBoard();
@@ -204,10 +221,25 @@ function processCascade(chain) {
 }
 
 function highlightMatched(matches) {
-  const cells = dom.board.querySelectorAll('.gem-cell');
-  matches.forEach(({ row, col }) => {
-    const idx = row * COLS + col;
-    if (cells[idx]) cells[idx].classList.add('matched');
+  const cells = dom.board ? dom.board.querySelectorAll('.gem-cell') : [];
+  matches.forEach(group => {
+    group.forEach(({ r, c }) => {
+      const idx = r * COLS + c;
+      if (cells[idx]) cells[idx].classList.add('matched');
+    });
+  });
+}
+
+function highlightSupernova(cells, supernovas) {
+  supernovas.forEach(({ r, c }) => {
+    for (let i = 0; i < COLS; i++) {
+      const idx = r * COLS + i;
+      if (cells[idx]) cells[idx].classList.add('supernova-fx');
+    }
+    for (let i = 0; i < ROWS; i++) {
+      const idx = i * COLS + c;
+      if (cells[idx]) cells[idx].classList.add('supernova-fx');
+    }
   });
 }
 
@@ -223,7 +255,7 @@ function checkLevelUp() {
 
 export function initMatchMaker(db, user) {
   cacheDom();
-  grid       = createGrid(ROWS, COLS);
+  grid       = createInitialGrid();
   score      = 0;
   moves      = 0;
   level      = 1;

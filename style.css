@@ -98,12 +98,17 @@ body {
 
 @keyframes gemExplode { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } 100% { transform: scale(0); opacity: 0; } }
 @keyframes gemDrop { from { transform: translateY(-100%); opacity: 0.5; } to { transform: translateY(0); opacity: 1; } }
+@keyframes starPulse { 0%, 100% { box-shadow: 0 0 6px 2px rgba(240,192,64,0.7); } 50% { box-shadow: 0 0 14px 5px rgba(240,192,64,1); } }
+@keyframes supernovaFlash { 0% { background: rgba(255,220,50,0.9); transform: scale(1.2); } 60% { background: rgba(255,100,50,0.6); transform: scale(1.05); } 100% { background: transparent; transform: scale(1); opacity: 0; } }
 
 .gem-heart { background: rgba(255,107,107,0.15); }
 .gem-star  { background: rgba(240,192,64,0.15); }
 .gem-cross { background: rgba(188,140,255,0.15); }
 .gem-flame { background: rgba(255,140,50,0.15); }
 .gem-drop  { background: rgba(88,166,255,0.15); }
+
+.gem-cell.star-power { animation: starPulse 1.4s ease-in-out infinite; border: 1px solid rgba(240,192,64,0.6); }
+.gem-cell.supernova-fx { animation: supernovaFlash 0.4s ease-out forwards; }
 
 .controls { padding: 12px 0; display: flex; justify-content: center; gap: 12px; }
 .btn {

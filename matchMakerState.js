@@ -2,8 +2,22 @@ export const GRID_SIZE = 7;
 
 const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
+/** Probability that any newly placed gem is a star (supernova) gem. */
+const STAR_CHANCE = 0.03;
+
+/** Returns the base gem type, stripping the star marker if present. */
+function gemType(cell) {
+  return cell ? cell.replace('*', '') : null;
+}
+
+/** Returns true if this cell carries the star (supernova) marker. */
+export function isStar(cell) {
+  return typeof cell === 'string' && cell.endsWith('*');
+}
+
 function randomGem() {
-  return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+  const type = GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+  return Math.random() < STAR_CHANCE ? type + '*' : type;
 }
 
 /**
@@ -18,8 +32,8 @@ export function createInitialGrid() {
       do {
         gem = randomGem();
       } while (
-        (c >= 2 && grid[r][c - 1] === gem && grid[r][c - 2] === gem) ||
-        (r >= 2 && grid[r - 1][c] === gem && grid[r - 2][c] === gem)
+        (c >= 2 && gemType(grid[r][c - 1]) === gemType(gem) && gemType(grid[r][c - 2]) === gemType(gem)) ||
+        (r >= 2 && gemType(grid[r - 1][c]) === gemType(gem) && gemType(grid[r - 2][c]) === gemType(gem))
       );
       grid[r][c] = gem;
     }
@@ -60,7 +74,7 @@ export function findMatches(grid) {
   for (let r = 0; r < GRID_SIZE; r++) {
     let run = 1;
     for (let c = 1; c <= GRID_SIZE; c++) {
-      if (c < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r][c - 1]) {
+      if (c < GRID_SIZE && gemType(grid[r][c]) && gemType(grid[r][c]) === gemType(grid[r][c - 1])) {
         run++;
       } else {
         if (run >= 3) {
@@ -75,7 +89,7 @@ export function findMatches(grid) {
   for (let c = 0; c < GRID_SIZE; c++) {
     let run = 1;
     for (let r = 1; r <= GRID_SIZE; r++) {
-      if (r < GRID_SIZE && grid[r][c] && grid[r][c] === grid[r - 1][c]) {
+      if (r < GRID_SIZE && gemType(grid[r][c]) && gemType(grid[r][c]) === gemType(grid[r - 1][c])) {
         run++;
       } else {
         if (run >= 3) {
@@ -123,6 +137,19 @@ export function applyGravity(grid) {
     for (let r = GRID_SIZE - 1; r >= 0; r--) {
       next[r][c] = gems.length > 0 ? gems.shift() : randomGem();
     }
+  }
+  return next;
+}
+
+/**
+ * Supernova effect: clears the entire row and column of the given cell.
+ * Called when a starred gem is part of a match.
+ */
+export function applySupernova(grid, r, c) {
+  const next = grid.map(row => [...row]);
+  for (let i = 0; i < GRID_SIZE; i++) {
+    next[r][i] = null;
+    next[i][c] = null;
   }
   return next;
 }
