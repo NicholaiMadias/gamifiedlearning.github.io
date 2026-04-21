@@ -11,13 +11,15 @@ function randomGem() {
 }
 
 /**
- * Creates an initial 7×7 grid with no pre-existing matches.
+ * Creates an initial grid with no pre-existing matches.
+ * @param {number} [rows=GRID_SIZE] - Number of rows (defaults to GRID_SIZE)
+ * @param {number} [cols=GRID_SIZE] - Number of columns (defaults to GRID_SIZE)
  */
-export function createInitialGrid() {
+export function createInitialGrid(rows = GRID_SIZE, cols = GRID_SIZE) {
   const grid = [];
-  for (let r = 0; r < GRID_SIZE; r++) {
+  for (let r = 0; r < rows; r++) {
     grid[r] = [];
-    for (let c = 0; c < GRID_SIZE; c++) {
+    for (let c = 0; c < cols; c++) {
       let gem;
       do {
         gem = randomGem();

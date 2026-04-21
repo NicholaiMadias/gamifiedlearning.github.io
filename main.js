@@ -1,14 +1,10 @@
-<<<<<<< copilot/improve-gameplay
-import { initMatchMaker, purchaseItem } from './match-maker-ui.js';
-=======
 /**
  * main.js — Bootstrap for Gamified Learning Matrix
  * Initializes the Match Maker, wires HUD, registers service worker.
  * (c) 2026 NicholaiMadias — MIT License
  */
->>>>>>> main
 
-import { initMatchMaker } from './match-maker-ui.js';
+import { initMatchMaker, purchaseItem } from './match-maker-ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initMatchMaker(null, null);
