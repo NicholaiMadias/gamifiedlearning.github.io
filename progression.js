@@ -7,7 +7,16 @@ const STORAGE_KEY = 'glm-progress';
 
 function load() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { total: 0 };
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      Number.isFinite(parsed.total)
+    ) {
+      return { total: parsed.total };
+    }
+    return { total: 0 };
   } catch {
     return { total: 0 };
   }
