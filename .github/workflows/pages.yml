@@ -3,6 +3,8 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -22,15 +24,33 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v4
 
-      # No build step needed — your site is static
+      - name: Validate HTML structure
+        run: |
+          echo "Checking for merge conflict markers..."
+          if grep -rn -E '<{7}|>{7}|={7}' --include="*.html" .; then
+            echo "ERROR: Merge conflict markers found in HTML files"
+            exit 1
+          fi
+          echo "Checking required game DOM IDs exist in index.html..."
+          for id in match-board hud-score hud-level hud-moves match-msg restart-btn bar-empathy bar-justice bar-wisdom bar-growth pct-empathy pct-justice pct-wisdom pct-growth match-badge-banner; do
+            if ! grep -q "id=\"$id\"" index.html; then
+              echo "ERROR: Missing required DOM id=\"$id\" in index.html"
+              exit 1
+            fi
+          done
+          echo "Validation passed."
+
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."   # deploy root of repo
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:
