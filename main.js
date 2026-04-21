@@ -4,7 +4,7 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { initMatchMaker } from './match-maker-ui.js';
+import { initMatchMaker, purchaseItem } from './match-maker-ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initMatchMaker(null, null);
@@ -24,4 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   console.log('[GLM] Gamified Learning Matrix initialized.');
+});
+
+// Wire up store buttons
+['extra-moves', 'shuffle', 'place-bomb'].forEach(id => {
+  const btn = document.getElementById(`store-btn-${id}`);
+  if (btn) btn.addEventListener('click', () => purchaseItem(id));
 });
