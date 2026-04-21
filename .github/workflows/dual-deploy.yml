@@ -21,7 +21,7 @@ jobs:
             exit 1
           fi
           ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="gamifiedlearning.org"
+          EXPECTED="nicholai.org"
           if [ "$ACTUAL" != "$EXPECTED" ]; then
             echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
             exit 1
@@ -39,15 +39,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-
-      - name: Sync to WordPress (Gamified Learning)
-        env:
-          WP_API_KEY: ${{ secrets.WP_API_KEY }}
-        run: |
-          test -f dist/index.html
-          CONTENT=$(jq -Rs . < dist/index.html)
-          curl -sSf \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${WP_API_KEY}" \
-            -d "{\"content\": ${CONTENT}}" \
-            https://www.gamifiedlearning.org/wp-json/nexus-sync/v1/update
