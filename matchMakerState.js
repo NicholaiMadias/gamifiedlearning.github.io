@@ -19,9 +19,12 @@ function randomGemType() {
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
 }
 
-function randomGem() {
-  const type = randomGemType();
+function applyStarChance(type) {
   return Math.random() < STAR_CHANCE ? type + '*' : type;
+}
+
+function randomGem() {
+  return applyStarChance(randomGemType());
 }
 
 /**
@@ -40,7 +43,7 @@ export function createInitialGrid() {
         (r >= 2 && gemType(grid[r - 1][c]) === baseType && gemType(grid[r - 2][c]) === baseType)
       );
       // Apply the star marker independently after a valid type is determined
-      grid[r][c] = Math.random() < STAR_CHANCE ? baseType + '*' : baseType;
+      grid[r][c] = applyStarChance(baseType);
     }
   }
   return grid;
