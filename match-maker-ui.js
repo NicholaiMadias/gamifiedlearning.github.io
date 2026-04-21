@@ -5,7 +5,7 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity, isStar, applySupernova } from './matchMakerState.js';
+import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity, isStar, applySupernova, gemType } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
 const COLS          = 7;
@@ -88,7 +88,7 @@ function renderBoard() {
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const cellVal = grid[r][c];
-      const baseType = cellVal ? cellVal.replace('*', '') : cellVal;
+      const baseType = gemType(cellVal);
       const info    = GEM_DISPLAY[baseType] || { emoji: '?', cls: '', label: baseType };
       const cell    = document.createElement('button');
       const idx     = r * COLS + c;

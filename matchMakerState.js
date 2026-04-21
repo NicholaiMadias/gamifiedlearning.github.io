@@ -6,8 +6,8 @@ const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 const STAR_CHANCE = 0.03;
 
 /** Returns the base gem type, stripping the star marker if present. */
-function gemType(cell) {
-  return cell ? cell.replace('*', '') : null;
+export function gemType(cell) {
+  return cell ? cell.replace(/\*/g, '') : null;
 }
 
 /** Returns true if this cell carries the star (supernova) marker. */
@@ -15,8 +15,12 @@ export function isStar(cell) {
   return typeof cell === 'string' && cell.endsWith('*');
 }
 
+function randomGemType() {
+  return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+}
+
 function randomGem() {
-  const type = GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+  const type = randomGemType();
   return Math.random() < STAR_CHANCE ? type + '*' : type;
 }
 
@@ -28,14 +32,15 @@ export function createInitialGrid() {
   for (let r = 0; r < GRID_SIZE; r++) {
     grid[r] = [];
     for (let c = 0; c < GRID_SIZE; c++) {
-      let gem;
+      let baseType;
       do {
-        gem = randomGem();
+        baseType = randomGemType();
       } while (
-        (c >= 2 && gemType(grid[r][c - 1]) === gemType(gem) && gemType(grid[r][c - 2]) === gemType(gem)) ||
-        (r >= 2 && gemType(grid[r - 1][c]) === gemType(gem) && gemType(grid[r - 2][c]) === gemType(gem))
+        (c >= 2 && gemType(grid[r][c - 1]) === baseType && gemType(grid[r][c - 2]) === baseType) ||
+        (r >= 2 && gemType(grid[r - 1][c]) === baseType && gemType(grid[r - 2][c]) === baseType)
       );
-      grid[r][c] = gem;
+      // Apply the star marker independently after a valid type is determined
+      grid[r][c] = Math.random() < STAR_CHANCE ? baseType + '*' : baseType;
     }
   }
   return grid;
