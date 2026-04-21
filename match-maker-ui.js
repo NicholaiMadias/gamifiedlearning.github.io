@@ -14,10 +14,57 @@ const SFX = {
   swap:      'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
 };
 
+const SPRITE_SHEET = {
+  src: './tiles.PNG',
+  cols: 6,
+  rows: 4,
+  map: {
+    heart: { col: 0, row: 0 },
+    star:  { col: 1, row: 0 },
+    cross: { col: 2, row: 0 },
+    flame: { col: 3, row: 0 },
+    drop:  { col: 4, row: 0 }
+  }
+};
+
+let spriteCache = {};
+let spriteReady = null;
+
 function playSound(type) {
   const audio = new Audio(SFX[type]);
   audio.volume = 0.4;
   audio.play().catch(() => console.log('Audio blocked by browser; click to enable.'));
+}
+
+function prepareSprites() {
+  if (spriteReady) return spriteReady;
+
+  spriteReady = new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const tileW = img.width / SPRITE_SHEET.cols;
+      const tileH = img.height / SPRITE_SHEET.rows;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = tileW;
+      canvas.height = tileH;
+
+      Object.entries(SPRITE_SHEET.map).forEach(([kind, pos]) => {
+        ctx.clearRect(0, 0, tileW, tileH);
+        ctx.drawImage(
+          img,
+          pos.col * tileW, pos.row * tileH, tileW, tileH,
+          0, 0, tileW, tileH
+        );
+        spriteCache[kind] = canvas.toDataURL();
+      });
+      resolve(spriteCache);
+    };
+    img.onerror = () => resolve(spriteCache);
+    img.src = SPRITE_SHEET.src;
+  });
+
+  return spriteReady;
 }
 
 const COLS          = 7;
@@ -28,11 +75,11 @@ const CHAIN_BONUS   = 25;
 const CONSCIENCE_KEYS = ['empathy', 'justice', 'wisdom', 'growth'];
 
 const GEM_DISPLAY = {
-  heart: { emoji: '❤️', cls: 'gem-heart', label: 'Heart' },
-  star:  { emoji: '⭐', cls: 'gem-star',  label: 'Star'  },
-  cross: { emoji: '✝️', cls: 'gem-cross', label: 'Cross' },
-  flame: { emoji: '🔥', cls: 'gem-flame', label: 'Flame' },
-  drop:  { emoji: '💧', cls: 'gem-drop',  label: 'Drop'  }
+  heart: { emoji: '❤️', cls: 'gem-heart', label: 'Heart', sprite: SPRITE_SHEET.map.heart },
+  star:  { emoji: '⭐', cls: 'gem-star',  label: 'Star',  sprite: SPRITE_SHEET.map.star  },
+  cross: { emoji: '✝️', cls: 'gem-cross', label: 'Cross', sprite: SPRITE_SHEET.map.cross },
+  flame: { emoji: '🔥', cls: 'gem-flame', label: 'Flame', sprite: SPRITE_SHEET.map.flame },
+  drop:  { emoji: '💧', cls: 'gem-drop',  label: 'Drop',  sprite: SPRITE_SHEET.map.drop  }
 };
 
 let grid       = [];
@@ -102,9 +149,18 @@ function renderBoard() {
       const info    = GEM_DISPLAY[gemType] || { emoji: '?', cls: '', label: gemType };
       const cell    = document.createElement('button');
       const idx     = r * COLS + c;
+      const sprite  = spriteCache[gemType];
 
       cell.className = 'gem-cell ' + info.cls;
-      cell.textContent = info.emoji;
+      if (sprite) {
+        cell.style.backgroundImage = `url(${sprite})`;
+        cell.style.backgroundSize = 'cover';
+        cell.style.backgroundRepeat = 'no-repeat';
+        cell.textContent = '';
+      } else {
+        cell.textContent = info.emoji;
+      }
+      cell.dataset.emoji = info.emoji || '';
       cell.dataset.row = r;
       cell.dataset.col = c;
       cell.setAttribute('role', 'gridcell');
@@ -252,4 +308,5 @@ export function initMatchMaker(db, user) {
   updateConscience();
   renderBoard();
   showMsg('Match the gems — align your conscience');
+  prepareSprites().then(() => renderBoard());
 }

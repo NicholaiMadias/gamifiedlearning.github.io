@@ -30,7 +30,7 @@ export function createInitialGrid() {
 /**
  * Returns true if the two cells are adjacent (share an edge).
  */
-export function canSwap(grid, r1, c1, r2, c2) {
+export function canSwap(r1, c1, r2, c2) {
   const rowDiff = Math.abs(r1 - r2);
   const colDiff = Math.abs(c1 - c2);
   return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);

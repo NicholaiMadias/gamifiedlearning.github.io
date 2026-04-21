@@ -67,7 +67,7 @@
       margin: 0 auto;
     }
 
-    .match-cell {
+    .gem-cell {
       aspect-ratio: 1 / 1;
       border-radius: 8px;
       display: flex;
@@ -76,13 +76,20 @@
       font-size: 1.4rem;
       cursor: pointer;
       background: #111;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 1px solid #1a1a2e;
+      color: #e8e8e8;
       box-shadow: 0 0 6px rgba(0,0,0,0.6);
       transition: transform 0.1s ease, box-shadow 0.1s ease;
       user-select: none;
     }
 
-    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
-    .match-cell:active { transform: scale(0.94); }
+    .gem-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .gem-cell:active { transform: scale(0.94); }
+    .gem-cell.selected { outline: 2px solid #00ff41; outline-offset: 2px; box-shadow: 0 0 12px rgba(0,255,65,0.4); }
+    .gem-cell.matched { filter: brightness(1.25); transform: scale(1.05); }
 
     .match-badge-banner {
       text-align: center;
