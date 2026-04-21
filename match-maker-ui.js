@@ -5,7 +5,7 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { createGrid, isAdjacent, swapGems, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
+import { createInitialGrid, isAdjacent, swapGems, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
 const COLS          = 7;
@@ -223,7 +223,7 @@ function checkLevelUp() {
 
 export function initMatchMaker(db, user) {
   cacheDom();
-  grid       = createGrid(ROWS, COLS);
+  grid       = createInitialGrid(7, 7);
   score      = 0;
   moves      = 0;
   level      = 1;
