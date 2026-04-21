@@ -83,6 +83,8 @@
 
     .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
     .match-cell:active { transform: scale(0.94); }
+    .match-cell.selected { outline: 2px solid #00ff41; box-shadow: 0 0 12px #00ff4180; }
+    .match-cell.matched { opacity: 0.4; transform: scale(0.88); }
 
     .match-badge-banner {
       text-align: center;
@@ -198,6 +200,8 @@
     <div class="match-grid" id="match-grid"></div>
 
     <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+    <p id="match-msg" style="text-align:center;font-size:0.85rem;color:#aaa;min-height:1.2em;margin-top:0.4rem;"></p>
 
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>
