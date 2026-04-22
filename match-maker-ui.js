@@ -512,10 +512,6 @@ export function initMatchMaker(db, user) {
   const modalInner    = dom.restartModal ? dom.restartModal.querySelector('[tabindex="-1"]') : null;
 
   const handleRestartModalKeydown = (e) => {
-    if (!dom.restartModal || dom.restartModal.classList.contains('hidden')) {
-      document.removeEventListener('keydown', handleRestartModalKeydown);
-      return;
-    }
     if (e.key === 'Escape') closeRestartModal();
   };
   const closeRestartModal = () => {
@@ -541,7 +537,6 @@ export function initMatchMaker(db, user) {
     confirmYes.onclick = () => {
       closeRestartModal();
       initMatchMaker(db, user);
-      if (restartBtn) restartBtn.focus();
     };
   }
   if (confirmNo && dom.restartModal) {
