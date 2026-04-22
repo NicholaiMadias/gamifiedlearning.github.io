@@ -424,10 +424,10 @@ function revealClue(n) {
   }
   // Shake + glow only when the panel is actually visible
   if (dom.suspect && dom.suspect.style.display !== 'none') {
-    dom.suspect.classList.remove('clue-shake');
+    dom.suspect.style.animation = 'none';
     void dom.suspect.offsetWidth; // force reflow to restart animation
-    dom.suspect.classList.add('clue-shake');
-    dom.suspect.addEventListener('animationend', () => dom.suspect.classList.remove('clue-shake'), { once: true });
+    dom.suspect.style.animation = 'clue-shake 0.45s ease';
+    dom.suspect.addEventListener('animationend', () => { dom.suspect.style.animation = ''; }, { once: true });
   }
 }
 
@@ -511,23 +511,42 @@ export function initMatchMaker(db, user) {
   const confirmNo     = document.getElementById('restart-confirm-no');
   const modalInner    = dom.restartModal ? dom.restartModal.querySelector('[tabindex="-1"]') : null;
 
+  const closeRestartModal = () => {
+    if (!dom.restartModal) return;
+    dom.restartModal.classList.add('hidden');
+    document.removeEventListener('keydown', handleRestartModalKeydown);
+    if (restartBtn) restartBtn.focus();
+  };
+  const handleRestartModalKeydown = (e) => {
+    if (!dom.restartModal || dom.restartModal.classList.contains('hidden')) {
+      document.removeEventListener('keydown', handleRestartModalKeydown);
+      return;
+    }
+    if (e.key === 'Escape') closeRestartModal();
+  };
+  const openRestartModal = () => {
+    if (!dom.restartModal) return;
+    dom.restartModal.classList.remove('hidden');
+    document.addEventListener('keydown', handleRestartModalKeydown);
+    if (modalInner) modalInner.focus();
+  };
+
   if (restartBtn && dom.restartModal) {
-    restartBtn.onclick = () => {
-      dom.restartModal.classList.remove('hidden');
-      if (modalInner) modalInner.focus();
+    restartBtn.onclick = () => openRestartModal();
+    dom.restartModal.onclick = (e) => {
+      if (e.target === dom.restartModal) closeRestartModal();
     };
   }
   if (confirmYes) {
     confirmYes.onclick = () => {
-      if (dom.restartModal) dom.restartModal.classList.add('hidden');
+      closeRestartModal();
       initMatchMaker(db, user);
+      const restartedBtn = document.getElementById('match-restart-btn');
+      if (restartedBtn) restartedBtn.focus();
     };
   }
   if (confirmNo && dom.restartModal) {
-    confirmNo.onclick = () => {
-      dom.restartModal.classList.add('hidden');
-      if (restartBtn) restartBtn.focus();
-    };
+    confirmNo.onclick = () => closeRestartModal();
   }
 
   updateHUD();
