@@ -511,18 +511,18 @@ export function initMatchMaker(db, user) {
   const confirmNo     = document.getElementById('restart-confirm-no');
   const modalInner    = dom.restartModal ? dom.restartModal.querySelector('[tabindex="-1"]') : null;
 
-  const closeRestartModal = () => {
-    if (!dom.restartModal) return;
-    dom.restartModal.classList.add('hidden');
-    document.removeEventListener('keydown', handleRestartModalKeydown);
-    if (restartBtn) restartBtn.focus();
-  };
   const handleRestartModalKeydown = (e) => {
     if (!dom.restartModal || dom.restartModal.classList.contains('hidden')) {
       document.removeEventListener('keydown', handleRestartModalKeydown);
       return;
     }
     if (e.key === 'Escape') closeRestartModal();
+  };
+  const closeRestartModal = () => {
+    if (!dom.restartModal) return;
+    dom.restartModal.classList.add('hidden');
+    document.removeEventListener('keydown', handleRestartModalKeydown);
+    if (restartBtn) restartBtn.focus();
   };
   const openRestartModal = () => {
     if (!dom.restartModal) return;
@@ -541,8 +541,7 @@ export function initMatchMaker(db, user) {
     confirmYes.onclick = () => {
       closeRestartModal();
       initMatchMaker(db, user);
-      const restartedBtn = document.getElementById('match-restart-btn');
-      if (restartedBtn) restartedBtn.focus();
+      if (restartBtn) restartBtn.focus();
     };
   }
   if (confirmNo && dom.restartModal) {
