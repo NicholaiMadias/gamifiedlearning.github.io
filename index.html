@@ -179,6 +179,84 @@
       background: linear-gradient(90deg, #1565c0, #4fc3f7);
       transition: width 0.4s ease;
     }
+
+    /* ── Assumed Remembrance ───────────────────────── */
+    .veil-card {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .veil-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .veil-heading {
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8be9fd;
+    }
+
+    .veil-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      color: #b0b0b0;
+      cursor: pointer;
+    }
+
+    .veil-toggle input {
+      width: 18px;
+      height: 18px;
+      accent-color: #8be9fd;
+    }
+
+    .veil-note {
+      font-size: 0.9rem;
+      color: #a5b4c3;
+      margin-bottom: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .veil-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .veil-cell {
+      background: #111827;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 0.8rem;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .veil-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64b5f6;
+    }
+
+    .veil-text {
+      font-size: 0.95rem;
+      color: #e0e0e0;
+      line-height: 1.45;
+    }
   </style>
 </head>
 <body>
@@ -233,6 +311,38 @@
         <span class="label">Growth</span>
         <span class="value" id="mc-growth">83</span>
         <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Assumed Remembrance (Veil) ═════════════════ -->
+  <section class="veil-card" id="assumed-remembrance">
+    <div class="veil-header">
+      <h2 class="veil-heading">Assumed Remembrance</h2>
+      <label class="veil-toggle">
+        <input type="checkbox" id="veil-toggle" />
+        <span>Player has seen the Veil</span>
+      </label>
+    </div>
+    <p class="veil-note">
+      Language shifts silently when the Veil has been seen—elliptical, assumptive, never announced.
+    </p>
+    <div class="veil-grid">
+      <div class="veil-cell">
+        <span class="veil-label">Codex Entry</span>
+        <p class="veil-text" id="veil-codex-text"></p>
+      </div>
+      <div class="veil-cell">
+        <span class="veil-label">Sage Reflection</span>
+        <p class="veil-text" id="veil-sage-text"></p>
+      </div>
+      <div class="veil-cell">
+        <span class="veil-label">Archivist Diagnostic</span>
+        <p class="veil-text" id="veil-archivist-text"></p>
+      </div>
+      <div class="veil-cell">
+        <span class="veil-label">Environmental Prompt</span>
+        <p class="veil-text" id="veil-prompt-text"></p>
       </div>
     </div>
   </section>
