@@ -1,0 +1,9 @@
+[
+  { "id": "gold", "virtue": "Knowledge", "goal": "Reach level 3" },
+  { "id": "silver", "virtue": "Faith", "goal": "Complete a daily challenge" },
+  { "id": "sapphire", "virtue": "Truth", "goal": "Score 1000 points" },
+  { "id": "emerald", "virtue": "Compassion", "goal": "Clear 50 gems" },
+  { "id": "ruby", "virtue": "Courage", "goal": "Make a 5-match combo" },
+  { "id": "amethyst", "virtue": "Creativity", "goal": "Trigger 10 explosions" },
+  { "id": "obsidian", "virtue": "Integrity", "goal": "Play 7 days in a row" }
+]
