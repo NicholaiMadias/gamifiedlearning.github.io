@@ -142,7 +142,8 @@
     <div class="quiz-card" id="quiz-box">
         <h2>The Bible Journey</h2>
         <div class="progress-bar-track">
-            <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+            <div class="progress-bar-fill" id="progress-bar" style="width:0%"
+                 role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
         </div>
         <p id="q-text"></p>
         <p id="feedback" aria-live="polite"></p>
@@ -174,14 +175,20 @@
             quizBox.replaceChildren(heading, restartBtn);
         }
 
+        function setProgress(value) {
+            const bar = document.getElementById('progress-bar');
+            bar.style.width = value + '%';
+            bar.setAttribute('aria-valuenow', value);
+        }
+
         function loadQ() {
             if (idx >= qData.length) {
+                setProgress(100);
                 renderComplete();
                 return;
             }
 
-            const progress = Math.round((idx / qData.length) * 100);
-            document.getElementById('progress-bar').style.width = progress + '%';
+            setProgress(Math.round((idx / qData.length) * 100));
             document.getElementById('q-text').textContent = qData[idx].question;
             document.getElementById('feedback').textContent = '';
 
