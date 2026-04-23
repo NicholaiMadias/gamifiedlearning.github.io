@@ -1,0 +1,5 @@
+[
+  { "id": "score500", "desc": "Score 500 points today", "check": "score >= 500" },
+  { "id": "clear20", "desc": "Clear 20 gems today", "check": "clears >= 20" },
+  { "id": "reach3", "desc": "Reach level 3 today", "check": "level >= 3" }
+]
