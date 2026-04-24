@@ -21,7 +21,7 @@ jobs:
         id: cname
         run: |
           # Set your canonical domain here
-          echo "EXPECTED=nicholai.org" >> $GITHUB_OUTPUT
+          echo "EXPECTED=amazinggracehl.org" >> $GITHUB_OUTPUT
 
       - name: Check current CNAME
         id: check
