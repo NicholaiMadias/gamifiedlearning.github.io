@@ -1353,8 +1353,25 @@ function resetInvestigationTimer() {
   const timerDisplay = document.getElementById('timer');
   if (timerDisplay) timerDisplay.textContent = '00:00';
 }
+// ── Restart ───────────────────────────────────────────────────
+function resetInvestigationTimer() {
+  if (typeof timerInterval !== 'undefined' && timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  if (typeof startTime !== 'undefined') {
+    startTime = null;
+  }
+
+  const timerDisplay = document.getElementById('timer');
+  if (timerDisplay) {
+    timerDisplay.textContent = '00:00';
+  }
+}
 
 function restartGame() {
+  resetInvestigationTimer();
   resetInvestigationTimer();
   showScreen('screen-difficulty');
 }
