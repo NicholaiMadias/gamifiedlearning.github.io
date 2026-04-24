@@ -1,0 +1,55 @@
+name: Dual Deploy
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build static site
+        run: |
+          rm -rf dist
+          mkdir -p dist
+          rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' ./ dist/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
+      - name: Prepare dual-domain directories
+        if: github.repository == 'NicholaiMadias/gamifiedlearning.github.io'
+        run: |
+          # Cleanup old directory structure
+          rm -rf public-aghl
+
+          # amazinggracehomeliving.com — primary (published to GitHub Pages)
+          mkdir -p public
+          cp -R dist/* public/
+          echo "amazinggracehomeliving.com" > public/CNAME
+
+          # gamifiedlearning.org — secondary (staged for backup/other use)
+          mkdir -p public-gl
+          cp -R dist/* public-gl/
+          echo "gamifiedlearning.org" > public-gl/CNAME
+
+      - name: Sync to WordPress (Gamified Learning)
+        env:
+          WP_API_KEY: ${{ secrets.WP_API_KEY }}
+        run: |
+          test -f dist/index.html
+          CONTENT=$(jq -Rs . < dist/index.html)
+          curl -sSf \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${WP_API_KEY}" \
+            -d "{\"content\": ${CONTENT}}" \
+            https://www.gamifiedlearning.org/wp-json/nexus-sync/v1/update
