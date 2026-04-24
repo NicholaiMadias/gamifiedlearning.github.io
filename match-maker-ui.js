@@ -369,7 +369,6 @@ function checkLevelUp() {
     onLevelComplete(level, score, db, user);
     level++;
     moves += 10;
-    flashStatus(`Level up! Level ${level}`);
     updateStats();
   }
 }
