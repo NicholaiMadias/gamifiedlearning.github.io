@@ -5,5 +5,6 @@
   { "id": "emerald", "virtue": "Compassion", "goal": "Clear 50 gems" },
   { "id": "ruby", "virtue": "Courage", "goal": "Make a 5-match combo" },
   { "id": "amethyst", "virtue": "Creativity", "goal": "Trigger 10 explosions" },
-  { "id": "obsidian", "virtue": "Integrity", "goal": "Play 7 days in a row" }
+  { "id": "obsidian", "virtue": "Integrity", "goal": "Play 7 days in a row" },
+  { "id": "detective", "virtue": "Perseverance", "goal": "Attempt Hard mode in The Seven Stars" }
 ]
