@@ -22,7 +22,10 @@
       padding: 0.55rem 1.1rem;
       gap: 0.5rem;
       flex-wrap: wrap;
-      width: 100%;
+      /* Override align-items:center on body so the nav spans full viewport width */
+      align-self: stretch;
+      /* Counteract the body's 1rem horizontal padding so the nav edge-to-edge */
+      margin-inline: -1rem;
     }
 
     .nexus-nav .brand {
