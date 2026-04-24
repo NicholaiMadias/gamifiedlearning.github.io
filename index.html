@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1117" />
+  <link rel="manifest" href="./manifest.json" />
   <title>Gamified Learning</title>
   <style>
     /* ── Base ─────────────────────────────────────── */
@@ -60,8 +62,8 @@
     .match-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      padding: 0.8rem;
+      gap: clamp(2px, 0.8vw, 6px);
+      padding: clamp(4px, 1.5vw, 12px);
       width: 100%;
       max-width: 420px;
       margin: 0 auto;
@@ -69,19 +71,23 @@
 
     .match-cell {
       aspect-ratio: 1 / 1;
-      border-radius: 8px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
+      font-size: clamp(1rem, 4.5vw, 1.4rem);
       cursor: pointer;
       background: #111;
       box-shadow: 0 0 6px rgba(0,0,0,0.6);
       transition: transform 0.1s ease, box-shadow 0.1s ease;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
-    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    @media (hover: hover) {
+      .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    }
     .match-cell:active { transform: scale(0.94); }
 
     .match-badge-banner {
@@ -298,13 +304,12 @@
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>
 
-  <!-- ══ Arcade ════════════════════════════════════════ -->
+  <!-- ══ Bible Match ══════════════════════════════════════ -->
   <section class="arcade-links-card" id="arcade-links">
-    <h2 class="arcade-links-heading">Arcade</h2>
 
-    <!-- Bible Journey quiz (inline) -->
+    <!-- Bible Match quiz (inline) -->
     <div class="bj-quiz" id="bj-quiz-box">
-      <h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">✝ Bible Journey</h3>
+      <h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">✝ Bible Match</h3>
       <div class="bj-progress-track">
         <div class="bj-progress-fill" id="bj-progress-bar" style="width:0%"
              role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
@@ -385,7 +390,7 @@
         const box = document.getElementById('bj-quiz-box');
 
         if (!document.getElementById('bj-q-text')) {
-          box.innerHTML = '<h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">\u271D Bible Journey</h3><div class="bj-progress-track"><div class="bj-progress-fill" id="bj-progress-bar" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div><p id="bj-q-text"></p><p id="bj-feedback" aria-live="polite"></p><div id="bj-options"></div>';
+          box.innerHTML = '<h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">\u271D Bible Match</h3><div class="bj-progress-track"><div class="bj-progress-fill" id="bj-progress-bar" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div><p id="bj-q-text"></p><p id="bj-feedback" aria-live="polite"></p><div id="bj-options"></div>';
         }
 
         if (bjIdx >= bjData.length) {
