@@ -65,6 +65,34 @@
       align-items: center;
       gap: 2rem;
       padding: 1.5rem 1rem 3rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      inset: -20%;
+      background:
+        radial-gradient(1px 1px at 10% 20%, #ffffff80 50%, transparent 51%),
+        radial-gradient(1px 1px at 80% 30%, #00ff4180 50%, transparent 51%),
+        radial-gradient(2px 2px at 30% 80%, #4fc3f780 50%, transparent 51%),
+        radial-gradient(2px 2px at 70% 60%, #ff00ff80 50%, transparent 51%);
+      opacity: 0.15;
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+
+    body::after {
+      animation: parallax-stars 35s linear infinite;
+      opacity: 0.2;
+    }
+
+    @keyframes parallax-stars {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(-8%, -6%, 0) scale(1.05); }
+      100% { transform: translate3d(0, 0, 0) scale(1); }
     }
 
     h1.app-title {
@@ -83,6 +111,8 @@
       padding: 1rem;
       width: 100%;
       max-width: 460px;
+      position: relative;
+      overflow: hidden;
     }
 
     .match-card h2 {
@@ -100,6 +130,8 @@
       font-size: 0.85rem;
       color: #aaa;
       margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
     .match-stats span { color: #00ff41; font-weight: 700; }
@@ -112,6 +144,15 @@
       width: 100%;
       max-width: 420px;
       margin: 0 auto;
+      position: relative;
+    }
+
+    .match-grid.power-up-mode {
+      cursor: crosshair;
+    }
+
+    .match-grid.power-up-mode .match-cell {
+      cursor: crosshair;
     }
 
     .match-cell {
@@ -120,16 +161,108 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
       cursor: pointer;
-      background: #111;
-      box-shadow: 0 0 6px rgba(0,0,0,0.6);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
       user-select: none;
+      overflow: hidden;
     }
 
-    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+    .gem-icon {
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transition: transform 0.2s ease;
+      filter: drop-shadow(0 0 3px rgba(0, 255, 65, 0.35));
+    }
+
+    .match-cell:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(0,255,65,0.4);
+    }
+
+    .match-cell:hover .gem-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
     .match-cell:active { transform: scale(0.94); }
+    .match-cell.locked::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.7) 70%);
+      pointer-events: none;
+    }
+
+    /* Explosion animation */
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.8; }
+      100% { transform: scale(0.5); opacity: 0; }
+    }
+
+    .match-explode .gem-icon {
+      animation: explode 0.3s ease-out forwards;
+    }
+
+    /* Particle effects */
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, #00ff41 0%, #00ff4100 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: particle-fly 0.6s ease-out forwards;
+    }
+
+    @keyframes particle-fly {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--dx), var(--dy)) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Effects overlay */
+    .match-effects-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 2;
+    }
+
+    .shooting-star {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+      opacity: 0;
+      transform-origin: center;
+    }
+
+    .supernova-burst {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      pointer-events: none;
+      opacity: 0;
+      transform-origin: center;
+      filter: drop-shadow(0 0 18px rgba(255, 120, 40, 0.6));
+    }
 
     .match-badge-banner {
       text-align: center;
@@ -143,6 +276,223 @@
     }
 
     .match-badge-banner.hidden { display: none; }
+
+    /* Combo banner */
+    .match-combo-banner {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ffaa00;
+      background: linear-gradient(135deg, #1a0f00 0%, #0d0600 100%);
+      border: 2px solid #ffaa00;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      margin-top: 0.6rem;
+      text-shadow: 0 0 10px #ffaa00;
+    }
+
+    .match-combo-banner.hidden { display: none; }
+
+    @keyframes combo-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .combo-pulse {
+      animation: combo-pulse 0.3s ease-in-out 2;
+    }
+
+    /* Store panel */
+    .match-store-panel {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.8rem;
+    }
+
+    .match-store-panel.hidden { display: none; }
+
+    .store-header {
+      text-align: center;
+      font-size: 1rem;
+      color: #00ff41;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .store-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+
+    .store-item {
+      background: #111;
+      border: 1px solid #1a1a2e;
+      border-radius: 6px;
+      padding: 0.6rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .store-item:hover {
+      border-color: #00ff41;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,65,0.2);
+    }
+
+    .store-item-icon {
+      font-size: 2rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .store-item-name {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-bottom: 0.2rem;
+      text-transform: uppercase;
+    }
+
+    .store-item-cost {
+      font-size: 0.8rem;
+      color: #ffaa00;
+      font-weight: bold;
+    }
+
+    .store-item-owned {
+      font-size: 0.7rem;
+      color: #00ff41;
+      margin-top: 0.2rem;
+    }
+
+    .store-item.locked {
+      filter: grayscale(0.5);
+      border-color: #333;
+      cursor: not-allowed;
+    }
+
+    .store-item.locked .store-item-cost {
+      color: #666;
+    }
+
+    .store-item.locked::after {
+      content: 'Locked';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
+      color: #ffaa00;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      opacity: 0.9;
+      pointer-events: none;
+      background-image: var(--locked-star, none);
+      background-size: 64px 64px;
+      background-repeat: no-repeat;
+      background-position: 12px center;
+    }
+
+    .store-lock-msg {
+      font-size: 0.7rem;
+      color: #ffaa00;
+      min-height: 1rem;
+      margin-top: 0.2rem;
+    }
+
+    @keyframes purchase-flash {
+      0%, 100% { background: #111; }
+      50% { background: #00ff4120; }
+    }
+
+    .purchase-flash {
+      animation: purchase-flash 0.3s ease-in-out;
+    }
+
+    .store-toggle-btn {
+      display: block;
+      margin: 0.8rem auto 0;
+      background: transparent;
+      border: 1px solid #ffaa00;
+      color: #ffaa00;
+      padding: 0.4rem 1.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s;
+    }
+
+    .store-toggle-btn:hover { background: #ffaa0020; }
+
+    /* Power-up use buttons */
+    .power-up-panel {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .power-up-btn {
+      background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
+      border: 1px solid #00ff41;
+      color: #00ff41;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .power-up-btn:hover:not(:disabled) {
+      background: #00ff4110;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,65,0.3);
+    }
+
+    .power-up-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: #555;
+      color: #555;
+    }
+
+    .power-up-btn.power-up-active {
+      background: #00ff4130;
+      border-color: #ffaa00;
+      color: #ffaa00;
+      box-shadow: 0 0 15px rgba(255,170,0,0.5);
+      animation: pulse-glow 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,170,0,0.5); }
+      50% { box-shadow: 0 0 20px rgba(255,170,0,0.8); }
+    }
+
+    .power-up-count {
+      background: #00ff4120;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.7rem;
+    }
+
+    .power-up-active .power-up-count {
+      background: #ffaa0030;
+      color: #ffaa00;
+    }
 
     .match-restart-btn {
       display: block;
@@ -252,11 +602,63 @@
       <div>Score: <span id="match-score">0</span></div>
       <div>Moves: <span id="match-moves">20</span></div>
       <div>Level: <span id="match-level">1</span></div>
+      <div>Combo: <span id="match-combo">-</span></div>
+      <div>Coins: <span id="match-coins">100</span></div>
     </div>
 
+    <div class="match-effects-layer" id="match-effects-layer"></div>
     <div class="match-grid" id="match-grid"></div>
 
+    <div id="match-combo-banner" class="match-combo-banner hidden"></div>
     <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+
+    <!-- Power-up Use Buttons -->
+    <div class="power-up-panel">
+      <button class="power-up-btn" id="use-bomb" onclick="activatePowerUp('bomb')">
+        <span>💣</span>
+        <span>Bomb</span>
+        <span class="power-up-count" id="use-bomb-count">0</span>
+      </button>
+      <button class="power-up-btn" id="use-lightning" onclick="activatePowerUp('lightning')">
+        <span>⚡</span>
+        <span>Lightning</span>
+        <span class="power-up-count" id="use-lightning-count">0</span>
+      </button>
+      <button class="power-up-btn" id="use-rainbow" onclick="activatePowerUp('rainbow')">
+        <span>🌈</span>
+        <span>Rainbow</span>
+        <span class="power-up-count" id="use-rainbow-count">0</span>
+      </button>
+    </div>
+
+    <button class="store-toggle-btn" onclick="toggleStore()">🛒 Store</button>
+
+    <div id="match-store-panel" class="match-store-panel hidden">
+      <div class="store-header">Power-Up Store</div>
+      <div class="store-grid">
+        <div class="store-item" id="store-bomb" onclick="purchasePowerUp('bomb', 30)">
+          <div class="store-item-icon">💣</div>
+          <div class="store-item-name">Bomb</div>
+          <div class="store-item-cost">30 coins</div>
+          <div class="store-item-owned">Owned: <span id="store-bomb-count">0</span></div>
+          <div class="store-lock-msg" id="store-bomb-lock"></div>
+        </div>
+        <div class="store-item" id="store-lightning" onclick="purchasePowerUp('lightning', 50)">
+          <div class="store-item-icon">⚡</div>
+          <div class="store-item-name">Lightning</div>
+          <div class="store-item-cost">50 coins</div>
+          <div class="store-item-owned">Owned: <span id="store-lightning-count">0</span></div>
+          <div class="store-lock-msg" id="store-lightning-lock"></div>
+        </div>
+        <div class="store-item" id="store-rainbow" onclick="purchasePowerUp('rainbow', 80)">
+          <div class="store-item-icon">🌈</div>
+          <div class="store-item-name">Rainbow</div>
+          <div class="store-item-cost">80 coins</div>
+          <div class="store-item-owned">Owned: <span id="store-rainbow-count">0</span></div>
+          <div class="store-lock-msg" id="store-rainbow-lock"></div>
+        </div>
+      </div>
+    </div>
 
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>
