@@ -154,6 +154,61 @@
       box-shadow: 0 0 8px #00ff4140;
     }
 
+    /* ── Bible Journey Quiz (inline) ──────────────── */
+    .bj-quiz {
+      margin-top: 1rem;
+      border-top: 1px solid #1a2a1a;
+      padding-top: 1rem;
+    }
+
+    .bj-progress-track {
+      width: 100%;
+      height: 4px;
+      background: #1a2a1a;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .bj-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00a82d, #00ff41);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    #bj-q-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #ccc;
+      margin-bottom: 1rem;
+      min-height: 2.5rem;
+    }
+
+    #bj-feedback {
+      min-height: 1.2rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      color: #ff4c4c;
+      margin-bottom: 0.6rem;
+    }
+
+    #bj-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .bj-complete-heading {
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #00ff41;
+      text-shadow: 0 0 12px #00ff4190;
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+
     /* ── Matrix of Conscience ─────────────────────── */
     .matrix-card {
       background: #0d0d1a;
@@ -243,10 +298,21 @@
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>
 
-  <!-- ══ Arcade Links ═════════════════════════════════ -->
+  <!-- ══ Arcade ════════════════════════════════════════ -->
   <section class="arcade-links-card" id="arcade-links">
     <h2 class="arcade-links-heading">Arcade</h2>
-    <a class="arcade-link-btn" href="bible-journey.html">✝ Bible Journey</a>
+
+    <!-- Bible Journey quiz (inline) -->
+    <div class="bj-quiz" id="bj-quiz-box">
+      <h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">✝ Bible Journey</h3>
+      <div class="bj-progress-track">
+        <div class="bj-progress-fill" id="bj-progress-bar" style="width:0%"
+             role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+      </div>
+      <p id="bj-q-text"></p>
+      <p id="bj-feedback" aria-live="polite"></p>
+      <div id="bj-options"></div>
+    </div>
   </section>
 
   <!-- ══ Matrix of Conscience ════════════════════════ -->
@@ -285,5 +351,73 @@
   </section>
 
   <script type="module" src="./main.js"></script>
+  <script>
+    (function () {
+      const bjData = [
+        { question: "Who built the ark?", answers: ["Moses", "Noah", "David"], correctIndex: 1 },
+        { question: "What is the first book of the Bible?", answers: ["Exodus", "Genesis", "Psalms"], correctIndex: 1 },
+        { question: "How many disciples did Jesus have?", answers: ["10", "12", "7"], correctIndex: 1 }
+      ];
+      let bjIdx = 0;
+
+      function bjSetProgress(value) {
+        const bar = document.getElementById('bj-progress-bar');
+        bar.style.width = value + '%';
+        bar.setAttribute('aria-valuenow', value);
+      }
+
+      function bjRenderComplete() {
+        const box = document.getElementById('bj-quiz-box');
+        const heading = document.createElement('h3');
+        heading.className = 'bj-complete-heading';
+        heading.textContent = 'Journey Complete!';
+
+        const btn = document.createElement('button');
+        btn.className = 'arcade-link-btn';
+        btn.style.marginTop = '0.8rem';
+        btn.textContent = '↺ Play Again';
+        btn.addEventListener('click', function () { bjIdx = 0; bjLoad(); });
+
+        box.replaceChildren(heading, btn);
+      }
+
+      function bjLoad() {
+        const box = document.getElementById('bj-quiz-box');
+
+        if (!document.getElementById('bj-q-text')) {
+          box.innerHTML = '<h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">\u271D Bible Journey</h3><div class="bj-progress-track"><div class="bj-progress-fill" id="bj-progress-bar" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div><p id="bj-q-text"></p><p id="bj-feedback" aria-live="polite"></p><div id="bj-options"></div>';
+        }
+
+        if (bjIdx >= bjData.length) {
+          bjSetProgress(100);
+          bjRenderComplete();
+          return;
+        }
+
+        bjSetProgress(Math.round((bjIdx / bjData.length) * 100));
+        document.getElementById('bj-q-text').textContent = bjData[bjIdx].question;
+        document.getElementById('bj-feedback').textContent = '';
+
+        const opts = document.getElementById('bj-options');
+        opts.innerHTML = '';
+        bjData[bjIdx].answers.forEach(function (answer, i) {
+          const btn = document.createElement('button');
+          btn.className = 'arcade-link-btn';
+          btn.textContent = answer;
+          btn.addEventListener('click', function () {
+            if (i === bjData[bjIdx].correctIndex) {
+              bjIdx++;
+              bjLoad();
+            } else {
+              document.getElementById('bj-feedback').textContent = '\u2717 Try again!';
+            }
+          });
+          opts.appendChild(btn);
+        });
+      }
+
+      bjLoad();
+    }());
+  </script>
 </body>
 </html>
