@@ -11,6 +11,10 @@ import {
   SPECIAL_GEM_TYPES,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
+import { saveGame, loadGame } from './saveSystem.js';
+import { getLevelConfig, checkLevelUp } from './levelSystem.js';
+import { updateDailyProgress, checkDailyCompletion } from './daily.js';
+import { unlockStar } from './sevenStars.js';
 
 let grid;
 let selected = null;
@@ -179,9 +183,11 @@ function updateStats() {
   document.getElementById('match-coins').textContent = coins;
 }
 
-function renderGrid() {
-  const container = document.getElementById('match-grid');
-  container.innerHTML = '';
+function maybeUnlock(key) {
+  if (typeof window !== 'undefined' && typeof window.unlock === 'function') {
+    window.unlock(key);
+  }
+}
 
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
@@ -206,6 +212,10 @@ function renderGrid() {
       cell.onclick = () => onCellClick(r, c);
       container.appendChild(cell);
     }
+    daysPlayed = streak;
+    localStorage.setItem('mm-streak', JSON.stringify({ date: today, streak }));
+  } catch (e) {
+    daysPlayed = 1;
   }
 }
 
@@ -255,8 +265,9 @@ function gemIcon(type) {
   return iconMap[type] || '⭐';
 }
 
-function onCellClick(r, c) {
-  if (moves <= 0) return;
+function showMsg(text) {
+  if (dom.msg) dom.msg.textContent = text;
+}
 
   // If a power-up is active, use it on this cell
   if (activePowerUp) {
@@ -269,33 +280,59 @@ function onCellClick(r, c) {
     highlightCell(r, c, true);
     return;
   }
+}
 
-  const { r: r1, c: c1 } = selected;
-  if (r === r1 && c === c1) {
-    highlightCell(r, c, false);
+function onCellClick(row, col) {
+  if (locked) return;
+  if (!selected) {
+    selected = { row, col };
+    renderBoard();
+  } else if (selected.row === row && selected.col === col) {
     selected = null;
+    renderBoard();
+  } else if (canSwap(grid, selected.row, selected.col, row, col)) {
+    attemptSwap(selected.row, selected.col, row, col);
+  } else {
+    selected = { row, col };
+    renderBoard();
+  }
+}
+
+function onCellKey(e, row, col) {
+  let targetR = row;
+  let targetC = col;
+
+  switch (e.key) {
+    case 'ArrowUp':    targetR = Math.max(0, row - 1); break;
+    case 'ArrowDown':  targetR = Math.min(ROWS - 1, row + 1); break;
+    case 'ArrowLeft':  targetC = Math.max(0, col - 1); break;
+    case 'ArrowRight': targetC = Math.min(COLS - 1, col + 1); break;
+    case 'Enter':
+    case ' ':
+      e.preventDefault();
+      onCellClick(row, col);
+      return;
+    case 'Escape':
+      selected = null;
+      renderBoard();
+      return;
+    default:
+      return;
+  }
+
+  e.preventDefault();
+  const idx = targetR * COLS + targetC;
+  const cells = dom.board.querySelectorAll('.gem-cell');
+  if (cells[idx]) cells[idx].focus();
+}
+
+function attemptSwap(r1, c1, r2, c2) {
+  if (moves <= 0) {
+    showMsg('No moves left');
     return;
   }
 
-  if (!canSwap(grid, r1, c1, r, c)) {
-    highlightCell(r1, c1, false);
-    selected = { r, c };
-    highlightCell(r, c, true);
-    return;
-  }
-
-  const swapped = applySwap(grid, r1, c1, r, c);
-  const matches = findMatches(swapped);
-
-  if (matches.length === 0) {
-    // Invalid swap — no match produced, revert selection
-    highlightCell(r1, c1, false);
-    selected = null;
-    return;
-  }
-
-  grid = swapped;
-  highlightCell(r1, c1, false);
+  locked = true;
   selected = null;
   moves--;
   combo = 0; // Reset combo on new move
@@ -349,12 +386,11 @@ function highlightCell(r, c, on) {
   cell.style.outline = on ? '2px solid #00ff41' : 'none';
 }
 
-function resolveMatches() {
+function processCascade(chain) {
   const matches = findMatches(grid);
   if (matches.length === 0) {
-    renderGrid();
-    checkLevelUp();
-    checkGameOver();
+    locked = false;
+    finalizeMove();
     return;
   }
 
@@ -384,12 +420,31 @@ function resolveMatches() {
   // Animate matched cells
   animateMatches(matches);
 
-  grid = clearMatches(grid, matches);
-  grid = applyGravity(grid);
-  renderGrid();
+  if (chain > 1) {
+    showMsg('Chain x' + chain + '! +' + points);
+  }
 
-  // chain reactions
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  bumpConscience(clearedCells);
+  highlightMatched(matches);
+  afterScoring();
+  updateHUD();
+
+  setTimeout(() => {
+    grid = clearMatches(grid, matches);
+    grid = applyGravity(grid);
+    renderBoard();
+    setTimeout(() => processCascade(chain + 1), CASCADE_DELAY);
+  }, CASCADE_DELAY);
+}
+
+function highlightMatched(matches) {
+  const cells = dom.board?.querySelectorAll('.gem-cell') || [];
+  matches.forEach(group => {
+    group.forEach(({ r, c }) => {
+      const idx = r * COLS + c;
+      if (cells[idx]) cells[idx].classList.add('matched');
+    });
+  });
 }
 
 function showComboEffect(comboCount) {
@@ -563,13 +618,50 @@ function checkLevelUp() {
   }
 }
 
-function checkGameOver() {
-  if (moves <= 0) {
-    const banner = document.getElementById('match-badge-banner');
-    if (banner) {
-      banner.textContent = `Game Over! Final score: ${score}`;
-      banner.classList.remove('hidden');
-    }
+function finalizeMove() {
+  updateDailyProgress('score', score);
+  updateDailyProgress('level', level);
+  updateDailyProgress('clears', totalClears);
+
+  const dailyDone = checkDailyCompletion({ score, level, clears: totalClears });
+  if (dailyDone) {
+    maybeUnlock('daily_complete');
+    unlockStar('silver');
+  }
+
+  if (level >= 3) unlockStar('gold');
+  if (score >= 1000) unlockStar('sapphire');
+  if (totalClears >= 50) unlockStar('emerald');
+  if (combo >= 5) unlockStar('ruby');
+  if (explosions >= 10) unlockStar('amethyst');
+  if (daysPlayed >= 7) unlockStar('obsidian');
+
+  saveState();
+}
+
+export function initMatchMaker(db, user) {
+  cacheDom();
+  updateDayStreak();
+
+  grid         = createInitialGrid();
+  score        = 0;
+  level        = 1;
+  totalClears  = 0;
+  combo        = 0;
+  explosions   = 0;
+  selected     = null;
+  locked       = false;
+  conscience   = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
+
+  initLevel();
+  if (!loadState()) {
+    renderBoard();
+    updateConscience();
+    showMsg('Match the gems — align your conscience');
+    saveState();
+  } else {
+    renderBoard();
+    showMsg('Loaded your save slot');
   }
 }
 

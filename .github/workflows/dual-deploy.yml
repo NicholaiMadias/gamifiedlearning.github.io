@@ -14,20 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate CNAME
-        run: |
-          if [ ! -f CNAME ]; then
-            echo "CNAME file not found at repo root"
-            exit 1
-          fi
-          ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="amazinggracehomeliving.com"
-          if [ "$ACTUAL" != "$EXPECTED" ]; then
-            echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
-            exit 1
-          fi
-          echo "CNAME validated: $ACTUAL"
-
       - name: Build static site
         run: |
           rm -rf dist
@@ -39,6 +25,22 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+
+      - name: Prepare dual-domain directories
+        if: github.repository == 'NicholaiMadias/gamifiedlearning.github.io'
+        run: |
+          # Cleanup old directory structure
+          rm -rf public-aghl
+
+          # amazinggracehomeliving.com — primary (published to GitHub Pages)
+          mkdir -p public
+          cp -R dist/* public/
+          echo "amazinggracehomeliving.com" > public/CNAME
+
+          # gamifiedlearning.org — secondary (staged for backup/other use)
+          mkdir -p public-gl
+          cp -R dist/* public-gl/
+          echo "gamifiedlearning.org" > public-gl/CNAME
 
       - name: Sync to WordPress (Gamified Learning)
         env:
