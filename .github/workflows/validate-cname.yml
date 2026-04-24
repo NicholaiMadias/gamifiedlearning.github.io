@@ -21,11 +21,16 @@ jobs:
             "NicholaiMadias/Amazing-Grace")
               EXPECTED="amazinggracehomeliving.com"
               ;;
-            "Gamified-Learning-Matrix/Gamified-Learning")
+            "Gamified-Learning-Matrix/Gamified-Learning" | \
+            "NicholaiMadias/gamifiedlearning.github.io")
               EXPECTED="gamifiedlearning.org"
               ;;
             "Gamified-Learning-Matrix/Limitless-Nexus")
               EXPECTED="limitlessnexus.com"
+              ;;
+            *)
+              echo "❌ No expected CNAME configured for repository '${{ github.repository }}'"
+              exit 1
               ;;
             *)
               echo "❌ No expected CNAME configured for repository '${{ github.repository }}'"
