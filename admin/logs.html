@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Logs — Sovereign Matrix</title>
+  <link rel="stylesheet" href="/admin/css/matrix.css">
+</head>
+<body>
+
+<nav class="matrix-nav">
+  <a href="/admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
+  <ul class="nav-links">
+    <li><a href="/admin/index.html">Dashboard</a></li>
+    <li><a href="/admin/users.html">Users</a></li>
+    <li><a href="/admin/keys.html">Keys</a></li>
+    <li><a href="/admin/diagnostics.html">Diagnostics</a></li>
+    <li><a href="/admin/network-defense.html">Network Defense</a></li>
+    <li><a href="/admin/logs.html" class="active">Logs</a></li>
+  </ul>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="page-wrap">
+
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Audit Logs</h2>
+    <p style="font-size:0.75rem;color:#3a5a3a;margin-bottom:1rem">
+      System events, role changes, key generation, and security actions.
+    </p>
+
+    <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+      <input id="log-filter" class="matrix-input" placeholder="Filter by action…"
+             style="margin:0;max-width:260px">
+      <button id="refresh-logs" class="btn btn-neon" style="margin:0">Refresh</button>
+      <button id="clear-logs"   class="btn btn-danger" style="margin:0">Clear Logs</button>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table class="matrix-table" id="log-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Action</th>
+            <th>User / UID</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody id="log-table-body">
+          <tr><td colspan="4" style="text-align:center;color:#555">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  import { requireRole, logout, ROLES } from '/admin/js/admin-router.js';
+  import { db }                          from '/admin/js/auth.js';
+  import { renderAuditLogs, seedDemoLogs } from '/admin/js/admin-logs.js';
+
+  const user = requireRole(ROLES.ALL_ADMIN);
+  if (!user) throw new Error('Unauthorized');
+
+  document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
+
+  const nav = document.querySelector('.matrix-nav');
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className   = 'btn btn-danger';
+  logoutBtn.style.fontSize = '0.72rem';
+  logoutBtn.style.padding  = '0.3rem 0.75rem';
+  logoutBtn.addEventListener('click', logout);
+  nav.appendChild(logoutBtn);
+
+  // Seed demo logs on first visit
+  seedDemoLogs();
+
+  function refresh() {
+    const filter = document.getElementById('log-filter').value.trim();
+    renderAuditLogs(db, { filterAction: filter || undefined });
+  }
+
+  refresh();
+
+  document.getElementById('refresh-logs').addEventListener('click', refresh);
+
+  let filterDebounce;
+  document.getElementById('log-filter').addEventListener('input', () => {
+    clearTimeout(filterDebounce);
+    filterDebounce = setTimeout(refresh, 300);
+  });
+
+  document.getElementById('clear-logs').addEventListener('click', () => {
+    if (!confirm('Clear all audit logs? This cannot be undone.')) return;
+    localStorage.removeItem('matrix_audit_logs');
+    refresh();
+  });
+</script>
+
+</body>
+</html>
