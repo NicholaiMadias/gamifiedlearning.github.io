@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Arcade — Gamified Learning</title>
+  <style>
+    :root {
+      --bg:       #07080f;
+      --surface:  #0d1120;
+      --card:     #131826;
+      --border:   #1e2a40;
+      --gold:     #f0c040;
+      --silver:   #c9d1d9;
+      --blue:     #58a6ff;
+      --purple:   #bc8cff;
+      --green:    #3fb950;
+      --red:      #ff6b6b;
+      --muted:    #8b949e;
+      --radius:   12px;
+      --r-sm:     8px;
+      --trans:    0.25s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--silver);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Nexus Nav ──────────────────────────────────── */
+    .nexus-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(7,8,15,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.2rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-brand {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nexus-links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nexus-links a {
+      font-size: 0.78rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--silver);
+      text-decoration: none;
+      transition: border-color var(--trans), color var(--trans);
+      white-space: nowrap;
+    }
+
+    .nexus-links a:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* ── Main ───────────────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    /* ── Hero ───────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 1rem 0 0.5rem;
+    }
+
+    .hero-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 0 18px rgba(240,192,64,0.5));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .hero h1 {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0.5rem 0 0.4rem;
+    }
+
+    .hero p {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* ── Section heading ────────────────────────────── */
+    .section-heading {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Game Cards ─────────────────────────────────── */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .game-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color var(--trans), transform var(--trans), box-shadow var(--trans);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--border));
+      transition: opacity var(--trans);
+      opacity: 0;
+    }
+
+    .game-card:hover {
+      border-color: var(--card-accent, var(--blue));
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .game-card:hover::before { opacity: 1; }
+    .game-card:focus-visible  { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: var(--radius); }
+
+    .game-card.match-maker { --card-accent: var(--blue); }
+    .game-card.mystery     { --card-accent: var(--gold); }
+
+    .card-icon { font-size: 2.8rem; }
+
+    .card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+    }
+
+    .card-tag.new    { background: rgba(63,185,80,0.15); color: var(--green); }
+    .card-tag.puzzle { background: rgba(88,166,255,0.12); color: var(--blue); }
+    .card-tag.story  { background: rgba(240,192,64,0.12); color: var(--gold); }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--silver);
+    }
+
+    .card-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 0.6rem;
+      margin-top: auto;
+    }
+
+    .card-play-btn {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--silver);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.25rem 0.7rem;
+      white-space: nowrap;
+    }
+
+    /* ── Leaderboard Preview ────────────────────────── */
+    .lb-preview {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+    }
+
+    .lb-preview h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+
+    .lb-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .lb-table th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .lb-table td {
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--silver);
+    }
+
+    .lb-table tr:first-child td { color: var(--gold); font-weight: 700; }
+    .lb-table tr:nth-child(2) td { color: var(--silver); }
+    .lb-table tr:nth-child(3) td { color: #c17d3c; }
+
+    .diff-badge {
+      font-size: 0.62rem;
+      padding: 0.12rem 0.35rem;
+      border-radius: 3px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .diff-badge.easy   { background: rgba(63,185,80,0.15);   color: var(--green); }
+    .diff-badge.medium { background: rgba(240,192,64,0.15);  color: var(--gold); }
+    .diff-badge.hard   { background: rgba(255,107,107,0.15); color: var(--red); }
+
+    .lb-empty {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding: 1rem;
+    }
+
+    /* ── Quick Nav ──────────────────────────────────── */
+    .quick-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .qn-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 1rem 1.2rem;
+      text-decoration: none;
+      color: var(--silver);
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      transition: border-color var(--trans), transform var(--trans);
+    }
+
+    .qn-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+    .qn-card:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: var(--r-sm); }
+
+    .qn-icon { font-size: 1.6rem; }
+    .qn-text .qn-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .qn-text .qn-name  { font-size: 0.88rem; font-weight: 700; }
+
+    /* ── Footer ─────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- ══ Nexus Navigation ══════════════════════════════ -->
+<nav class="nexus-nav" aria-label="Nexus navigation">
+  <a class="nav-brand" href="arcade.html">🕹️ THE ARCADE</a>
+  <div class="nexus-links">
+    <a href="embed.html">🏠 Amazing Grace</a>
+    <a href="mailto:gulfnexus@gmail.com">✉️ Contact Sheila</a>
+    <a href="index.html">🧩 Match Maker</a>
+  </div>
+</nav>
+
+<!-- ══ Main Content ══════════════════════════════════ -->
+<main>
+
+  <!-- Hero -->
+  <section class="hero" aria-label="Arcade welcome">
+    <div class="hero-icon" aria-hidden="true">🎮</div>
+    <h1>The Arcade</h1>
+    <p>Play, learn, and earn stars at Grace Manor's community game hub.</p>
+  </section>
+
+  <!-- Games -->
+  <section aria-labelledby="games-heading">
+    <div class="section-heading" id="games-heading">🎲 Available Games</div>
+    <div class="game-grid">
+
+      <a class="game-card match-maker" href="index.html" aria-label="Play Match Maker">
+        <div class="card-icon" aria-hidden="true">💎</div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+          <span class="card-tag puzzle">Puzzle</span>
+        </div>
+        <div class="card-title">Match Maker</div>
+        <p class="card-desc">Align gems on a 7×7 grid to clear matches and build your Matrix of Conscience. Earn stars and level up.</p>
+        <div class="card-footer">
+          <span>Score &amp; level up</span>
+          <span class="card-play-btn">▶ Play</span>
+        </div>
+      </a>
+
+      <a class="game-card mystery" href="mystery.html" aria-label="Play The Seven Stars mystery game">
+        <div class="card-icon" aria-hidden="true">🔭</div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+          <span class="card-tag story">Story</span>
+          <span class="card-tag new">New</span>
+        </div>
+        <div class="card-title">The Seven Stars</div>
+        <p class="card-desc">A gem has vanished from Grace Manor's prized collection. Question suspects, gather evidence, and solve the mystery before time runs out.</p>
+        <div class="card-footer">
+          <span>3 difficulty tiers</span>
+          <span class="card-play-btn">▶ Play</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Leaderboard Preview -->
+  <section aria-labelledby="lb-preview-heading">
+    <div class="section-heading" id="lb-preview-heading">🏆 Top Detectives</div>
+    <div class="lb-preview">
+      <div id="lb-content"></div>
+    </div>
+  </section>
+
+  <!-- Quick Navigation -->
+  <section aria-labelledby="qn-heading">
+    <div class="section-heading" id="qn-heading">🔗 Quick Navigation</div>
+    <div class="quick-nav">
+      <a class="qn-card" href="arcade.html">
+        <span class="qn-icon" aria-hidden="true">🎮</span>
+        <div class="qn-text">
+          <div class="qn-label">Hub</div>
+          <div class="qn-name">The Arcade</div>
+        </div>
+      </a>
+      <a class="qn-card" href="embed.html">
+        <span class="qn-icon" aria-hidden="true">🏠</span>
+        <div class="qn-text">
+          <div class="qn-label">Home</div>
+          <div class="qn-name">Amazing Grace</div>
+        </div>
+      </a>
+      <a class="qn-card" href="mailto:gulfnexus@gmail.com">
+        <span class="qn-icon" aria-hidden="true">✉️</span>
+        <div class="qn-text">
+          <div class="qn-label">Inquiries</div>
+          <div class="qn-name">Contact Sheila</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2026 Grace Manor Arcade · Part of <a href="embed.html">Amazing Grace Home Living</a> · <a href="mailto:gulfnexus@gmail.com">Contact Sheila</a></p>
+</footer>
+
+<script>
+(function () {
+  const LB_KEY = 'seven-stars-leaderboard';
+
+  function getLeaderboard() {
+    try { return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); }
+    catch { return []; }
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function render() {
+    const entries = getLeaderboard();
+    const container = document.getElementById('lb-content');
+
+    if (entries.length === 0) {
+      container.innerHTML = '<p class="lb-empty">No scores yet — be the first detective to solve The Seven Stars!</p>';
+      return;
+    }
+
+    const top5 = entries.slice(0, 5);
+    let rows = top5.map((e, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${escapeHtml(e.name || 'Anonymous')}</td>
+        <td>${(e.score || 0).toLocaleString()}</td>
+        <td><span class="diff-badge ${escapeHtml(e.difficulty || '')}">${escapeHtml(e.difficulty || '—')}</span></td>
+        <td>${escapeHtml(e.date || '—')}</td>
+      </tr>`).join('');
+
+    container.innerHTML = `
+      <table class="lb-table" aria-label="Top detective leaderboard">
+        <thead><tr><th>#</th><th>Name</th><th>Score</th><th>Difficulty</th><th>Date</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  render();
+})();
+</script>
+
+</body>
+</html>

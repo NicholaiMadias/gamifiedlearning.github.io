@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Seven Stars — Mystery Game</title>
+  <style>
+    /* ── Base ─────────────────────────────────────────── */
+    :root {
+      --bg:         #07080f;
+      --surface:    #0d1120;
+      --card:       #131826;
+      --border:     #1e2a40;
+      --gold:       #f0c040;
+      --silver:     #c9d1d9;
+      --blue:       #58a6ff;
+      --purple:     #bc8cff;
+      --green:      #3fb950;
+      --red:        #ff6b6b;
+      --muted:      #8b949e;
+      --radius:     12px;
+      --r-sm:       8px;
+      --transition: 0.25s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--silver);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Nexus Nav ────────────────────────────────────── */
+    .nexus-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(7, 8, 15, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.2rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nexus-nav .brand {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .nexus-links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nexus-links a {
+      font-size: 0.78rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--silver);
+      text-decoration: none;
+      transition: border-color var(--transition), color var(--transition);
+      white-space: nowrap;
+    }
+
+    .nexus-links a:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* ── Screen container ─────────────────────────────── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem 3rem;
+      gap: 1.5rem;
+    }
+
+    .screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 640px; gap: 1.2rem; }
+    .screen.active { display: flex; }
+
+    /* ── Shared cards ─────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      width: 100%;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+
+    /* ── Title screen ─────────────────────────────────── */
+    #screen-title { text-align: center; padding-top: 2rem; }
+
+    .mystery-badge {
+      font-size: 4rem;
+      filter: drop-shadow(0 0 20px rgba(240,192,64,0.6));
+      animation: pulse-badge 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-badge {
+      0%, 100% { filter: drop-shadow(0 0 14px rgba(240,192,64,0.5)); transform: scale(1); }
+      50%       { filter: drop-shadow(0 0 28px rgba(240,192,64,0.9)); transform: scale(1.06); }
+    }
+
+    .mystery-title {
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0.6rem 0;
+    }
+
+    .mystery-subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 420px;
+      line-height: 1.6;
+    }
+
+    /* ── Buttons ──────────────────────────────────────── */
+    .btn {
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.65rem 1.6rem;
+      border-radius: var(--r-sm);
+      border: none;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition);
+      letter-spacing: 0.04em;
+    }
+
+    .btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .btn:hover  { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), #e0a020);
+      color: #000;
+    }
+
+    .btn-primary:hover { box-shadow: 0 4px 16px rgba(240,192,64,0.5); }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--silver);
+    }
+
+    .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--red), #c0392b);
+      color: #fff;
+    }
+
+    .btn-danger:hover { box-shadow: 0 4px 16px rgba(255,107,107,0.4); }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--green), #27ae60);
+      color: #fff;
+    }
+
+    .btn-success:hover { box-shadow: 0 4px 16px rgba(63,185,80,0.4); }
+
+    /* ── Difficulty screen ────────────────────────────── */
+    .diff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.8rem;
+      width: 100%;
+    }
+
+    .diff-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .diff-card:hover  { border-color: var(--blue); transform: translateY(-3px); }
+    .diff-card:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: var(--radius); }
+
+    .diff-card.easy   { --accent: var(--green); }
+    .diff-card.medium { --accent: var(--gold); }
+    .diff-card.hard   { --accent: var(--red); }
+
+    .diff-card:hover { border-color: var(--accent, var(--blue)); }
+
+    .diff-icon  { font-size: 2.2rem; margin-bottom: 0.4rem; }
+    .diff-name  { font-size: 1rem; font-weight: 700; color: var(--silver); margin-bottom: 0.3rem; }
+    .diff-desc  { font-size: 0.75rem; color: var(--muted); line-height: 1.4; }
+
+    /* ── Intro screen ─────────────────────────────────── */
+    .intro-text {
+      line-height: 1.7;
+      color: var(--silver);
+      font-size: 0.95rem;
+      border-left: 3px solid var(--gold);
+      padding-left: 1rem;
+    }
+
+    /* ── Investigation screen ─────────────────────────── */
+    .investigate-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    @media (min-width: 560px) {
+      .investigate-layout { grid-template-columns: 200px 1fr; }
+    }
+
+    /* Clue board */
+    .clue-board { display: flex; flex-direction: column; gap: 0.5rem; }
+    .clue-board h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.3rem; }
+
+    .clue-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.5rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--silver);
+      line-height: 1.4;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .clue-item .clue-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .clue-item.locked { opacity: 0.35; filter: blur(2px); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Suspect panel */
+    .suspect-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .suspect-list h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.3rem; }
+
+    .suspect-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+      transition: border-color var(--transition);
+      text-align: left;
+      color: var(--silver);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .suspect-btn:hover  { border-color: var(--blue); }
+    .suspect-btn.interviewed { border-color: var(--green); }
+    .suspect-btn .s-emoji { font-size: 1.5rem; }
+    .suspect-btn .s-info  { display: flex; flex-direction: column; gap: 0.15rem; }
+    .suspect-btn .s-name  { font-weight: 700; font-size: 0.88rem; }
+    .suspect-btn .s-role  { font-size: 0.72rem; color: var(--muted); }
+    .suspect-btn .s-badge { font-size: 0.65rem; color: var(--green); font-weight: 600; margin-top: 2px; }
+
+    /* Interview panel */
+    #interview-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    #interview-panel.active { display: flex; }
+
+    .interview-header {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .interview-avatar { font-size: 2.5rem; }
+    .interview-name   { font-size: 1rem; font-weight: 700; color: var(--silver); }
+    .interview-role   { font-size: 0.75rem; color: var(--muted); }
+
+    .dialogue-box {
+      background: var(--surface);
+      border-radius: var(--r-sm);
+      padding: 0.7rem 1rem;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--silver);
+      min-height: 3rem;
+      border-left: 3px solid var(--blue);
+      font-style: italic;
+    }
+
+    .question-list { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    .question-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.5rem 0.8rem;
+      color: var(--silver);
+      font-family: inherit;
+      font-size: 0.82rem;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color var(--transition);
+    }
+
+    .question-btn:hover   { border-color: var(--gold); color: var(--gold); }
+    .question-btn.asked   { opacity: 0.45; cursor: default; }
+    .question-btn.asked:hover { border-color: var(--border); color: var(--silver); }
+
+    /* Accuse button row */
+    .action-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    /* ── Accuse screen ────────────────────────────────── */
+    .accuse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.8rem;
+      width: 100%;
+    }
+
+    .accuse-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .accuse-card:hover  { border-color: var(--red); transform: translateY(-3px); }
+    .accuse-card .ac-emoji { font-size: 2.5rem; margin-bottom: 0.4rem; }
+    .accuse-card .ac-name  { font-size: 0.9rem; font-weight: 700; color: var(--silver); margin-bottom: 0.25rem; }
+    .accuse-card .ac-role  { font-size: 0.72rem; color: var(--muted); }
+
+    /* ── Ending screen ────────────────────────────────── */
+    #screen-ending { text-align: center; }
+
+    .ending-icon {
+      font-size: 5rem;
+      animation: ending-pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+
+    @keyframes ending-pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .ending-title {
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      font-weight: 800;
+      margin: 0.4rem 0;
+    }
+
+    .ending-title.correct { color: var(--gold); text-shadow: 0 0 20px rgba(240,192,64,0.5); }
+    .ending-title.partial { color: var(--blue); }
+    .ending-title.wrong   { color: var(--red); }
+
+    .ending-text {
+      font-size: 0.95rem;
+      color: var(--silver);
+      max-width: 480px;
+      line-height: 1.7;
+    }
+
+    .score-display {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 2rem;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      font-family: 'Cascadia Code', monospace;
+    }
+
+    .score-display .score-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      margin-bottom: 0.25rem;
+    }
+
+    .showcase-card {
+      background: linear-gradient(135deg, #1a1230, #0d1a2a);
+      border: 1px solid var(--purple);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    .showcase-card h3 { color: var(--purple); margin-bottom: 0.4rem; font-size: 0.9rem; }
+    .showcase-card p  { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.8rem; }
+    .showcase-links { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+
+    .showcase-links a {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--purple);
+      border-radius: 20px;
+      color: var(--purple);
+      text-decoration: none;
+      transition: background var(--transition);
+    }
+
+    .showcase-links a:hover { background: rgba(188,140,255,0.15); }
+
+    /* ── Leaderboard ──────────────────────────────────── */
+    .leaderboard { width: 100%; }
+    .leaderboard h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.6rem; }
+
+    .lb-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .lb-table th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .lb-table td {
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--silver);
+    }
+
+    .lb-table tr:first-child td { color: var(--gold); font-weight: 700; }
+    .lb-table tr:nth-child(2) td { color: var(--silver); }
+    .lb-table tr:nth-child(3) td { color: #c17d3c; }
+
+    .diff-badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .diff-badge.easy   { background: rgba(63,185,80,0.15);  color: var(--green); }
+    .diff-badge.medium { background: rgba(240,192,64,0.15); color: var(--gold); }
+    .diff-badge.hard   { background: rgba(255,107,107,0.15); color: var(--red); }
+
+    /* ── Name input ───────────────────────────────────── */
+    .name-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .name-input {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.5rem 0.8rem;
+      color: var(--silver);
+      font-family: inherit;
+      font-size: 0.9rem;
+      width: 200px;
+    }
+
+    .name-input:focus { outline: none; border-color: var(--gold); }
+
+    /* ── Confetti ─────────────────────────────────────── */
+    #confetti-layer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 500;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      border-radius: 2px;
+      animation: confetti-fall linear forwards;
+    }
+
+    @keyframes confetti-fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .star-pop {
+      position: absolute;
+      animation: star-rise linear forwards;
+      pointer-events: none;
+      font-size: 1.5rem;
+    }
+
+    @keyframes star-rise {
+      0%   { transform: translateY(0) scale(0.5); opacity: 1; }
+      100% { transform: translateY(-80vh) scale(1.5); opacity: 0; }
+    }
+
+    /* ── Progress dots ────────────────────────────────── */
+    .progress-dots {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: center;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+
+    .dot.active   { background: var(--gold); }
+    .dot.complete { background: var(--green); }
+
+    /* ── Timer ────────────────────────────────────────── */
+    .timer {
+      font-family: 'Cascadia Code', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Hint box ─────────────────────────────────────── */
+    .hint-box {
+      background: rgba(240,192,64,0.08);
+      border: 1px solid rgba(240,192,64,0.3);
+      border-radius: var(--r-sm);
+      padding: 0.6rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--gold);
+      display: none;
+    }
+
+    .hint-box.visible { display: block; }
+
+    /* ── Utility ──────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .text-muted { color: var(--muted); font-size: 0.8rem; }
+    .gap-row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<!-- ══ Nexus Navigation ══════════════════════════════ -->
+<nav class="nexus-nav" aria-label="Nexus navigation">
+  <a class="brand" href="arcade.html">🕹️ The Arcade</a>
+  <div class="nexus-links">
+    <a href="arcade.html">← Back to Arcade</a>
+    <a href="embed.html">🏠 Amazing Grace</a>
+    <a href="mailto:gulfnexus@gmail.com">✉️ Contact Sheila</a>
+  </div>
+</nav>
+
+<!-- ══ Confetti Layer ════════════════════════════════ -->
+<div id="confetti-layer" aria-hidden="true"></div>
+
+<!-- ══ Main ══════════════════════════════════════════ -->
+<main>
+
+  <!-- ── Title Screen ────────────────────────────────── -->
+  <section id="screen-title" class="screen active" aria-labelledby="title-heading">
+    <div class="mystery-badge" aria-hidden="true">🔭</div>
+    <h1 id="title-heading" class="mystery-title">The Seven Stars</h1>
+    <p class="mystery-subtitle">
+      A prized gemstone from Grace Manor's legendary Seven Stars collection has vanished.
+      Three residents hold secrets. One holds the truth. You must find it.
+    </p>
+    <div class="progress-dots" id="progress-dots">
+      <div class="dot" id="dot-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+    </div>
+    <button class="btn btn-primary" onclick="showDifficulty()" aria-label="Begin investigation">Begin Investigation →</button>
+    <button class="btn btn-ghost" onclick="showLeaderboard()" style="font-size:0.8rem;">🏆 Leaderboard</button>
+  </section>
+
+  <!-- ── Difficulty Screen ───────────────────────────── -->
+  <section id="screen-difficulty" class="screen" aria-labelledby="diff-heading">
+    <h1 id="diff-heading" class="mystery-title" style="font-size:1.4rem;">Choose Difficulty</h1>
+    <p class="text-muted">Harder tiers offer fewer clues but higher score multipliers.</p>
+    <div class="diff-grid">
+      <button class="diff-card easy" onclick="startGame('easy')" aria-label="Easy difficulty">
+        <div class="diff-icon">🌿</div>
+        <div class="diff-name">Easy</div>
+        <div class="diff-desc">Clear clues, helpful hints, solid alibis.</div>
+      </button>
+      <button class="diff-card medium" onclick="startGame('medium')" aria-label="Medium difficulty">
+        <div class="diff-icon">⭐</div>
+        <div class="diff-name">Medium</div>
+        <div class="diff-desc">Standard investigation. Read carefully.</div>
+      </button>
+      <button class="diff-card hard" onclick="startGame('hard')" aria-label="Hard difficulty">
+        <div class="diff-icon">🌑</div>
+        <div class="diff-name">Hard</div>
+        <div class="diff-desc">Red herrings, vague clues, 2× score.</div>
+      </button>
+    </div>
+    <button class="btn btn-ghost" onclick="showScreen('screen-title')">← Back</button>
+  </section>
+
+  <!-- ── Intro Screen ────────────────────────────────── -->
+  <section id="screen-intro" class="screen" aria-labelledby="intro-heading">
+    <div class="mystery-badge" style="font-size:2.5rem;" aria-hidden="true">🔍</div>
+    <h2 id="intro-heading" class="mystery-title" style="font-size:1.3rem;">Case Briefing</h2>
+    <div class="card">
+      <p class="intro-text" id="intro-text">Loading…</p>
+    </div>
+    <div id="hint-intro" class="hint-box">💡 Tip: Gather all three clues and interview every suspect before making your accusation.</div>
+    <button class="btn btn-primary" onclick="showInvestigate()">Start Investigating →</button>
+  </section>
+
+  <!-- ── Investigation Screen ────────────────────────── -->
+  <section id="screen-investigate" class="screen" aria-labelledby="invest-heading">
+    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+      <h2 id="invest-heading" style="font-size:1rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;">Investigation</h2>
+      <span class="timer" id="timer-display">0:00</span>
+    </div>
+
+    <div class="investigate-layout">
+      <!-- Clue Board -->
+      <div class="card" style="align-self:start;">
+        <h2>🔍 Clue Board</h2>
+        <div class="clue-board" id="clue-board">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- Suspect Panel -->
+      <div style="display:flex;flex-direction:column;gap:0.8rem;">
+        <div class="card">
+          <h2>👥 Suspects</h2>
+          <div class="suspect-list" id="suspect-list">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <!-- Interview Panel -->
+        <div id="interview-panel" role="region" aria-label="Interview">
+          <div class="interview-header">
+            <div class="interview-avatar" id="iv-avatar">🧓</div>
+            <div>
+              <div class="interview-name" id="iv-name">Name</div>
+              <div class="interview-role" id="iv-role">Role</div>
+            </div>
+          </div>
+          <div class="dialogue-box" id="dialogue-box" aria-live="polite">Select a question below…</div>
+          <div class="question-list" id="question-list">
+            <!-- populated by JS -->
+          </div>
+          <button class="btn btn-ghost" style="align-self:flex-start;font-size:0.78rem;" onclick="closeInterview()">↩ Back to Suspects</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn btn-ghost" onclick="showScreen('screen-title')" style="font-size:0.78rem;">🔄 Restart</button>
+      <button class="btn btn-danger" id="accuse-btn" onclick="showAccuse()">Make Accusation →</button>
+    </div>
+  </section>
+
+  <!-- ── Accuse Screen ───────────────────────────────── -->
+  <section id="screen-accuse" class="screen" aria-labelledby="accuse-heading">
+    <h2 id="accuse-heading" class="mystery-title" style="font-size:1.3rem;">Who Took the Sapphire?</h2>
+    <p class="text-muted" style="text-align:center;">Choose carefully. You only get one accusation.</p>
+    <div class="accuse-grid" id="accuse-grid">
+      <!-- populated by JS -->
+    </div>
+    <button class="btn btn-ghost" onclick="showScreen('screen-investigate')" style="font-size:0.8rem;">← Continue Investigating</button>
+  </section>
+
+  <!-- ── Ending Screen ───────────────────────────────── -->
+  <section id="screen-ending" class="screen" aria-labelledby="ending-heading">
+    <div class="ending-icon" id="ending-icon" aria-hidden="true">⭐</div>
+    <h2 id="ending-heading" class="ending-title" id="ending-title"></h2>
+    <p class="ending-text" id="ending-text"></p>
+    <div class="score-display" id="score-display" aria-label="Your score">
+      <span class="score-label">Score</span>
+      <span id="score-value">0</span>
+    </div>
+
+    <!-- Community Showcase (correct ending only) -->
+    <div class="showcase-card hidden" id="showcase-card">
+      <h3>🌟 Community Showcase Unlocked</h3>
+      <p>You solved the mystery! As a reward, explore the real Grace Manor communities.</p>
+      <div class="showcase-links">
+        <a href="https://drive.google.com/drive/folders/1JVp5rKSMxX6PUWwh8s15ceHhN4qxBHxa" target="_blank" rel="noopener">📸 Tampa Gallery</a>
+        <a href="https://drive.google.com/drive/folders/1rq4JYVN-X7xNK-JRJL yLGMOB9EfGswp" target="_blank" rel="noopener">📸 Largo Gallery</a>
+      </div>
+    </div>
+
+    <!-- Leaderboard entry (correct / medium correct / hard correct) -->
+    <div id="lb-entry-form" class="hidden" style="width:100%;">
+      <p class="text-muted" style="text-align:center;margin-bottom:0.5rem;">Save your score to the leaderboard:</p>
+      <div class="name-row">
+        <input class="name-input" id="player-name" type="text" maxlength="18" placeholder="Enter your name" aria-label="Your name for the leaderboard" />
+        <button class="btn btn-primary" onclick="saveScore()">Save Score</button>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="leaderboard card" id="lb-section" style="display:none;">
+      <h3>🏆 Top Detectives</h3>
+      <table class="lb-table" id="lb-table" aria-label="Leaderboard">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Score</th><th>Difficulty</th><th>Date</th></tr>
+        </thead>
+        <tbody id="lb-body"></tbody>
+      </table>
+    </div>
+
+    <div class="gap-row">
+      <a class="btn btn-ghost" href="arcade.html">🎮 Back to Arcade</a>
+      <button class="btn btn-primary" onclick="restartGame()">🔄 Play Again</button>
+    </div>
+  </section>
+
+  <!-- ── Standalone Leaderboard Screen ──────────────── -->
+  <section id="screen-leaderboard" class="screen" aria-labelledby="lb-heading">
+    <h2 id="lb-heading" class="mystery-title" style="font-size:1.4rem;">🏆 Top Detectives</h2>
+    <div class="card leaderboard" style="width:100%;">
+      <table class="lb-table" aria-label="Full leaderboard">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Score</th><th>Difficulty</th><th>Date</th></tr>
+        </thead>
+        <tbody id="lb-full-body"></tbody>
+      </table>
+      <p class="text-muted" id="lb-empty" style="text-align:center;padding:1rem;display:none;">No scores yet — be the first detective!</p>
+    </div>
+    <button class="btn btn-ghost" onclick="showScreen('screen-title')">← Back</button>
+  </section>
+
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   THE SEVEN STARS — Mystery Game Engine
+   ═══════════════════════════════════════════════════════════ */
+
+// ── Constants ────────────────────────────────────────────────
+const LB_KEY = 'seven-stars-leaderboard';
+const STAR_KEY = 'stars';
+
+const DIFF_MULTIPLIER = { easy: 1, medium: 1.5, hard: 2 };
+const BASE_SCORE = 1000;
+const CLUE_BONUS = 150;
+const SPEED_BONUS = { fast: 500, medium: 250 };  // < 3 min, < 5 min
+
+// ── Story Content ─────────────────────────────────────────────
+const INTRO = {
+  easy:
+    'The Sapphire of Truth — centrepiece of the Seven Stars collection — has been moved from its display case at Grace Manor. ' +
+    'Three people were present that evening: Eleanor (long-time resident), Marcus (junior staff), and Diana (visiting family). ' +
+    'Clues point clearly in one direction. Trust the evidence.',
+  medium:
+    'The Sapphire of Truth is missing from the Seven Stars display at Grace Manor. ' +
+    'Suspects: Eleanor (20-year resident), Marcus (new staff), Diana (visitor). ' +
+    'Study the clues carefully and question everyone before drawing conclusions.',
+  hard:
+    'The Sapphire of Truth has vanished. Three people, each with a reason to act. ' +
+    'The evidence is thin. Suspects are evasive. Someone is lying outright. ' +
+    'Only a careful, methodical detective will find the truth.'
+};
+
+const SUSPECTS = [
+  { id: 'eleanor', emoji: '🧓', name: 'Eleanor Voss',  role: 'Long-time Resident, 72' },
+  { id: 'marcus',  emoji: '👨', name: 'Marcus Webb',   role: 'Junior Staff, 28'       },
+  { id: 'diana',   emoji: '👩', name: 'Diana Reyes',   role: 'Visitor (Eleanor\'s granddaughter)' }
+];
+
+const CLUES = {
+  easy: [
+    { id: 'key',    icon: '🔑', title: 'Displaced Key',   desc: 'A master key on the floor near the display. Staff carry these. Eleanor\'s has been in her drawer for 20 years; Marcus only got his last week.' },
+    { id: 'note',   icon: '📝', title: 'Handwritten Note', desc: '"…moved for safekeeping…" — in Diana\'s distinctive loopy handwriting. She dropped it near the case.' },
+    { id: 'prints', icon: '👣', title: 'Shoe Prints',      desc: 'Fresh prints lead from the case straight toward Guest Room 4 — Diana\'s room.' }
+  ],
+  medium: [
+    { id: 'key',    icon: '🔑', title: 'Displaced Key',   desc: 'A master key found near the display case. Only staff members are issued these.' },
+    { id: 'note',   icon: '📝', title: 'Handwritten Note', desc: '"…moved for safekeeping…" Written in careful, deliberate cursive. Who wrote it?' },
+    { id: 'prints', icon: '👣', title: 'Shoe Prints',      desc: 'Shoe prints lead from the display case toward the guest wing.' }
+  ],
+  hard: [
+    { id: 'key',    icon: '🔑', title: 'Displaced Key',   desc: 'A master key on the floor. Multiple people could have dropped it — residents borrow them occasionally.' },
+    { id: 'note',   icon: '📝', title: 'Cryptic Note',    desc: '"…moved for safekeeping…" Anyone could have written this. Or dropped it earlier.' },
+    { id: 'prints', icon: '👣', title: 'Faint Prints',    desc: 'Prints near the case. The direction is ambiguous — they could lead several ways.' }
+  ]
+};
+
+// Questions per suspect — each has text, and per-difficulty response
+// revealClue: clue id to add when asked on easy/medium; locked: clue id required before question appears
+const QUESTIONS = {
+  eleanor: [
+    {
+      id: 'e1',
+      text: 'Where were you when the gem disappeared?',
+      response: {
+        easy:   'I was in the garden all evening tending to the roses. Marcus brought me my 8 o\'clock tea — he can confirm.',
+        medium: 'In the garden, I believe. I wasn\'t watching the clock. Ask Marcus if you\'d like confirmation.',
+        hard:   'I\'d prefer to keep that to myself. It\'s… personal. Nothing to do with this.'
+      },
+      revealClue: null
+    },
+    {
+      id: 'e2',
+      text: 'Do you recognise the handwriting on the note?',
+      response: {
+        easy:   'Let me see… that loopy style? That\'s Diana\'s. She always curves her letters that way. I taught her penmanship myself.',
+        medium: 'I can\'t place it. Neat handwriting, but it could be anyone\'s.',
+        hard:   'It could be mine. I write notes sometimes. But I don\'t remember writing that.'
+      },
+      revealClue: { easy: 'note', medium: null, hard: null }
+    },
+    {
+      id: 'e3',
+      text: 'Do you still have your master key?',
+      response: {
+        easy:   'Yes, it\'s right here in my cardigan pocket. Never goes anywhere without me.',
+        medium: 'Yes, I have it. I keep it in my drawer. I haven\'t needed it lately.',
+        hard:   'I… yes. I have it. [she glances away briefly]'
+      },
+      revealClue: null
+    }
+  ],
+  marcus: [
+    {
+      id: 'm1',
+      text: 'Where were you last night?',
+      response: {
+        easy:   'Maintenance room until 10 pm, then I locked up and went home. Check the sign-in log — I initialled out at 10:04.',
+        medium: 'Working late in the maintenance area. Nothing unusual.',
+        hard:   'I was around. Doing my rounds. Why do you ask?'
+      },
+      revealClue: null
+    },
+    {
+      id: 'm2',
+      text: 'Can you account for your master key?',
+      response: {
+        easy:   'Right here. In my front pocket the whole night. I\'m careful — they drilled that into us in orientation.',
+        medium: 'In my pocket. I think. It was in my pocket when I left.',
+        hard:   'I may have set it down on the counter briefly near the common room. Only for a minute.'
+      },
+      revealClue: { easy: null, medium: null, hard: 'key' }
+    },
+    {
+      id: 'm3',
+      text: 'Have you spoken to Diana recently?',
+      response: {
+        easy:   'She stopped me in the hallway and asked whether any of the collectibles were going to be auctioned. Seemed very worried about it.',
+        medium: 'She\'s visited a few times. Seemed stressed about something — I didn\'t pry.',
+        hard:   'We\'ve crossed paths. She asked a vague question about facility finances. I didn\'t have answers for her.'
+      },
+      revealClue: { easy: 'prints', medium: 'prints', hard: null }
+    }
+  ],
+  diana: [
+    {
+      id: 'd1',
+      text: 'Why have you been visiting so frequently?',
+      response: {
+        easy:   'Grandma Eleanor isn\'t getting any younger, and I heard the manor is under financial review. Some collectibles might be auctioned. I couldn\'t let that happen to the sapphire.',
+        medium: 'I\'m here for Gran. She\'s not well. And I may have… overheard something about the estate finances.',
+        hard:   'Family. Is that suspicious now?'
+      },
+      revealClue: { easy: 'prints', medium: null, hard: null }
+    },
+    {
+      id: 'd2',
+      text: 'Did you move the sapphire?',
+      response: {
+        easy:   '[She exhales.] Yes. I moved it to Gran\'s wardrobe for safekeeping. I wasn\'t stealing it — I was protecting it from being sold. I\'m sorry I didn\'t ask first.',
+        medium: '[She goes quiet.] I… no. [A long pause.] Alright. Yes. I was protecting it. You can check Gran\'s wardrobe.',
+        hard:   'Absolutely not. Why would I do that?'
+      },
+      revealClue: { easy: 'note', medium: 'note', hard: null }
+    },
+    {
+      id: 'd3',
+      text: 'Is this your handwriting on the note?',
+      response: {
+        easy:   'Oh — yes. I wrote that as a reminder. I must have dropped it. [She flushes.] I was going to tell someone, I promise.',
+        medium: '[Nervously.] Where did you find that? [She looks at it.] … Yes. It\'s mine.',
+        hard:   'I\'ve never seen that note in my life.'
+      },
+      revealClue: { easy: null, medium: null, hard: null }
+    }
+  ]
+};
+
+// ── Game State ────────────────────────────────────────────────
+let difficulty = null;
+let cluesFound = new Set();
+let questionsAsked = {};   // { suspectId: Set<questionId> }
+let interviewedSuspects = new Set();
+let currentSuspect = null;
+let startTime = null;
+let timerInterval = null;
+let finalScore = 0;
+let gameEnded = false;
+
+// ── Screen Management ─────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
+// ── Title ─────────────────────────────────────────────────────
+function showDifficulty() {
+  showScreen('screen-difficulty');
+}
+
+function showLeaderboard() {
+  renderFullLeaderboard();
+  showScreen('screen-leaderboard');
+}
+
+// ── Start Game ────────────────────────────────────────────────
+function startGame(diff) {
+  difficulty = diff;
+  cluesFound = new Set();
+  questionsAsked = {};
+  interviewedSuspects = new Set();
+  currentSuspect = null;
+  gameEnded = false;
+  finalScore = 0;
+
+  SUSPECTS.forEach(s => { questionsAsked[s.id] = new Set(); });
+
+  // Show intro
+  document.getElementById('intro-text').textContent = INTRO[difficulty];
+  const hintEl = document.getElementById('hint-intro');
+  if (difficulty === 'easy') hintEl.classList.add('visible');
+  else hintEl.classList.remove('visible');
+
+  showScreen('screen-intro');
+}
+
+// ── Investigation ─────────────────────────────────────────────
+function showInvestigate() {
+  renderClueBoard();
+  renderSuspects();
+  closeInterview();
+  updateProgress();
+  startTimer();
+  showScreen('screen-investigate');
+}
+
+function startTimer() {
+  startTime = Date.now();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    const el = document.getElementById('timer-display');
+    if (el) el.textContent = m + ':' + String(s).padStart(2, '0');
+  }, 1000);
+}
+
+function renderClueBoard() {
+  const board = document.getElementById('clue-board');
+  board.innerHTML = '<h3>Evidence Collected</h3>';
+  const clues = CLUES[difficulty];
+  clues.forEach(clue => {
+    const el = document.createElement('div');
+    el.className = 'clue-item' + (cluesFound.has(clue.id) ? '' : ' locked');
+    el.id = 'clue-' + clue.id;
+    el.setAttribute('aria-label', cluesFound.has(clue.id) ? clue.title + ': ' + clue.desc : 'Undiscovered clue');
+    el.innerHTML = `<span class="clue-icon">${clue.icon}</span>
+      <div>
+        <strong style="font-size:0.78rem;color:var(--gold);">${clue.title}</strong>
+        <div>${cluesFound.has(clue.id) ? clue.desc : '???'}</div>
+      </div>`;
+    board.appendChild(el);
+  });
+}
+
+function unlockClue(id) {
+  if (cluesFound.has(id)) return;
+  cluesFound.add(id);
+  // Re-render the specific clue card
+  const clueData = CLUES[difficulty].find(c => c.id === id);
+  if (!clueData) return;
+  const el = document.getElementById('clue-' + id);
+  if (el) {
+    el.classList.remove('locked');
+    el.setAttribute('aria-label', clueData.title + ': ' + clueData.desc);
+    el.querySelector('div > div').textContent = clueData.desc;
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = '';
+  }
+  updateProgress();
+}
+
+function renderSuspects() {
+  const list = document.getElementById('suspect-list');
+  list.innerHTML = '';
+  SUSPECTS.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'suspect-btn' + (interviewedSuspects.has(s.id) ? ' interviewed' : '');
+    btn.setAttribute('aria-label', 'Interview ' + s.name);
+    btn.innerHTML = `
+      <span class="s-emoji" aria-hidden="true">${s.emoji}</span>
+      <div class="s-info">
+        <span class="s-name">${s.name}</span>
+        <span class="s-role">${s.role}</span>
+        ${interviewedSuspects.has(s.id) ? '<span class="s-badge">✓ Interviewed</span>' : ''}
+      </div>`;
+    btn.addEventListener('click', () => openInterview(s.id));
+    list.appendChild(btn);
+  });
+}
+
+function openInterview(suspectId) {
+  const suspect = SUSPECTS.find(s => s.id === suspectId);
+  currentSuspect = suspectId;
+
+  document.getElementById('iv-avatar').textContent = suspect.emoji;
+  document.getElementById('iv-name').textContent   = suspect.name;
+  document.getElementById('iv-role').textContent   = suspect.role;
+  document.getElementById('dialogue-box').textContent = 'Select a question to ask…';
+
+  renderQuestions(suspectId);
+
+  const panel = document.getElementById('interview-panel');
+  panel.classList.add('active');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderQuestions(suspectId) {
+  const list = document.getElementById('question-list');
+  list.innerHTML = '';
+  const questions = QUESTIONS[suspectId];
+  questions.forEach(q => {
+    const btn = document.createElement('button');
+    const asked = questionsAsked[suspectId].has(q.id);
+    btn.className = 'question-btn' + (asked ? ' asked' : '');
+    btn.textContent = (asked ? '✓ ' : '') + q.text;
+    btn.setAttribute('aria-label', (asked ? 'Already asked: ' : '') + q.text);
+    if (!asked) {
+      btn.addEventListener('click', () => askQuestion(suspectId, q));
+    }
+    list.appendChild(btn);
+  });
+}
+
+function askQuestion(suspectId, q) {
+  const dialogueBox = document.getElementById('dialogue-box');
+  dialogueBox.textContent = q.response[difficulty];
+
+  questionsAsked[suspectId].add(q.id);
+  interviewedSuspects.add(suspectId);
+
+  // Unlock clue if applicable
+  if (q.revealClue) {
+    const clueId = q.revealClue[difficulty];
+    if (clueId) unlockClue(clueId);
+  }
+
+  // Refresh question list styling
+  renderQuestions(suspectId);
+  renderSuspects();
+  updateProgress();
+}
+
+function closeInterview() {
+  document.getElementById('interview-panel').classList.remove('active');
+  currentSuspect = null;
+}
+
+function updateProgress() {
+  const total = 3; // 3 clues
+  const found = cluesFound.size;
+  for (let i = 0; i < total; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (!dot) continue;
+    if (i < found) dot.className = 'dot complete';
+    else if (i === found) dot.className = 'dot active';
+    else dot.className = 'dot';
+  }
+}
+
+// ── Accusation ────────────────────────────────────────────────
+function showAccuse() {
+  renderAccuseGrid();
+  showScreen('screen-accuse');
+}
+
+function renderAccuseGrid() {
+  const grid = document.getElementById('accuse-grid');
+  grid.innerHTML = '';
+  SUSPECTS.forEach(s => {
+    const card = document.createElement('button');
+    card.className = 'accuse-card';
+    card.setAttribute('aria-label', 'Accuse ' + s.name);
+    card.innerHTML = `
+      <div class="ac-emoji" aria-hidden="true">${s.emoji}</div>
+      <div class="ac-name">${s.name}</div>
+      <div class="ac-role">${s.role}</div>`;
+    card.addEventListener('click', () => makeAccusation(s.id));
+    grid.appendChild(card);
+  });
+}
+
+function makeAccusation(suspectId) {
+  clearInterval(timerInterval);
+  const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 999;
+
+  let endingType, icon, title, text;
+
+  if (suspectId === 'diana') {
+    endingType = 'correct';
+    icon  = '🏆';
+    title = 'Case Closed!';
+    text  = 'Brilliant work, Detective. Diana had moved the Sapphire of Truth to her grandmother\'s wardrobe to protect it from a rumoured estate auction. ' +
+            'The gem is safely returned. Grace Manor breathes easy. The truth always finds the light.';
+  } else if (suspectId === 'marcus') {
+    endingType = 'partial';
+    icon  = '🤔';
+    title = 'Not Quite…';
+    text  = 'Marcus was aware of Diana\'s concerns about the estate — he\'d spoken to her — but he didn\'t touch the gem. ' +
+            'You\'re closer to the truth. Re-examine your clues and question Diana more carefully.';
+  } else {
+    endingType = 'wrong';
+    icon  = '💔';
+    title = 'Wrong Accusation';
+    text  = 'Eleanor is heartbroken. She has lived at Grace Manor for 20 years and had nothing to do with the missing gem. ' +
+            'The real culprit is still out there. Take another look at the evidence.';
+  }
+
+  // Calculate score
+  let score = 0;
+  if (endingType === 'correct') {
+    score = Math.round(BASE_SCORE * DIFF_MULTIPLIER[difficulty]);
+    score += cluesFound.size * CLUE_BONUS;
+    if (elapsed < 180)      score += SPEED_BONUS.fast;
+    else if (elapsed < 300) score += SPEED_BONUS.medium;
+  }
+  finalScore = score;
+
+  showEnding(endingType, icon, title, text, score, elapsed);
+}
+
+// ── Ending ────────────────────────────────────────────────────
+function showEnding(type, icon, title, text, score, elapsed) {
+  gameEnded = true;
+
+  document.getElementById('ending-icon').textContent = icon;
+  const titleEl = document.getElementById('ending-heading');
+  titleEl.textContent  = title;
+  titleEl.className    = 'ending-title ' + type;
+  document.getElementById('ending-text').textContent   = text;
+  document.getElementById('score-value').textContent   = score.toLocaleString();
+
+  // Community Showcase (correct only)
+  const showcase = document.getElementById('showcase-card');
+  if (type === 'correct') showcase.classList.remove('hidden');
+  else showcase.classList.add('hidden');
+
+  // Leaderboard entry form (correct only)
+  const lbForm = document.getElementById('lb-entry-form');
+  if (type === 'correct' && score > 0) lbForm.classList.remove('hidden');
+  else lbForm.classList.add('hidden');
+
+  // Show existing leaderboard
+  const lbSection = document.getElementById('lb-section');
+  const entries = getLeaderboard();
+  if (entries.length > 0) {
+    lbSection.style.display = 'block';
+    renderLeaderboardTable('lb-body', entries.slice(0, 5));
+  }
+
+  showScreen('screen-ending');
+
+  if (type === 'correct') {
+    launchConfetti();
+    unlockStarAchievement('sapphire');  // "Truth" star
+  }
+
+  // Unlock achievement for attempting hard mode
+  if (difficulty === 'hard') unlockStarAchievement('ruby');
+}
+
+// ── Confetti ──────────────────────────────────────────────────
+function launchConfetti() {
+  const layer = document.getElementById('confetti-layer');
+  layer.innerHTML = '';
+
+  const COLORS = ['#f0c040', '#bc8cff', '#58a6ff', '#3fb950', '#ff6b6b', '#ffffff'];
+  const COUNT  = 80;
+
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const size  = 6 + Math.random() * 8;
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    const left  = Math.random() * 100;
+    const dur   = 2.5 + Math.random() * 2;
+    const delay = Math.random() * 1.5;
+    el.style.cssText =
+      `width:${size}px;height:${size}px;background:${color};left:${left}%;` +
+      `animation-duration:${dur}s;animation-delay:${delay}s;`;
+    layer.appendChild(el);
+  }
+
+  // Stars
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement('div');
+    el.className = 'star-pop';
+    el.textContent = '⭐';
+    const left  = 10 + Math.random() * 80;
+    const top   = 30 + Math.random() * 50;
+    const dur   = 1.8 + Math.random() * 1.5;
+    const delay = Math.random() * 2;
+    el.style.cssText = `left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;`;
+    layer.appendChild(el);
+  }
+
+  setTimeout(() => { layer.innerHTML = ''; }, 5500);
+}
+
+// ── Leaderboard ───────────────────────────────────────────────
+function getLeaderboard() {
+  try { return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveScore() {
+  const nameEl = document.getElementById('player-name');
+  const name = (nameEl.value || '').trim() || 'Anonymous';
+
+  const entry = {
+    name,
+    score:      finalScore,
+    difficulty,
+    date:       new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  };
+
+  const entries = getLeaderboard();
+  entries.push(entry);
+  entries.sort((a, b) => b.score - a.score);
+  const top10 = entries.slice(0, 10);
+  localStorage.setItem(LB_KEY, JSON.stringify(top10));
+
+  document.getElementById('lb-entry-form').classList.add('hidden');
+  const lbSection = document.getElementById('lb-section');
+  lbSection.style.display = 'block';
+  renderLeaderboardTable('lb-body', top10.slice(0, 5));
+}
+
+function renderLeaderboardTable(tbodyId, entries) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+  entries.forEach((e, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${escapeHtml(e.name)}</td>
+      <td>${(e.score || 0).toLocaleString()}</td>
+      <td><span class="diff-badge ${e.difficulty || ''}">${e.difficulty || '—'}</span></td>
+      <td>${e.date || '—'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderFullLeaderboard() {
+  const entries = getLeaderboard();
+  const body = document.getElementById('lb-full-body');
+  const empty = document.getElementById('lb-empty');
+  if (entries.length === 0) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    renderLeaderboardTable('lb-full-body', entries);
+  }
+}
+
+// ── Achievements ──────────────────────────────────────────────
+function unlockStarAchievement(id) {
+  try {
+    const unlocked = JSON.parse(localStorage.getItem(STAR_KEY) || '[]');
+    if (!unlocked.includes(id)) {
+      unlocked.push(id);
+      localStorage.setItem(STAR_KEY, JSON.stringify(unlocked));
+    }
+  } catch { /* ignore */ }
+}
+
+// ── Restart ───────────────────────────────────────────────────
+function restartGame() {
+  showScreen('screen-difficulty');
+}
+
+// ── Utilities ─────────────────────────────────────────────────
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+</script>
+</body>
+</html>
