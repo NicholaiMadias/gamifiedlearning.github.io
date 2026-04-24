@@ -304,12 +304,12 @@
     <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
   </section>
 
-  <!-- ══ Bible Match ══════════════════════════════════════ -->
+  <!-- ══ Bible Journey ══════════════════════════════════════ -->
   <section class="arcade-links-card" id="arcade-links">
 
-    <!-- Bible Match quiz (inline) -->
+    <!-- Bible Journey quiz (inline) -->
     <div class="bj-quiz" id="bj-quiz-box">
-      <h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">✝ Bible Match</h3>
+      <h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">✝ Bible Journey</h3>
       <div class="bj-progress-track">
         <div class="bj-progress-fill" id="bj-progress-bar" style="width:0%"
              role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
@@ -390,7 +390,7 @@
         const box = document.getElementById('bj-quiz-box');
 
         if (!document.getElementById('bj-q-text')) {
-          box.innerHTML = '<h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">\u271D Bible Match</h3><div class="bj-progress-track"><div class="bj-progress-fill" id="bj-progress-bar" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div><p id="bj-q-text"></p><p id="bj-feedback" aria-live="polite"></p><div id="bj-options"></div>';
+          box.innerHTML = '<h3 style="text-align:center;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:#00ff41;text-shadow:0 0 8px #00ff4160;margin-bottom:1rem;">\u271D Bible Journey</h3><div class="bj-progress-track"><div class="bj-progress-fill" id="bj-progress-bar" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div><p id="bj-q-text"></p><p id="bj-feedback" aria-live="polite"></p><div id="bj-options"></div>';
         }
 
         if (bjIdx >= bjData.length) {
