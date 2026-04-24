@@ -600,7 +600,8 @@
   <a class="brand" href="arcade.html">🕹️ The Arcade</a>
   <div class="nexus-links">
     <a href="arcade.html">← Back to Arcade</a>
-    <a href="embed.html">🏠 Amazing Grace</a>
+    <a href="https://www.amazinggraceho.org" target="_blank" rel="noopener">🏡 Amazing Grace HO</a>
+    <a href="embed.html">🏠 Amazing Grace HL</a>
     <a href="mailto:gulfnexus@gmail.com">✉️ Contact Sheila</a>
   </div>
 </nav>
@@ -839,8 +840,8 @@ const CLUES = {
   ]
 };
 
-// Questions per suspect — each has text, and per-difficulty response
-// revealClue: clue id to add when asked on easy/medium; locked: clue id required before question appears
+// Questions per suspect — each has text and per-difficulty responses.
+// revealClue: clue id to add when this question is asked for the configured difficulty, or null if none.
 const QUESTIONS = {
   eleanor: [
     {
@@ -945,7 +946,6 @@ let difficulty = null;
 let cluesFound = new Set();
 let questionsAsked = {};   // { suspectId: Set<questionId> }
 let interviewedSuspects = new Set();
-let currentSuspect = null;
 let startTime = null;
 let timerInterval = null;
 let finalScore = 0;
@@ -974,7 +974,6 @@ function startGame(diff) {
   cluesFound = new Set();
   questionsAsked = {};
   interviewedSuspects = new Set();
-  currentSuspect = null;
   gameEnded = false;
   finalScore = 0;
 
@@ -1068,7 +1067,6 @@ function renderSuspects() {
 
 function openInterview(suspectId) {
   const suspect = SUSPECTS.find(s => s.id === suspectId);
-  currentSuspect = suspectId;
 
   document.getElementById('iv-avatar').textContent = suspect.emoji;
   document.getElementById('iv-name').textContent   = suspect.name;
@@ -1120,7 +1118,6 @@ function askQuestion(suspectId, q) {
 
 function closeInterview() {
   document.getElementById('interview-panel').classList.remove('active');
-  currentSuspect = null;
 }
 
 function updateProgress() {
@@ -1158,6 +1155,8 @@ function renderAccuseGrid() {
 }
 
 function makeAccusation(suspectId) {
+  if (gameEnded) return;
+  gameEnded = true;
   clearInterval(timerInterval);
   const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 999;
 
@@ -1233,7 +1232,7 @@ function showEnding(type, icon, title, text, score, elapsed) {
   }
 
   // Unlock achievement for attempting hard mode
-  if (difficulty === 'hard') unlockStarAchievement('ruby');
+  if (difficulty === 'hard') unlockStarAchievement('detective');
 }
 
 // ── Confetti ──────────────────────────────────────────────────
@@ -1306,14 +1305,16 @@ function saveScore() {
 function renderLeaderboardTable(tbodyId, entries) {
   const tbody = document.getElementById(tbodyId);
   tbody.innerHTML = '';
+  const VALID_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
   entries.forEach((e, i) => {
+    const safeDiff = VALID_DIFFICULTIES.has(e.difficulty) ? e.difficulty : '';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${i + 1}</td>
       <td>${escapeHtml(e.name)}</td>
       <td>${(e.score || 0).toLocaleString()}</td>
-      <td><span class="diff-badge ${e.difficulty || ''}">${e.difficulty || '—'}</span></td>
-      <td>${e.date || '—'}</td>`;
+      <td><span class="diff-badge ${safeDiff}">${escapeHtml(e.difficulty) || '—'}</span></td>
+      <td>${escapeHtml(e.date) || '—'}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -1343,13 +1344,25 @@ function unlockStarAchievement(id) {
 }
 
 // ── Restart ───────────────────────────────────────────────────
+function resetInvestigationTimer() {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  startTime = null;
+  const timerDisplay = document.getElementById('timer');
+  if (timerDisplay) timerDisplay.textContent = '00:00';
+}
+
 function restartGame() {
+  resetInvestigationTimer();
   showScreen('screen-difficulty');
 }
 
 // ── Utilities ─────────────────────────────────────────────────
 function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const value = String(str ?? '');
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 </script>
 </body>
