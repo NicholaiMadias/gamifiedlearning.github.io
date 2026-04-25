@@ -215,11 +215,17 @@ export function markContested(entryId, note = '') {
   }
 }
 
+const MAX_MARGINAL_TITLES_PER_ENTRY = 20;
+
 export function addMarginalTitle(entryId, titleText) {
   if (!namingUnlocked) return;
   const text = titleText.trim().slice(0, 40);
   if (!text) return;
   if (!marginalTitles[entryId]) marginalTitles[entryId] = [];
+  // De-duplicate: skip if the same text already exists for this entry
+  if (marginalTitles[entryId].some(t => t.text === text)) {
+    return;
+  }
   const entry = CODEX_ENTRIES.find(e => e.id === entryId);
   marginalTitles[entryId].push({
     text,
@@ -228,6 +234,10 @@ export function addMarginalTitle(entryId, titleText) {
     contributorMastery: playerMasteryScore(),
     timestamp:          Date.now(),
   });
+  // Cap to the most recent MAX_MARGINAL_TITLES_PER_ENTRY entries
+  if (marginalTitles[entryId].length > MAX_MARGINAL_TITLES_PER_ENTRY) {
+    marginalTitles[entryId] = marginalTitles[entryId].slice(-MAX_MARGINAL_TITLES_PER_ENTRY);
+  }
   save();
   renderLens();
 }
