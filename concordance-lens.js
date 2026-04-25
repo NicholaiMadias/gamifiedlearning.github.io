@@ -408,14 +408,28 @@ function renderEntries() {
       card.appendChild(controls);
     }
 
-    // Click records a read
-    card.addEventListener('click', () => {
+    // Make the card keyboard-accessible as an interactive control
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+
+    const recordRead = () => {
       readCounts[entry.id] = (readCounts[entry.id] || 0) + 1;
       schismPressure = Math.min(1, schismPressure + 0.01);
       save();
       checkUnlock();
+    };
+
+    // Click records a read
+    card.addEventListener('click', () => {
+      recordRead();
     });
 
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        recordRead();
+      }
+    });
     container.appendChild(card);
   });
 
