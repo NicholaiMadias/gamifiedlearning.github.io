@@ -473,12 +473,28 @@
         }
 
         let mmBannerTimeout = null;
+        let mmBannerToken = 0;
+
+        function mmClearBannerTimeout(hideBanner = false) {
+            if (mmBannerTimeout !== null) {
+                clearTimeout(mmBannerTimeout);
+                mmBannerTimeout = null;
+            }
+            mmBannerToken++;
+            if (hideBanner) {
+                const banner = document.getElementById('match-badge-banner');
+                if (banner) banner.classList.add('hidden');
+            }
+        }
 
         function mmShowBanner(text) {
             const banner = document.getElementById('match-badge-banner');
-            banner.textContent = text; banner.classList.remove('hidden');
-            if (mmBannerTimeout !== null) clearTimeout(mmBannerTimeout);
+            mmClearBannerTimeout(false);
+            banner.textContent = text;
+            banner.classList.remove('hidden');
+            const bannerToken = mmBannerToken;
             mmBannerTimeout = setTimeout(() => {
+                if (mmBannerTimeout === null || bannerToken !== mmBannerToken) return;
                 banner.classList.add('hidden');
                 mmBannerTimeout = null;
             }, 3000);
