@@ -303,11 +303,12 @@ export function downloadMatchMakerCertPNG() {
 
 export function downloadMatchMakerCertPDF() {
   if (!_certDataUrl) return;
-  const win = window.open('', '_blank');
+  const win = window.open('', '_blank', 'noopener');
   if (!win) {
     showNotification('Please allow pop-ups to save the certificate as PDF.');
     return;
   }
+  win.opener = null;
   win.document.write(
     '<!DOCTYPE html><html><head><title>Certificate \u2014 Match Maker</title>' +
     '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#020617;display:flex;' +
