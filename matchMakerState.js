@@ -176,25 +176,28 @@ function classifyComponent(comp) {
 
   // T / L shape (5+ cells spanning 2+ rows and cols) → bomb at intersection
   if (comp.length >= 5 && height >= 2 && width >= 2) {
-    // Compute degree within this component by checking 4-directional adjacency
+    // Compute adjacency degree within this component for each cell
     const compSet = new Set(comp.map(c => `${c.row},${c.col}`));
-    const degree = cell => [[0, 1], [0, -1], [1, 0], [-1, 0]].reduce(
-      (n, [dr, dc]) => n + (compSet.has(`${cell.row + dr},${cell.col + dc}`) ? 1 : 0), 0
-    );
+    const degrees = new Map(comp.map(cell => [
+      `${cell.row},${cell.col}`,
+      [[0, 1], [0, -1], [1, 0], [-1, 0]].reduce(
+        (n, [dr, dc]) => n + (compSet.has(`${cell.row + dr},${cell.col + dc}`) ? 1 : 0), 0
+      )
+    ]));
     // The intersection cell has the highest degree (most neighbors in the component)
     const intersection = comp.reduce((best, cell) =>
-      degree(cell) > degree(best) ? cell : best
+      degrees.get(`${cell.row},${cell.col}`) > degrees.get(`${best.row},${best.col}`) ? cell : best
     , comp[0]);
     specials.push({ row: intersection.row, col: intersection.col, specialType: 'bomb' });
     return { specials };
   }
 
-  // 4-in-a-row → line clear at median cell (index 2 of 4 when sorted)
+  // 4-in-a-row → line clear at the median cell (index 2 of 4 when sorted)
   if (comp.length === 4 && (height === 1 || width === 1)) {
-    const center = sorted[midIdx];
+    const medianCell = sorted[midIdx];
     specials.push({
-      row: center.row,
-      col: center.col,
+      row: medianCell.row,
+      col: medianCell.col,
       specialType: height === 1 ? 'lineH' : 'lineV',
     });
   }
