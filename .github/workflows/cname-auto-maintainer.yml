@@ -25,10 +25,7 @@ jobs:
 
           case "$REPO" in
             "NicholaiMadias/gamifiedlearning.github.io")
-              EXPECTED="nicholai.org"
-              ;;
-            "NicholaiMadias/amazinggracehomeliving.github.io")
-              EXPECTED="amazinggracehomeliving.com"
+              EXPECTED="amazinggracehl.org"
               ;;
             *)
               echo "No case arm exists for repo: $REPO"
@@ -66,12 +63,12 @@ jobs:
 
           echo "CNAME validation passed."
 
-      - name: Auto-detect domain from DNS if missing
+      - name: Auto-detect domain from Pages hostname if missing
         id: autodomain
         if: ${{ steps.cname.outputs.EXPECTED == '' }}
         run: |
-          REPO="${{ github.repository }}"
-          DOMAIN=$(dig +short CNAME "$REPO" | sed 's/\.$//')
+          OWNER=$(echo "${{ github.repository }}" | cut -d/ -f1)
+          DOMAIN=$(dig +short CNAME "${OWNER}.github.io" | sed 's/\.$//')
 
           if [ -z "$DOMAIN" ]; then
             DOMAIN="ADD_DOMAIN_HERE"
@@ -81,6 +78,8 @@ jobs:
 
       - name: Auto‑PR missing case arm
         if: ${{ steps.cname.outputs.EXPECTED == '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BRANCH="add-cname-case-${{ github.run_id }}"
           FILE=".github/workflows/cname-auto-maintainer.yml"
@@ -102,34 +101,3 @@ jobs:
             --body "This PR was automatically generated because no case arm existed for this repository. Domain auto-detected as: $DOMAIN" \
             --base main \
             --head "$BRANCH"
-
-      - name: Auto-update dual-deploy.yml
-        if: ${{ steps.cname.outputs.EXPECTED == '' }}
-        run: |
-          BRANCH2="update-dual-deploy-${{ github.run_id }}"
-          FILE2=".github/workflows/dual-deploy.yml"
-          DOMAIN="${{ steps.autodomain.outputs.DOMAIN }}"
-
-          git checkout -b "$BRANCH2"
-
-          sed -i "/# AUTO-DOMAINS/a \ \ - $DOMAIN" "$FILE2"
-
-          git add "$FILE2"
-          git commit -m "Auto-update dual-deploy.yml with new domain: $DOMAIN"
-          git push origin "$BRANCH2"
-
-          gh pr create \
-            --title "Auto-update dual-deploy.yml with new domain" \
-            --body "Automatically added $DOMAIN to dual-deploy.yml domain list." \
-            --base main \
-            --head "$BRANCH2"
-
-      - name: Auto-sync domain to WordPress
-        if: ${{ steps.cname.outputs.EXPECTED == '' }}
-        run: |
-          DOMAIN="${{ steps.autodomain.outputs.DOMAIN }}"
-          echo "Syncing new domain to WordPress: $DOMAIN"
-          curl --retry 3 --fail -X POST \
-            -H "Authorization: Bearer ${WP_API_KEY}" \
-            -d "{\"domain\": \"$DOMAIN\"}" \
-            https://www.amazinggracehomeliving.com/wp-json/nexus-sync/v1/add-domain || true
