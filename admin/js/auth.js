@@ -90,7 +90,7 @@ function seedDemoUsers() {
 /**
  * True when running on a local/dev/preview host.
  * Demo seeding and the permissive demo-login path are disabled on production
- * hostnames (e.g. admin.gamifiedlearning.org) so demo credentials are never
+ * hostnames (e.g. admin.amazinggracehl.org) so demo credentials are never
  * available on the live site.
  */
 const IS_DEMO_HOST = (() => {
