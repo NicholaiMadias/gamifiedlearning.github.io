@@ -324,11 +324,42 @@
         let mmGrid = [], mmSelected = null, mmScore = 0, mmLevel = 1, mmMoves = 20;
         let mmConscienceVals = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
 
+        function mmRandomGem(pool = MM_GEMS) {
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        function mmPickStartingGem(grid, row, col) {
+            const blocked = new Set();
+
+            if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) {
+                blocked.add(grid[row][col - 1]);
+            }
+
+            if (row >= 2 && grid[row - 1][col] === grid[row - 2][col]) {
+                blocked.add(grid[row - 1][col]);
+            }
+
+            const choices = MM_GEMS.filter(gem => !blocked.has(gem));
+            return mmRandomGem(choices.length > 0 ? choices : MM_GEMS);
+        }
+
+        function mmCreateStartingGrid() {
+            const grid = Array.from({ length: 7 }, () => Array(7).fill(null));
+
+            for (let row = 0; row < 7; row++) {
+                for (let col = 0; col < 7; col++) {
+                    grid[row][col] = mmPickStartingGem(grid, row, col);
+                }
+            }
+
+            return grid;
+        }
+
         function initMatchMaker() {
             mmScore = 0; mmLevel = 1; mmMoves = 20;
             mmConscienceVals = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
             mmSelected = null;
-            mmGrid = Array.from({ length: 7 }, () => Array.from({ length: 7 }, () => MM_GEMS[Math.floor(Math.random() * MM_GEMS.length)]));
+            mmGrid = mmCreateStartingGrid();
             mmUpdateHUD(); mmRenderBoard(); mmSetMsg('');
             const banner = document.getElementById('match-badge-banner');
             banner.classList.add('hidden'); banner.textContent = '';
