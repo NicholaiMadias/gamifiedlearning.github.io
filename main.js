@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMatchMaker(null, null);
   refreshStarMap();
 
-  const restartBtn = document.getElementById('restart-btn');
+  const restartBtn = document.getElementById('match-restart-btn');
   if (restartBtn) {
     restartBtn.addEventListener('click', () => {
       initMatchMaker(null, null);
