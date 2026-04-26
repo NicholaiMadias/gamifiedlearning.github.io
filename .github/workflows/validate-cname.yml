@@ -19,7 +19,7 @@ jobs:
               EXPECTED="amazinggracehl.org"
               ;;
             "NicholaiMadias/Amazing-Grace")
-              EXPECTED="amazinggracehomeliving.com"
+              EXPECTED="amazinggracehl.org"
               ;;
             "Gamified-Learning-Matrix/Gamified-Learning")
               EXPECTED="gamifiedlearning.org"
