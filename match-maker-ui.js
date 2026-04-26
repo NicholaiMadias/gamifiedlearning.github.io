@@ -22,7 +22,8 @@ const ROWS          = GRID_SIZE;
 const COLS          = GRID_SIZE;
 const CASCADE_DELAY = 300;   // ms between cascade steps
 const BASE_POINTS   = 10;    // base points per matched gem
-const MAX_LEVEL     = 5;     // final level — game complete when this level clears
+const TOTAL_LEVELS  = 7;     // Match Maker is a 7-level mode
+const MAX_LEVEL     = TOTAL_LEVELS; // final level — game complete when this level clears
 
 const GEM_EMOJI = {
   heart: '❤️',
