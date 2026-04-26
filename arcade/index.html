@@ -221,7 +221,7 @@
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('/sw.js')
+        .register('./sw.js')
         .catch(err => console.warn('[SW] Registration skipped:', err.message));
     }
   </script>
