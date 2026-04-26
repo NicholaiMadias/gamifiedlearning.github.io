@@ -166,6 +166,11 @@ function onCellKey(e, row, col) {
 }
 
 function attemptSwap(r1, c1, r2, c2) {
+  if (moves <= 0) {
+    showMsg('No moves left — restart to play again!');
+    return;
+  }
+
   locked = true;
   selected = null;
   grid = swapGems(grid, r1, c1, r2, c2);
@@ -178,9 +183,11 @@ function attemptSwap(r1, c1, r2, c2) {
   if (!result || !result.matches || result.matches.length === 0) {
     setTimeout(() => {
       grid = swapGems(grid, r1, c1, r2, c2);
+      moves++;  // restore move — invalid swaps don't cost a turn
       streak = 0;
       globalMultiplier = 1.0;
       showMsg('No match — try again');
+      updateHUD();
       renderBoard();
       setTimeout(() => showMsg(''), 1200);
       locked = false;

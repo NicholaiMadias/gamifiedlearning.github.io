@@ -163,23 +163,29 @@ function classifyComponent(comp) {
   const height = Math.max(...compRows) - Math.min(...compRows) + 1;
   const width  = Math.max(...compCols) - Math.min(...compCols) + 1;
 
-  // 5-in-a-row → supernova
+  // Sort by (row, col) for deterministic median selection
+  const sorted = [...comp].sort((a, b) => a.row !== b.row ? a.row - b.row : a.col - b.col);
+
+  // 5-in-a-row → supernova at median cell
   if (comp.length >= 5 && (height === 1 || width === 1)) {
-    const center = comp[Math.floor(comp.length / 2)];
+    const center = sorted[Math.floor(sorted.length / 2)];
     specials.push({ row: center.row, col: center.col, specialType: 'supernova' });
     return { specials };
   }
 
-  // T / L shape (5+ cells spanning 2+ rows and cols) → bomb
+  // T / L shape (5+ cells spanning 2+ rows and cols) → bomb at intersection
   if (comp.length >= 5 && height >= 2 && width >= 2) {
-    const center = comp[Math.floor(comp.length / 2)];
-    specials.push({ row: center.row, col: center.col, specialType: 'bomb' });
+    // The intersection cell has the highest neighbor count in the match
+    const intersection = comp.reduce((best, cell) =>
+      cell.neighbors.length > best.neighbors.length ? cell : best
+    , comp[0]);
+    specials.push({ row: intersection.row, col: intersection.col, specialType: 'bomb' });
     return { specials };
   }
 
-  // 4-in-a-row → line clear
+  // 4-in-a-row → line clear at median cell
   if (comp.length === 4 && (height === 1 || width === 1)) {
-    const center = comp[1];
+    const center = sorted[Math.floor((sorted.length - 1) / 2)];
     specials.push({
       row: center.row,
       col: center.col,
@@ -191,8 +197,11 @@ function classifyComponent(comp) {
 }
 
 /**
- * Applies a match result to the grid: places specials, clears normal cells,
- * then triggers any specials that were part of the match.
+ * Applies a match result to the grid:
+ * 1. Captures any pre-existing specials that are being matched (to trigger later).
+ * 2. Places newly-created specials at designated cells (they persist for future moves).
+ * 3. Clears remaining matched cells.
+ * 4. Triggers only the pre-existing specials — newly-created ones stay on the board.
  * Returns a new grid (mutates a copy).
  */
 export function applyMatches(grid, matchResult, comboLevel = 1) {
@@ -200,7 +209,12 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
   const next = grid.map(row => [...row]);
   const toClear = new Set(matches.map(m => `${m.row},${m.col}`));
 
-  // Place special gems at designated cells (remove from clear list)
+  // Capture pre-existing specials that are part of this match before clearing anything
+  const preExistingSpecials = matches
+    .filter(m => next[m.row][m.col]?.special)
+    .map(m => ({ row: m.row, col: m.col, type: next[m.row][m.col].special }));
+
+  // Place newly-created special gems (remove those cells from the clear list so they persist)
   for (const s of specials) {
     const key = `${s.row},${s.col}`;
     if (toClear.has(key)) {
@@ -216,9 +230,9 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
     next[r][c] = null;
   }
 
-  // Trigger specials that were themselves matched
-  for (const s of specials) {
-    triggerSpecial(next, s.row, s.col, s.specialType, comboLevel);
+  // Trigger ONLY pre-existing specials that were part of the match
+  for (const ps of preExistingSpecials) {
+    triggerSpecial(next, ps.row, ps.col, ps.type, comboLevel);
   }
 
   return next;
