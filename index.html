@@ -117,19 +117,40 @@
     </div>
 
     <!-- STARLIGHT SEEKER CERTIFICATE OVERLAY -->
-    <div id="ss-cert-overlay" class="hidden fixed inset-0 z-[100] flex flex-col items-center justify-center p-6" style="background:rgba(2,6,23,0.97);overflow-y:auto;">
+    <!-- Notification bar for pop-up-blocked and other messages -->
+    <div id="ss-notification" class="hidden fixed top-16 left-0 right-0 z-[200] flex justify-center pointer-events-none">
+        <div id="ss-notification-text" role="alert" aria-live="assertive" class="glass-panel px-6 py-3 rounded-full text-xs font-bold text-yellow-400" style="pointer-events:auto;"></div>
+    </div>
+
+    <div id="ss-cert-overlay" class="hidden fixed inset-0 z-[100] flex flex-col items-center justify-center p-6" style="background:rgba(2,6,23,0.97);overflow-y:auto;" role="dialog" aria-modal="true" aria-labelledby="ss-cert-title">
         <div class="text-center mb-6">
-            <div class="text-5xl mb-3">🌟</div>
-            <h2 class="orbitron text-4xl font-black text-white mb-2" style="text-shadow:0 0 20px #00f2ff;">MISSION COMPLETE!</h2>
+            <div class="text-5xl mb-3" aria-hidden="true">🌟</div>
+            <h2 id="ss-cert-title" class="orbitron text-4xl font-black text-white mb-2" style="text-shadow:0 0 20px #00f2ff;">MISSION COMPLETE!</h2>
             <p class="text-blue-400 text-[10px] tracking-[0.4em] uppercase font-bold">Starlight Protocol Achieved</p>
         </div>
-        <canvas id="ss-cert-canvas" class="rounded-lg mb-5" style="max-width:min(90vw,800px);border:1px solid rgba(0,242,255,0.2);"></canvas>
-        <div class="flex flex-wrap gap-3 justify-center mb-5">
-            <button onclick="ssCertPNG()" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-cyan-400">⬇ Download PNG</button>
-            <button onclick="ssCertPDF()" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-purple-400">🖨 Save as PDF</button>
-            <a href="/arcade/certificates/" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-green-400 flex items-center" style="text-decoration:none;">📜 My Certificates</a>
+
+        <!-- Phase 1: Name input -->
+        <div id="ss-name-phase" class="flex flex-col items-center gap-3 mb-4 w-full max-w-xs">
+            <label for="ss-player-name" class="text-slate-400 text-[9px] uppercase tracking-[0.15em] font-bold">Your name for the certificate</label>
+            <input id="ss-player-name" type="text" maxlength="30" placeholder="Player"
+                autocomplete="name" aria-label="Player name for certificate"
+                class="w-full px-4 py-2 rounded-xl text-sm text-white font-medium glass-panel"
+                style="border:1px solid rgba(255,255,255,0.1);background:rgba(15,23,42,0.9);outline:none;"
+                onkeydown="if(event.key==='Enter')ssGenerateCert()">
+            <button id="ss-gen-btn" onclick="ssGenerateCert()" class="w-full cmd-btn py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-cyan-400">Generate Certificate</button>
         </div>
-        <button onclick="ssResetGame()" class="text-slate-500 text-[9px] uppercase tracking-[0.3em] hover:text-slate-300 transition-colors mt-2">↩ Play Again</button>
+
+        <!-- Phase 2: Certificate canvas + download buttons -->
+        <div id="ss-cert-phase" class="hidden flex-col items-center gap-3 w-full">
+            <canvas id="ss-cert-canvas" class="rounded-lg" style="max-width:min(90vw,800px);border:1px solid rgba(0,242,255,0.2);" aria-label="Completion certificate"></canvas>
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button onclick="ssCertPNG()" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-cyan-400">⬇ Download PNG</button>
+                <button onclick="ssCertPDF()" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-purple-400">🖨 Save as PDF</button>
+                <a href="/arcade/certificates/" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-green-400 flex items-center" style="text-decoration:none;">📜 My Certificates</a>
+            </div>
+        </div>
+
+        <button onclick="ssResetGame()" class="text-slate-500 text-[9px] uppercase tracking-[0.3em] hover:text-slate-300 transition-colors mt-4">↩ Play Again</button>
     </div>
 
     <script>
@@ -305,9 +326,51 @@
 
         /** --- STARLIGHT SEEKER CERTIFICATE SYSTEM --- **/
         function ssGenCertId() {
-            const ts   = Date.now().toString(36).toUpperCase();
-            const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-            return 'SS-' + ts + '-' + rand;
+            if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                return 'SS-' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
+            }
+            return 'SS-' + Date.now().toString(36).toUpperCase() + '-' + (Date.now() ^ performance.now()).toString(36).slice(-4).toUpperCase();
+        }
+
+        function ssShowNotification(text) {
+            const bar  = document.getElementById('ss-notification');
+            const txt  = document.getElementById('ss-notification-text');
+            if (!bar || !txt) return;
+            txt.textContent = text;
+            bar.classList.remove('hidden');
+            setTimeout(() => bar.classList.add('hidden'), 3500);
+        }
+
+        async function ssShowCongratulations() {
+            // Show name-input phase; cert phase hidden
+            document.getElementById('ss-name-phase').classList.remove('hidden');
+            document.getElementById('ss-cert-phase').classList.remove('hidden');
+            document.getElementById('ss-cert-phase').style.display = 'none';
+            document.getElementById('ss-cert-overlay').classList.remove('hidden');
+            const nameInput = document.getElementById('ss-player-name');
+            if (nameInput) setTimeout(() => nameInput.focus(), 100);
+        }
+
+        async function ssGenerateCert() {
+            const btn        = document.getElementById('ss-gen-btn');
+            const playerName = (document.getElementById('ss-player-name').value || '').trim().slice(0, 30) || 'Player';
+            if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+            const certId     = ssGenCertId();
+            const gameTitle  = 'Starlight Seeker';
+            const completionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            try {
+                const cert  = { id: certId, player: playerName, game: gameTitle, date: completionDate, score };
+                const certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
+                certs.push(cert); localStorage.setItem('arcade-certificates', JSON.stringify(certs));
+            } catch(_) {}
+            const canvas = document.getElementById('ss-cert-canvas');
+            await ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, score);
+            ssCertDataUrl = canvas.toDataURL('image/png');
+            ssCertId      = certId;
+            // Switch to certificate phase
+            document.getElementById('ss-name-phase').classList.add('hidden');
+            document.getElementById('ss-cert-phase').style.display = 'flex';
+            if (btn) { btn.disabled = false; btn.textContent = 'Generate Certificate'; }
         }
 
         async function ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, finalScore) {
@@ -356,24 +419,6 @@
             ctx.fillText('Certificate ID: ' + certId, W/2, 468);
         }
 
-        async function ssShowCongratulations() {
-            const raw        = prompt('Enter your name for the certificate (or leave blank):', '');
-            const playerName = (raw || '').trim().slice(0, 30) || 'Player';
-            const certId     = ssGenCertId();
-            const gameTitle  = 'Starlight Seeker';
-            const completionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            try {
-                const cert  = { id: certId, player: playerName, game: gameTitle, date: completionDate, score };
-                const certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
-                certs.push(cert); localStorage.setItem('arcade-certificates', JSON.stringify(certs));
-            } catch(_) {}
-            const canvas = document.getElementById('ss-cert-canvas');
-            await ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, score);
-            ssCertDataUrl = canvas.toDataURL('image/png');
-            ssCertId      = certId;
-            document.getElementById('ss-cert-overlay').classList.remove('hidden');
-        }
-
         function ssCertPNG() {
             if (!ssCertDataUrl) return;
             const a = document.createElement('a');
@@ -384,7 +429,7 @@
         function ssCertPDF() {
             if (!ssCertDataUrl) return;
             const win = window.open('', '_blank');
-            if (!win) { alert('Please allow pop-ups to save the certificate as PDF.'); return; }
+            if (!win) { ssShowNotification('Please allow pop-ups to save the certificate as PDF.'); return; }
             win.document.write('<!DOCTYPE html><html><head><title>Certificate \u2014 Starlight Seeker</title>' +
                 '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#020617;display:flex;justify-content:center;align-items:center;min-height:100vh}img{width:100%;max-width:800px}@media print{body{background:white}}</style>' +
                 '</head><body><img src="' + ssCertDataUrl + '">' +

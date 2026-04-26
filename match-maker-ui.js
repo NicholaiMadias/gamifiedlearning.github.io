@@ -51,17 +51,20 @@ let _certId        = null;
 // ── DOM helpers ──────────────────────────────────────────────────────────────
 function cacheDom() {
   dom = {
-    board:       document.getElementById('match-grid'),
-    score:       document.getElementById('match-score'),
-    level:       document.getElementById('match-level'),
-    moves:       document.getElementById('match-moves'),
-    msg:         document.getElementById('match-msg'),
-    empathy:     { bar: document.getElementById('mc-empathy-bar'),  pct: document.getElementById('mc-empathy')  },
-    justice:     { bar: document.getElementById('mc-justice-bar'),  pct: document.getElementById('mc-justice')  },
-    wisdom:      { bar: document.getElementById('mc-wisdom-bar'),   pct: document.getElementById('mc-wisdom')   },
-    growth:      { bar: document.getElementById('mc-growth-bar'),   pct: document.getElementById('mc-growth')   },
-    certOverlay: document.getElementById('mm-cert-overlay'),
-    certCanvas:  document.getElementById('mm-cert-canvas'),
+    board:          document.getElementById('match-grid'),
+    score:          document.getElementById('match-score'),
+    level:          document.getElementById('match-level'),
+    moves:          document.getElementById('match-moves'),
+    msg:            document.getElementById('match-msg'),
+    empathy:        { bar: document.getElementById('mc-empathy-bar'),  pct: document.getElementById('mc-empathy')  },
+    justice:        { bar: document.getElementById('mc-justice-bar'),  pct: document.getElementById('mc-justice')  },
+    wisdom:         { bar: document.getElementById('mc-wisdom-bar'),   pct: document.getElementById('mc-wisdom')   },
+    growth:         { bar: document.getElementById('mc-growth-bar'),   pct: document.getElementById('mc-growth')   },
+    certOverlay:    document.getElementById('mm-cert-overlay'),
+    certCanvas:     document.getElementById('mm-cert-canvas'),
+    certNamePhase:  document.getElementById('mm-cert-name-phase'),
+    certCertPhase:  document.getElementById('mm-cert-cert-phase'),
+    notification:   document.getElementById('mm-notification'),
   };
 }
 
@@ -90,6 +93,17 @@ function showMsg(text) {
   if (dom.msg) dom.msg.textContent = text;
 }
 
+function showNotification(text) {
+  if (!dom.notification) return;
+  dom.notification.textContent = text;
+  dom.notification.removeAttribute('hidden');
+  dom.notification.classList.remove('hidden');
+  setTimeout(() => {
+    dom.notification.setAttribute('hidden', '');
+    dom.notification.classList.add('hidden');
+  }, 3500);
+}
+
 function renderBoard() {
   if (!dom.board) return;
   dom.board.innerHTML = '';
@@ -106,12 +120,14 @@ function renderBoard() {
       }
       cell.setAttribute('tabindex', '0');
       cell.setAttribute('role', 'button');
-      cell.setAttribute('aria-label', gem ? gem.type + ' gem' + (gem.special ? ' (' + gem.special + ')' : '') : 'empty cell');
+      cell.setAttribute('aria-label', gem
+        ? gem.type + ' gem' + (gem.special ? ' (' + gem.special + ')' : '')
+        : 'empty cell');
       if (selected && selected.row === r && selected.col === c) {
         cell.classList.add('selected');
       }
-      cell.onclick        = () => onCellClick(r, c);
-      cell.onkeydown      = (e) => onCellKey(e, r, c);
+      cell.onclick   = () => onCellClick(r, c);
+      cell.onkeydown = (e) => onCellKey(e, r, c);
       dom.board.appendChild(cell);
     }
   }
@@ -119,8 +135,12 @@ function renderBoard() {
 
 // ── Certificate system ───────────────────────────────────────────────────────
 function generateCertId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return 'MM-' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
+  }
+  // Fallback for environments without crypto.randomUUID
   const ts   = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+  const rand = (Date.now() ^ performance.now()).toString(36).slice(-4).toUpperCase();
   return 'MM-' + ts + '-' + rand;
 }
 
@@ -214,37 +234,47 @@ async function drawCertificate(canvas, playerName, gameTitle, completionDate, ce
   ctx.fillText('Certificate ID: ' + certId, W / 2, 468);
 }
 
-async function showGameComplete() {
+function showGameComplete() {
   locked = true;
-  const raw        = prompt('Enter your name for the certificate (or leave blank):', '');
-  const playerName = (raw || '').trim().slice(0, 30) || 'Player';
-  const certId     = generateCertId();
-  const gameTitle  = 'Match Maker';
+  // Reset to name-input phase then reveal overlay
+  if (dom.certNamePhase) dom.certNamePhase.classList.remove('hidden');
+  if (dom.certCertPhase) dom.certCertPhase.classList.add('hidden');
+  if (dom.certOverlay)   dom.certOverlay.classList.remove('hidden');
+  window.dispatchEvent(new CustomEvent('matchmaker-game-complete', {
+    detail: { level: MAX_LEVEL, score },
+  }));
+}
+
+/**
+ * Called by the host page when the player submits their name.
+ * Draws the certificate and activates the download buttons.
+ */
+export async function generateCertificateFor(playerName) {
+  const name           = (playerName || '').trim().slice(0, 30) || 'Player';
+  const certId         = generateCertId();
+  const gameTitle      = 'Match Maker';
   const completionDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
   });
 
-  // Persist certificate to localStorage
   try {
-    const cert  = { id: certId, player: playerName, game: gameTitle, date: completionDate, score };
+    const cert  = { id: certId, player: name, game: gameTitle, date: completionDate, score };
     const certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
     certs.push(cert);
     localStorage.setItem('arcade-certificates', JSON.stringify(certs));
   } catch (_) { /* storage unavailable */ }
 
-  // Draw certificate
   if (dom.certCanvas) {
-    await drawCertificate(dom.certCanvas, playerName, gameTitle, completionDate, certId, score);
+    await drawCertificate(dom.certCanvas, name, gameTitle, completionDate, certId, score);
     _certDataUrl = dom.certCanvas.toDataURL('image/png');
     _certId      = certId;
   }
 
-  // Notify other modules
-  window.dispatchEvent(new CustomEvent('matchmaker-game-complete', {
-    detail: { level: MAX_LEVEL, score, certId },
-  }));
+  // Switch overlay to certificate phase
+  if (dom.certNamePhase) dom.certNamePhase.classList.add('hidden');
+  if (dom.certCertPhase) dom.certCertPhase.classList.remove('hidden');
 
-  if (dom.certOverlay) dom.certOverlay.classList.remove('hidden');
+  return certId;
 }
 
 export function downloadMatchMakerCertPNG() {
@@ -258,7 +288,10 @@ export function downloadMatchMakerCertPNG() {
 export function downloadMatchMakerCertPDF() {
   if (!_certDataUrl) return;
   const win = window.open('', '_blank');
-  if (!win) { alert('Please allow pop-ups to save the certificate as PDF.'); return; }
+  if (!win) {
+    showNotification('Please allow pop-ups to save the certificate as PDF.');
+    return;
+  }
   win.document.write(
     '<!DOCTYPE html><html><head><title>Certificate \u2014 Match Maker</title>' +
     '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#020617;display:flex;' +
@@ -331,7 +364,7 @@ function attemptSwap(r1, c1, r2, c2) {
 
   const result = findMatches(grid);
   if (!result || !result.matches || result.matches.length === 0) {
-    if (pendingTimeout) clearTimeout(pendingTimeout);
+    if (pendingTimeout) { clearTimeout(pendingTimeout); pendingTimeout = null; }
     pendingTimeout = setTimeout(() => {
       grid = swapGems(grid, r1, c1, r2, c2);
       moves++;   // restore move — invalid swaps don't cost a turn
@@ -340,7 +373,7 @@ function attemptSwap(r1, c1, r2, c2) {
       showMsg('No match — try again');
       updateHUD();
       renderBoard();
-      pendingTimeout = setTimeout(() => showMsg(''), 1200);
+      pendingTimeout = setTimeout(() => { showMsg(''); pendingTimeout = null; }, 1200);
       locked = false;
     }, CASCADE_DELAY);
   } else {
@@ -377,8 +410,9 @@ function processCascade(isFirstPass = false) {
   bumpConscience(result.matches.length);
   highlightMatched(result.matches);
 
-  if (pendingTimeout) clearTimeout(pendingTimeout);
+  if (pendingTimeout) { clearTimeout(pendingTimeout); pendingTimeout = null; }
   pendingTimeout = setTimeout(() => {
+    pendingTimeout = null;
     grid = applyMatches(grid, result, comboLevel);
     grid = applyGravity(grid);
 
@@ -389,7 +423,7 @@ function processCascade(isFirstPass = false) {
 
     updateHUD();
     renderBoard();
-    pendingTimeout = setTimeout(() => processCascade(false), CASCADE_DELAY);
+    pendingTimeout = setTimeout(() => { pendingTimeout = null; processCascade(false); }, CASCADE_DELAY);
   }, CASCADE_DELAY);
 }
 

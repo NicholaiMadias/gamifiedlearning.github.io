@@ -131,24 +131,47 @@
   </div>
 
   <!-- Certificate overlay (shown after final level is cleared) -->
-  <div id="mm-cert-overlay" class="cert-overlay hidden" role="dialog" aria-modal="true" aria-label="Game complete — certificate">
+  <!-- Notification for pop-up blocked message -->
+  <div id="mm-notification" class="hidden" hidden role="alert" aria-live="assertive"
+    style="position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:300;
+           background:rgba(22,27,34,0.95);border:1px solid rgba(0,242,255,0.3);
+           color:#e2e8f0;font-size:0.75rem;padding:0.75rem 1.25rem;border-radius:var(--radius);
+           max-width:90vw;text-align:center;"></div>
+
+  <div id="mm-cert-overlay" class="cert-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mm-cert-title">
     <div style="text-align:center;margin-bottom:1.5rem;">
       <div style="font-size:3.5rem;margin-bottom:0.75rem;" aria-hidden="true">🌟</div>
-      <h2>MISSION COMPLETE!</h2>
+      <h2 id="mm-cert-title">MISSION COMPLETE!</h2>
       <p style="color:var(--accent-blue);font-size:0.65rem;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;margin-top:0.25rem;">All Levels Cleared</p>
     </div>
-    <canvas id="mm-cert-canvas" aria-label="Completion certificate"></canvas>
-    <div class="cert-actions">
-      <button class="cert-btn blue"   onclick="window._mmCertPNG && window._mmCertPNG()">⬇ Download PNG</button>
-      <button class="cert-btn purple" onclick="window._mmCertPDF && window._mmCertPDF()">🖨 Save as PDF</button>
-      <a class="cert-btn green" href="/arcade/certificates/">📜 My Certificates</a>
+
+    <!-- Phase 1: Player name input -->
+    <div id="mm-cert-name-phase" style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;margin-bottom:1rem;width:100%;max-width:360px;">
+      <label for="mm-player-name" style="font-size:0.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Your name for the certificate</label>
+      <input id="mm-player-name" type="text" maxlength="30" placeholder="Player"
+        autocomplete="name" aria-label="Player name for certificate"
+        style="width:100%;padding:0.6rem 1rem;background:var(--bg-card);border:1px solid rgba(255,255,255,0.1);
+               border-radius:var(--radius-sm);color:var(--text-primary);font-size:0.9rem;outline:none;"
+        onkeydown="if(event.key==='Enter')document.getElementById('mm-gen-cert-btn').click()">
+      <button id="mm-gen-cert-btn" class="btn btn-primary" style="width:100%;">Generate Certificate</button>
     </div>
+
+    <!-- Phase 2: Certificate canvas + download buttons -->
+    <div id="mm-cert-cert-phase" class="hidden" style="display:none;flex-direction:column;align-items:center;gap:1rem;width:100%;">
+      <canvas id="mm-cert-canvas" aria-label="Completion certificate" style="max-width:min(90vw,800px);border:1px solid rgba(0,242,255,0.2);border-radius:8px;"></canvas>
+      <div class="cert-actions">
+        <button class="cert-btn blue"   onclick="window._mmCertPNG && window._mmCertPNG()">⬇ Download PNG</button>
+        <button class="cert-btn purple" onclick="window._mmCertPDF && window._mmCertPDF()">🖨 Save as PDF</button>
+        <a class="cert-btn green" href="/arcade/certificates/">📜 My Certificates</a>
+      </div>
+    </div>
+
     <button class="play-again-btn" id="overlay-restart-btn">↩ Play Again</button>
   </div>
 
   <!-- Module bootstrap -->
   <script type="module">
-    import { initMatchMaker, downloadMatchMakerCertPNG, downloadMatchMakerCertPDF } from '/match-maker-ui.js';
+    import { initMatchMaker, generateCertificateFor, downloadMatchMakerCertPNG, downloadMatchMakerCertPDF } from '/match-maker-ui.js';
     import { renderStarMap } from '/star-map.js';
     import { onGameLevelComplete } from '/concordance-lens.js';
 
@@ -168,6 +191,23 @@
     document.getElementById('overlay-restart-btn').addEventListener('click', () => {
       document.getElementById('mm-cert-overlay').classList.add('hidden');
       initMatchMaker(null, null);
+    });
+
+    // Handle certificate generation form submission
+    document.getElementById('mm-gen-cert-btn').addEventListener('click', async () => {
+      const btn        = document.getElementById('mm-gen-cert-btn');
+      const playerName = document.getElementById('mm-player-name').value;
+      btn.disabled     = true;
+      btn.textContent  = 'Generating…';
+      try {
+        await generateCertificateFor(playerName);
+        // Phase transition is handled inside generateCertificateFor via DOM IDs
+        const phase = document.getElementById('mm-cert-cert-phase');
+        if (phase) { phase.style.display = 'flex'; }
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Generate Certificate';
+      }
     });
 
     window.addEventListener('matchmaker-level-complete', e => {
