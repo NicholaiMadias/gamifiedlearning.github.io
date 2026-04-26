@@ -471,10 +471,16 @@
             mmPendingTimeout = setTimeout(mmCheckAndClear, 300);
         }
 
+        let mmBannerTimeout = null;
+
         function mmShowBanner(text) {
             const banner = document.getElementById('match-badge-banner');
             banner.textContent = text; banner.classList.remove('hidden');
-            setTimeout(() => banner.classList.add('hidden'), 3000);
+            if (mmBannerTimeout !== null) clearTimeout(mmBannerTimeout);
+            mmBannerTimeout = setTimeout(() => {
+                banner.classList.add('hidden');
+                mmBannerTimeout = null;
+            }, 3000);
         }
 
         /** --- NUMBER LOCK GAME --- **/
