@@ -14,19 +14,21 @@ A 7×7 gem-matching puzzle game that tracks a **Matrix of Conscience** (Empathy,
 
 - **Primary game:** a match‑3 puzzle (the "Nexus Arcade" core experience)
 - **Progression:** 7‑level "Seven‑Star" track (levels live under `levels/1.json` … `levels/7.json`)
-- **Deployment:** GitHub Pages to **[nicholai.org](https://nicholai.org)**
+- **Deployment:** GitHub Pages to **[amazinggracehl.org](https://amazinggracehl.org)**
 
 This repo is intentionally kept **static‑site simple** so Pages deploys are fast and reliable.
 
 ## Play / Run locally
 
-- Open `index.html` directly in a browser, **or**
-- Run a static server (example):
-  - `npx serve .`
+This project uses ES modules, so it must be served via a local static server (browsers block `file://` ES module imports):
+
+- `npx serve .` — recommended
+- `python -m http.server 8080` — Python alternative
+- Any static file server pointed at the repository root
 
 ## Deployment (GitHub Pages)
 
-The site deploys automatically to **[nicholai.org](https://nicholai.org)** via GitHub Actions whenever code is pushed to the `main` branch.
+The site deploys automatically to **[amazinggracehl.org](https://amazinggracehl.org)** via GitHub Actions whenever code is pushed to the `main` branch.
 
 - **Workflow:** `.github/workflows/pages.yml`
 - **Trigger:** Push to `main` (or manual `workflow_dispatch`)
@@ -46,7 +48,7 @@ No deployment happens for PRs—only for pushes to `main`.
 
 ### CNAME / Custom Domain
 
-The `CNAME` file contains `nicholai.org`. The `cname-auto-maintainer` workflow will open a PR to restore it if it ever changes.
+The `CNAME` file contains `amazinggracehl.org`. The `cname-auto-maintainer` workflow will open a PR to restore it if it ever changes.
 
 ## Shared assets (single tileset)
 
