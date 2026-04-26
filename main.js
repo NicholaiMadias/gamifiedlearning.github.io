@@ -6,6 +6,7 @@
 
 import { initMatchMaker } from './match-maker-ui.js';
 import { renderStarMap } from './star-map.js';
+import { onGameLevelComplete } from './concordance-lens.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const starMapContainer = document.getElementById('star-map-container');
