@@ -2,6 +2,8 @@
  * badges.js — handles level completion and badge awarding.
  */
 
+import { recordLevelComplete } from './progression.js';
+
 const LEVEL_BADGES = {
   1: { icon: '🌱', label: 'Seedling' },
   2: { icon: '⚡', label: 'Charged' },
@@ -21,6 +23,9 @@ const LEVEL_BADGES = {
  */
 export function onLevelComplete(level, score, db, user) {
   const badge = LEVEL_BADGES[level] || { icon: '🏅', label: `Level ${level}` };
+
+  // Persist progress
+  recordLevelComplete(level);
 
   // Show in-game notification
   const banner = document.getElementById('match-badge-banner');
