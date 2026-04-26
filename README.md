@@ -50,12 +50,9 @@ No deployment happens for PRs—only for pushes to `main`.
 
 The `CNAME` file contains `amazinggracehl.org`. The `cname-auto-maintainer` workflow will open a PR to restore it if it ever changes.
 
-## Shared assets (single tileset)
+## Tileset tile IDs
 
-To avoid duplicating graphics/audio across future games, Nexus Arcade uses a shared tileset concept.
-
-- **Recommended atlas:** `assets/games/shared/tileset_atlas.png`
-- **Atlas metadata:** `assets/games/shared/tileset.json`
+Current gem types used by the match-3 engine (see `matchMakerState.js`):
 
 | Tile ID | Row | Col | Description |
 |---|---|---|---|
