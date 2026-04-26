@@ -348,36 +348,54 @@
 
             for (let row = 0; row < 7; row++) {
                 for (let col = 0; col < 7; col++) {
-                    grid[row][col] = mmPickStartingGem(grid, row, col);
-                }
-            }
-
-            return grid;
+        function getMatchMakerController() {
+            return window.matchMakerUI || window.matchMaker || window.MatchMakerUI || null;
         }
 
         function initMatchMaker() {
-            mmScore = 0; mmLevel = 1; mmMoves = 20;
-            mmConscienceVals = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
-            mmSelected = null;
-            mmGrid = mmCreateStartingGrid();
-            mmUpdateHUD(); mmRenderBoard(); mmSetMsg('');
-            const banner = document.getElementById('match-badge-banner');
-            banner.classList.add('hidden'); banner.textContent = '';
+            const matchMaker = getMatchMakerController();
+            if (!matchMaker || typeof matchMaker.init !== 'function') {
+                throw new Error('Match Maker module is not loaded. Reuse the dedicated Match Maker implementation instead of defining it inline in index.html.');
+            }
+
+            matchMaker.init({
+                boardId: 'match-grid',
+                scoreId: 'hud-score',
+                levelId: 'hud-level',
+                movesId: 'hud-moves',
+                messageId: 'match-msg',
+                bannerId: 'match-badge-banner',
+                conscienceBarIds: {
+                    empathy: 'bar-empathy',
+                    justice: 'bar-justice',
+                    wisdom: 'bar-wisdom',
+                    growth: 'bar-growth'
+                },
+                consciencePctIds: {
+                    empathy: 'pct-empathy',
+                    justice: 'pct-justice',
+                    wisdom: 'pct-wisdom',
+                    growth: 'pct-growth'
+                }
+            });
         }
 
         function mmUpdateHUD() {
-            document.getElementById('hud-score').textContent = mmScore;
-            document.getElementById('hud-level').textContent = mmLevel;
-            document.getElementById('hud-moves').textContent = mmMoves;
-            for (const key of ['empathy','justice','wisdom','growth']) {
-                const pct = Math.min(100, Math.round(mmConscienceVals[key]));
-                document.getElementById('bar-' + key).style.width = pct + '%';
-                document.getElementById('pct-' + key).textContent = pct + '%';
+            const matchMaker = getMatchMakerController();
+            if (matchMaker && typeof matchMaker.updateHUD === 'function') {
+                matchMaker.updateHUD();
             }
         }
 
-        function mmSetMsg(text) { document.getElementById('match-msg').textContent = text; }
+        function mmSetMsg(text) {
+            const matchMaker = getMatchMakerController();
+            if (matchMaker && typeof matchMaker.setMessage === 'function') {
+                matchMaker.setMessage(text);
+                return;
+            }
 
+            document.getElementById('match-msg').textContent = text;
+        }
         function mmRenderBoard() {
             const board = document.getElementById('match-board');
             board.innerHTML = '';
