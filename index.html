@@ -50,7 +50,7 @@
             <button onclick="switchView('view-match3')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-cyan-400">
                 <div class="w-12 h-12 bg-blue-500/20 rounded-xl mb-4 flex items-center justify-center text-blue-400">✨</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Starlight Seeker</h2>
-                <p class="text-slate-400 text-[10px]">Match-3 simulation with custom Designer assets.</p>
+                <p class="text-slate-400 text-[10px]">Match-3 — reach 500 points to complete the mission.</p>
             </button>
             <button onclick="switchView('view-lock')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-red-400">
                 <div class="w-12 h-12 bg-red-500/20 rounded-xl mb-4 flex items-center justify-center text-red-400">🔒</div>
@@ -62,6 +62,10 @@
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Command Center</h2>
                 <p class="text-slate-400 text-[10px]">Execute Drive Organization and Mission Protocols.</p>
             </button>
+        </div>
+        <div class="mt-8 flex gap-4 justify-center">
+            <a href="/arcade/" class="text-[9px] text-green-400 font-bold uppercase tracking-[0.2em] hover:text-green-300 transition-colors" style="text-decoration:none;">▶ Match Maker (7-level mode)</a>
+            <a href="/arcade/certificates/" class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] hover:text-cyan-400 transition-colors" style="text-decoration:none;">📜 My Certificates</a>
         </div>
     </div>
 
@@ -93,7 +97,7 @@
     <div id="view-match3" class="hidden w-full flex flex-col items-center px-4">
         <div id="grid" class="grid-container"></div>
         <div class="mt-8 p-4 glass-panel rounded-2xl w-full max-w-[500px]">
-            <p id="hint-text" class="text-[9px] text-slate-400 italic text-center uppercase tracking-[0.25em]">Awaiting Starlight Intelligence Synchronization...</p>
+            <p id="hint-text" class="text-[9px] text-slate-400 italic text-center uppercase tracking-[0.25em]">Match 3 or more tiles — reach 500 points to complete!</p>
         </div>
     </div>
 
@@ -112,13 +116,31 @@
         </div>
     </div>
 
+    <!-- STARLIGHT SEEKER CERTIFICATE OVERLAY -->
+    <div id="ss-cert-overlay" class="hidden fixed inset-0 z-[100] flex flex-col items-center justify-center p-6" style="background:rgba(2,6,23,0.97);overflow-y:auto;">
+        <div class="text-center mb-6">
+            <div class="text-5xl mb-3">🌟</div>
+            <h2 class="orbitron text-4xl font-black text-white mb-2" style="text-shadow:0 0 20px #00f2ff;">MISSION COMPLETE!</h2>
+            <p class="text-blue-400 text-[10px] tracking-[0.4em] uppercase font-bold">Starlight Protocol Achieved</p>
+        </div>
+        <canvas id="ss-cert-canvas" class="rounded-lg mb-5" style="max-width:min(90vw,800px);border:1px solid rgba(0,242,255,0.2);"></canvas>
+        <div class="flex flex-wrap gap-3 justify-center mb-5">
+            <button onclick="ssCertPNG()" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-cyan-400">⬇ Download PNG</button>
+            <button onclick="ssCertPDF()" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-purple-400">🖨 Save as PDF</button>
+            <a href="/arcade/certificates/" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-green-400 flex items-center" style="text-decoration:none;">📜 My Certificates</a>
+        </div>
+        <button onclick="ssResetGame()" class="text-slate-500 text-[9px] uppercase tracking-[0.3em] hover:text-slate-300 transition-colors mt-2">↩ Play Again</button>
+    </div>
+
     <script>
         const GRAPHICS_API = 'https://script.google.com/macros/s/AKfycbRML3cWX2MAAabhtW_fY0tixmfwfU7rFCxLj788SEl8lOl474T2wRbLzNQ9t1IhCJVUg/exec';
         const BRIDGE_API = 'https://script.google.com/macros/s/AKfycbxj6_tnxRG7JfO1gAZ_OCuCufIoI91zWmRQRw7tDRZ-aehu8eTTRKQTm46LX7Kg1rbNDQ/exec';
         const MISSION_KEY = "WHITE_RABBIT_LEADERBOARD_SECURE_2026";
+        const FINAL_SCORE = 500;
 
         let score = 0, size = 8, gameAssets = [], board = [], selectedTile = null;
         let lockTarget = "", lockInput = "", baseline = 0, lockInterval;
+        let ssGameComplete = false, ssCertDataUrl = null, ssCertId = null;
 
         function switchView(viewId) {
             document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
@@ -126,14 +148,21 @@
             const view = document.getElementById(viewId);
             if (view) view.classList.remove('hidden');
             if (viewId !== 'view-hub') document.getElementById('hud').classList.remove('hidden');
-            
+
+            ssGameComplete = false; ssCertDataUrl = null; ssCertId = null;
             score = 0; updateScoreDisplay();
             if (viewId === 'view-match3') initMatch3();
             if (viewId === 'view-lock') initLock();
             if (lockInterval) clearInterval(lockInterval);
         }
 
-        function updateScoreDisplay() { document.getElementById('score-display').innerText = score; }
+        function updateScoreDisplay() {
+            document.getElementById('score-display').innerText = score;
+            if (!ssGameComplete && score >= FINAL_SCORE) {
+                ssGameComplete = true;
+                setTimeout(ssShowCongratulations, 600);
+            }
+        }
 
         /** --- DRIVE COMMAND SYSTEM --- **/
         async function executeDriveAction(action, params = {}) {
@@ -209,6 +238,7 @@
         }
 
         function checkMatches() {
+            if (ssGameComplete) return;
             let toRemove = new Set();
             for (let r = 0; r < size; r++) {
                 for (let c = 0; c < size - 2; c++) {
@@ -232,6 +262,7 @@
         }
 
         function applyGravity() {
+            if (ssGameComplete) return;
             for (let c = 0; c < size; c++) {
                 let emptyRows = [];
                 for (let r = size - 1; r >= 0; r--) {
@@ -271,6 +302,102 @@
         }
 
         function tickLock() { baseline += 0.5; document.getElementById('baseline-pct').innerText = `BASELINE: ${Math.floor(baseline)}%`; if (baseline >= 100) { clearInterval(lockInterval); switchView('view-hub'); } }
+
+        /** --- STARLIGHT SEEKER CERTIFICATE SYSTEM --- **/
+        function ssGenCertId() {
+            const ts   = Date.now().toString(36).toUpperCase();
+            const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+            return 'SS-' + ts + '-' + rand;
+        }
+
+        async function ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, finalScore) {
+            await document.fonts.ready;
+            const ctx = canvas.getContext('2d');
+            const W = 800, H = 560;
+            canvas.width = W; canvas.height = H;
+            // Background
+            const bg = ctx.createLinearGradient(0, 0, W, H);
+            bg.addColorStop(0, '#020617'); bg.addColorStop(1, '#0f172a');
+            ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+            // Particles
+            for (let i = 0; i < 30; i++) {
+                ctx.fillStyle = 'rgba(255,255,255,' + (0.08 + (i % 5) * 0.04) + ')';
+                ctx.fillRect(((i * 127 + 50) % (W - 60)) + 30, ((i * 97 + 30) % (H - 60)) + 30, 2, 2);
+            }
+            // Borders
+            ctx.strokeStyle = '#00f2ff'; ctx.lineWidth = 3; ctx.strokeRect(12, 12, W-24, H-24);
+            ctx.strokeStyle = 'rgba(188,19,254,0.3)'; ctx.lineWidth = 1; ctx.strokeRect(20, 20, W-40, H-40);
+            // Corner dots
+            ctx.fillStyle = 'rgba(0,242,255,0.6)';
+            [[16,16],[W-16,16],[16,H-16],[W-16,H-16]].forEach(([cx,cy]) => { ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2); ctx.fill(); });
+            ctx.textAlign = 'center';
+            // Title
+            ctx.fillStyle = '#00f2ff'; ctx.font = 'bold 26px monospace';
+            ctx.fillText('CERTIFICATE OF COMPLETION', W/2, 76);
+            ctx.strokeStyle = 'rgba(0,242,255,0.2)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(80,96); ctx.lineTo(W-80,96); ctx.stroke();
+            ctx.fillStyle = '#bc13fe'; ctx.font = '11px monospace';
+            ctx.fillText('STARLIGHT SEEKER  \u00b7  NEXUS ARCADE', W/2, 118);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '15px sans-serif';
+            ctx.fillText('This certifies that', W/2, 176);
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 40px monospace';
+            ctx.fillText(playerName, W/2, 236);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '15px sans-serif';
+            ctx.fillText('has successfully completed the mission', W/2, 282);
+            ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 28px monospace';
+            ctx.fillText(gameTitle, W/2, 334);
+            ctx.fillStyle = '#22d3ee'; ctx.font = '13px monospace';
+            ctx.fillText('Final Score: ' + finalScore, W/2, 374);
+            ctx.strokeStyle = 'rgba(0,242,255,0.15)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(80,410); ctx.lineTo(W-80,410); ctx.stroke();
+            ctx.fillStyle = '#64748b'; ctx.font = '13px sans-serif';
+            ctx.fillText('Completed: ' + completionDate, W/2, 440);
+            ctx.fillStyle = '#334155'; ctx.font = '11px monospace';
+            ctx.fillText('Certificate ID: ' + certId, W/2, 468);
+        }
+
+        async function ssShowCongratulations() {
+            const raw        = prompt('Enter your name for the certificate (or leave blank):', '');
+            const playerName = (raw || '').trim().slice(0, 30) || 'Player';
+            const certId     = ssGenCertId();
+            const gameTitle  = 'Starlight Seeker';
+            const completionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            try {
+                const cert  = { id: certId, player: playerName, game: gameTitle, date: completionDate, score };
+                const certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
+                certs.push(cert); localStorage.setItem('arcade-certificates', JSON.stringify(certs));
+            } catch(_) {}
+            const canvas = document.getElementById('ss-cert-canvas');
+            await ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, score);
+            ssCertDataUrl = canvas.toDataURL('image/png');
+            ssCertId      = certId;
+            document.getElementById('ss-cert-overlay').classList.remove('hidden');
+        }
+
+        function ssCertPNG() {
+            if (!ssCertDataUrl) return;
+            const a = document.createElement('a');
+            a.download = 'starlight-seeker-certificate-' + (ssCertId || 'nexus') + '.png';
+            a.href = ssCertDataUrl; a.click();
+        }
+
+        function ssCertPDF() {
+            if (!ssCertDataUrl) return;
+            const win = window.open('', '_blank');
+            if (!win) { alert('Please allow pop-ups to save the certificate as PDF.'); return; }
+            win.document.write('<!DOCTYPE html><html><head><title>Certificate \u2014 Starlight Seeker</title>' +
+                '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#020617;display:flex;justify-content:center;align-items:center;min-height:100vh}img{width:100%;max-width:800px}@media print{body{background:white}}</style>' +
+                '</head><body><img src="' + ssCertDataUrl + '">' +
+                '<script>setTimeout(function(){window.print()},400);<\/script></body></html>');
+            win.document.close();
+        }
+
+        function ssResetGame() {
+            ssGameComplete = false; ssCertDataUrl = null; ssCertId = null;
+            score = 0; updateScoreDisplay();
+            document.getElementById('ss-cert-overlay').classList.add('hidden');
+            if (gameAssets.length > 0) { createBoard(); renderGrid(); } else { initMatch3(); }
+        }
 
         window.onload = () => switchView('view-hub');
     </script>
