@@ -36,3 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('[GLM] Gamified Learning Matrix initialized.');
 });
+
+// Relay match-maker level completions into the Concordance Lens
+window.addEventListener('matchmaker-level-complete', e => {
+  onGameLevelComplete(e.detail?.level ?? 1);
+});
