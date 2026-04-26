@@ -1,124 +1,16 @@
-/**
- * match-maker-ui.js — Game UI Layer for Match Maker
- * Renders the 7×7 grid, handles input (click, touch, keyboard),
- * animates cascades, manages levels, and updates the HUD + Conscience bars.
- * (c) 2026 NicholaiMadias — MIT License
- */
-
-import { createGrid, isAdjacent, swapGems, findMatches, applyMatches, applyGravity } from './matchMakerState.js';
-import { onLevelComplete } from './badges.js';
-
-const COLS          = 7;
-const ROWS          = 7;
-const CASCADE_DELAY = 200;
-const BASE_POINTS   = 10;
-const CONSCIENCE_KEYS = ['empathy', 'justice', 'wisdom', 'growth'];
-
-const GEM_DISPLAY = {
-  heart: { emoji: '❤️', cls: 'gem-heart', label: 'Heart' },
-  star:  { emoji: '⭐', cls: 'gem-star',  label: 'Star'  },
-  cross: { emoji: '✝️', cls: 'gem-cross', label: 'Cross' },
-  flame: { emoji: '🔥', cls: 'gem-flame', label: 'Flame' },
-  drop:  { emoji: '💧', cls: 'gem-drop',  label: 'Drop'  }
-};
-
-const SPECIAL_DISPLAY = {
-  supernova: { emoji: '💥', cls: 'gem-supernova' },
-  bomb:      { emoji: '💣', cls: 'gem-bomb'      },
-  lineH:     { emoji: '↔️', cls: 'gem-lineH'    },
-  lineV:     { emoji: '↕️', cls: 'gem-lineV'    }
-};
-
-let grid            = [];
-let score           = 0;
-let moves           = 20;
-let level           = 1;
-let selected        = null;
-let locked          = false;
-let comboLevel      = 0;
-let streak          = 0;
-let globalMultiplier = 1.0;
-let conscience = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
-
-const dom = {};
-
-function cacheDom() {
-  dom.board      = document.getElementById('match-grid');
-  dom.score      = document.getElementById('match-score');
-  dom.level      = document.getElementById('match-level');
-  dom.moves      = document.getElementById('match-moves');
-  dom.msg        = document.getElementById('match-msg');
-  dom.barEmpathy = document.getElementById('mc-empathy-bar');
-  dom.barJustice = document.getElementById('mc-justice-bar');
-  dom.barWisdom  = document.getElementById('mc-wisdom-bar');
-  dom.barGrowth  = document.getElementById('mc-growth-bar');
-  dom.pctEmpathy = document.getElementById('mc-empathy');
-  dom.pctJustice = document.getElementById('mc-justice');
-  dom.pctWisdom  = document.getElementById('mc-wisdom');
-  dom.pctGrowth  = document.getElementById('mc-growth');
-}
-
-function updateHUD() {
-  if (dom.score) dom.score.textContent = score;
-  if (dom.level) dom.level.textContent = level;
-  if (dom.moves) dom.moves.textContent = moves;
-}
-
-function showMsg(text) {
-  if (dom.msg) dom.msg.textContent = text;
-}
-
-function updateConscience() {
-  CONSCIENCE_KEYS.forEach(key => {
-    const val  = Math.min(conscience[key], 100);
-    const bar  = dom['bar' + key.charAt(0).toUpperCase() + key.slice(1)];
-    const pct  = dom['pct' + key.charAt(0).toUpperCase() + key.slice(1)];
-    if (bar) bar.style.width = val + '%';
-    if (pct) pct.textContent = val + '%';
-    const track = bar?.parentElement;
-    if (track) track.setAttribute('aria-valuenow', val);
-  });
-}
-
-function bumpConscience(matchCount) {
-  const boost = Math.ceil(matchCount * 1.5);
-  conscience.empathy = Math.min(100, conscience.empathy + boost + Math.floor(Math.random() * 3));
-  conscience.justice = Math.min(100, conscience.justice + boost + Math.floor(Math.random() * 2));
-  conscience.wisdom  = Math.min(100, conscience.wisdom  + Math.floor(boost * 0.8));
-  conscience.growth  = Math.min(100, conscience.growth  + Math.floor(boost * 1.2));
-  updateConscience();
-}
-
-function renderBoard() {
-  if (!dom.board) return;
-  dom.board.innerHTML = '';
-
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const gem         = grid[r][c];
-      const gemType     = gem?.type;
-      const info        = GEM_DISPLAY[gemType] || { emoji: '?', cls: '', label: gemType || '?' };
-      const specialInfo = gem?.special ? SPECIAL_DISPLAY[gem.special] : null;
-      const cell        = document.createElement('button');
-      const idx         = r * COLS + c;
-
-      cell.className   = 'gem-cell ' + info.cls + (specialInfo ? ' ' + specialInfo.cls : '');
-      cell.textContent = specialInfo ? specialInfo.emoji : info.emoji;
-      cell.dataset.row = r;
-      cell.dataset.col = c;
-      cell.setAttribute('role', 'gridcell');
-      cell.setAttribute('aria-label', info.label + ', row ' + (r + 1) + ' column ' + (c + 1));
-      cell.setAttribute('tabindex', idx === 0 ? '0' : '-1');
-
-      if (selected && selected.row === r && selected.col === c) {
-        cell.classList.add('selected');
-      }
-
-      cell.addEventListener('click', () => onCellClick(r, c));
-      cell.addEventListener('keydown', (e) => onCellKey(e, r, c));
-      dom.board.appendChild(cell);
+// --- Updated within initLock() ---
+function initLock() {
+    const keypad = document.getElementById('lock-keypad');
+    if (!keypad || keypad.children.length > 0) return; 
+    
+    // ... (keypad generation logic) ...
+    
+    // Ensure the execution button reflects the new branding
+    const actionBtn = document.querySelector('#view-lock button');
+    if (actionBtn) {
+        actionBtn.innerText = "BREAK STATIC";
+        actionBtn.classList.add('orbitron', 'tracking-[0.3em]');
     }
-  }
 }
 
 function onCellClick(row, col) {

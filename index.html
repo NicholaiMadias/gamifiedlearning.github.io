@@ -1,262 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gamified Learning</title>
-  <style>
-    /* ── Base ─────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0a0a0f;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      padding: 1.5rem 1rem 3rem;
-    }
-
-    h1.app-title {
-      font-size: 1.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #00ff41;
-      text-shadow: 0 0 10px #00ff4180;
-    }
-
-    /* ── Match Maker ──────────────────────────────── */
-    .match-card {
-      background: #0d0d1a;
-      border: 1px solid #1a1a2e;
-      border-radius: 12px;
-      padding: 1rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .match-card h2 {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #00ff41;
-      margin-bottom: 0.6rem;
-    }
-
-    .match-stats {
-      display: flex;
-      justify-content: space-around;
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 0.8rem;
-    }
-
-    .match-stats span { color: #00ff41; font-weight: 700; }
-
-    .match-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      padding: 0.8rem;
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-    }
-
-    .match-cell, .gem-cell {
-      aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      cursor: pointer;
-      background: #111;
-      box-shadow: 0 0 6px rgba(0,0,0,0.6);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-      user-select: none;
-    }
-
-    .match-cell:hover, .gem-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
-    .match-cell:active, .gem-cell:active { transform: scale(0.94); }
-
-    .gem-cell.selected { outline: 2px solid #00ff41; transform: scale(1.05); }
-    .gem-cell.matched  { opacity: 0.4; transform: scale(0.9); }
-
-    .match-badge-banner {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #00ff41;
-      background: #001a00;
-      border: 1px solid #00ff4160;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      margin-top: 0.6rem;
-    }
-
-    .match-badge-banner.hidden { display: none; }
-
-    .match-restart-btn {
-      display: block;
-      margin: 0.8rem auto 0;
-      background: transparent;
-      border: 1px solid #00ff41;
-      color: #00ff41;
-      padding: 0.4rem 1.4rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      transition: background 0.15s;
-    }
-
-    .match-restart-btn:hover { background: #00ff4120; }
-
-    /* ── Match message ────────────────────────────── */
-    .match-msg {
-      min-height: 1.2em;
-      text-align: center;
-      font-size: 0.85rem;
-      color: #00ff41;
-      margin: 0.4rem 0;
-    }
-
-    /* ── Special gem indicators ───────────────────── */
-    .gem-supernova { box-shadow: 0 0 12px 4px #fff176, 0 0 6px #ff8f00 inset; }
-    .gem-bomb      { box-shadow: 0 0 10px 3px #ef5350, 0 0 6px #b71c1c inset; }
-    .gem-lineH     { box-shadow: 0 0 10px 3px #42a5f5 inset; }
-    .gem-lineV     { box-shadow: 0 0 10px 3px #66bb6a inset; }
-
-    /* ── Matrix of Conscience ─────────────────────── */
-    .matrix-card {
-      background: #0d0d1a;
-      border-radius: 12px;
-      padding: 1.2rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .matrix-border { border: 1px solid #1a2a3a; }
-
-    .matrix-heading {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #4fc3f7;
-      margin-bottom: 1rem;
-    }
-
-    .matrix-economy-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
-    .matrix-cell {
-      background: #111827;
-      border: 1px solid #1e3a5f;
-      border-radius: 8px;
-      padding: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .matrix-cell .icon { font-size: 1.6rem; }
-
-    .matrix-cell .label {
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #64b5f6;
-    }
-
-    .matrix-cell .value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #e0e0e0;
-    }
-
-    .matrix-cell .bar-track {
-      width: 100%;
-      height: 4px;
-      background: #1e3a5f;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .matrix-cell .bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: linear-gradient(90deg, #1565c0, #4fc3f7);
-      transition: width 0.4s ease;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus Arcade | Amazing Grace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
+        :root { --neon-blue: #00f2ff; --neon-purple: #bc13fe; --deep-space: #020617; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--deep-space); color: #e2e8f0; margin: 0; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; -webkit-tap-highlight-color: transparent; }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        .nexus-bg { background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%); position: fixed; inset: 0; z-index: -1; }
+        .glass-panel { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .grid-container { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; width: 100%; max-width: 500px; aspect-ratio: 1; margin: 0 auto; }
+        .tile { position: relative; border-radius: 8px; cursor: pointer; transition: transform 0.2s, opacity 0.3s; background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.05); }
+        .tile.selected { outline: 3px solid var(--neon-blue); transform: scale(1.1); z-index: 10; box-shadow: 0 0 20px var(--neon-blue); }
+        .key-btn { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 210, 255, 0.2); transition: all 0.2s; }
+        .key-btn:active { background: var(--neon-blue); color: var(--deep-space); transform: scale(0.9); }
+        .cmd-btn { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(0, 242, 255, 0.1); transition: all 0.3s; }
+        .cmd-btn:hover { background: rgba(0, 242, 255, 0.1); border-color: var(--neon-blue); transform: translateY(-2px); }
+        .loader { width: 40px; height: 40px; border: 4px solid #00D2FF; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+    </style>
 </head>
-<body>
+<body class="flex flex-col items-center justify-center">
+    <div class="nexus-bg"></div>
 
-  <h1 class="app-title">Gamified Learning</h1>
-
-  <!-- ══ Match Maker ══════════════════════════════════ -->
-  <section class="match-card" id="match-maker-screen">
-    <h2>Match Maker</h2>
-
-    <div class="match-stats">
-      <div>Score: <span id="match-score">0</span></div>
-      <div>Moves: <span id="match-moves">20</span></div>
-      <div>Level: <span id="match-level">1</span></div>
+    <!-- HUD -->
+    <div id="hud" class="fixed top-0 left-0 w-full p-4 flex justify-between items-center glass-panel z-50 hidden">
+        <button onclick="switchView('view-hub')" class="text-[10px] text-slate-400 uppercase font-bold tracking-widest hover:text-cyan-400 transition-colors">← Back to Hub</button>
+        <div class="text-center">
+            <div class="orbitron text-blue-400 text-sm font-bold tracking-tighter">RESONANCE: <span id="score-display">0</span></div>
+            <div class="text-[8px] text-slate-500 uppercase font-bold tracking-[0.2em]">Nexus Arcade Node</div>
+        </div>
+        <div id="ai-status" class="flex items-center gap-2">
+            <span class="text-[8px] text-slate-500 uppercase">Starlight AI</span>
+            <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+        </div>
     </div>
 
-    <div class="match-grid" id="match-grid"></div>
-
-    <p id="match-msg" class="match-msg"></p>
-
-    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
-
-    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
-  </section>
-
-  <!-- ══ Matrix of Conscience ════════════════════════ -->
-  <section class="matrix-card matrix-border" id="matrix-economy-screen">
-    <h2 class="matrix-heading">Matrix of Conscience</h2>
-
-    <div class="matrix-economy-grid">
-      <div class="matrix-cell">
-        <span class="icon">💖</span>
-        <span class="label">Empathy</span>
-        <span class="value" id="mc-empathy">72</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
-      </div>
-
-      <div class="matrix-cell">
-        <span class="icon">⚖️</span>
-        <span class="label">Justice</span>
-        <span class="value" id="mc-justice">58</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
-      </div>
-
-      <div class="matrix-cell">
-        <span class="icon">🧠</span>
-        <span class="label">Wisdom</span>
-        <span class="value" id="mc-wisdom">45</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
-      </div>
-
-      <div class="matrix-cell">
-        <span class="icon">🌱</span>
-        <span class="label">Growth</span>
-        <span class="value" id="mc-growth">83</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
-      </div>
+    <!-- HUB VIEW -->
+    <div id="view-hub" class="h-full flex flex-col items-center justify-center p-6 text-center w-full max-w-4xl">
+        <div class="mb-12">
+            <h1 class="orbitron text-5xl md:text-7xl font-black text-white tracking-tighter mb-2 italic">NEXUS ARCADE</h1>
+            <p class="text-blue-400 font-bold tracking-[0.4em] uppercase text-[10px]">Largo & Tampa Operational Nodes</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            <button onclick="switchView('view-match3')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-cyan-400">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-xl mb-4 flex items-center justify-center text-blue-400">✨</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Starlight Seeker</h2>
+                <p class="text-slate-400 text-[10px]">Match-3 simulation with custom Designer assets.</p>
+            </button>
+            <button onclick="switchView('view-lock')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-red-400">
+                <div class="w-12 h-12 bg-red-500/20 rounded-xl mb-4 flex items-center justify-center text-red-400">🔒</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Number Lock</h2>
+                <p class="text-slate-400 text-[10px]">Disrupt the Red Queen's behavioral baseline.</p>
+            </button>
+            <button onclick="switchView('view-admin')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-purple-400">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-xl mb-4 flex items-center justify-center text-purple-400">🛠️</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Command Center</h2>
+                <p class="text-slate-400 text-[10px]">Execute Drive Organization and Mission Protocols.</p>
+            </button>
+        </div>
     </div>
-  </section>
 
-  <script type="module" src="./main.js"></script>
+    <!-- ADMIN COMMAND CENTER -->
+    <div id="view-admin" class="hidden w-full max-w-2xl px-6">
+        <div class="glass-panel p-8 rounded-[2.5rem] space-y-6">
+            <h2 class="orbitron text-2xl font-bold text-white italic mb-4">DRIVE COMMANDS</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <button onclick="executeDriveAction('organizeDrive', { structure: { 'Philippines 2026': ['Curriculum', 'Photos', 'Donations'], 'Bakersfield Node': ['Engineering', 'Ministry', 'Legal'] } })" class="cmd-btn p-4 rounded-2xl flex items-center justify-between group">
+                    <span class="text-xs uppercase font-bold tracking-widest text-slate-300">Initialize Mission Structure</span>
+                    <span class="text-cyan-400 text-xs">🚀 Execute</span>
+                </button>
+                <button onclick="triggerFolderPrompt()" class="cmd-btn p-4 rounded-2xl flex items-center justify-between group">
+                    <span class="text-xs uppercase font-bold tracking-widest text-slate-300">Create Custom Folder</span>
+                    <span class="text-cyan-400 text-xs">📁 Create</span>
+                </button>
+                <button onclick="executeDriveAction('githubPush', { path: 'arcade/status.txt', content: 'Protocol Active: ' + new Date().toISOString(), message: 'Heartbeat update' })" class="cmd-btn p-4 rounded-2xl flex items-center justify-between group">
+                    <span class="text-xs uppercase font-bold tracking-widest text-slate-300">Push Production Heartbeat</span>
+                    <span class="text-purple-400 text-xs">☁️ Sync</span>
+                </button>
+            </div>
+            <div id="cmd-output" class="p-4 bg-black/40 rounded-xl text-[10px] font-mono text-cyan-500 h-24 overflow-y-auto border border-white/5">
+                > Awaiting Command input...
+            </div>
+        </div>
+    </div>
+
+    <!-- MATCH-3 GAME -->
+    <div id="view-match3" class="hidden w-full flex flex-col items-center px-4">
+        <div id="grid" class="grid-container"></div>
+        <div class="mt-8 p-4 glass-panel rounded-2xl w-full max-w-[500px]">
+            <p id="hint-text" class="text-[9px] text-slate-400 italic text-center uppercase tracking-[0.25em]">Awaiting Starlight Intelligence Synchronization...</p>
+        </div>
+    </div>
+
+    <!-- NUMBER LOCK GAME -->
+    <div id="view-lock" class="hidden w-full flex flex-col items-center px-4 max-w-md">
+        <div class="bg-slate-900/80 border border-white/10 p-8 rounded-[2.5rem] shadow-2xl w-full">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="orbitron text-xl font-bold text-white italic">LOCK PROTOCOL</h2>
+                <span id="baseline-pct" class="text-red-500 font-bold orbitron text-xs">BASELINE: 0%</span>
+            </div>
+            <div class="bg-black/40 border border-white/5 p-6 rounded-2xl mb-8 text-center">
+                <span id="lock-target" class="text-4xl font-black tracking-[0.3em] text-white">----</span>
+            </div>
+            <div id="lock-keypad" class="grid grid-cols-3 gap-3 mb-8"></div>
+            <button onclick="resetLock()" class="w-full bg-cyan-500 text-slate-950 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Execute Ghosting</button>
+        </div>
+    </div>
+
+    <script>
+        const GRAPHICS_API = 'https://script.google.com/macros/s/AKfycbRML3cWX2MAAabhtW_fY0tixmfwfU7rFCxLj788SEl8lOl474T2wRbLzNQ9t1IhCJVUg/exec';
+        const BRIDGE_API = 'https://script.google.com/macros/s/AKfycbxj6_tnxRG7JfO1gAZ_OCuCufIoI91zWmRQRw7tDRZ-aehu8eTTRKQTm46LX7Kg1rbNDQ/exec';
+        const MISSION_KEY = "WHITE_RABBIT_LEADERBOARD_SECURE_2026";
+
+        let score = 0, size = 8, gameAssets = [], board = [], selectedTile = null;
+        let lockTarget = "", lockInput = "", baseline = 0, lockInterval;
+
+        function switchView(viewId) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.getElementById('hud').classList.add('hidden');
+            const view = document.getElementById(viewId);
+            if (view) view.classList.remove('hidden');
+            if (viewId !== 'view-hub') document.getElementById('hud').classList.remove('hidden');
+            
+            score = 0; updateScoreDisplay();
+            if (viewId === 'view-match3') initMatch3();
+            if (viewId === 'view-lock') initLock();
+            if (lockInterval) clearInterval(lockInterval);
+        }
+
+        function updateScoreDisplay() { document.getElementById('score-display').innerText = score; }
+
+        /** --- DRIVE COMMAND SYSTEM --- **/
+        async function executeDriveAction(action, params = {}) {
+            const output = document.getElementById('cmd-output');
+            output.innerText += `\n> Executing: ${action}...`;
+            
+            try {
+                const response = await fetch(BRIDGE_API, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ missionKey: MISSION_KEY, action: action, ...params })
+                });
+                output.innerText += `\n> Success: Action sent to Node-Zero.`;
+            } catch (e) {
+                output.innerText += `\n> Error: ${e.message}`;
+            }
+        }
+
+        function triggerFolderPrompt() {
+            const name = prompt("Enter Folder Name:");
+            if (name) executeDriveAction('createFolder', { folderName: name });
+        }
+
+        async function initMatch3() {
+            try {
+                const res = await fetch(GRAPHICS_API);
+                const result = await res.json();
+                gameAssets = result.data.filter(a => a.category === "Match3");
+                createBoard(); renderGrid();
+            } catch (e) { console.error(e); }
+        }
+
+        function createBoard() {
+            for (let r = 0; r < size; r++) {
+                board[r] = [];
+                for (let c = 0; c < size; c++) board[r][c] = getRandomAsset();
+            }
+        }
+
+        function getRandomAsset() {
+            const asset = gameAssets[Math.floor(Math.random() * gameAssets.length)];
+            return { img: asset.url, type: asset.file_name };
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('grid');
+            if (!grid) return; grid.innerHTML = '';
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    const tileData = board[r][c];
+                    const tile = document.createElement('div');
+                    tile.className = `tile ${selectedTile && selectedTile.r === r && selectedTile.c === c ? 'selected' : ''}`;
+                    if (tileData?.img) tile.style.backgroundImage = `url(${tileData.img})`;
+                    tile.onclick = () => handleTileClick(r, c);
+                    grid.appendChild(tile);
+                }
+            }
+        }
+
+        function handleTileClick(r, c) {
+            if (selectedTile === null) { selectedTile = { r, c }; }
+            else {
+                const dist = Math.abs(r - selectedTile.r) + Math.abs(c - selectedTile.c);
+                if (dist === 1) {
+                    const temp = board[selectedTile.r][selectedTile.c];
+                    board[selectedTile.r][selectedTile.c] = board[r][c];
+                    board[r][c] = temp;
+                    checkMatches();
+                }
+                selectedTile = null;
+            }
+            renderGrid();
+        }
+
+        function checkMatches() {
+            let toRemove = new Set();
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size - 2; c++) {
+                    if (board[r][c].type && board[r][c].type === board[r][c+1].type && board[r][c].type === board[r][c+2].type) {
+                        [0, 1, 2].forEach(o => toRemove.add(`${r},${c+o}`));
+                    }
+                }
+            }
+            for (let c = 0; c < size; c++) {
+                for (let r = 0; r < size - 2; r++) {
+                    if (board[r][c].type && board[r][c].type === board[r+1][c].type && board[r][c].type === board[r+2][c].type) {
+                        [0, 1, 2].forEach(o => toRemove.add(`${r+o},${c}`));
+                    }
+                }
+            }
+            if (toRemove.size > 0) {
+                toRemove.forEach(coord => { const [r, c] = coord.split(',').map(Number); board[r][c].type = null; });
+                score += toRemove.size * 10; updateScoreDisplay();
+                setTimeout(applyGravity, 300);
+            }
+        }
+
+        function applyGravity() {
+            for (let c = 0; c < size; c++) {
+                let emptyRows = [];
+                for (let r = size - 1; r >= 0; r--) {
+                    if (board[r][c].type === null) emptyRows.push(r);
+                    else if (emptyRows.length > 0) {
+                        let targetRow = emptyRows.shift();
+                        board[targetRow][c] = board[r][c];
+                        board[r][c] = { type: null };
+                        emptyRows.push(r);
+                    }
+                }
+                emptyRows.forEach(r => board[r][c] = getRandomAsset());
+            }
+            renderGrid(); setTimeout(checkMatches, 300);
+        }
+
+        function initLock() {
+            const keypad = document.getElementById('lock-keypad');
+            keypad.innerHTML = '';
+            for (let i = 1; i <= 9; i++) {
+                const btn = document.createElement('button');
+                btn.className = "key-btn h-14 rounded-xl text-xl font-bold flex items-center justify-center orbitron text-white";
+                btn.innerText = i; btn.onclick = () => handleLockInput(i.toString());
+                keypad.appendChild(btn);
+            }
+            resetLock(); lockInterval = setInterval(tickLock, 100);
+        }
+
+        function resetLock() { lockTarget = Math.floor(1000 + Math.random() * 9000).toString(); document.getElementById('lock-target').innerText = lockTarget; lockInput = ""; baseline = 0; }
+
+        function handleLockInput(n) {
+            lockInput += n;
+            if (lockInput.length === 4) {
+                if (lockInput === lockTarget) { score += 50; baseline = Math.max(0, baseline - 30); resetLock(); updateScoreDisplay(); }
+                lockInput = "";
+            }
+        }
+
+        function tickLock() { baseline += 0.5; document.getElementById('baseline-pct').innerText = `BASELINE: ${Math.floor(baseline)}%`; if (baseline >= 100) { clearInterval(lockInterval); switchView('view-hub'); } }
+
+        window.onload = () => switchView('view-hub');
+    </script>
 </body>
 </html>
