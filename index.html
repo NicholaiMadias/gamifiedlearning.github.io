@@ -64,7 +64,7 @@
             </button>
         </div>
         <div class="mt-8 flex gap-4 justify-center">
-            <a href="/arcade/" class="text-[9px] text-green-400 font-bold uppercase tracking-[0.2em] hover:text-green-300 transition-colors" style="text-decoration:none;">▶ Match Maker (5-level mode)</a>
+            <a href="/arcade/" class="text-[9px] text-green-400 font-bold uppercase tracking-[0.2em] hover:text-green-300 transition-colors" style="text-decoration:none;">▶ Match Maker (7-level mode)</a>
             <a href="/arcade/certificates/" class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] hover:text-cyan-400 transition-colors" style="text-decoration:none;">📜 My Certificates</a>
         </div>
     </div>
@@ -141,7 +141,7 @@
         </div>
 
         <!-- Phase 2: Certificate canvas + download buttons -->
-        <div id="ss-cert-phase" class="hidden flex-col items-center gap-3 w-full">
+        <div id="ss-cert-phase" class="hidden flex flex-col items-center gap-3 w-full">
             <canvas id="ss-cert-canvas" class="rounded-lg" style="max-width:min(90vw,800px);border:1px solid rgba(0,242,255,0.2);" aria-label="Completion certificate"></canvas>
             <div class="flex flex-wrap gap-3 justify-center">
                 <button onclick="ssCertPNG()" class="cmd-btn px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-cyan-400">⬇ Download PNG</button>
@@ -346,7 +346,7 @@
         async function ssShowCongratulations() {
             // Show name-input phase; ensure cert-display phase is hidden
             document.getElementById('ss-name-phase').classList.remove('hidden');
-            document.getElementById('ss-cert-phase').style.display = 'none';
+            document.getElementById('ss-cert-phase').classList.add('hidden');
             document.getElementById('ss-cert-overlay').classList.remove('hidden');
             const nameInput = document.getElementById('ss-player-name');
             if (nameInput) setTimeout(() => nameInput.focus(), 100);
@@ -372,7 +372,7 @@
                 ssCertId      = certId;
                 // Switch to certificate phase
                 document.getElementById('ss-name-phase').classList.add('hidden');
-                document.getElementById('ss-cert-phase').style.display = 'flex';
+                document.getElementById('ss-cert-phase').classList.remove('hidden');
             } finally {
                 if (btn) { btn.disabled = false; btn.textContent = 'Generate Certificate'; }
             }

@@ -157,7 +157,7 @@
     </div>
 
     <!-- Phase 2: Certificate canvas + download buttons -->
-    <div id="mm-cert-display-phase" class="hidden" style="flex-direction:column;align-items:center;gap:1rem;width:100%;">
+    <div id="mm-cert-display-phase" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%;">
       <canvas id="mm-cert-canvas" aria-label="Completion certificate" style="max-width:min(90vw,800px);border:1px solid rgba(0,242,255,0.2);border-radius:8px;"></canvas>
       <div class="cert-actions">
         <button class="cert-btn blue"   onclick="window._mmCertPNG && window._mmCertPNG()">⬇ Download PNG</button>
@@ -203,7 +203,7 @@
         await generateCertificateFor(playerName);
         // Phase transition is handled inside generateCertificateFor via DOM IDs
         const phase = document.getElementById('mm-cert-display-phase');
-        if (phase) { phase.style.display = 'flex'; }
+        if (phase) { phase.classList.remove('hidden'); }
       } finally {
         btn.disabled    = false;
         btn.textContent = 'Generate Certificate';

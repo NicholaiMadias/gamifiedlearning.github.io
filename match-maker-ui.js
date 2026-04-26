@@ -124,7 +124,8 @@ function renderBoard() {
           : (GEM_EMOJI[gem.type] || gem.type[0].toUpperCase());
       }
       cell.setAttribute('tabindex', '0');
-      cell.setAttribute('role', 'button');
+      cell.setAttribute('role', 'gridcell');
+      cell.setAttribute('aria-selected', selected && selected.row === r && selected.col === c ? 'true' : 'false');
       cell.setAttribute('aria-label', gem
         ? gem.type + ' gem' + (gem.special ? ' (' + gem.special + ')' : '')
         : 'empty cell');
