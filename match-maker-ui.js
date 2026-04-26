@@ -63,7 +63,7 @@ function cacheDom() {
     certOverlay:    document.getElementById('mm-cert-overlay'),
     certCanvas:     document.getElementById('mm-cert-canvas'),
     certNamePhase:  document.getElementById('mm-cert-name-phase'),
-    certCertPhase:  document.getElementById('mm-cert-cert-phase'),
+    certDisplayPhase:  document.getElementById('mm-cert-display-phase'),
     notification:   document.getElementById('mm-notification'),
   };
 }
@@ -135,9 +135,11 @@ function renderBoard() {
 
 // ── Certificate system ───────────────────────────────────────────────────────
 function generateCertId() {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return 'MM-' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
-  }
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return 'MM-' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
+    }
+  } catch (_) { /* fall through to deterministic fallback */ }
   // Fallback for environments without crypto.randomUUID
   const ts   = Date.now().toString(36).toUpperCase();
   const rand = (Date.now() ^ performance.now()).toString(36).slice(-4).toUpperCase();
@@ -238,7 +240,7 @@ function showGameComplete() {
   locked = true;
   // Reset to name-input phase then reveal overlay
   if (dom.certNamePhase) dom.certNamePhase.classList.remove('hidden');
-  if (dom.certCertPhase) dom.certCertPhase.classList.add('hidden');
+  if (dom.certDisplayPhase) dom.certDisplayPhase.classList.add('hidden');
   if (dom.certOverlay)   dom.certOverlay.classList.remove('hidden');
   window.dispatchEvent(new CustomEvent('matchmaker-game-complete', {
     detail: { level: MAX_LEVEL, score },
@@ -272,7 +274,7 @@ export async function generateCertificateFor(playerName) {
 
   // Switch overlay to certificate phase
   if (dom.certNamePhase) dom.certNamePhase.classList.add('hidden');
-  if (dom.certCertPhase) dom.certCertPhase.classList.remove('hidden');
+  if (dom.certDisplayPhase) dom.certDisplayPhase.classList.remove('hidden');
 
   return certId;
 }

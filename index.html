@@ -326,9 +326,11 @@
 
         /** --- STARLIGHT SEEKER CERTIFICATE SYSTEM --- **/
         function ssGenCertId() {
-            if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-                return 'SS-' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
-            }
+            try {
+                if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                    return 'SS-' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
+                }
+            } catch (_) { /* fall through to deterministic fallback */ }
             return 'SS-' + Date.now().toString(36).toUpperCase() + '-' + (Date.now() ^ performance.now()).toString(36).slice(-4).toUpperCase();
         }
 
@@ -342,9 +344,8 @@
         }
 
         async function ssShowCongratulations() {
-            // Show name-input phase; cert phase hidden
+            // Show name-input phase; ensure cert-display phase is hidden
             document.getElementById('ss-name-phase').classList.remove('hidden');
-            document.getElementById('ss-cert-phase').classList.remove('hidden');
             document.getElementById('ss-cert-phase').style.display = 'none';
             document.getElementById('ss-cert-overlay').classList.remove('hidden');
             const nameInput = document.getElementById('ss-player-name');
