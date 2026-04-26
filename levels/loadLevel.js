@@ -1,11 +1,10 @@
 const DEFAULT_LEVEL = 1;
 const MIN_LEVEL = 1;
-const MAX_LEVEL = 7;
 
 function clampLevelNumber(n) {
   const num = Number(n);
   if (!Number.isFinite(num)) return DEFAULT_LEVEL;
-  return Math.min(Math.max(Math.round(num), MIN_LEVEL), MAX_LEVEL);
+  return Math.max(Math.round(num), MIN_LEVEL);
 }
 
 export async function loadLevel(levelNumber = DEFAULT_LEVEL) {
