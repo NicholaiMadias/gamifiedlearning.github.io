@@ -163,29 +163,35 @@ function classifyComponent(comp) {
   const height = Math.max(...compRows) - Math.min(...compRows) + 1;
   const width  = Math.max(...compCols) - Math.min(...compCols) + 1;
 
-  // Sort by (row, col) for deterministic median selection
+  // Sort by (row, col) for deterministic median selection in all cases
   const sorted = [...comp].sort((a, b) => a.row !== b.row ? a.row - b.row : a.col - b.col);
+  const midIdx = Math.floor(sorted.length / 2);
 
   // 5-in-a-row → supernova at median cell
   if (comp.length >= 5 && (height === 1 || width === 1)) {
-    const center = sorted[Math.floor(sorted.length / 2)];
+    const center = sorted[midIdx];
     specials.push({ row: center.row, col: center.col, specialType: 'supernova' });
     return { specials };
   }
 
   // T / L shape (5+ cells spanning 2+ rows and cols) → bomb at intersection
   if (comp.length >= 5 && height >= 2 && width >= 2) {
-    // The intersection cell has the highest neighbor count in the match
+    // Compute degree within this component by checking 4-directional adjacency
+    const compSet = new Set(comp.map(c => `${c.row},${c.col}`));
+    const degree = cell => [[0, 1], [0, -1], [1, 0], [-1, 0]].reduce(
+      (n, [dr, dc]) => n + (compSet.has(`${cell.row + dr},${cell.col + dc}`) ? 1 : 0), 0
+    );
+    // The intersection cell has the highest degree (most neighbors in the component)
     const intersection = comp.reduce((best, cell) =>
-      cell.neighbors.length > best.neighbors.length ? cell : best
+      degree(cell) > degree(best) ? cell : best
     , comp[0]);
     specials.push({ row: intersection.row, col: intersection.col, specialType: 'bomb' });
     return { specials };
   }
 
-  // 4-in-a-row → line clear at median cell
+  // 4-in-a-row → line clear at median cell (index 2 of 4 when sorted)
   if (comp.length === 4 && (height === 1 || width === 1)) {
-    const center = sorted[Math.floor((sorted.length - 1) / 2)];
+    const center = sorted[midIdx];
     specials.push({
       row: center.row,
       col: center.col,
