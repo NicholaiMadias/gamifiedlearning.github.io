@@ -386,14 +386,16 @@
             for (let r = 0; r < 7; r++) {
                 for (let c = 0; c < 7; c++) {
                     const gem = mmGrid[r][c];
-                    const cell = document.createElement('div');
-                    cell.style.cssText = `aspect-ratio:1;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(30,41,59,0.8);border:1px solid rgba(255,255,255,0.06);transition:transform 0.15s,box-shadow 0.15s;`;
+                    const cell = document.createElement('button');
+                    cell.type = 'button';
+                    cell.style.cssText = `aspect-ratio:1;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(30,41,59,0.8);border:1px solid rgba(255,255,255,0.06);transition:transform 0.15s,box-shadow 0.15s;padding:0;appearance:none;`;
                     if (mmSelected && mmSelected[0] === r && mmSelected[1] === c) {
                         cell.style.outline = '2px solid #00f2ff';
                         cell.style.transform = 'scale(1.08)';
                         cell.style.boxShadow = '0 0 12px #00f2ff';
                     }
                     cell.textContent = MM_EMOJI[gem] || gem;
+                    cell.setAttribute('aria-label', `${gem} gem at row ${r + 1}, column ${c + 1}`);
                     cell.onclick = () => mmHandleClick(r, c);
                     board.appendChild(cell);
                 }
