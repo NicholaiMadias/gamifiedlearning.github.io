@@ -1,0 +1,45 @@
+name: Validate CNAME
+
+on:
+  pull_request:
+    paths:
+      - 'CNAME'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate CNAME
+        run: |
+          EXPECTED=""
+          case "${{ github.repository }}" in
+            "NicholaiMadias/gamifiedlearning.github.io")
+              EXPECTED="amazinggracehl.org"
+              ;;
+            "NicholaiMadias/Amazing-Grace")
+              EXPECTED="amazinggracehomeliving.com"
+              ;;
+            "Gamified-Learning-Matrix/Gamified-Learning")
+              EXPECTED="gamifiedlearning.org"
+              ;;
+            "Gamified-Learning-Matrix/Limitless-Nexus")
+              EXPECTED="limitlessnexus.com"
+              ;;
+            *)
+              echo "❌ No expected CNAME configured for repository '${{ github.repository }}'"
+              exit 1
+              ;;
+          esac
+
+          ACTUAL=$(tr -d '\r\n' < CNAME)
+          ACTUAL="${ACTUAL#"${ACTUAL%%[![:space:]]*}"}"
+          ACTUAL="${ACTUAL%"${ACTUAL##*[![:space:]]}"}"
+
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "❌ CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
+            exit 1
+          fi
+
+          echo "✅ CNAME is correct: $ACTUAL"
