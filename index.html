@@ -198,6 +198,7 @@
                 clearInterval(lockInterval);
                 lockInterval = null;
             }
+            if (mmPendingTimeout !== null) { clearTimeout(mmPendingTimeout); mmPendingTimeout = null; }
 
             score = 0; updateScoreDisplay();
             if (viewId === 'view-match3') initMatch3();
@@ -321,11 +322,13 @@
         }
 
         /** --- MATCH MAKER GAME --- **/
+        const MM_SIZE = 7;
         const MM_GEMS = ['heart','star','cross','flame','drop','moon'];
         const MM_CONSCIENCE = { heart:'empathy', star:'wisdom', cross:'justice', flame:'growth', drop:'empathy', moon:'wisdom' };
         const MM_EMOJI  = { heart:'❤️', star:'⭐', cross:'✝️', flame:'🔥', drop:'💧', moon:'🌙' };
         let mmGrid = [], mmSelected = null, mmScore = 0, mmLevel = 1, mmMoves = 20;
         let mmConscienceVals = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
+        let mmPendingTimeout = null;
 
         function mmRandomGem(pool = MM_GEMS) {
             return pool[Math.floor(Math.random() * pool.length)];
@@ -347,10 +350,10 @@
         }
 
         function mmCreateStartingGrid() {
-            const grid = Array.from({ length: 7 }, () => Array(7).fill(null));
+            const grid = Array.from({ length: MM_SIZE }, () => Array(MM_SIZE).fill(null));
 
-            for (let row = 0; row < 7; row++) {
-                for (let col = 0; col < 7; col++) {
+            for (let row = 0; row < MM_SIZE; row++) {
+                for (let col = 0; col < MM_SIZE; col++) {
                     grid[row][col] = mmPickStartingGem(grid, row, col);
                 }
             }
@@ -359,6 +362,7 @@
         }
 
         function initMatchMaker() {
+            if (mmPendingTimeout !== null) { clearTimeout(mmPendingTimeout); mmPendingTimeout = null; }
             mmScore = 0; mmLevel = 1; mmMoves = 20;
             mmConscienceVals = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
             mmSelected = null;
@@ -382,9 +386,10 @@
         function mmSetMsg(text) { document.getElementById('match-msg').textContent = text; }
         function mmRenderBoard() {
             const board = document.getElementById('match-board');
+            board.style.gridTemplateColumns = `repeat(${MM_SIZE},1fr)`;
             board.innerHTML = '';
-            for (let r = 0; r < 7; r++) {
-                for (let c = 0; c < 7; c++) {
+            for (let r = 0; r < MM_SIZE; r++) {
+                for (let c = 0; c < MM_SIZE; c++) {
                     const gem = mmGrid[r][c];
                     const cell = document.createElement('button');
                     cell.type = 'button';
@@ -412,22 +417,23 @@
                 const tmp = mmGrid[sr][sc]; mmGrid[sr][sc] = mmGrid[r][c]; mmGrid[r][c] = tmp;
                 mmMoves--;
                 mmUpdateHUD(); mmRenderBoard();
-                setTimeout(mmCheckAndClear, 200);
+                mmPendingTimeout = setTimeout(mmCheckAndClear, 200);
             } else {
                 mmRenderBoard();
             }
         }
 
         function mmCheckAndClear() {
+            mmPendingTimeout = null;
             const toRemove = new Set();
-            for (let r = 0; r < 7; r++) {
-                for (let c = 0; c < 5; c++) {
+            for (let r = 0; r < MM_SIZE; r++) {
+                for (let c = 0; c < MM_SIZE - 2; c++) {
                     const g = mmGrid[r][c];
                     if (g && g === mmGrid[r][c+1] && g === mmGrid[r][c+2]) { toRemove.add(`${r},${c}`); toRemove.add(`${r},${c+1}`); toRemove.add(`${r},${c+2}`); }
                 }
             }
-            for (let c = 0; c < 7; c++) {
-                for (let r = 0; r < 5; r++) {
+            for (let c = 0; c < MM_SIZE; c++) {
+                for (let r = 0; r < MM_SIZE - 2; r++) {
                     const g = mmGrid[r][c];
                     if (g && g === mmGrid[r+1][c] && g === mmGrid[r+2][c]) { toRemove.add(`${r},${c}`); toRemove.add(`${r+1},${c}`); toRemove.add(`${r+2},${c}`); }
                 }
@@ -448,20 +454,21 @@
             const allFull = Object.values(mmConscienceVals).every(v => v >= 100);
             if (allFull) { mmLevel++; mmMoves += 10; mmConscienceVals = { empathy:0, justice:0, wisdom:0, growth:0 }; mmShowBanner(`LEVEL ${mmLevel} — Conscience Restored!`); }
             mmUpdateHUD(); mmRenderBoard();
-            setTimeout(mmApplyGravity, 250);
+            mmPendingTimeout = setTimeout(mmApplyGravity, 250);
         }
 
         function mmApplyGravity() {
-            for (let c = 0; c < 7; c++) {
+            mmPendingTimeout = null;
+            for (let c = 0; c < MM_SIZE; c++) {
                 let empty = [];
-                for (let r = 6; r >= 0; r--) {
+                for (let r = MM_SIZE - 1; r >= 0; r--) {
                     if (mmGrid[r][c] === null) empty.push(r);
                     else if (empty.length > 0) { mmGrid[empty.shift()][c] = mmGrid[r][c]; mmGrid[r][c] = null; empty.push(r); }
                 }
                 empty.forEach(r => { mmGrid[r][c] = MM_GEMS[Math.floor(Math.random() * MM_GEMS.length)]; });
             }
             mmRenderBoard();
-            setTimeout(mmCheckAndClear, 300);
+            mmPendingTimeout = setTimeout(mmCheckAndClear, 300);
         }
 
         function mmShowBanner(text) {
