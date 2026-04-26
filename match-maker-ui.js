@@ -16,6 +16,50 @@ function createGem(type = randomGemType()) {
   };
 }
 
+export function initMatchMaker(options = {}) {
+  const {
+    rows = ROWS,
+    cols = COLS,
+    onRender,
+  } = options;
+
+  let grid = createInitialGrid(rows, cols);
+
+  if (typeof onRender === 'function') {
+    onRender(grid);
+  }
+
+  return {
+    getGrid() {
+      return grid;
+    },
+    reset() {
+      grid = createInitialGrid(rows, cols);
+      if (typeof onRender === 'function') {
+        onRender(grid);
+      }
+      return grid;
+    },
+    canSwap(r1, c1, r2, c2) {
+      return canSwap(grid, r1, c1, r2, c2);
+    },
+    swap(r1, c1, r2, c2) {
+      grid = swapGems(grid, r1, c1, r2, c2);
+      if (typeof onRender === 'function') {
+        onRender(grid);
+      }
+      return grid;
+    },
+    applyGravity() {
+      grid = applyGravity(grid);
+      if (typeof onRender === 'function') {
+        onRender(grid);
+      }
+      return grid;
+    },
+  };
+}
+
 export function createInitialGrid(rows = ROWS, cols = COLS) {
   const grid = Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => createGem())
