@@ -52,6 +52,11 @@
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Starlight Seeker</h2>
                 <p class="text-slate-400 text-[10px]">Match-3 simulation with custom Designer assets.</p>
             </button>
+            <button onclick="switchView('view-match-maker')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-emerald-400">
+                <div class="w-12 h-12 bg-emerald-500/20 rounded-xl mb-4 flex items-center justify-center text-emerald-400">💎</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Match Maker</h2>
+                <p class="text-slate-400 text-[10px]">Conscience-driven gem matching. Build empathy, justice, wisdom, and growth.</p>
+            </button>
             <button onclick="switchView('view-lock')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-red-400">
                 <div class="w-12 h-12 bg-red-500/20 rounded-xl mb-4 flex items-center justify-center text-red-400">🔒</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Number Lock</h2>
@@ -97,6 +102,68 @@
         </div>
     </div>
 
+    <!-- MATCH MAKER GAME -->
+    <div id="view-match-maker" class="hidden w-full flex flex-col items-center px-4 pb-4" style="padding-top:4rem">
+        <!-- Badge Banner -->
+        <div id="match-badge-banner" class="hidden w-full max-w-[500px] mb-2 text-center py-2 px-4 rounded-xl bg-yellow-400/20 border border-yellow-400/40 text-yellow-300 orbitron text-xs font-bold tracking-widest"></div>
+
+        <!-- HUD Row -->
+        <div class="w-full max-w-[500px] flex justify-between items-center mb-2 px-1">
+            <div class="glass-panel px-3 py-1 rounded-xl text-center">
+                <div class="text-[8px] text-slate-500 uppercase tracking-widest">Score</div>
+                <div id="hud-score" class="orbitron text-cyan-400 text-sm font-bold">0</div>
+            </div>
+            <div class="glass-panel px-3 py-1 rounded-xl text-center">
+                <div class="text-[8px] text-slate-500 uppercase tracking-widest">Level</div>
+                <div id="hud-level" class="orbitron text-purple-400 text-sm font-bold">1</div>
+            </div>
+            <div class="glass-panel px-3 py-1 rounded-xl text-center">
+                <div class="text-[8px] text-slate-500 uppercase tracking-widest">Moves</div>
+                <div id="hud-moves" class="orbitron text-emerald-400 text-sm font-bold">20</div>
+            </div>
+            <button id="restart-btn" onclick="initMatchMaker()" class="glass-panel px-3 py-1 rounded-xl text-[8px] text-slate-400 uppercase font-bold tracking-widest hover:text-cyan-400 transition-colors">Restart</button>
+        </div>
+
+        <!-- Game Board -->
+        <div id="match-board" class="w-full max-w-[500px] aspect-square rounded-2xl overflow-hidden" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;background:rgba(15,23,42,0.8);padding:8px;"></div>
+
+        <!-- Message -->
+        <div id="match-msg" class="mt-2 text-[10px] text-slate-400 italic uppercase tracking-widest text-center h-5"></div>
+
+        <!-- Conscience Bars -->
+        <div class="w-full max-w-[500px] mt-3 glass-panel rounded-2xl p-4 space-y-2">
+            <div class="text-[8px] text-slate-500 uppercase tracking-widest mb-1">Conscience Meters</div>
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] text-pink-400 w-14">Empathy</span>
+                <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div id="bar-empathy" class="h-2 bg-pink-500 rounded-full transition-all" style="width:0%"></div>
+                </div>
+                <span id="pct-empathy" class="text-[9px] text-pink-400 w-7 text-right">0%</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] text-blue-400 w-14">Justice</span>
+                <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div id="bar-justice" class="h-2 bg-blue-500 rounded-full transition-all" style="width:0%"></div>
+                </div>
+                <span id="pct-justice" class="text-[9px] text-blue-400 w-7 text-right">0%</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] text-yellow-400 w-14">Wisdom</span>
+                <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div id="bar-wisdom" class="h-2 bg-yellow-500 rounded-full transition-all" style="width:0%"></div>
+                </div>
+                <span id="pct-wisdom" class="text-[9px] text-yellow-400 w-7 text-right">0%</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] text-emerald-400 w-14">Growth</span>
+                <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div id="bar-growth" class="h-2 bg-emerald-500 rounded-full transition-all" style="width:0%"></div>
+                </div>
+                <span id="pct-growth" class="text-[9px] text-emerald-400 w-7 text-right">0%</span>
+            </div>
+        </div>
+    </div>
+
     <!-- NUMBER LOCK GAME -->
     <div id="view-lock" class="hidden w-full flex flex-col items-center px-4 max-w-md">
         <div class="bg-slate-900/80 border border-white/10 p-8 rounded-[2.5rem] shadow-2xl w-full">
@@ -129,6 +196,7 @@
             
             score = 0; updateScoreDisplay();
             if (viewId === 'view-match3') initMatch3();
+            if (viewId === 'view-match-maker') initMatchMaker();
             if (viewId === 'view-lock') initLock();
             if (lockInterval) clearInterval(lockInterval);
         }
@@ -248,7 +316,126 @@
             renderGrid(); setTimeout(checkMatches, 300);
         }
 
-        function initLock() {
+        /** --- MATCH MAKER GAME --- **/
+        const MM_GEMS = ['heart','star','cross','flame','drop','moon'];
+        const MM_CONSCIENCE = { heart:'empathy', star:'wisdom', cross:'justice', flame:'growth', drop:'empathy', moon:'wisdom' };
+        const MM_COLORS = { heart:'#ec4899', star:'#eab308', cross:'#3b82f6', flame:'#10b981', drop:'#ec4899', moon:'#eab308' };
+        const MM_EMOJI  = { heart:'❤️', star:'⭐', cross:'✝️', flame:'🔥', drop:'💧', moon:'🌙' };
+        let mmGrid = [], mmSelected = null, mmScore = 0, mmLevel = 1, mmMoves = 20;
+        let mmConscienceVals = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
+
+        function initMatchMaker() {
+            mmScore = 0; mmLevel = 1; mmMoves = 20;
+            mmConscienceVals = { empathy: 0, justice: 0, wisdom: 0, growth: 0 };
+            mmSelected = null;
+            mmGrid = Array.from({ length: 7 }, () => Array.from({ length: 7 }, () => MM_GEMS[Math.floor(Math.random() * MM_GEMS.length)]));
+            mmUpdateHUD(); mmRenderBoard(); mmSetMsg('');
+            const banner = document.getElementById('match-badge-banner');
+            banner.classList.add('hidden'); banner.textContent = '';
+        }
+
+        function mmUpdateHUD() {
+            document.getElementById('hud-score').textContent = mmScore;
+            document.getElementById('hud-level').textContent = mmLevel;
+            document.getElementById('hud-moves').textContent = mmMoves;
+            for (const key of ['empathy','justice','wisdom','growth']) {
+                const pct = Math.min(100, Math.round(mmConscienceVals[key]));
+                document.getElementById('bar-' + key).style.width = pct + '%';
+                document.getElementById('pct-' + key).textContent = pct + '%';
+            }
+        }
+
+        function mmSetMsg(text) { document.getElementById('match-msg').textContent = text; }
+
+        function mmRenderBoard() {
+            const board = document.getElementById('match-board');
+            board.innerHTML = '';
+            for (let r = 0; r < 7; r++) {
+                for (let c = 0; c < 7; c++) {
+                    const gem = mmGrid[r][c];
+                    const cell = document.createElement('div');
+                    cell.style.cssText = `aspect-ratio:1;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(30,41,59,0.8);border:1px solid rgba(255,255,255,0.06);transition:transform 0.15s,box-shadow 0.15s;`;
+                    if (mmSelected && mmSelected[0] === r && mmSelected[1] === c) {
+                        cell.style.outline = '2px solid #00f2ff';
+                        cell.style.transform = 'scale(1.08)';
+                        cell.style.boxShadow = '0 0 12px #00f2ff';
+                    }
+                    cell.textContent = MM_EMOJI[gem] || gem;
+                    cell.onclick = () => mmHandleClick(r, c);
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function mmHandleClick(r, c) {
+            if (mmMoves <= 0) return;
+            if (!mmSelected) { mmSelected = [r, c]; mmRenderBoard(); return; }
+            const [sr, sc] = mmSelected;
+            mmSelected = null;
+            const dr = Math.abs(r - sr), dc = Math.abs(c - sc);
+            if ((dr === 1 && dc === 0) || (dr === 0 && dc === 1)) {
+                const tmp = mmGrid[sr][sc]; mmGrid[sr][sc] = mmGrid[r][c]; mmGrid[r][c] = tmp;
+                mmMoves--;
+                mmUpdateHUD(); mmRenderBoard();
+                setTimeout(mmCheckAndClear, 200);
+            } else {
+                mmRenderBoard();
+            }
+        }
+
+        function mmCheckAndClear() {
+            const toRemove = new Set();
+            for (let r = 0; r < 7; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const g = mmGrid[r][c];
+                    if (g && g === mmGrid[r][c+1] && g === mmGrid[r][c+2]) { toRemove.add(`${r},${c}`); toRemove.add(`${r},${c+1}`); toRemove.add(`${r},${c+2}`); }
+                }
+            }
+            for (let c = 0; c < 7; c++) {
+                for (let r = 0; r < 5; r++) {
+                    const g = mmGrid[r][c];
+                    if (g && g === mmGrid[r+1][c] && g === mmGrid[r+2][c]) { toRemove.add(`${r},${c}`); toRemove.add(`${r+1},${c}`); toRemove.add(`${r+2},${c}`); }
+                }
+            }
+            if (toRemove.size === 0) { if (mmMoves <= 0) mmSetMsg('No moves left! Tap Restart.'); return; }
+            const gemCounts = {};
+            toRemove.forEach(k => {
+                const [r, c] = k.split(',').map(Number);
+                const g = mmGrid[r][c];
+                gemCounts[g] = (gemCounts[g] || 0) + 1;
+                mmGrid[r][c] = null;
+            });
+            mmScore += toRemove.size * 10;
+            for (const [gem, count] of Object.entries(gemCounts)) {
+                const stat = MM_CONSCIENCE[gem];
+                if (stat) mmConscienceVals[stat] = Math.min(100, mmConscienceVals[stat] + count * 5);
+            }
+            const allFull = Object.values(mmConscienceVals).every(v => v >= 100);
+            if (allFull) { mmLevel++; mmMoves += 10; mmConscienceVals = { empathy:0, justice:0, wisdom:0, growth:0 }; mmShowBanner(`LEVEL ${mmLevel} — Conscience Restored!`); }
+            mmUpdateHUD(); mmRenderBoard();
+            setTimeout(mmApplyGravity, 250);
+        }
+
+        function mmApplyGravity() {
+            for (let c = 0; c < 7; c++) {
+                let empty = [];
+                for (let r = 6; r >= 0; r--) {
+                    if (mmGrid[r][c] === null) empty.push(r);
+                    else if (empty.length > 0) { mmGrid[empty.shift()][c] = mmGrid[r][c]; mmGrid[r][c] = null; empty.push(r); }
+                }
+                empty.forEach(r => { mmGrid[r][c] = MM_GEMS[Math.floor(Math.random() * MM_GEMS.length)]; });
+            }
+            mmRenderBoard();
+            setTimeout(mmCheckAndClear, 300);
+        }
+
+        function mmShowBanner(text) {
+            const banner = document.getElementById('match-badge-banner');
+            banner.textContent = text; banner.classList.remove('hidden');
+            setTimeout(() => banner.classList.add('hidden'), 3000);
+        }
+
+        /** --- NUMBER LOCK GAME --- **/
             const keypad = document.getElementById('lock-keypad');
             keypad.innerHTML = '';
             for (let i = 1; i <= 9; i++) {
