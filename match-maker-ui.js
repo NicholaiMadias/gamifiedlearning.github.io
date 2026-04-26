@@ -78,7 +78,11 @@ function updateHUD() {
 function updateConscience() {
   ['empathy', 'justice', 'wisdom', 'growth'].forEach(k => {
     const pct = Math.round(Math.min(100, conscience[k] || 0));
-    if (dom[k]?.bar) dom[k].bar.style.width = pct + '%';
+    if (dom[k]?.bar) {
+      dom[k].bar.style.width = pct + '%';
+      dom[k].bar.setAttribute('aria-valuenow', String(pct));
+      dom[k].bar.setAttribute('aria-valuetext', pct + '%');
+    }
     if (dom[k]?.pct) dom[k].pct.textContent = pct + '%';
   });
 }
