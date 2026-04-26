@@ -281,9 +281,14 @@ export async function generateCertificateFor(playerName) {
   } catch (_) { /* storage unavailable */ }
 
   if (dom.certCanvas) {
-    await drawCertificate(dom.certCanvas, name, gameTitle, completionDate, certId, score);
-    _certDataUrl = dom.certCanvas.toDataURL('image/png');
-    _certId      = certId;
+    try {
+      await drawCertificate(dom.certCanvas, name, gameTitle, completionDate, certId, score);
+      _certDataUrl = dom.certCanvas.toDataURL('image/png');
+      _certId      = certId;
+    } catch (err) {
+      showNotification('Certificate could not be drawn: ' + err.message);
+      throw err;
+    }
   }
 
   // Switch overlay to certificate phase
