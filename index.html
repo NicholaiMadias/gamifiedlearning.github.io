@@ -408,6 +408,7 @@
         }
 
         function mmHandleClick(r, c) {
+            if (mmPendingTimeout !== null) return;
             if (mmMoves <= 0) return;
             if (!mmSelected) { mmSelected = [r, c]; mmRenderBoard(); return; }
             const [sr, sc] = mmSelected;
