@@ -356,27 +356,33 @@
             const btn        = document.getElementById('ss-gen-btn');
             const playerName = (document.getElementById('ss-player-name').value || '').trim().slice(0, 30) || 'Player';
             if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
-            const certId     = ssGenCertId();
-            const gameTitle  = 'Starlight Seeker';
-            const completionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             try {
-                const cert  = { id: certId, player: playerName, game: gameTitle, date: completionDate, score };
-                const certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
-                certs.push(cert); localStorage.setItem('arcade-certificates', JSON.stringify(certs));
-            } catch(_) {}
-            const canvas = document.getElementById('ss-cert-canvas');
-            await ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, score);
-            ssCertDataUrl = canvas.toDataURL('image/png');
-            ssCertId      = certId;
-            // Switch to certificate phase
-            document.getElementById('ss-name-phase').classList.add('hidden');
-            document.getElementById('ss-cert-phase').style.display = 'flex';
-            if (btn) { btn.disabled = false; btn.textContent = 'Generate Certificate'; }
+                const certId     = ssGenCertId();
+                const gameTitle  = 'Starlight Seeker';
+                const completionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                try {
+                    const cert  = { id: certId, player: playerName, game: gameTitle, date: completionDate, score };
+                    const certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
+                    certs.push(cert); localStorage.setItem('arcade-certificates', JSON.stringify(certs));
+                } catch(_) {}
+                const canvas = document.getElementById('ss-cert-canvas');
+                if (!canvas) throw new Error('Certificate canvas not found');
+                await ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, score);
+                ssCertDataUrl = canvas.toDataURL('image/png');
+                ssCertId      = certId;
+                // Switch to certificate phase
+                document.getElementById('ss-name-phase').classList.add('hidden');
+                document.getElementById('ss-cert-phase').style.display = 'flex';
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = 'Generate Certificate'; }
+            }
         }
 
         async function ssCertDraw(canvas, playerName, gameTitle, completionDate, certId, finalScore) {
+            if (!canvas) throw new Error('Certificate canvas not found');
             await document.fonts.ready;
             const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('2D canvas context is unavailable');
             const W = 800, H = 560;
             canvas.width = W; canvas.height = H;
             // Background
