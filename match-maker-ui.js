@@ -79,9 +79,17 @@ function updateConscience() {
   ['empathy', 'justice', 'wisdom', 'growth'].forEach(k => {
     const pct = Math.round(Math.min(100, conscience[k] || 0));
     if (dom[k]?.bar) {
-      dom[k].bar.style.width = pct + '%';
+      const valueText = pct + '%';
+      const progressbar = dom[k].bar.parentElement;
+
+      dom[k].bar.style.width = valueText;
       dom[k].bar.setAttribute('aria-valuenow', String(pct));
-      dom[k].bar.setAttribute('aria-valuetext', pct + '%');
+      dom[k].bar.setAttribute('aria-valuetext', valueText);
+
+      if (progressbar) {
+        progressbar.setAttribute('aria-valuenow', String(pct));
+        progressbar.setAttribute('aria-valuetext', valueText);
+      }
     }
     if (dom[k]?.pct) dom[k].pct.textContent = pct + '%';
   });
