@@ -132,8 +132,7 @@ function renderBoard() {
           : (GEM_EMOJI[gem.type] || gem.type[0].toUpperCase());
       }
       cell.setAttribute('tabindex', '0');
-      cell.setAttribute('role', 'gridcell');
-      cell.setAttribute('aria-selected', selected && selected.row === r && selected.col === c ? 'true' : 'false');
+      cell.setAttribute('role', 'button');
       cell.setAttribute('aria-label', gem
         ? gem.type + ' gem' + (gem.special ? ' (' + gem.special + ')' : '')
         : 'empty cell');
@@ -163,6 +162,7 @@ function generateCertId() {
 async function drawCertificate(canvas, playerName, gameTitle, completionDate, certId, finalScore) {
   await document.fonts.ready;
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D canvas context is unavailable');
   const W = 800, H = 560;
   canvas.width  = W;
   canvas.height = H;

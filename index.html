@@ -435,8 +435,9 @@
 
         function ssCertPDF() {
             if (!ssCertDataUrl) return;
-            const win = window.open('', '_blank');
+            const win = window.open('', '_blank', 'noopener');
             if (!win) { ssShowNotification('Please allow pop-ups to save the certificate as PDF.'); return; }
+            win.opener = null;
             win.document.write('<!DOCTYPE html><html><head><title>Certificate \u2014 Starlight Seeker</title>' +
                 '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#020617;display:flex;justify-content:center;align-items:center;min-height:100vh}img{width:100%;max-width:800px}@media print{body{background:white}}</style>' +
                 '</head><body><img src="' + ssCertDataUrl + '">' +
