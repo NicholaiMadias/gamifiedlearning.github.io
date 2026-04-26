@@ -257,8 +257,8 @@ function processCascade(chain) {
     return;
   }
 
-  const matchedCells = matches.reduce((sum, group) => sum + group.length, 0);
-  const points = matchedCells * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
+  const cellCount = matches.reduce((n, g) => n + g.length, 0);
+  const points = cellCount * (BASE_POINTS + CHAIN_BONUS * (chain - 1));
   score += points;
 
   if (chain > 1) {
