@@ -55,10 +55,10 @@ function timeoutSignal(ms) {
 
 /** Well-known hostnames to probe */
 const DNS_TARGETS = [
-  { host: 'gamifiedlearning.org',       label: 'Main site' },
-  { host: 'admin.gamifiedlearning.org', label: 'Admin panel' },
-  { host: '1.1.1.1',                    label: 'Cloudflare DNS' },
-  { host: '8.8.8.8',                    label: 'Google DNS' },
+  { host: 'amazinggracehl.org',       label: 'Main site' },
+  { host: 'admin.amazinggracehl.org', label: 'Admin panel' },
+  { host: '1.1.1.1',                  label: 'Cloudflare DNS' },
+  { host: '8.8.8.8',                  label: 'Google DNS' },
 ];
 
 /**
