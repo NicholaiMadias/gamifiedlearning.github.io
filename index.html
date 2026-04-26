@@ -194,11 +194,15 @@
             if (view) view.classList.remove('hidden');
             if (viewId !== 'view-hub') document.getElementById('hud').classList.remove('hidden');
             
+            if (lockInterval) {
+                clearInterval(lockInterval);
+                lockInterval = null;
+            }
+
             score = 0; updateScoreDisplay();
             if (viewId === 'view-match3') initMatch3();
             if (viewId === 'view-match-maker') initMatchMaker();
             if (viewId === 'view-lock') initLock();
-            if (lockInterval) clearInterval(lockInterval);
         }
 
         function updateScoreDisplay() { document.getElementById('score-display').innerText = score; }
