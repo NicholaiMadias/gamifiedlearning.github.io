@@ -22,6 +22,7 @@
   --cell-size:     clamp(38px, 11vw, 56px);
   --font-sans:     'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono:     'Cascadia Code', 'Fira Code', monospace;
+  --site-nav-height: 52px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -144,11 +145,15 @@ body {
   top: 0;
   left: 0;
   right: 0;
+  height: var(--site-nav-height);
   z-index: 1000;
   background: #0044cc;
   color: #fff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
+
+/* Single-source offset for any element that must clear the fixed nav */
+.site-nav-top-offset { top: var(--site-nav-height); }
 
 .site-nav .nav-container {
   position: relative;
@@ -169,8 +174,6 @@ body {
   white-space: nowrap;
   letter-spacing: 0.01em;
 }
-
-/* Use the shared `.sr-only` utility on #menu-toggle in the markup. */
 
 /* Hamburger icon – hidden on desktop */
 .site-nav .menu-icon {

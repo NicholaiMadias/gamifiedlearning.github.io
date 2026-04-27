@@ -9,7 +9,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
         :root { --neon-blue: #00f2ff; --neon-purple: #bc13fe; --deep-space: #020617; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--deep-space); color: #e2e8f0; margin: 0; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; -webkit-tap-highlight-color: transparent; padding-top: 52px; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--deep-space); color: #e2e8f0; margin: 0; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; -webkit-tap-highlight-color: transparent; padding-top: var(--site-nav-height); box-sizing: border-box; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         .nexus-bg { background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%); position: fixed; inset: 0; z-index: -1; }
         .glass-panel { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -32,13 +32,12 @@
         <div class="site-title">
           <a href="/">Amazing Grace Home Living</a>
         </div>
-        <input type="checkbox" id="menu-toggle">
+        <input type="checkbox" id="menu-toggle" class="sr-only">
         <label for="menu-toggle" class="menu-icon" aria-label="Toggle navigation menu">&#9776;</label>
         <ul class="nav-links">
           <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/properties">Available Properties</a></li>
-          <li><a href="/contact">Contact</a></li>
+          <li><a href="/">Available Properties</a></li>
+          <li><a href="/contact/">Contact</a></li>
         </ul>
       </div>
     </nav>
@@ -46,7 +45,7 @@
     <div class="nexus-bg"></div>
 
     <!-- HUD -->
-    <div id="hud" class="fixed top-[52px] left-0 w-full p-4 flex justify-between items-center glass-panel z-50 hidden">
+    <div id="hud" class="site-nav-top-offset fixed left-0 w-full p-4 flex justify-between items-center glass-panel z-50 hidden">
         <button onclick="switchView('view-hub')" class="text-[10px] text-slate-400 uppercase font-bold tracking-widest hover:text-cyan-400 transition-colors">← Back to Hub</button>
         <div class="text-center">
             <div class="orbitron text-blue-400 text-sm font-bold tracking-tighter">RESONANCE: <span id="score-display">0</span></div>
