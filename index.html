@@ -46,7 +46,7 @@
             <h1 class="orbitron text-5xl md:text-7xl font-black text-white tracking-tighter mb-2 italic">NEXUS ARCADE</h1>
             <p class="text-blue-400 font-bold tracking-[0.4em] uppercase text-[10px]">Largo & Tampa Operational Nodes</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             <button onclick="switchView('view-match3')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-cyan-400">
                 <div class="w-12 h-12 bg-blue-500/20 rounded-xl mb-4 flex items-center justify-center text-blue-400">✨</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Starlight Seeker</h2>
@@ -56,6 +56,11 @@
                 <div class="w-12 h-12 bg-red-500/20 rounded-xl mb-4 flex items-center justify-center text-red-400">🔒</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Number Lock</h2>
                 <p class="text-slate-400 text-[10px]">Disrupt the Red Queen's behavioral baseline.</p>
+            </button>
+            <button onclick="switchView('view-bible')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-green-400">
+                <div class="w-12 h-12 bg-green-500/20 rounded-xl mb-4 flex items-center justify-center text-green-400">✝</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Bible Journey</h2>
+                <p class="text-slate-400 text-[10px]">Scripture quiz — answer all questions to complete the journey.</p>
             </button>
             <button onclick="switchView('view-admin')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-purple-400">
                 <div class="w-12 h-12 bg-purple-500/20 rounded-xl mb-4 flex items-center justify-center text-purple-400">🛠️</div>
@@ -98,6 +103,20 @@
         <div id="grid" class="grid-container"></div>
         <div class="mt-8 p-4 glass-panel rounded-2xl w-full max-w-[500px]">
             <p id="hint-text" class="text-[9px] text-slate-400 italic text-center uppercase tracking-[0.25em]">Match 3 or more tiles — reach 500 points to complete!</p>
+        </div>
+    </div>
+
+    <!-- BIBLE JOURNEY QUIZ -->
+    <div id="view-bible" class="hidden w-full flex flex-col items-center px-4 max-w-md">
+        <div class="glass-panel p-8 rounded-[2.5rem] w-full">
+            <h2 class="orbitron text-2xl font-bold text-white italic mb-6 text-center">✝ BIBLE JOURNEY</h2>
+            <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden mb-6">
+                <div id="bj-progress" class="h-full bg-green-400 rounded-full transition-all duration-300" style="width:0%"
+                     role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+            </div>
+            <p id="bj-question" class="text-slate-200 text-sm leading-relaxed mb-6 min-h-[2.5rem]"></p>
+            <p id="bj-feedback" aria-live="polite" class="text-red-400 text-[10px] uppercase tracking-widest font-bold mb-4 min-h-[1rem]"></p>
+            <div id="bj-options" class="flex flex-col gap-3"></div>
         </div>
     </div>
 
@@ -174,6 +193,7 @@
             score = 0; updateScoreDisplay();
             if (viewId === 'view-match3') initMatch3();
             if (viewId === 'view-lock') initLock();
+            if (viewId === 'view-bible') initBibleJourney();
             if (lockInterval) clearInterval(lockInterval);
         }
 
@@ -453,6 +473,67 @@
         }
 
         window.onload = () => switchView('view-hub');
+
+        /** --- BIBLE JOURNEY QUIZ --- **/
+        const bjData = [
+            { question: "Who built the ark?", answers: ["Moses", "Noah", "David"], correctIndex: 1 },
+            { question: "What is the first book of the Bible?", answers: ["Exodus", "Genesis", "Psalms"], correctIndex: 1 },
+            { question: "How many disciples did Jesus have?", answers: ["10", "12", "7"], correctIndex: 1 }
+        ];
+        let bjIdx = 0;
+
+        function bjSetProgress(value) {
+            const bar = document.getElementById('bj-progress');
+            bar.style.width = value + '%';
+            bar.setAttribute('aria-valuenow', value);
+        }
+
+        function bjRenderComplete() {
+            const box = document.getElementById('view-bible').querySelector('.glass-panel');
+            box.innerHTML = '<h2 class="orbitron text-3xl font-black text-white italic text-center mb-4">JOURNEY COMPLETE!</h2>' +
+                '<p class="text-green-400 text-[10px] uppercase tracking-[0.3em] font-bold text-center mb-8">Scripture Mission Achieved</p>' +
+                '<button onclick="initBibleJourney()" class="w-full cmd-btn py-4 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-green-400">↺ Play Again</button>';
+        }
+
+        function initBibleJourney() {
+            bjIdx = 0;
+            const panel = document.getElementById('view-bible').querySelector('.glass-panel');
+            panel.innerHTML = '<h2 class="orbitron text-2xl font-bold text-white italic mb-6 text-center">\u271D BIBLE JOURNEY</h2>' +
+                '<div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden mb-6">' +
+                '<div id="bj-progress" class="h-full bg-green-400 rounded-full transition-all duration-300" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>' +
+                '<p id="bj-question" class="text-slate-200 text-sm leading-relaxed mb-6 min-h-[2.5rem]"></p>' +
+                '<p id="bj-feedback" aria-live="polite" class="text-red-400 text-[10px] uppercase tracking-widest font-bold mb-4 min-h-[1rem]"></p>' +
+                '<div id="bj-options" class="flex flex-col gap-3"></div>';
+            bjLoadQuestion();
+        }
+
+        function bjLoadQuestion() {
+            if (bjIdx >= bjData.length) {
+                bjSetProgress(100);
+                bjRenderComplete();
+                return;
+            }
+            bjSetProgress(Math.round((bjIdx / bjData.length) * 100));
+            document.getElementById('bj-question').textContent = bjData[bjIdx].question;
+            document.getElementById('bj-feedback').textContent = '';
+            const opts = document.getElementById('bj-options');
+            opts.innerHTML = '';
+            bjData[bjIdx].answers.forEach(function (answer, i) {
+                const btn = document.createElement('button');
+                btn.className = 'cmd-btn py-3 rounded-xl text-xs font-bold uppercase tracking-[0.1em] text-slate-200 w-full text-left px-4';
+                btn.textContent = answer;
+                btn.addEventListener('click', function () {
+                    if (i === bjData[bjIdx].correctIndex) {
+                        bjIdx++;
+                        bjLoadQuestion();
+                    } else {
+                        document.getElementById('bj-feedback').textContent = '\u2717 Try again!';
+                    }
+                });
+                opts.appendChild(btn);
+            });
+        }
+
     </script>
 </body>
 </html>
