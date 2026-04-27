@@ -292,16 +292,6 @@
         window.onload = () => switchView('view-hub');
     </script>
     <!-- Dynamic nav-height: keeps --site-nav-height in sync with the actual rendered nav -->
-    <script>
-        (function () {
-            function updateNavHeight() {
-                var nav = document.querySelector('.site-nav');
-                if (!nav) return;
-                document.documentElement.style.setProperty('--site-nav-height', nav.offsetHeight + 'px');
-            }
-            window.addEventListener('load', updateNavHeight);
-            window.addEventListener('resize', updateNavHeight);
-        })();
-    </script>
+    <script src="nav-height.js"></script>
 </body>
 </html>
