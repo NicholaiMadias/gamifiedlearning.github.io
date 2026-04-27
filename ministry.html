@@ -106,7 +106,7 @@
               }
             );
 
-            if (!response.ok) throw new Error("Generation failed");
+            if (!response.ok) throw new Error(`Generation failed: ${response.status} ${response.statusText}`);
 
             const result = await response.json();
             const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
@@ -124,8 +124,11 @@
       };
 
       useEffect(() => {
+        /* Trigger image generation when the page changes.
+           `images` and `loading` are read inside generateImage which closes over the
+           latest state via React's batched updates; calling it here is intentional. */
         generateImage(currentPage);
-      }, [currentPage]);
+      }, [currentPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
       const nextChapter = () => {
         if (currentPage < chapters.length - 1) setCurrentPage((prev) => prev + 1);
