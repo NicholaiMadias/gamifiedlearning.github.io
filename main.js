@@ -5,16 +5,28 @@
  */
 
 import { initMatchMaker } from './match-maker-ui.js';
+import { renderStarMap } from './star-map.js';
+import { onGameLevelComplete } from './concordance-lens.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  initMatchMaker(null, null);
+  const starMapContainer = document.getElementById('star-map-container');
 
-  const restartBtn = document.getElementById('restart-btn');
+  function refreshStarMap() {
+    if (starMapContainer) renderStarMap(starMapContainer);
+  }
+
+  initMatchMaker(null, null);
+  refreshStarMap();
+
+  const restartBtn = document.getElementById('match-restart-btn');
   if (restartBtn) {
     restartBtn.addEventListener('click', () => {
       initMatchMaker(null, null);
     });
   }
+
+  // Refresh star map whenever a level is completed
+  window.addEventListener('matchmaker-level-complete', refreshStarMap);
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
@@ -24,4 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   console.log('[GLM] Gamified Learning Matrix initialized.');
+});
+
+// Relay match-maker level completions into the Concordance Lens
+window.addEventListener('matchmaker-level-complete', e => {
+  onGameLevelComplete(e.detail?.level ?? 1);
 });
