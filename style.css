@@ -186,6 +186,11 @@ body {
   transition: background 0.2s ease;
 }
 .site-nav .menu-icon:hover { background: rgba(255, 255, 255, 0.15); }
+.site-nav #menu-toggle:focus-visible + .menu-icon {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 3px;
+  background: rgba(255, 255, 255, 0.15);
+}
 
 /* Desktop nav links */
 .site-nav .nav-links {
