@@ -22,11 +22,11 @@
   --cell-size:     clamp(38px, 11vw, 56px);
   --font-sans:     'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono:     'Cascadia Code', 'Fira Code', monospace;
-  --site-nav-height: 52px;
+  --site-nav-height: 0px; /* updated dynamically by nav-height.js inline script */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; scroll-padding-top: var(--site-nav-height); }
 
 body {
   font-family: var(--font-sans);
@@ -145,7 +145,6 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: var(--site-nav-height);
   z-index: 1000;
   background: #0044cc;
   color: #fff;
