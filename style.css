@@ -189,8 +189,9 @@ body {
 }
 .site-nav .menu-icon:hover { background: rgba(255, 255, 255, 0.15); }
 .site-nav #menu-toggle:focus-visible + .menu-icon {
-  outline: 2px solid var(--accent-blue);
-  outline-offset: 3px;
+  outline: 2px solid #4F46E5;
+  outline-offset: 4px;
+  border-radius: 0.375rem;
   background: rgba(255, 255, 255, 0.15);
 }
 
