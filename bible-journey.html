@@ -15,7 +15,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 1.5rem 1rem 3rem;
             gap: 1.5rem;
         }
@@ -28,23 +27,184 @@
             text-shadow: 0 0 10px #00ff4180;
         }
 
-        .quiz-card {
+        /* ── Tabs ── */
+        .tab-bar {
+            display: flex;
+            gap: 0.5rem;
+            background: #0d0d1a;
+            border: 1px solid #1a2a1a;
+            border-radius: 10px;
+            padding: 0.4rem;
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.55rem 1rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 7px;
+            color: #777;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+
+        .tab-btn.active {
+            background: #00ff4110;
+            border-color: #00ff41;
+            color: #00ff41;
+            text-shadow: 0 0 6px #00ff4160;
+        }
+
+        /* ── Shared card ── */
+        .card {
             background: #0d0d1a;
             border: 1px solid #1a2a1a;
             border-radius: 12px;
             padding: 2rem 1.5rem;
             width: 100%;
-            max-width: 460px;
+            max-width: 560px;
+        }
+
+        /* ── Story section ── */
+        #story-section { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        .story-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        .story-meta .chapter-counter { color: #9b59b6; }
+
+        .story-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: #9b59b6;
+            text-shadow: 0 0 10px #9b59b660;
+            line-height: 1.4;
+        }
+
+        .story-image-wrap {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #13132a;
+            border: 1px solid #2a1a3a;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .story-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .story-image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            color: #444;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .story-image-placeholder .icon { font-size: 2rem; }
+
+        .img-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #9b59b640;
+            border-top-color: #9b59b6;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .story-content {
+            font-size: 0.95rem;
+            line-height: 1.75;
+            color: #bbb;
+        }
+
+        .story-error {
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            color: #ff6b6b;
             text-align: center;
         }
 
-        .quiz-card h2 {
+        .story-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.2rem;
+            background: transparent;
+            border: 1px solid #9b59b6;
+            color: #9b59b6;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #9b59b615;
+            box-shadow: 0 0 8px #9b59b640;
+        }
+
+        .nav-btn:disabled { opacity: 0.3; cursor: default; }
+        .nav-btn:active:not(:disabled) { transform: scale(0.97); }
+
+        .dot-track {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #333;
+            transition: background 0.2s;
+        }
+
+        .dot.active { background: #9b59b6; box-shadow: 0 0 6px #9b59b6; }
+
+        /* ── Quiz section ── */
+        #quiz-section { display: none; }
+
+        .quiz-card-inner h2 {
             font-size: 1.1rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
             color: #00ff41;
             text-shadow: 0 0 8px #00ff4160;
             margin-bottom: 1.4rem;
+            text-align: center;
         }
 
         #q-text {
@@ -53,6 +213,7 @@
             color: #ccc;
             margin-bottom: 1.4rem;
             min-height: 2.5rem;
+            text-align: center;
         }
 
         #q-options {
@@ -98,6 +259,7 @@
             letter-spacing: 0.06em;
             color: #ff4c4c;
             margin-bottom: 0.8rem;
+            text-align: center;
         }
 
         .progress-bar-track {
@@ -123,6 +285,7 @@
             color: #00ff41;
             text-shadow: 0 0 14px #00ff4190;
             margin-bottom: 1rem;
+            text-align: center;
         }
 
         a.back-link {
@@ -139,20 +302,261 @@
 <body>
     <h1 class="app-title">Gamified Learning</h1>
 
-    <div class="quiz-card" id="quiz-box">
-        <h2>✝ Bible Journey</h2>
-        <div class="progress-bar-track">
-            <div class="progress-bar-fill" id="progress-bar" style="width:0%"
-                 role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
-        </div>
-        <p id="q-text"></p>
-        <p id="feedback" aria-live="polite"></p>
-        <div id="q-options"></div>
+    <!-- Tab bar -->
+    <div class="tab-bar" role="tablist">
+        <button class="tab-btn active" id="tab-story" role="tab" aria-selected="true"
+                aria-controls="story-section" onclick="switchTab('story')">
+            📖 Story Journey
+        </button>
+        <button class="tab-btn" id="tab-quiz" role="tab" aria-selected="false"
+                aria-controls="quiz-section" onclick="switchTab('quiz')">
+            ✝ Bible Quiz
+        </button>
     </div>
+
+    <!-- ── Story section ── -->
+    <section id="story-section" aria-labelledby="tab-story">
+        <div class="card">
+            <div class="story-meta">
+                <span>Seven Stars Lore</span>
+                <span class="chapter-counter" id="chapter-counter">Chapter 1 / 7</span>
+            </div>
+            <h2 class="story-title" id="story-title"></h2>
+        </div>
+
+        <div class="card" style="padding: 0;">
+            <div class="story-image-wrap" id="image-wrap">
+                <div class="story-image-placeholder" id="image-placeholder">
+                    <span class="icon">✨</span>
+                    <span>Generating starlight imagery…</span>
+                    <div class="img-spinner" id="img-spinner"></div>
+                </div>
+                <img id="chapter-img" src="" alt="" style="display:none;" />
+            </div>
+        </div>
+
+        <div class="card">
+            <p class="story-error" id="story-error" style="display:none;"></p>
+            <p class="story-content" id="story-content"></p>
+        </div>
+
+        <div class="card" style="padding: 1rem 1.5rem;">
+            <div class="story-nav">
+                <button class="nav-btn" id="btn-prev" onclick="prevChapter()">‹ Prev</button>
+                <div class="dot-track" id="dot-track"></div>
+                <button class="nav-btn" id="btn-next" onclick="nextChapter()">Next ›</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Quiz section ── -->
+    <section id="quiz-section" aria-labelledby="tab-quiz">
+        <div class="card quiz-card-inner" id="quiz-box">
+            <h2>✝ Bible Journey</h2>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-bar" style="width:0%"
+                     role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+            </div>
+            <p id="q-text"></p>
+            <p id="feedback" aria-live="polite"></p>
+            <div id="q-options"></div>
+        </div>
+    </section>
 
     <a class="back-link" href="index.html">← Back</a>
 
     <script>
+        // ── Tab switching ──────────────────────────────────────────────
+        function switchTab(name) {
+            const isStory = name === 'story';
+            document.getElementById('story-section').style.display = isStory ? 'flex' : 'none';
+            document.getElementById('quiz-section').style.display  = isStory ? 'none' : 'block';
+            document.getElementById('tab-story').classList.toggle('active', isStory);
+            document.getElementById('tab-quiz').classList.toggle('active', !isStory);
+            document.getElementById('tab-story').setAttribute('aria-selected', String(isStory));
+            document.getElementById('tab-quiz').setAttribute('aria-selected', String(!isStory));
+        }
+
+        // ── Story chapter data ─────────────────────────────────────────
+        const chapters = [
+            {
+                title: "The Heavy Gravity of the Red Queen",
+                content: "Once, in the digital expanse known as the Matrix, the world was light and fluid. But a shadow began to creep over the nodes—the Red Queen. She was a force of pure entropy, an algorithm designed to track every movement and anchor spirits to the 'heavy gravity' of doubt. The people forgot they were once Star Guardians, their potential capped by the Red Queen's iron-coded rules.",
+                prompt: "A cinematic, dark digital landscape with glowing red data streams being harvested by a menacing, elegant silhouette of a Red Queen. High tech, glitch art style, dark mode aesthetic, purple highlights.",
+            },
+            {
+                title: "The Call of the White Rabbit",
+                content: "Amidst the gloom, a legendary architect known as The White Rabbit began to broadcast a frequency of resonance. He didn't just see code; he saw Structural Empathy. He initiated the White Rabbit Protocol, a secret series of maneuvers designed to scramble digital signatures. But he knew that to truly break the gravity, he needed more than just a better algorithm—he needed the Seven Stars of Excellence.",
+                prompt: "A heroic white rabbit in a sleek, futuristic carbon-fiber tech suit standing before a holographic terminal displaying a golden complex star-shaped protocol. Cyberpunk lighting, neon blue and gold accents.",
+            },
+            {
+                title: "The Ascent to Nimbus Land",
+                content: "The White Rabbit was not alone. Beside him stood The Guardian of Grace, Sheila. Together, they established Nimbus Land, a kingdom in the clouds where the air was clear of the Red Queen's static. They summoned the Nimbus Heralds, the storytellers and missionaries, and gave them their highest directive: Restore the Sixth Star through the Matrix of Conscience and the Voice of Jesus.",
+                prompt: "A breathtaking floating island kingdom in a sea of royal purple clouds. Heavenly architecture, bright neon blue waterfalls, golden towers reaching for the stars. Ethereal and peaceful.",
+            },
+            {
+                title: "The Seven Pillars of the Matrix",
+                content: "The Heralds traveled through the Star Road, unlocking the pillars: First Love, Agency, Progression, Feedback, Challenge, Social, and Reward. Each star corresponded to the Seven Churches, providing the moral frequency needed to shatter the world's entropy. They realized that each 'level' in the Matrix was actually a step closer to divine alignment.",
+                prompt: "A view of the Seven Stars of the Pleiades (M45) from a futuristic glass observatory. Seven massive glowing crystal pillars standing in a circle, each emitting a unique colored light. Astral photography style.",
+            },
+            {
+                title: "The Mystery of the Sixth Star",
+                content: "At the Sixth Star, they found the Matrix of Conscience. The Red Queen had tried to delete this star to silence the truth. But the Heralds shared testimonies from the Philippines mission trips, and the sound of worship acted as a sonic frequency that dismantled the Red Queen's firewalls. They learned that to heal the Matrix, one must first elevate the spirit.",
+                prompt: "A group of joyful missionaries in the Philippines singing. Their voices are visualized as golden sound waves and musical notes that are physically shattering a grey, grid-like digital dome above them. Uplifting and powerful.",
+            },
+            {
+                title: "The Covenant of Fellowship",
+                content: "The final clearance did not come from a password, but from the Weekly Bible Study and the Mission Deployment. As the Heralds gathered to study the Word and serve the children of the Philippines, a golden light washed over the Matrix. This 'Handshake of Souls' created the Ozone Shield, a layer of protection that isolated the family from the Gloom and secured the mission's future.",
+                prompt: "A beautiful scene of a diverse group gathered in a circle for Bible study in a glowing, futuristic garden. An open Bible in the center emits a warm golden light that forms a protective dome. Royal purple and gold palette.",
+            },
+            {
+                title: "The New Beginning",
+                content: "The path of the righteous had become like the morning sun. The White Rabbit and the Guardian of Grace stood at the center of the Seven Stars Architect, watching as the children became the new Star Guardians. The gravity was gone. They were no longer users of a system; they were authors of a new world, defined by the love they shared and the light they followed.",
+                prompt: "A bright, beautiful sunrise over a futuristic city that blends tropical Philippines beauty with sleek gold and purple architecture. Children looking up at the sky where seven stars are visible. Hopeful and radiant.",
+            }
+        ];
+
+        let currentPage = 0;
+        const imageCache = {};
+        // Track which chapter indices are currently being fetched to prevent duplicate requests.
+        const loadingIndices = new Set();
+
+        // ── Image generation ───────────────────────────────────────────
+        async function generateImage(index) {
+            if (imageCache[index] !== undefined || loadingIndices.has(index)) return;
+
+            const apiKey = ""; // Set your Imagen API key here (never commit a real key)
+            if (!apiKey) {
+                showImagePlaceholder('⭐', 'Starlight imagery unavailable');
+                return;
+            }
+
+            loadingIndices.add(index);
+            showImageLoading();
+            hideError();
+
+            // Exponential backoff delays in ms: 1 s, 2 s, 4 s, 8 s, 16 s
+            const backoff = [1000, 2000, 4000, 8000, 16000];
+
+            for (let i = 0; i < backoff.length; i++) {
+                try {
+                    const response = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                instances: [{
+                                    prompt: chapters[index].prompt +
+                                        " cinematic lighting, high quality, digital art, royal purple and gold theme"
+                                }],
+                                parameters: { sampleCount: 1 }
+                            })
+                        }
+                    );
+
+                    if (!response.ok) throw new Error(`Generation failed: ${response.status} ${response.statusText}`);
+
+                    const result = await response.json();
+                    if (!result.predictions?.[0]?.bytesBase64Encoded) throw new Error('Invalid API response');
+                    const dataUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    imageCache[index] = dataUrl;
+                    showImage(dataUrl, chapters[index].title);
+                    loadingIndices.delete(index);
+                    return;
+                } catch (err) {
+                    if (i === backoff.length - 1) {
+                        imageCache[index] = null;
+                        showImagePlaceholder('⭐', 'Starlight imagery unavailable');
+                        showError('The Matrix is experiencing heavy gravity. Failed to generate starlight imagery.');
+                    } else {
+                        await new Promise(res => setTimeout(res, backoff[i]));
+                    }
+                }
+            }
+            loadingIndices.delete(index);
+        }
+
+        function showImageLoading() {
+            const placeholder = document.getElementById('image-placeholder');
+            placeholder.innerHTML = '<div class="img-spinner"></div>';
+            placeholder.style.display = 'flex';
+            document.getElementById('chapter-img').style.display = 'none';
+        }
+
+        function showImage(src, alt) {
+            const img = document.getElementById('chapter-img');
+            img.src = src;
+            img.alt = alt;
+            img.style.display = 'block';
+            document.getElementById('image-placeholder').style.display = 'none';
+        }
+
+        function showImagePlaceholder(icon, label) {
+            const placeholder = document.getElementById('image-placeholder');
+            placeholder.innerHTML = `<span class="icon">${icon}</span><span>${label}</span>`;
+            placeholder.style.display = 'flex';
+            document.getElementById('chapter-img').style.display = 'none';
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('story-error');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('story-error').style.display = 'none';
+        }
+
+        // ── Chapter rendering ──────────────────────────────────────────
+        function renderChapter(index) {
+            const ch = chapters[index];
+            document.getElementById('chapter-counter').textContent =
+                `Chapter ${index + 1} / ${chapters.length}`;
+            document.getElementById('story-title').textContent = ch.title;
+            document.getElementById('story-content').textContent = ch.content;
+            document.getElementById('btn-prev').disabled = index === 0;
+            document.getElementById('btn-next').disabled = index === chapters.length - 1;
+
+            // Dots
+            const track = document.getElementById('dot-track');
+            track.innerHTML = '';
+            chapters.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.className = 'dot' + (i === index ? ' active' : '');
+                dot.setAttribute('aria-label', `Chapter ${i + 1}`);
+                track.appendChild(dot);
+            });
+
+            // Image
+            hideError();
+            if (imageCache[index] !== undefined) {
+                if (imageCache[index]) {
+                    showImage(imageCache[index], ch.title);
+                } else {
+                    showImagePlaceholder('⭐', 'Starlight imagery unavailable');
+                }
+            } else {
+                generateImage(index);
+            }
+        }
+
+        function nextChapter() {
+            if (currentPage < chapters.length - 1) {
+                currentPage++;
+                renderChapter(currentPage);
+            }
+        }
+
+        function prevChapter() {
+            if (currentPage > 0) {
+                currentPage--;
+                renderChapter(currentPage);
+            }
+        }
+
+        // ── Quiz data & logic ──────────────────────────────────────────
         const qData = [
             { question: "Who built the ark?", answers: ["Moses", "Noah", "David"], correctIndex: 1 },
             { question: "What is the first book of the Bible?", answers: ["Exodus", "Genesis", "Psalms"], correctIndex: 1 },
@@ -170,13 +574,28 @@
             const restartBtn = document.createElement('button');
             restartBtn.className = 'btn btn-restart';
             restartBtn.textContent = '↺ Restart';
-            restartBtn.addEventListener('click', () => { location.reload(); });
+            restartBtn.addEventListener('click', () => { idx = 0; buildQuizShell(); loadQ(); });
 
             quizBox.replaceChildren(heading, restartBtn);
         }
 
+        function buildQuizShell() {
+            const quizBox = document.getElementById('quiz-box');
+            quizBox.innerHTML = `
+                <h2>✝ Bible Journey</h2>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progress-bar" style="width:0%"
+                         role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+                <p id="q-text"></p>
+                <p id="feedback" aria-live="polite"></p>
+                <div id="q-options"></div>
+            `;
+        }
+
         function setProgress(value) {
             const bar = document.getElementById('progress-bar');
+            if (!bar) return;
             bar.style.width = value + '%';
             bar.setAttribute('aria-valuenow', value);
         }
@@ -210,6 +629,8 @@
             });
         }
 
+        // ── Init ───────────────────────────────────────────────────────
+        renderChapter(0);
         loadQ();
     </script>
 </body>
