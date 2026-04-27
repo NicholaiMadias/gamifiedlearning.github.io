@@ -170,18 +170,7 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* Hide checkbox visually but keep it keyboard/screen-reader accessible */
-.site-nav #menu-toggle {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* Use the shared `.sr-only` utility on #menu-toggle in the markup. */
 
 /* Hamburger icon – hidden on desktop */
 .site-nav .menu-icon {
