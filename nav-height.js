@@ -6,6 +6,7 @@
     if (!nav) return;
     document.documentElement.style.setProperty('--site-nav-height', nav.offsetHeight + 'px');
   }
+  updateNavHeight();
   window.addEventListener('load', updateNavHeight);
   window.addEventListener('resize', updateNavHeight);
 })();
