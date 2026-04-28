@@ -59,12 +59,13 @@
 
     <!-- HUB VIEW -->
     <!-- Unlock banner (shown after Bible Journey is completed; hidden while in any game view) -->
-    <div id="unlock-banner" class="hidden fixed left-0 right-0 z-[400] bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-500/50 px-4 py-3 text-center" style="top:var(--site-nav-height,48px);">
+    <div id="unlock-banner" class="hidden fixed left-0 right-0 z-[400] bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-500/50 px-4 py-3 text-center"
+         style="top:var(--site-nav-height,48px);cursor:pointer;" title="Click to dismiss"
+         onclick="dismissUnlockBanner()">
         <p class="text-[10px] font-bold text-yellow-300 tracking-[0.2em] uppercase">🌟 Bible Journey Complete — New games unlocked! Scroll down to explore. 🌟</p>
         <button id="unlock-banner-close" aria-label="Dismiss unlock notification"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-300/60 hover:text-yellow-300 transition-colors text-base leading-none"
-                style="background:none;border:none;cursor:pointer;padding:0.25rem 0.5rem;"
-                onclick="dismissUnlockBanner()">✕</button>
+                style="background:none;border:none;cursor:pointer;padding:0.25rem 0.5rem;">✕</button>
     </div>
 
     <div id="view-hub" class="h-full overflow-y-auto flex flex-col items-center p-6 text-center w-full max-w-4xl" style="padding-bottom:3rem;">
@@ -244,6 +245,9 @@
         let lockTarget = "", lockInput = "", baseline = 0, lockInterval;
         let ssGameComplete = false, ssCertDataUrl = null, ssCertId = null;
 
+        let _bannerTimer = null;
+        let _bannerKeyHandler = null;
+
         function switchView(viewId) {
             document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
             document.getElementById('hud').classList.add('hidden');
@@ -254,12 +258,21 @@
                 document.getElementById('hud').classList.remove('hidden');
                 // Always hide the unlock banner when entering any game view
                 if (banner) banner.classList.add('hidden');
+                _clearBannerListeners();
             } else {
                 // Show the unlock banner on hub (unless the user dismissed it)
                 try {
                     if (localStorage.getItem('bjComplete') === 'true' &&
                         localStorage.getItem('bjBannerDismissed') !== 'true') {
-                        if (banner) banner.classList.remove('hidden');
+                        if (banner) {
+                            banner.classList.remove('hidden');
+                            _clearBannerListeners();
+                            // Auto-dismiss after 7 s
+                            _bannerTimer = setTimeout(dismissUnlockBanner, 7000);
+                            // Dismiss on any keypress
+                            _bannerKeyHandler = () => dismissUnlockBanner();
+                            document.addEventListener('keydown', _bannerKeyHandler, { once: true });
+                        }
                     }
                 } catch(_) {}
             }
@@ -273,7 +286,13 @@
             if (lockInterval) clearInterval(lockInterval);
         }
 
+        function _clearBannerListeners() {
+            if (_bannerTimer !== null) { clearTimeout(_bannerTimer); _bannerTimer = null; }
+            if (_bannerKeyHandler !== null) { document.removeEventListener('keydown', _bannerKeyHandler); _bannerKeyHandler = null; }
+        }
+
         function dismissUnlockBanner() {
+            _clearBannerListeners();
             const banner = document.getElementById('unlock-banner');
             if (banner) banner.classList.add('hidden');
             try { localStorage.setItem('bjBannerDismissed', 'true'); } catch(_) {}
