@@ -1,0 +1,379 @@
+/* ============================================================
+   Sovereign Matrix — Admin Dashboard Theme
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --matrix-green:   #00ff41;
+  --matrix-cyan:    #00e5ff;
+  --matrix-dark:    #0a0a0a;
+  --matrix-panel:   #0d1a0d;
+  --matrix-border:  #00ff41;
+  --matrix-dim:     #003b00;
+  --matrix-red:     #ff2244;
+  --matrix-text:    #b0ffb0;
+  --matrix-heading: #00ff41;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+html, body {
+  background-color: var(--matrix-dark);
+  color: var(--matrix-text);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--matrix-dark); }
+::-webkit-scrollbar-thumb { background: var(--matrix-dim); border-radius: 3px; }
+
+/* ── Layout helpers ──────────────────────────────────────── */
+.page-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* ── Top Nav ──────────────────────────────────────────────── */
+.matrix-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--matrix-dim);
+  background: #000;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.matrix-nav .nav-brand {
+  color: var(--matrix-green);
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+
+.matrix-nav .nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.matrix-nav .nav-links a {
+  color: var(--matrix-text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+
+.matrix-nav .nav-links a:hover,
+.matrix-nav .nav-links a.active {
+  color: var(--matrix-green);
+  text-shadow: 0 0 6px var(--matrix-green);
+}
+
+.matrix-nav .nav-user {
+  font-size: 0.75rem;
+  color: var(--matrix-dim);
+}
+
+/* ── Cards ────────────────────────────────────────────────── */
+.matrix-card {
+  background: var(--matrix-panel);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.matrix-border {
+  border: 1px solid var(--matrix-border);
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.12);
+}
+
+/* ── Headings ─────────────────────────────────────────────── */
+.matrix-heading {
+  color: var(--matrix-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+  margin-bottom: 1rem;
+}
+
+h1.matrix-heading { font-size: 1.6rem; }
+h2.matrix-heading { font-size: 1.25rem; }
+h3.matrix-heading { font-size: 1rem; }
+
+/* ── Dashboard Grid ───────────────────────────────────────── */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.admin-tile {
+  display: block;
+  padding: 1.25rem;
+  border: 1px solid var(--matrix-dim);
+  border-radius: 4px;
+  background: #000;
+  color: var(--matrix-text);
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.admin-tile:hover {
+  border-color: var(--matrix-green);
+  box-shadow: 0 0 14px rgba(0, 255, 65, 0.3);
+  background: var(--matrix-panel);
+  color: var(--matrix-green);
+}
+
+.admin-tile h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-tile p {
+  font-size: 0.75rem;
+  color: #5a7a5a;
+}
+
+.admin-tile:hover p { color: #00cc33; }
+
+/* ── Tables ───────────────────────────────────────────────── */
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-top: 0.75rem;
+}
+
+.matrix-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--matrix-border);
+  color: var(--matrix-green);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+}
+
+.matrix-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--matrix-dim);
+  vertical-align: middle;
+}
+
+.matrix-table tr:hover td {
+  background: rgba(0, 255, 65, 0.04);
+}
+
+.matrix-table input[type="checkbox"] {
+  accent-color: var(--matrix-green);
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+/* ── Terminal / Pre ───────────────────────────────────────── */
+.matrix-terminal {
+  background: #000;
+  border: 1px solid var(--matrix-dim);
+  color: var(--matrix-green);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 1rem;
+  border-radius: 3px;
+  min-height: 3rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Form Inputs ──────────────────────────────────────────── */
+.matrix-input {
+  background: #000;
+  border: 1px solid var(--matrix-dim);
+  color: var(--matrix-green);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 3px;
+  outline: none;
+  width: 100%;
+  max-width: 420px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.matrix-input::placeholder { color: #2a4a2a; }
+
+.matrix-input:focus {
+  border-color: var(--matrix-green);
+  box-shadow: 0 0 6px rgba(0, 255, 65, 0.25);
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border-radius: 3px;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  transition: box-shadow 0.2s, background 0.2s, color 0.2s;
+  text-decoration: none;
+}
+
+.btn-neon {
+  background: transparent;
+  border: 1px solid var(--matrix-green);
+  color: var(--matrix-green);
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.btn-neon:hover {
+  background: var(--matrix-green);
+  color: #000;
+  box-shadow: 0 0 16px rgba(0, 255, 65, 0.6);
+}
+
+.btn-danger {
+  background: transparent;
+  border: 1px solid var(--matrix-red);
+  color: var(--matrix-red);
+  margin-top: 0.25rem;
+}
+
+.btn-danger:hover {
+  background: var(--matrix-red);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 34, 68, 0.5);
+}
+
+/* ── Alerts / Status messages ─────────────────────────────── */
+.matrix-alert {
+  padding: 0.6rem 1rem;
+  border-radius: 3px;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--matrix-green);
+  background: rgba(0, 255, 65, 0.07);
+  color: var(--matrix-green);
+}
+
+.matrix-alert.error {
+  border-color: var(--matrix-red);
+  background: rgba(255, 34, 68, 0.07);
+  color: var(--matrix-red);
+}
+
+.matrix-alert.info {
+  border-color: var(--matrix-cyan);
+  background: rgba(0, 229, 255, 0.07);
+  color: var(--matrix-cyan);
+}
+
+/* ── Badges / Role tags ───────────────────────────────────── */
+.role-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.role-owner     { background: rgba(255, 200, 0, 0.15); color: #ffc800; border: 1px solid #7a6000; }
+.role-superAdmin { background: rgba(0, 229, 255, 0.1); color: var(--matrix-cyan); border: 1px solid #006080; }
+.role-admin     { background: rgba(0, 255, 65, 0.1);  color: var(--matrix-green); border: 1px solid var(--matrix-dim); }
+.role-user      { background: rgba(100,100,100,0.1);   color: #666; border: 1px solid #333; }
+
+/* ── Login / Centered form ───────────────────────────────── */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 380px;
+  padding: 2rem;
+}
+
+.login-box .matrix-heading {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-box label {
+  display: block;
+  font-size: 0.78rem;
+  margin-bottom: 0.3rem;
+  color: var(--matrix-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Forbidden page ──────────────────────────────────────── */
+.forbidden-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.forbidden-wrap .code {
+  font-size: 5rem;
+  color: var(--matrix-red);
+  text-shadow: 0 0 20px rgba(255, 34, 68, 0.5);
+}
+
+/* ── Glitch title animation ──────────────────────────────── */
+@keyframes glitch {
+  0%, 100% { text-shadow: 0 0 8px var(--matrix-green); }
+  20% { text-shadow: -2px 0 var(--matrix-cyan), 2px 0 var(--matrix-red); }
+  40% { text-shadow: 2px 0 var(--matrix-cyan), -2px 0 var(--matrix-red); }
+}
+
+.glitch {
+  animation: glitch 4s infinite;
+}
+
+/* ── Rain canvas (optional overlay) ──────────────────────── */
+#matrix-rain {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0.04;
+  z-index: -1;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .matrix-nav .nav-links { gap: 0.75rem; }
+  .admin-grid { grid-template-columns: 1fr 1fr; }
+  .matrix-table { font-size: 0.72rem; }
+  .matrix-table th, .matrix-table td { padding: 0.4rem 0.5rem; }
+}

@@ -55,7 +55,8 @@ const ELEMENT_DISPLAY = {
 
 /** Single-character overlay glyphs rendered on top of special tiles */
 const SPECIAL_GLYPH = {
-  [SPECIAL.LINE]:      '—',
+  [SPECIAL.LINE_H]:    '—',
+  [SPECIAL.LINE_V]:    '|',
   [SPECIAL.CROSS]:     '✚',
   [SPECIAL.NOVA]:      '✦',
   [SPECIAL.SUPERNOVA]: '★',
