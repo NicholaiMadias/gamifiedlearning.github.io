@@ -77,10 +77,11 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_REF: ${{ github.base_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           # Collect the diff (JS, HTML, CSS only; cap at 30 000 chars for the API)
-          DIFF=$(git diff "origin/${BASE_REF}..HEAD" -- '*.js' '*.html' '*.css' \
+          DIFF=$(git diff "${BASE_SHA}..${HEAD_SHA}" -- '*.js' '*.html' '*.css' \
                  | head -c 30000)
 
           if [ -z "$DIFF" ]; then
