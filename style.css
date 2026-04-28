@@ -138,6 +138,47 @@ body {
 .site-footer a:hover { text-decoration: underline; }
 .hidden { display: none !important; }
 
+.gem-supernova {
+  background: linear-gradient(135deg, rgba(255,120,0,0.3), rgba(255,50,50,0.3));
+  animation: supernovaPulse 1.8s ease-in-out infinite;
+}
+@keyframes supernovaPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(255,120,0,0.5); }
+  50%       { box-shadow: 0 0 18px rgba(255,50,50,0.9); }
+}
+
+.supernova-blast {
+  animation: supernovaExplode 0.45s ease-out forwards;
+}
+@keyframes supernovaExplode {
+  0%   { filter: brightness(1);   transform: scale(1); }
+  40%  { filter: brightness(3);   transform: scale(1.4); }
+  100% { filter: brightness(0.2); transform: scale(0); opacity: 0; }
+}
+
+.cosmic-trail {
+  border: 2px solid var(--accent-cosmic) !important;
+  animation: cosmicGlow 1.2s ease-in-out infinite;
+}
+@keyframes cosmicGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(247,120,186,0.4); }
+  50%       { box-shadow: 0 0 28px rgba(247,120,186,0.9); }
+}
+
+.board-complete {
+  border: 2px solid var(--accent-gold) !important;
+  box-shadow: 0 0 32px rgba(240,192,64,0.7);
+}
+
+.gem-dropping {
+  animation: gemDrop 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes gemDrop {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  70%  { transform: translateY(6%);    opacity: 1; }
+  100% { transform: translateY(0);     opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 @media (min-width: 480px) { .hud { flex-direction: row; justify-content: space-between; } }
 @media (min-width: 600px) { :root { --cell-size: 52px; --grid-gap: 5px; } }
