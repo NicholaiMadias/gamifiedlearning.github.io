@@ -245,9 +245,8 @@
     <div id="sm-name-phase" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:320px;">
       <label for="sm-player-name" style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.15em;color:#94a3b8;margin-bottom:0.5rem;">Your name for the certificate</label>
       <input id="sm-player-name" type="text" maxlength="30" placeholder="Star Guardian" class="name-input"
-             autocomplete="name" aria-label="Player name for certificate"
-             onkeydown="if(event.key==='Enter')smGenerateCert()">
-      <button class="cert-btn purple" onclick="smGenerateCert()" id="sm-gen-btn">Generate Certificate</button>
+             autocomplete="name" aria-label="Player name for certificate">
+      <button class="cert-btn purple" id="sm-gen-btn">Generate Certificate</button>
     </div>
 
     <div id="sm-cert-phase" style="display:none;flex-direction:column;align-items:center;gap:0.75rem;width:100%;">
@@ -561,7 +560,7 @@
       if (!certDataUrl) return;
       const win = window.open('', '_blank', 'noopener');
       if (!win) { alert('Please allow pop-ups to save the certificate as PDF.'); return; }
-      win.opener = null;
+      win.opener = null; // Belt-and-suspenders: noopener may not clear opener in all contexts
       win.document.write('<!DOCTYPE html><html><head><title>Certificate — Star Matrix</title>' +
         '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#020617;display:flex;justify-content:center;align-items:center;min-height:100vh}img{width:100%;max-width:760px}@media print{body{background:white}}</style>' +
         '</head><body><img src="' + certDataUrl + '">' +
@@ -575,7 +574,14 @@
     }
 
     // ── Boot ─────────────────────────────────────────────────────────────────
-    window.addEventListener('DOMContentLoaded', smInit);
+    window.addEventListener('DOMContentLoaded', function () {
+      // Wire up certificate name input events
+      const nameInput = document.getElementById('sm-player-name');
+      if (nameInput) nameInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') smGenerateCert(); });
+      const genBtn = document.getElementById('sm-gen-btn');
+      if (genBtn) genBtn.addEventListener('click', smGenerateCert);
+      smInit();
+    });
   </script>
 </body>
 </html>

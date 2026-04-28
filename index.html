@@ -59,7 +59,7 @@
 
     <!-- HUB VIEW -->
     <!-- Unlock banner (shown after Bible Journey is completed) -->
-    <div id="unlock-banner" class="hidden fixed top-0 left-0 right-0 z-[999] bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-500/50 px-4 py-3 text-center">
+    <div id="unlock-banner" class="hidden fixed left-0 right-0 z-[400] bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-500/50 px-4 py-3 text-center" style="top:var(--site-nav-height,48px);">
         <p class="text-[10px] font-bold text-yellow-300 tracking-[0.2em] uppercase">🌟 Bible Journey Complete — New games unlocked! Scroll down to explore. 🌟</p>
     </div>
 
@@ -247,9 +247,7 @@
             if (view) view.classList.remove('hidden');
             if (viewId !== 'view-hub') {
                 document.getElementById('hud').classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
             } else {
-                document.body.style.overflow = 'hidden';
                 // Check quiz completion unlock banner
                 try {
                     if (localStorage.getItem('bjComplete') === 'true') {
@@ -258,6 +256,7 @@
                     }
                 } catch(_) {}
             }
+            document.body.style.overflow = 'hidden';
 
             ssGameComplete = false; ssCertDataUrl = null; ssCertId = null;
             score = 0; updateScoreDisplay();
@@ -308,7 +307,7 @@
             ];
             try {
                 const res = await fetch(GRAPHICS_API);
-                if (!res.ok) throw new Error('API ' + res.status);
+                if (!res.ok) throw new Error('Graphics API request failed with status ' + res.status);
                 const result = await res.json();
                 const apiAssets = result.data.filter(a => a.category === "Match3");
                 if (apiAssets.length > 0) {
