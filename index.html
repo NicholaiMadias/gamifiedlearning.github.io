@@ -58,11 +58,19 @@
     </div>
 
     <!-- HUB VIEW -->
-    <div id="view-hub" class="h-full flex flex-col items-center justify-center p-6 text-center w-full max-w-4xl">
-        <div class="mb-12">
+    <!-- Unlock banner (shown after Bible Journey is completed) -->
+    <div id="unlock-banner" class="hidden fixed top-0 left-0 right-0 z-[999] bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-500/50 px-4 py-3 text-center">
+        <p class="text-[10px] font-bold text-yellow-300 tracking-[0.2em] uppercase">🌟 Bible Journey Complete — New games unlocked! Scroll down to explore. 🌟</p>
+    </div>
+
+    <div id="view-hub" class="h-full overflow-y-auto flex flex-col items-center p-6 text-center w-full max-w-4xl" style="padding-bottom:3rem;">
+        <div class="mb-8 mt-4">
             <h1 class="orbitron text-5xl md:text-7xl font-black text-white tracking-tighter mb-2 italic">NEXUS ARCADE</h1>
-            <p class="text-blue-400 font-bold tracking-[0.4em] uppercase text-[10px]">Largo & Tampa Operational Nodes</p>
+            <p class="text-blue-400 font-bold tracking-[0.4em] uppercase text-[10px]">Largo &amp; Tampa Operational Nodes</p>
         </div>
+
+        <!-- ── Core Games ─────────────────────────────────── -->
+        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.25em] mb-4 w-full text-left">▸ Core Games</p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
             <button onclick="switchView('view-match3')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-cyan-400">
                 <div class="w-12 h-12 bg-blue-500/20 rounded-xl mb-4 flex items-center justify-center text-blue-400">✨</div>
@@ -74,26 +82,51 @@
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Number Lock</h2>
                 <p class="text-slate-400 text-[10px]">Disrupt the Red Queen's behavioral baseline.</p>
             </button>
-            <button onclick="switchView('view-admin')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-purple-400">
-                <div class="w-12 h-12 bg-purple-500/20 rounded-xl mb-4 flex items-center justify-center text-purple-400">🛠️</div>
+            <a href="/arcade/" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-green-400" style="text-decoration:none;">
+                <div class="w-12 h-12 bg-green-500/20 rounded-xl mb-4 flex items-center justify-center text-green-400">🎮</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Match Maker</h2>
+                <p class="text-slate-400 text-[10px]">7-level championship mode — earn certificates and stars.</p>
+            </a>
+        </div>
+
+        <!-- ── New Games ──────────────────────────────────── -->
+        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.25em] mt-8 mb-4 w-full text-left">▸ New Games</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <a href="/star-matrix/" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-yellow-400" style="text-decoration:none;">
+                <div class="w-12 h-12 bg-yellow-500/20 rounded-xl mb-4 flex items-center justify-center text-yellow-400">🌟</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Star Matrix</h2>
+                <p class="text-slate-400 text-[10px]">Match star constellations — align 5 star types to reach 1000 points.</p>
+                <span class="mt-3 inline-block text-[8px] font-bold uppercase tracking-[0.15em] text-yellow-500 border border-yellow-500/30 rounded-full px-2 py-0.5">New</span>
+            </a>
+            <a href="/matrix-of-conscience/" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-purple-400" style="text-decoration:none;">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-xl mb-4 flex items-center justify-center text-purple-400">🧠</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Matrix of Conscience</h2>
+                <p class="text-slate-400 text-[10px]">Explore the Seven Pillars — an interactive journey through the White Rabbit Protocol.</p>
+                <span class="mt-3 inline-block text-[8px] font-bold uppercase tracking-[0.15em] text-purple-500 border border-purple-500/30 rounded-full px-2 py-0.5">New</span>
+            </a>
+            <button onclick="switchView('view-admin')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-slate-400">
+                <div class="w-12 h-12 bg-slate-500/20 rounded-xl mb-4 flex items-center justify-center text-slate-400">🛠️</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Command Center</h2>
                 <p class="text-slate-400 text-[10px]">Execute Drive Organization and Mission Protocols.</p>
             </button>
         </div>
-        <div class="mt-6 w-full grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">
+
+        <!-- ── Stories ────────────────────────────────────── -->
+        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.25em] mt-8 mb-4 w-full text-left">▸ Stories &amp; Missions</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+            <a href="/ministry.html" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-purple-400" style="text-decoration:none;">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-xl mb-4 flex items-center justify-center text-purple-400">✦</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Enter the Matrix of Conscience</h2>
+                <p class="text-slate-400 text-[10px]">Seven AI-illustrated chapters of the White Rabbit Protocol — Voice of Jesus Storybook.</p>
+            </a>
             <button onclick="switchView('view-bible-journey')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-yellow-400">
                 <div class="w-12 h-12 bg-yellow-500/20 rounded-xl mb-4 flex items-center justify-center text-yellow-400">✝</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Bible Journey</h2>
-                <p class="text-slate-400 text-[10px]">Test your Bible knowledge — answer questions to complete the journey.</p>
+                <p class="text-slate-400 text-[10px]">Test your Bible knowledge — complete the journey to unlock new experiences.</p>
             </button>
-            <a href="/ministry.html" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-purple-400 no-underline" style="text-decoration:none;">
-                <div class="w-12 h-12 bg-purple-500/20 rounded-xl mb-4 flex items-center justify-center text-purple-400">✦</div>
-                <h2 class="orbitron text-xl font-bold text-white mb-2">The Enter Matrix of Conscience</h2>
-                <p class="text-slate-400 text-[10px]">Seven chapters of the White Rabbit Protocol — Voice of Jesus Storybook.</p>
-            </a>
         </div>
-        <div class="mt-8 flex gap-4 justify-center">
-            <a href="/arcade/" class="text-[9px] text-green-400 font-bold uppercase tracking-[0.2em] hover:text-green-300 transition-colors" style="text-decoration:none;">▶ Match Maker (7-level mode)</a>
+
+        <div class="mt-8 flex flex-wrap gap-4 justify-center">
             <a href="/arcade/certificates/" class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] hover:text-cyan-400 transition-colors" style="text-decoration:none;">📜 My Certificates</a>
         </div>
     </div>
@@ -212,7 +245,19 @@
             document.getElementById('hud').classList.add('hidden');
             const view = document.getElementById(viewId);
             if (view) view.classList.remove('hidden');
-            if (viewId !== 'view-hub') document.getElementById('hud').classList.remove('hidden');
+            if (viewId !== 'view-hub') {
+                document.getElementById('hud').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'hidden';
+                // Check quiz completion unlock banner
+                try {
+                    if (localStorage.getItem('bjComplete') === 'true') {
+                        const banner = document.getElementById('unlock-banner');
+                        if (banner) banner.classList.remove('hidden');
+                    }
+                } catch(_) {}
+            }
 
             ssGameComplete = false; ssCertDataUrl = null; ssCertId = null;
             score = 0; updateScoreDisplay();
@@ -253,12 +298,29 @@
         }
 
         async function initMatch3() {
+            // Fallback tile set used when the graphics API is unavailable
+            const FALLBACK_ASSETS = [
+                { url: '', file_name: 'star_gold',   emoji: '🌟' },
+                { url: '', file_name: 'star_blue',   emoji: '💫' },
+                { url: '', file_name: 'star_gem',    emoji: '💎' },
+                { url: '', file_name: 'star_rank',   emoji: '⭐' },
+                { url: '', file_name: 'star_cosmic', emoji: '✨' },
+            ];
             try {
                 const res = await fetch(GRAPHICS_API);
+                if (!res.ok) throw new Error('API ' + res.status);
                 const result = await res.json();
-                gameAssets = result.data.filter(a => a.category === "Match3");
-                createBoard(); renderGrid();
-            } catch (e) { console.error(e); }
+                const apiAssets = result.data.filter(a => a.category === "Match3");
+                if (apiAssets.length > 0) {
+                    gameAssets = apiAssets;
+                } else {
+                    gameAssets = FALLBACK_ASSETS;
+                }
+            } catch (e) {
+                console.warn('Graphics API unavailable, using emoji fallback:', e.message);
+                gameAssets = FALLBACK_ASSETS;
+            }
+            createBoard(); renderGrid();
         }
 
         function createBoard() {
@@ -270,7 +332,7 @@
 
         function getRandomAsset() {
             const asset = gameAssets[Math.floor(Math.random() * gameAssets.length)];
-            return { img: asset.url, type: asset.file_name };
+            return { img: asset.url || '', type: asset.file_name, emoji: asset.emoji || '' };
         }
 
         function renderGrid() {
@@ -281,7 +343,15 @@
                     const tileData = board[r][c];
                     const tile = document.createElement('div');
                     tile.className = `tile ${selectedTile && selectedTile.r === r && selectedTile.c === c ? 'selected' : ''}`;
-                    if (tileData?.img) tile.style.backgroundImage = `url(${tileData.img})`;
+                    if (tileData?.img) {
+                        tile.style.backgroundImage = `url(${tileData.img})`;
+                    } else if (tileData?.emoji) {
+                        tile.textContent = tileData.emoji;
+                        tile.style.display = 'flex';
+                        tile.style.alignItems = 'center';
+                        tile.style.justifyContent = 'center';
+                        tile.style.fontSize = 'clamp(1rem,3.5vw,1.6rem)';
+                    }
                     tile.onclick = () => handleTileClick(r, c);
                     grid.appendChild(tile);
                 }
@@ -513,12 +583,24 @@
         }
 
         function bjRenderComplete() {
+            // Persist quiz completion and show unlock notification
+            try { localStorage.setItem('bjComplete', 'true'); } catch(_) {}
+
             const heading = document.createElement('p');
             heading.className = 'text-yellow-400 text-center font-bold text-lg mb-4';
             heading.textContent = 'Journey Complete! 🎉';
 
+            const unlockMsg = document.createElement('p');
+            unlockMsg.className = 'text-purple-400 text-center text-xs mb-4';
+            unlockMsg.innerHTML = '🌟 New games unlocked: <strong>Star Matrix</strong> &amp; <strong>Matrix of Conscience</strong>!';
+
+            const btnHub = document.createElement('button');
+            btnHub.className = 'cmd-btn w-full py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-yellow-400 mb-2';
+            btnHub.textContent = '← Return to Hub';
+            btnHub.addEventListener('click', function () { switchView('view-hub'); });
+
             const btn = document.createElement('button');
-            btn.className = 'cmd-btn w-full py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-yellow-400';
+            btn.className = 'cmd-btn w-full py-3 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-slate-400';
             btn.textContent = '↺ Play Again';
             btn.addEventListener('click', function () { bjIdx = 0; bjLoad(); });
 
@@ -526,7 +608,7 @@
             if (opts) {
                 document.getElementById('bj-q-text').textContent = '';
                 document.getElementById('bj-feedback').textContent = '';
-                opts.replaceChildren(heading, btn);
+                opts.replaceChildren(heading, unlockMsg, btnHub, btn);
             }
         }
 
