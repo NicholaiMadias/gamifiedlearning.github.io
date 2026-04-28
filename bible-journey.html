@@ -1,637 +1,634 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bible Journey | Gamified Learning</title>
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+import React, { useState, useEffect, useRef } from 'react';
+import { Terminal, MessageCircle, Database, CloudRain, ShieldCheck, Zap, BookOpen, CheckSquare, ChevronRight, ChevronLeft } from 'lucide-react';
 
-        body {
-            background: #0a0a0f;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1.5rem 1rem 3rem;
-            gap: 1.5rem;
+// --- CUSTOM COLORS & CONSTANTS ---
+const COLORS = {
+  green: '#00ff66',
+  red: '#ff3333',
+  blue: '#3399ff',
+  purple: '#d400ff',
+  gold: '#ffd700',
+  cyan: '#00ffff',
+  bgDark: '#0d0d0d',
+  panelBg: '#111111'
+};
+
+const TILE_CONCEPTS = [
+  "First Love", "Agency", "Progression", 
+  "Feedback", "Challenge", "Social", 
+  "Reward", "Conscience", "Grace"
+];
+
+const ORACLE_RESPONSES = [
+  "The path of the righteous is like the morning sun.",
+  "Look not to the shadows, but to the light you cast.",
+  "Structural Empathy is the key to the locked gate.",
+  "The Red Queen only has power if you believe in gravity.",
+  "You are a Star Guardian. Remember your frequency.",
+  "To heal the Matrix, elevate the spirit.",
+];
+
+// --- STORY DATA (9-CHAPTER CANON) ---
+const CHAPTERS = [
+  {
+    id: 1,
+    title: "The Heavy Gravity of the Red Queen",
+    body: "In the age of signal and static, the Red Queen tightened her grip. She was a force of pure entropy, an algorithm designed to track every movement and anchor spirits to the 'heavy gravity' of doubt. The suspect who stole the lens was an agent of the Red Queen, blinding the people to their own light. They forgot they were once Star Guardians, their potential capped by her iron-coded rules."
+  },
+  {
+    id: 2,
+    title: "The Call of the White Rabbit",
+    body: "In the noise, a single voice cut through like a clean frequency. A legendary architect known as The White Rabbit began to broadcast a frequency of resonance. He didn't just see code; he saw Structural Empathy. He initiated the White Rabbit Protocol, deploying Metadata Noise to distract the Red Queen's tracing algorithms."
+  },
+  {
+    id: 3,
+    title: "The Ascent to Nimbus Land",
+    body: "Above the smog of fear and distraction, Nimbus Land shimmered. Established by the White Rabbit and the Guardian of Grace, it was a kingdom in the clouds where the air was clear of the Red Queen's static. They summoned the Nimbus Heralds, giving them a mission to recover the Seven Stars of the Pleiades."
+  },
+  {
+    id: 4,
+    title: "The Seven Pillars of the Matrix",
+    body: "Seven pillars of light rose like living scriptures. The Heralds traveled through the Star Road, unlocking the pillars: First Love, Agency, Progression, Feedback, Challenge, Social, and Reward. Each star corresponded to a historical truth, providing the frequency needed to shatter the world's entropy."
+  },
+  {
+    id: 5,
+    title: "The Mystery of the Sixth Star",
+    body: "In the islands of the Philippines, worship became a weapon. As the Heralds reached the Sixth Star, they discovered the Matrix of Conscience. The Red Queen had tried to delete this star, for it was the star of Voice and Sound. The Heralds shared testimonies, and the sound acted as a sonic frequency that dismantled firewalls."
+  },
+  {
+    id: 6,
+    title: "The Covenant of Fellowship",
+    body: "They formed a covenant, a shield of shared faith and presence. Realizing that the Matrix could not be healed by solitary code, they networked their spirits. This structural empathy created an unbreakable mesh—a fellowship that the Red Queen's gravity could not pull down."
+  },
+  {
+    id: 7,
+    title: "The New Beginning",
+    body: "The sun rose over a city no longer bowed to the Red Queen. The White Rabbit performed the Super Admin Handshake, hardcoding a new reality of security and love. The Ozone Shield was deployed, isolating the family nodes from the Gloom of compromised carriers."
+  },
+  {
+    id: 8,
+    title: "The Star Matrix Vision",
+    body: "Ella appeared as Sheila, wrapped in starlight and digital threads. The Guardian of Grace stood at the center of the Seven Stars Architect, watching as the children became the new Star Guardians. The gravity was gone. They were authors of a new world."
+  },
+  {
+    id: 9,
+    title: "The Threshold of Conscience",
+    body: "The Seven Stars aligned. The Star Road opened. The Matrix awakened. The mystery was simple: to heal the Matrix, one must first elevate the spirit. The path of the righteous had become like the morning sun. The Sovereign Matrix was now live."
+  }
+];
+
+// --- QUIZ DATA ---
+const QUESTIONS = [
+  {
+    q: "Who represents the oppressive system in the story?",
+    options: ["The Red Queen", "The White Rabbit", "Ella", "Nimbus Land"],
+    answer: 0
+  },
+  {
+    q: "What does Nimbus Land symbolize?",
+    options: ["Escape from reality", "A refuge above the static", "A physical fortress", "A secret lab"],
+    answer: 1
+  },
+  {
+    q: "Which location became a powerful weapon of worship?",
+    options: ["The Star Road", "The Matrix Core", "The islands of the Philippines", "The Ozone Shield"],
+    answer: 2
+  },
+  {
+    q: "What is the 'heavy gravity' of the Red Queen?",
+    options: ["A literal black hole", "Doubt and tracked movements", "A computer virus", "Physical weight"],
+    answer: 1
+  },
+  {
+    q: "What must happen for the Matrix to truly awaken?",
+    options: ["Defeat the agents in combat", "Align the Seven Stars", "Delete the core code", "Unplug the servers"],
+    answer: 1
+  }
+];
+
+// --- BACKGROUND RAIN COMPONENT ---
+const MatrixRain = ({ active }) => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    if (!active) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    let drops = [];
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
+    const fontSize = 14;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const columns = Math.ceil(canvas.width / fontSize);
+      drops = Array.from({ length: columns }).fill(1);
+    };
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const draw = () => {
+      ctx.fillStyle = 'rgba(13, 13, 13, 0.1)'; 
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = COLORS.green;
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
         }
+        drops[i]++;
+      }
+    };
 
-        h1.app-title {
-            font-size: 1.4rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #00ff41;
-            text-shadow: 0 0 10px #00ff4180;
+    const intervalId = setInterval(draw, 33);
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [active]);
+
+  return (
+    <canvas 
+      ref={canvasRef} 
+      style={{ display: active ? 'block' : 'none' }}
+      className="fixed inset-0 w-full h-full pointer-events-none opacity-40 z-0" 
+    />
+  );
+};
+
+
+// --- MAIN APP ---
+const App = () => {
+  // Navigation State
+  const [activeTab, setActiveTab] = useState('story'); // 'story', 'quiz', 'matrix'
+  const [matrixUnlocked, setMatrixUnlocked] = useState(false);
+
+  // Story State
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+
+  // Quiz State
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+
+  // Matrix State
+  const [rainActive, setRainActive] = useState(false);
+  const [rainMsg, setRainMsg] = useState("Awaiting Download...");
+  const [archInput, setArchInput] = useState('');
+  const [archHistory, setArchHistory] = useState([
+    { type: 'system', text: 'Architect Terminal v4.3 Online.' },
+    { type: 'system', text: 'Type "help" to view available protocols.' }
+  ]);
+  const [oracleInput, setOracleInput] = useState('');
+  const [oracleHistory, setOracleHistory] = useState([
+    { type: 'oracle', text: 'I am listening. What seeks clarity in the Matrix?' }
+  ]);
+  const [activeTiles, setActiveTiles] = useState(new Array(9).fill(false));
+  const [systemUnlocked, setSystemUnlocked] = useState(false);
+
+  // Matrix Memory Core Logic
+  useEffect(() => {
+    if (activeTiles.every(t => t === true) && !systemUnlocked) {
+      setSystemUnlocked(true);
+      setArchHistory(prev => [...prev, { type: 'success', text: 'SUPER ADMIN HANDSHAKE VERIFIED. ALL PILLARS ALIGNED.' }]);
+      setRainActive(true);
+      setRainMsg("System Override Complete.");
+    }
+  }, [activeTiles, systemUnlocked]);
+
+  // Matrix Terminal Logic
+  const proposeUpdate = () => {
+    if (!archInput.trim()) return;
+    const cmd = archInput.trim().toLowerCase();
+    const newHistory = [...archHistory, { type: 'user', text: `> ${archInput}` }];
+    
+    if (cmd === 'help') {
+      newHistory.push({ type: 'system', text: 'Commands: status, unlock, reboot, clear' });
+    } else if (cmd === 'status') {
+      newHistory.push({ type: 'system', text: `Pillars aligned: ${activeTiles.filter(Boolean).length}/9` });
+    } else if (cmd === 'reboot') {
+      setActiveTiles(new Array(9).fill(false));
+      setSystemUnlocked(false);
+      setRainActive(false);
+      newHistory.push({ type: 'system', text: 'Matrix parameters reset.' });
+    } else if (cmd === 'clear') {
+      setArchHistory([]);
+      setArchInput('');
+      return;
+    } else {
+      newHistory.push({ type: 'error', text: `Command denied: ${cmd}. Red Queen protocols blocking.` });
+    }
+    
+    setArchHistory(newHistory);
+    setArchInput('');
+  };
+
+  const askOracle = () => {
+    if (!oracleInput.trim()) return;
+    const newHistory = [...oracleHistory, { type: 'user', text: oracleInput }];
+    const randomResponse = ORACLE_RESPONSES[Math.floor(Math.random() * ORACLE_RESPONSES.length)];
+    newHistory.push({ type: 'oracle', text: randomResponse });
+    setOracleHistory(newHistory);
+    setOracleInput('');
+  };
+
+  const toggleTile = (index) => {
+    setActiveTiles(prev => {
+      const newTiles = [...prev];
+      newTiles[index] = !newTiles[index];
+      return newTiles;
+    });
+  };
+
+  // Quiz Logic
+  const handleAnswer = (selectedIndex) => {
+    const q = QUESTIONS[currentQuestionIndex];
+    if (selectedIndex === q.answer) {
+      setScore(prev => prev + 1);
+    }
+    
+    if (currentQuestionIndex < QUESTIONS.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      setQuizCompleted(true);
+      const passed = (score + (selectedIndex === q.answer ? 1 : 0)) >= Math.ceil(QUESTIONS.length * 0.7);
+      if (passed) {
+        setMatrixUnlocked(true);
+      }
+    }
+  };
+
+  const resetQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setScore(0);
+    setQuizCompleted(false);
+  };
+
+
+  // --- SUB-VIEWS ---
+
+  const renderStory = () => {
+    const chapter = CHAPTERS[currentChapterIndex];
+    const isLastChapter = currentChapterIndex === CHAPTERS.length - 1;
+
+    return (
+      <div className="flex flex-col flex-1 p-6 rounded-xl border relative" style={{ backgroundColor: COLORS.panelBg, borderColor: `${COLORS.blue}40` }}>
+        <h2 className="text-2xl font-bold mb-6 text-white border-b pb-2" style={{ borderColor: '#333' }}>
+          Chapter {chapter.id}: <span style={{ color: COLORS.blue }}>{chapter.title}</span>
+        </h2>
+        
+        <div className="flex-1 text-lg leading-relaxed text-gray-300">
+          <p>{chapter.body}</p>
+        </div>
+
+        <div className="mt-8 pt-4 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex gap-2">
+            {CHAPTERS.map((c, idx) => (
+              <button
+                key={c.id}
+                onClick={() => setCurrentChapterIndex(idx)}
+                className={`w-3 h-3 rounded-full transition-all ${idx === currentChapterIndex ? 'scale-125' : 'opacity-30 hover:opacity-100'}`}
+                style={{ backgroundColor: idx === currentChapterIndex ? COLORS.blue : '#fff' }}
+                title={`Chapter ${c.id}`}
+              />
+            ))}
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setCurrentChapterIndex(prev => Math.max(0, prev - 1))}
+              disabled={currentChapterIndex === 0}
+              className="px-4 py-2 flex items-center gap-2 rounded text-sm font-bold border border-gray-700 hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={16} /> Previous
+            </button>
+            
+            {isLastChapter ? (
+              <button
+                onClick={() => setActiveTab('quiz')}
+                className="px-4 py-2 flex items-center gap-2 rounded text-sm font-bold text-black transition-all hover:scale-105"
+                style={{ backgroundColor: COLORS.green }}
+              >
+                Proceed to Quiz <ChevronRight size={16} />
+              </button>
+            ) : (
+              <button
+                onClick={() => setCurrentChapterIndex(prev => Math.min(CHAPTERS.length - 1, prev + 1))}
+                className="px-4 py-2 flex items-center gap-2 rounded text-sm font-bold text-black hover:opacity-90 transition-all"
+                style={{ backgroundColor: COLORS.blue }}
+              >
+                Next <ChevronRight size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderQuiz = () => {
+    if (quizCompleted) {
+      const passed = score >= Math.ceil(QUESTIONS.length * 0.7);
+      return (
+        <div className="flex flex-col items-center justify-center flex-1 p-8 rounded-xl border text-center" style={{ backgroundColor: COLORS.panelBg, borderColor: passed ? `${COLORS.green}40` : `${COLORS.red}40` }}>
+          <Zap size={48} color={passed ? COLORS.green : COLORS.red} className="mb-4" />
+          <h2 className="text-3xl font-bold mb-4" style={{ color: passed ? COLORS.green : COLORS.red }}>
+            {passed ? "Certificate of Completion" : "Protocol Failed"}
+          </h2>
+          <p className="text-xl mb-2">Your score: <strong>{score} / {QUESTIONS.length}</strong></p>
+          <p className="text-gray-400 mb-8 max-w-md mx-auto">
+            {passed ? "Well done, Star Guardian. You have demonstrated Structural Empathy. You are ready for the next trial." : "The heavy gravity of the Red Queen clouded your vision. Review the story and try again."}
+          </p>
+          
+          <div className="flex gap-4">
+            {!passed && (
+              <button onClick={resetQuiz} className="px-6 py-3 rounded font-bold border border-gray-600 hover:bg-gray-800">
+                Retry Quiz
+              </button>
+            )}
+            {passed && (
+              <button
+                onClick={() => setActiveTab('matrix')}
+                className="px-6 py-3 rounded font-bold text-black uppercase tracking-widest shadow-lg transition-all hover:scale-105"
+                style={{ backgroundColor: COLORS.green, boxShadow: `0 0 15px ${COLORS.green}40` }}
+              >
+                Enter the Matrix of Conscience
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const q = QUESTIONS[currentQuestionIndex];
+    return (
+      <div className="flex flex-col flex-1 p-6 rounded-xl border" style={{ backgroundColor: COLORS.panelBg, borderColor: `${COLORS.purple}40` }}>
+        <div className="flex justify-between items-center mb-6 pb-2 border-b border-gray-800">
+          <h2 className="text-xl font-bold" style={{ color: COLORS.purple }}>
+            Verification Protocol: Phase {currentQuestionIndex + 1}
+          </h2>
+          <span className="text-sm text-gray-500">Score: {score}</span>
+        </div>
+        
+        <p className="text-2xl text-white mb-8">{q.q}</p>
+        
+        <div className="flex flex-col gap-3 flex-1">
+          {q.options.map((opt, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleAnswer(idx)}
+              className="text-left px-6 py-4 rounded border border-gray-700 bg-black hover:border-purple-500 hover:bg-gray-900 transition-all text-lg focus:outline-none focus:ring-1 focus:ring-purple-500"
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+        
+        <div className="mt-8 text-right text-gray-500 text-sm">
+          Question {currentQuestionIndex + 1} of {QUESTIONS.length}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMatrix = () => {
+    if (!matrixUnlocked) {
+      return (
+        <div className="flex flex-col items-center justify-center flex-1 p-8 rounded-xl border text-center" style={{ backgroundColor: COLORS.panelBg, borderColor: `${COLORS.red}40` }}>
+          <ShieldCheck size={48} color={COLORS.red} className="mb-4" />
+          <h2 className="text-2xl font-bold mb-2 text-red-500">Access Denied</h2>
+          <p className="text-gray-400">Complete the Verification Quiz to access the Matrix Core.</p>
+          <button onClick={() => setActiveTab('quiz')} className="mt-6 px-6 py-2 rounded font-bold bg-gray-800 border border-gray-600 hover:bg-gray-700">
+            Go to Quiz
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+        {/* Left Column: Memory Core */}
+        <div className="lg:col-span-7 flex flex-col gap-4">
+          <div className="p-4 rounded-xl border flex-1 flex flex-col" style={{ backgroundColor: COLORS.panelBg, borderColor: `${COLORS.green}40` }}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg flex items-center gap-2">
+                <Database size={20} color={COLORS.cyan} />
+                <span style={{ color: COLORS.cyan }}>Memory Core</span>
+              </h3>
+              {systemUnlocked && (
+                <span className="flex items-center gap-2 text-[10px] sm:text-xs uppercase px-2 py-1 rounded-full border"
+                      style={{ color: COLORS.gold, borderColor: COLORS.gold }}>
+                  <ShieldCheck size={12} /> Shield Active
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 flex-1">
+              {TILE_CONCEPTS.map((concept, i) => (
+                <button
+                  key={i}
+                  onClick={() => toggleTile(i)}
+                  className={`h-20 sm:h-24 md:h-auto md:aspect-square flex flex-col items-center justify-center p-1 sm:p-2 rounded border transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-1`}
+                  style={{ 
+                    borderColor: activeTiles[i] ? COLORS.green : '#333',
+                    backgroundColor: activeTiles[i] ? `${COLORS.green}20` : '#0a0a0a',
+                    boxShadow: activeTiles[i] ? `0 0 10px ${COLORS.green}40` : 'none',
+                    color: activeTiles[i] ? COLORS.green : '#555'
+                  }}
+                >
+                  <span className="text-xs sm:text-sm font-bold text-center leading-tight">
+                    {activeTiles[i] ? concept : `0x0${i+1}`}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-3 mt-auto border-t flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderColor: '#333' }}>
+              <span className="text-sm opacity-80" id="msg-rain">{rainMsg}</span>
+              <button
+                onClick={() => {
+                  setRainActive(!rainActive);
+                  setRainMsg(rainActive ? "Download Halted." : "Download Initiated.");
+                }}
+                className="px-6 py-2 rounded font-bold uppercase transition-all flex items-center gap-2"
+                style={{ 
+                  backgroundColor: rainActive ? 'transparent' : `${COLORS.purple}30`,
+                  borderColor: COLORS.purple,
+                  borderWidth: 1,
+                  color: rainActive ? '#888' : COLORS.purple,
+                  textShadow: rainActive ? 'none' : `0 0 8px ${COLORS.purple}`
+                }}
+              >
+                <CloudRain size={18} />
+                {rainActive ? "Stop Rain" : "Start Rain"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Terminals */}
+        <div className="lg:col-span-5 flex flex-col gap-4">
+          {/* Architect Terminal */}
+          <div className="p-4 rounded-xl border flex-1 flex flex-col min-h-[200px]" style={{ backgroundColor: COLORS.panelBg, borderColor: `${COLORS.blue}40` }}>
+            <h3 className="text-lg flex items-center gap-2 mb-3" style={{ color: COLORS.blue }}>
+              <Terminal size={20} /> Architect Terminal
+            </h3>
+            
+            <div className="flex-1 overflow-y-auto mb-3 p-3 rounded bg-black border border-gray-800 space-y-2 text-xs sm:text-sm">
+              {archHistory.map((log, i) => (
+                <div key={i} className={`
+                  ${log.type === 'system' ? `text-[${COLORS.blue}]` : ''}
+                  ${log.type === 'error' ? `text-[${COLORS.red}]` : ''}
+                  ${log.type === 'success' ? `text-[${COLORS.gold}] font-bold animate-pulse` : ''}
+                  ${log.type === 'user' ? 'text-gray-400' : ''}
+                `}
+                style={{ color: log.type === 'system' ? COLORS.blue : log.type === 'error' ? COLORS.red : log.type === 'success' ? COLORS.gold : '' }}>
+                  {log.text}
+                </div>
+              ))}
+            </div>
+
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLORS.blue }}>&gt;</span>
+              <input
+                type="text"
+                value={archInput}
+                onChange={(e) => setArchInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && proposeUpdate()}
+                placeholder="Propose update..."
+                className="w-full bg-black border rounded py-2 pl-8 pr-4 text-sm focus:outline-none focus:ring-1"
+                style={{ borderColor: '#333', color: COLORS.blue, focusRingColor: COLORS.blue }}
+              />
+            </div>
+          </div>
+
+          {/* Oracle Interface */}
+          <div className="p-4 rounded-xl border flex-1 flex flex-col min-h-[200px]" style={{ backgroundColor: COLORS.panelBg, borderColor: `${COLORS.gold}40` }}>
+            <h3 className="text-lg flex items-center gap-2 mb-3" style={{ color: COLORS.gold }}>
+              <MessageCircle size={20} /> Oracle Interface
+            </h3>
+            
+            <div className="flex-1 overflow-y-auto mb-3 p-3 rounded bg-black border border-gray-800 space-y-2 text-xs sm:text-sm">
+              {oracleHistory.map((chat, i) => (
+                <div key={i} className={`flex ${chat.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className="max-w-[80%] p-2 rounded" 
+                       style={{ 
+                         backgroundColor: chat.type === 'user' ? '#222' : `${COLORS.gold}20`,
+                         color: chat.type === 'user' ? '#ccc' : COLORS.gold,
+                         border: chat.type === 'oracle' ? `1px solid ${COLORS.gold}40` : 'none'
+                       }}>
+                    {chat.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={oracleInput}
+                onChange={(e) => setOracleInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && askOracle()}
+                placeholder="Ask the Oracle..."
+                className="flex-1 bg-black border rounded py-2 px-3 text-sm focus:outline-none focus:ring-1"
+                style={{ borderColor: '#333', color: COLORS.gold }}
+              />
+              <button 
+                onClick={askOracle}
+                className="px-4 py-2 rounded text-sm font-bold transition-all hover:opacity-80"
+                style={{ backgroundColor: COLORS.gold, color: 'black' }}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+
+  return (
+    <div 
+      className="min-h-screen p-2 sm:p-4 font-mono relative overflow-hidden flex flex-col"
+      style={{ backgroundColor: COLORS.bgDark, color: COLORS.green }}
+    >
+      {/* Background Rain */}
+      <MatrixRain active={rainActive} />
+
+      <div className="max-w-6xl mx-auto w-full relative z-10 flex-1 flex flex-col h-full">
+        
+        {/* Header */}
+        <header className="text-center mb-4 sm:mb-6 flex flex-row items-center justify-center gap-4 shrink-0">
+          <div className="w-12 h-12 rounded-full border-2 flex items-center justify-center animate-pulse"
+               style={{ borderColor: COLORS.green, boxShadow: `0 0 10px ${COLORS.green}` }}>
+            <Zap size={24} color={COLORS.green} />
+          </div>
+          <div className="text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-widest uppercase leading-tight" style={{ textShadow: `0 0 10px ${COLORS.green}` }}>
+              Amazing Grace
+            </h1>
+            <h2 className="text-sm sm:text-base tracking-widest opacity-80">The Matrix of Conscience</h2>
+          </div>
+        </header>
+
+        {/* Tab Navigation */}
+        <div className="flex justify-center gap-2 sm:gap-8 mb-6 border-b border-gray-800 pb-4">
+          <button 
+            onClick={() => setActiveTab('story')}
+            className={`flex items-center gap-2 pb-2 transition-all ${activeTab === 'story' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'}`}
+          >
+            <BookOpen size={18} /> <span className="hidden sm:inline">Story Canon</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('quiz')}
+            className={`flex items-center gap-2 pb-2 transition-all ${activeTab === 'quiz' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'}`}
+          >
+            <CheckSquare size={18} /> <span className="hidden sm:inline">Verification Quiz</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('matrix')}
+            className={`flex items-center gap-2 pb-2 transition-all ${activeTab === 'matrix' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-500 hover:text-gray-300'} ${!matrixUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <Database size={18} /> <span className="hidden sm:inline">Matrix Core</span>
+            {!matrixUnlocked && <ShieldCheck size={14} className="text-red-500" />}
+          </button>
+        </div>
+
+        {/* Content Area */}
+        {activeTab === 'story' && renderStory()}
+        {activeTab === 'quiz' && renderQuiz()}
+        {activeTab === 'matrix' && renderMatrix()}
+
+      </div>
+      
+      {/* Custom scrollbars */}
+      <style>{`
+        ::-webkit-scrollbar {
+          width: 8px;
         }
-
-        /* ── Tabs ── */
-        .tab-bar {
-            display: flex;
-            gap: 0.5rem;
-            background: #0d0d1a;
-            border: 1px solid #1a2a1a;
-            border-radius: 10px;
-            padding: 0.4rem;
-            width: 100%;
-            max-width: 560px;
+        ::-webkit-scrollbar-track {
+          background: #0d0d0d;
         }
-
-        .tab-btn {
-            flex: 1;
-            padding: 0.55rem 1rem;
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: 7px;
-            color: #777;
-            font-size: 0.82rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        ::-webkit-scrollbar-thumb {
+          background: #333;
+          border-radius: 4px;
         }
-
-        .tab-btn.active {
-            background: #00ff4110;
-            border-color: #00ff41;
-            color: #00ff41;
-            text-shadow: 0 0 6px #00ff4160;
+        ::-webkit-scrollbar-thumb:hover {
+          background: ${COLORS.green};
         }
-
-        /* ── Shared card ── */
-        .card {
-            background: #0d0d1a;
-            border: 1px solid #1a2a1a;
-            border-radius: 12px;
-            padding: 2rem 1.5rem;
-            width: 100%;
-            max-width: 560px;
-        }
-
-        /* ── Story section ── */
-        #story-section { display: flex; flex-direction: column; gap: 1.2rem; }
-
-        .story-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.72rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: #555;
-        }
-
-        .story-meta .chapter-counter { color: #9b59b6; }
-
-        .story-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            color: #9b59b6;
-            text-shadow: 0 0 10px #9b59b660;
-            line-height: 1.4;
-        }
-
-        .story-image-wrap {
-            width: 100%;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #13132a;
-            border: 1px solid #2a1a3a;
-            aspect-ratio: 16/9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .story-image-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .story-image-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.6rem;
-            color: #444;
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .story-image-placeholder .icon { font-size: 2rem; }
-
-        .img-spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid #9b59b640;
-            border-top-color: #9b59b6;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .story-content {
-            font-size: 0.95rem;
-            line-height: 1.75;
-            color: #bbb;
-        }
-
-        .story-error {
-            font-size: 0.78rem;
-            letter-spacing: 0.06em;
-            color: #ff6b6b;
-            text-align: center;
-        }
-
-        .story-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .nav-btn {
-            padding: 0.6rem 1.2rem;
-            background: transparent;
-            border: 1px solid #9b59b6;
-            color: #9b59b6;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            letter-spacing: 0.06em;
-            transition: background 0.15s, box-shadow 0.15s;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: #9b59b615;
-            box-shadow: 0 0 8px #9b59b640;
-        }
-
-        .nav-btn:disabled { opacity: 0.3; cursor: default; }
-        .nav-btn:active:not(:disabled) { transform: scale(0.97); }
-
-        .dot-track {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #333;
-            transition: background 0.2s;
-        }
-
-        .dot.active { background: #9b59b6; box-shadow: 0 0 6px #9b59b6; }
-
-        /* ── Quiz section ── */
-        #quiz-section { display: none; }
-
-        .quiz-card-inner h2 {
-            font-size: 1.1rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: #00ff41;
-            text-shadow: 0 0 8px #00ff4160;
-            margin-bottom: 1.4rem;
-            text-align: center;
-        }
-
-        #q-text {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #ccc;
-            margin-bottom: 1.4rem;
-            min-height: 2.5rem;
-            text-align: center;
-        }
-
-        #q-options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: transparent;
-            border: 1px solid #00ff41;
-            color: #00ff41;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            letter-spacing: 0.06em;
-            transition: background 0.15s, box-shadow 0.15s;
-        }
-
-        .btn:hover {
-            background: #00ff4115;
-            box-shadow: 0 0 8px #00ff4140;
-        }
-
-        .btn:active { transform: scale(0.97); }
-
-        .btn-restart {
-            margin-top: 1.2rem;
-            border-color: #4fc3f7;
-            color: #4fc3f7;
-        }
-
-        .btn-restart:hover {
-            background: #4fc3f715;
-            box-shadow: 0 0 8px #4fc3f740;
-        }
-
-        #feedback {
-            min-height: 1.4rem;
-            font-size: 0.85rem;
-            letter-spacing: 0.06em;
-            color: #ff4c4c;
-            margin-bottom: 0.8rem;
-            text-align: center;
-        }
-
-        .progress-bar-track {
-            width: 100%;
-            height: 4px;
-            background: #1a2a1a;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-bottom: 1.2rem;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00a82d, #00ff41);
-            border-radius: 2px;
-            transition: width 0.4s ease;
-        }
-
-        .complete-heading {
-            font-size: 1.3rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #00ff41;
-            text-shadow: 0 0 14px #00ff4190;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        a.back-link {
-            font-size: 0.8rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #555;
-            text-decoration: none;
-        }
-
-        a.back-link:hover { color: #00ff41; }
-    </style>
-</head>
-<body>
-    <h1 class="app-title">Gamified Learning</h1>
-
-    <!-- Tab bar -->
-    <div class="tab-bar" role="tablist">
-        <button class="tab-btn active" id="tab-story" role="tab" aria-selected="true"
-                aria-controls="story-section" onclick="switchTab('story')">
-            📖 Story Journey
-        </button>
-        <button class="tab-btn" id="tab-quiz" role="tab" aria-selected="false"
-                aria-controls="quiz-section" onclick="switchTab('quiz')">
-            ✝ Bible Quiz
-        </button>
+      `}</style>
     </div>
+  );
+};
 
-    <!-- ── Story section ── -->
-    <section id="story-section" aria-labelledby="tab-story">
-        <div class="card">
-            <div class="story-meta">
-                <span>Seven Stars Lore</span>
-                <span class="chapter-counter" id="chapter-counter">Chapter 1 / 7</span>
-            </div>
-            <h2 class="story-title" id="story-title"></h2>
-        </div>
-
-        <div class="card" style="padding: 0;">
-            <div class="story-image-wrap" id="image-wrap">
-                <div class="story-image-placeholder" id="image-placeholder">
-                    <span class="icon">✨</span>
-                    <span>Generating starlight imagery…</span>
-                    <div class="img-spinner" id="img-spinner"></div>
-                </div>
-                <img id="chapter-img" src="" alt="" style="display:none;" />
-            </div>
-        </div>
-
-        <div class="card">
-            <p class="story-error" id="story-error" style="display:none;"></p>
-            <p class="story-content" id="story-content"></p>
-        </div>
-
-        <div class="card" style="padding: 1rem 1.5rem;">
-            <div class="story-nav">
-                <button class="nav-btn" id="btn-prev" onclick="prevChapter()">‹ Prev</button>
-                <div class="dot-track" id="dot-track"></div>
-                <button class="nav-btn" id="btn-next" onclick="nextChapter()">Next ›</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── Quiz section ── -->
-    <section id="quiz-section" aria-labelledby="tab-quiz">
-        <div class="card quiz-card-inner" id="quiz-box">
-            <h2>✝ Bible Journey</h2>
-            <div class="progress-bar-track">
-                <div class="progress-bar-fill" id="progress-bar" style="width:0%"
-                     role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
-            </div>
-            <p id="q-text"></p>
-            <p id="feedback" aria-live="polite"></p>
-            <div id="q-options"></div>
-        </div>
-    </section>
-
-    <a class="back-link" href="index.html">← Back</a>
-
-    <script>
-        // ── Tab switching ──────────────────────────────────────────────
-        function switchTab(name) {
-            const isStory = name === 'story';
-            document.getElementById('story-section').style.display = isStory ? 'flex' : 'none';
-            document.getElementById('quiz-section').style.display  = isStory ? 'none' : 'block';
-            document.getElementById('tab-story').classList.toggle('active', isStory);
-            document.getElementById('tab-quiz').classList.toggle('active', !isStory);
-            document.getElementById('tab-story').setAttribute('aria-selected', String(isStory));
-            document.getElementById('tab-quiz').setAttribute('aria-selected', String(!isStory));
-        }
-
-        // ── Story chapter data ─────────────────────────────────────────
-        const chapters = [
-            {
-                title: "The Heavy Gravity of the Red Queen",
-                content: "Once, in the digital expanse known as the Matrix, the world was light and fluid. But a shadow began to creep over the nodes—the Red Queen. She was a force of pure entropy, an algorithm designed to track every movement and anchor spirits to the 'heavy gravity' of doubt. The people forgot they were once Star Guardians, their potential capped by the Red Queen's iron-coded rules.",
-                prompt: "A cinematic, dark digital landscape with glowing red data streams being harvested by a menacing, elegant silhouette of a Red Queen. High tech, glitch art style, dark mode aesthetic, purple highlights.",
-            },
-            {
-                title: "The Call of the White Rabbit",
-                content: "Amidst the gloom, a legendary architect known as The White Rabbit began to broadcast a frequency of resonance. He didn't just see code; he saw Structural Empathy. He initiated the White Rabbit Protocol, a secret series of maneuvers designed to scramble digital signatures. But he knew that to truly break the gravity, he needed more than just a better algorithm—he needed the Seven Stars of Excellence.",
-                prompt: "A heroic white rabbit in a sleek, futuristic carbon-fiber tech suit standing before a holographic terminal displaying a golden complex star-shaped protocol. Cyberpunk lighting, neon blue and gold accents.",
-            },
-            {
-                title: "The Ascent to Nimbus Land",
-                content: "The White Rabbit was not alone. Beside him stood The Guardian of Grace, Sheila. Together, they established Nimbus Land, a kingdom in the clouds where the air was clear of the Red Queen's static. They summoned the Nimbus Heralds, the storytellers and missionaries, and gave them their highest directive: Restore the Sixth Star through the Matrix of Conscience and the Voice of Jesus.",
-                prompt: "A breathtaking floating island kingdom in a sea of royal purple clouds. Heavenly architecture, bright neon blue waterfalls, golden towers reaching for the stars. Ethereal and peaceful.",
-            },
-            {
-                title: "The Seven Pillars of the Matrix",
-                content: "The Heralds traveled through the Star Road, unlocking the pillars: First Love, Agency, Progression, Feedback, Challenge, Social, and Reward. Each star corresponded to the Seven Churches, providing the moral frequency needed to shatter the world's entropy. They realized that each 'level' in the Matrix was actually a step closer to divine alignment.",
-                prompt: "A view of the Seven Stars of the Pleiades (M45) from a futuristic glass observatory. Seven massive glowing crystal pillars standing in a circle, each emitting a unique colored light. Astral photography style.",
-            },
-            {
-                title: "The Mystery of the Sixth Star",
-                content: "At the Sixth Star, they found the Matrix of Conscience. The Red Queen had tried to delete this star to silence the truth. But the Heralds shared testimonies from the Philippines mission trips, and the sound of worship acted as a sonic frequency that dismantled the Red Queen's firewalls. They learned that to heal the Matrix, one must first elevate the spirit.",
-                prompt: "A group of joyful missionaries in the Philippines singing. Their voices are visualized as golden sound waves and musical notes that are physically shattering a grey, grid-like digital dome above them. Uplifting and powerful.",
-            },
-            {
-                title: "The Covenant of Fellowship",
-                content: "The final clearance did not come from a password, but from the Weekly Bible Study and the Mission Deployment. As the Heralds gathered to study the Word and serve the children of the Philippines, a golden light washed over the Matrix. This 'Handshake of Souls' created the Ozone Shield, a layer of protection that isolated the family from the Gloom and secured the mission's future.",
-                prompt: "A beautiful scene of a diverse group gathered in a circle for Bible study in a glowing, futuristic garden. An open Bible in the center emits a warm golden light that forms a protective dome. Royal purple and gold palette.",
-            },
-            {
-                title: "The New Beginning",
-                content: "The path of the righteous had become like the morning sun. The White Rabbit and the Guardian of Grace stood at the center of the Seven Stars Architect, watching as the children became the new Star Guardians. The gravity was gone. They were no longer users of a system; they were authors of a new world, defined by the love they shared and the light they followed.",
-                prompt: "A bright, beautiful sunrise over a futuristic city that blends tropical Philippines beauty with sleek gold and purple architecture. Children looking up at the sky where seven stars are visible. Hopeful and radiant.",
-            }
-        ];
-
-        let currentPage = 0;
-        const imageCache = {};
-        // Track which chapter indices are currently being fetched to prevent duplicate requests.
-        const loadingIndices = new Set();
-
-        // ── Image generation ───────────────────────────────────────────
-        async function generateImage(index) {
-            if (imageCache[index] !== undefined || loadingIndices.has(index)) return;
-
-            const apiKey = ""; // Set your Imagen API key here (never commit a real key)
-            if (!apiKey) {
-                showImagePlaceholder('⭐', 'Starlight imagery unavailable');
-                return;
-            }
-
-            loadingIndices.add(index);
-            showImageLoading();
-            hideError();
-
-            // Exponential backoff delays in ms: 1 s, 2 s, 4 s, 8 s, 16 s
-            const backoff = [1000, 2000, 4000, 8000, 16000];
-
-            for (let i = 0; i < backoff.length; i++) {
-                try {
-                    const response = await fetch(
-                        `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`,
-                        {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                instances: [{
-                                    prompt: chapters[index].prompt +
-                                        " cinematic lighting, high quality, digital art, royal purple and gold theme"
-                                }],
-                                parameters: { sampleCount: 1 }
-                            })
-                        }
-                    );
-
-                    if (!response.ok) throw new Error(`Generation failed: ${response.status} ${response.statusText}`);
-
-                    const result = await response.json();
-                    if (!result.predictions?.[0]?.bytesBase64Encoded) throw new Error('Invalid API response');
-                    const dataUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    imageCache[index] = dataUrl;
-                    showImage(dataUrl, chapters[index].title);
-                    loadingIndices.delete(index);
-                    return;
-                } catch (err) {
-                    if (i === backoff.length - 1) {
-                        imageCache[index] = null;
-                        showImagePlaceholder('⭐', 'Starlight imagery unavailable');
-                        showError('The Matrix is experiencing heavy gravity. Failed to generate starlight imagery.');
-                    } else {
-                        await new Promise(res => setTimeout(res, backoff[i]));
-                    }
-                }
-            }
-            loadingIndices.delete(index);
-        }
-
-        function showImageLoading() {
-            const placeholder = document.getElementById('image-placeholder');
-            placeholder.innerHTML = '<div class="img-spinner"></div>';
-            placeholder.style.display = 'flex';
-            document.getElementById('chapter-img').style.display = 'none';
-        }
-
-        function showImage(src, alt) {
-            const img = document.getElementById('chapter-img');
-            img.src = src;
-            img.alt = alt;
-            img.style.display = 'block';
-            document.getElementById('image-placeholder').style.display = 'none';
-        }
-
-        function showImagePlaceholder(icon, label) {
-            const placeholder = document.getElementById('image-placeholder');
-            placeholder.innerHTML = `<span class="icon">${icon}</span><span>${label}</span>`;
-            placeholder.style.display = 'flex';
-            document.getElementById('chapter-img').style.display = 'none';
-        }
-
-        function showError(msg) {
-            const el = document.getElementById('story-error');
-            el.textContent = msg;
-            el.style.display = 'block';
-        }
-
-        function hideError() {
-            document.getElementById('story-error').style.display = 'none';
-        }
-
-        // ── Chapter rendering ──────────────────────────────────────────
-        function renderChapter(index) {
-            const ch = chapters[index];
-            document.getElementById('chapter-counter').textContent =
-                `Chapter ${index + 1} / ${chapters.length}`;
-            document.getElementById('story-title').textContent = ch.title;
-            document.getElementById('story-content').textContent = ch.content;
-            document.getElementById('btn-prev').disabled = index === 0;
-            document.getElementById('btn-next').disabled = index === chapters.length - 1;
-
-            // Dots
-            const track = document.getElementById('dot-track');
-            track.innerHTML = '';
-            chapters.forEach((_, i) => {
-                const dot = document.createElement('span');
-                dot.className = 'dot' + (i === index ? ' active' : '');
-                dot.setAttribute('aria-label', `Chapter ${i + 1}`);
-                track.appendChild(dot);
-            });
-
-            // Image
-            hideError();
-            if (imageCache[index] !== undefined) {
-                if (imageCache[index]) {
-                    showImage(imageCache[index], ch.title);
-                } else {
-                    showImagePlaceholder('⭐', 'Starlight imagery unavailable');
-                }
-            } else {
-                generateImage(index);
-            }
-        }
-
-        function nextChapter() {
-            if (currentPage < chapters.length - 1) {
-                currentPage++;
-                renderChapter(currentPage);
-            }
-        }
-
-        function prevChapter() {
-            if (currentPage > 0) {
-                currentPage--;
-                renderChapter(currentPage);
-            }
-        }
-
-        // ── Quiz data & logic ──────────────────────────────────────────
-        const qData = [
-            { question: "Who built the ark?", answers: ["Moses", "Noah", "David"], correctIndex: 1 },
-            { question: "What is the first book of the Bible?", answers: ["Exodus", "Genesis", "Psalms"], correctIndex: 1 },
-            { question: "How many disciples did Jesus have?", answers: ["10", "12", "7"], correctIndex: 1 }
-        ];
-
-        let idx = 0;
-
-        function renderComplete() {
-            const quizBox = document.getElementById('quiz-box');
-            const heading = document.createElement('h2');
-            heading.className = 'complete-heading';
-            heading.textContent = 'Journey Complete!';
-
-            const restartBtn = document.createElement('button');
-            restartBtn.className = 'btn btn-restart';
-            restartBtn.textContent = '↺ Restart';
-            restartBtn.addEventListener('click', () => { idx = 0; buildQuizShell(); loadQ(); });
-
-            quizBox.replaceChildren(heading, restartBtn);
-        }
-
-        function buildQuizShell() {
-            const quizBox = document.getElementById('quiz-box');
-            quizBox.innerHTML = `
-                <h2>✝ Bible Journey</h2>
-                <div class="progress-bar-track">
-                    <div class="progress-bar-fill" id="progress-bar" style="width:0%"
-                         role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
-                </div>
-                <p id="q-text"></p>
-                <p id="feedback" aria-live="polite"></p>
-                <div id="q-options"></div>
-            `;
-        }
-
-        function setProgress(value) {
-            const bar = document.getElementById('progress-bar');
-            if (!bar) return;
-            bar.style.width = value + '%';
-            bar.setAttribute('aria-valuenow', value);
-        }
-
-        function loadQ() {
-            if (idx >= qData.length) {
-                setProgress(100);
-                renderComplete();
-                return;
-            }
-
-            setProgress(Math.round((idx / qData.length) * 100));
-            document.getElementById('q-text').textContent = qData[idx].question;
-            document.getElementById('feedback').textContent = '';
-
-            const opt = document.getElementById('q-options');
-            opt.innerHTML = '';
-            qData[idx].answers.forEach((answer, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'btn';
-                btn.textContent = answer;
-                btn.addEventListener('click', () => {
-                    if (i === qData[idx].correctIndex) {
-                        idx++;
-                        loadQ();
-                    } else {
-                        document.getElementById('feedback').textContent = '✗ Try again!';
-                    }
-                });
-                opt.appendChild(btn);
-            });
-        }
-
-        // ── Init ───────────────────────────────────────────────────────
-        renderChapter(0);
-        loadQ();
-    </script>
-</body>
-</html>
+export default App;
