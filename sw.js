@@ -25,13 +25,31 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Network-first: always try network, fall back to cache
+// Network-first for GET requests: always try network, fall back to cache
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() =>
+        caches.match(event.request).then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html').then(fallbackResponse => {
+              return fallbackResponse || Response.error();
+            });
+          }
+
+          return Response.error();
+        })
+      )
   );
 });
