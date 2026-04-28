@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ministry | Voice of Jesus Storybook</title>
+  <title>The Enter Matrix of Conscience</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -46,7 +46,17 @@
       const [images, setImages] = useState({});
       const [error, setError] = useState(null);
 
-      const apiKey = ""; // Environment provided key
+      const [apiKey] = useState(() => {
+        const saved = window.localStorage.getItem('ENTER_MATRIX_API_KEY');
+        if (saved && saved.trim()) return saved.trim();
+        const entered = window.prompt('Enter your Gemini API key to enable AI imagery (leave blank to skip):');
+        if (entered && entered.trim()) {
+          const key = entered.trim();
+          window.localStorage.setItem('ENTER_MATRIX_API_KEY', key);
+          return key;
+        }
+        return '';
+      });
 
       const chapters = [
         {
@@ -149,7 +159,7 @@
               </div>
               <div>
                 <h1 className="font-bold text-xl tracking-tight uppercase" style={{ background: "linear-gradient(to right,#c084fc,#fbbf24)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  Voice of Jesus Storybook
+                  The Enter Matrix of Conscience
                 </h1>
                 <p className="text-xs uppercase tracking-widest text-purple-400 font-mono">
                   Matrix Fellowship Protocol v5.0
@@ -205,7 +215,7 @@
                         <span className="font-mono text-sm text-purple-500/50">Starlight Awaiting...</span>
                       ) : (
                         <p className="font-mono text-sm text-purple-400/70 max-w-xs">
-                          Image generation requires an API key. Set <code className="text-amber-400">apiKey</code> in <code className="text-amber-400">ministry.html</code> to enable AI imagery.
+                          Image generation requires an API key. Reload the page and enter your Gemini API key when prompted to enable AI imagery.
                         </p>
                       )}
                     </div>
