@@ -40,6 +40,7 @@ export default function StarAnimation({ config, size = 128 }) {
 
         if (!config.loop && frameIndex.current === frames.length - 1) {
           setCurrentFrame(frames[frames.length - 1]);
+          cancelAnimationFrame(raf.current);
           return;
         }
 

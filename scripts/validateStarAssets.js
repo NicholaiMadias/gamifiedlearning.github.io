@@ -67,7 +67,7 @@ for (const configFile of CONFIG_FILES) {
     const absPath = join(ASSETS_BASE, relPath);
 
     if (!existsSync(absPath)) {
-      console.warn(`[MISSING FRAME] ${name}: expected asset at public${relPath}`);
+      console.warn(`[MISSING FRAME] ${name}: expected asset at /public${relPath}`);
       hasErrors = true;
     } else {
       console.log(`[OK] ${name}: frame_${i}.png`);
