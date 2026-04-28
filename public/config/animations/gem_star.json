@@ -1,0 +1,8 @@
+{
+  "name": "gem_star",
+  "frames": 1,
+  "frameRate": 0,
+  "loop": false,
+  "glow": 0.8,
+  "spritePath": "/assets/stars/gem/frame_"
+}
