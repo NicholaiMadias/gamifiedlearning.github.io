@@ -3,6 +3,8 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
+import { recordLevelComplete } from './progression.js';
+
 const BADGE_TIERS = [
   { level: 1,  name: 'Seedling',  emoji: '\uD83C\uDF31', desc: 'Planted the first seed of knowledge' },
   { level: 3,  name: 'Charged',   emoji: '\u26A1',       desc: 'Electrified by curiosity' },
@@ -24,6 +26,7 @@ function showBadgeBanner(badge) {
 }
 
 export function onLevelComplete(completedLevel, currentScore, db, user) {
+  recordLevelComplete(completedLevel);
   BADGE_TIERS.forEach(badge => {
     if (completedLevel >= badge.level && !earnedBadges.includes(badge.name)) {
       earnedBadges.push(badge.name);

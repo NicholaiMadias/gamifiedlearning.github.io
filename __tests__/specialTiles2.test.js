@@ -11,9 +11,14 @@ describe('specialTiles2 — getSpawnedSpecial', () => {
     expect(getSpawnedSpecial(cells)).toBeNull();
   });
 
-  test('4 collinear cells spawn LINE', () => {
+  test('4 horizontal cells spawn LINE_H', () => {
     const cells = makeCells([[0,0],[0,1],[0,2],[0,3]]);
-    expect(getSpawnedSpecial(cells)).toBe(SPECIAL.LINE);
+    expect(getSpawnedSpecial(cells)).toBe(SPECIAL.LINE_H);
+  });
+
+  test('4 vertical cells spawn LINE_V', () => {
+    const cells = makeCells([[0,0],[1,0],[2,0],[3,0]]);
+    expect(getSpawnedSpecial(cells)).toBe(SPECIAL.LINE_V);
   });
 
   test('5 collinear cells spawn NOVA', () => {
@@ -55,13 +60,23 @@ describe('specialTiles2 — activateSpecial', () => {
     expect(clearedCells).toEqual([]);
   });
 
-  test('LINE clears the entire row (7 cells)', () => {
-    const grid = gridWithSpecialAt(3, 0, SPECIAL.LINE);
+  test('LINE_H clears the entire row (7 cells)', () => {
+    const grid = gridWithSpecialAt(3, 0, SPECIAL.LINE_H);
     const { clearedCells } = activateSpecial(grid, 3, 0);
     expect(clearedCells).toHaveLength(GRID_SIZE);
     clearedCells.forEach(cell => expect(cell.r).toBe(3));
     for (let col = 0; col < GRID_SIZE; col++) {
       expect(clearedCells.some(cell => cell.c === col)).toBe(true);
+    }
+  });
+
+  test('LINE_V clears the entire column (7 cells)', () => {
+    const grid = gridWithSpecialAt(0, 3, SPECIAL.LINE_V);
+    const { clearedCells } = activateSpecial(grid, 0, 3);
+    expect(clearedCells).toHaveLength(GRID_SIZE);
+    clearedCells.forEach(cell => expect(cell.c).toBe(3));
+    for (let row = 0; row < GRID_SIZE; row++) {
+      expect(clearedCells.some(cell => cell.r === row)).toBe(true);
     }
   });
 

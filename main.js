@@ -14,6 +14,8 @@
 import { initMatchMaker }              from './match-maker-ui.js';
 import { loadBadges, resetBadges }     from './badges.js';
 import { initMatchMakerV2 }            from './match-maker-ui2.js';
+import { renderStarMap }               from './star-map.js';
+import { onGameLevelComplete }         from './concordance-lens.js';
 
 /** Returns true when the V2 engine should be used. */
 function isV2Enabled() {
@@ -40,23 +42,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const v2 = isV2Enabled();
   applyVersionLayout(v2);
 
+  const starMapContainer = document.getElementById('star-map-container');
+  function refreshStarMap() {
+    if (starMapContainer) renderStarMap(starMapContainer);
+  }
+
   if (v2) {
-    initMatchMakerV2(null, null);
-    const restartBtn = document.getElementById('v2-restart-btn');
-    if (restartBtn) {
-      restartBtn.addEventListener('click', () => initMatchMakerV2(null, null));
+    if (document.getElementById('v2-restart-btn') || document.getElementById('v2-section')) {
+      initMatchMakerV2(null, null);
+      const restartBtn = document.getElementById('v2-restart-btn');
+      if (restartBtn) {
+        restartBtn.addEventListener('click', () => initMatchMakerV2(null, null));
+      }
+      console.log('[GLM] Nexus Arcade V2 initialised.');
     }
-    console.log('[GLM] Nexus Arcade V2 initialised.');
   } else {
     loadBadges();
-    initMatchMaker(null, null);
-    const restartBtn = document.getElementById('restart-btn');
+    if (document.getElementById('match-grid') || document.getElementById('match-board')) {
+      initMatchMaker(null, null);
+    }
+    refreshStarMap();
+
+    const restartBtn = document.getElementById('match-restart-btn');
     if (restartBtn) {
       restartBtn.addEventListener('click', () => {
         resetBadges();
         initMatchMaker(null, null);
       });
     }
+
+    // Refresh star map whenever a level is completed
+    window.addEventListener('matchmaker-level-complete', refreshStarMap);
+
     console.log('[GLM] Gamified Learning Matrix V1 initialised.');
   }
 
@@ -88,4 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(reg => console.log('[SW] Registered:', reg.scope))
       .catch(err => console.warn('[SW] Registration skipped:', err.message));
   }
+});
+
+// Relay match-maker level completions into the Concordance Lens
+window.addEventListener('matchmaker-level-complete', e => {
+  onGameLevelComplete(e.detail?.level ?? 1);
 });
