@@ -12,7 +12,7 @@
  */
 
 import { initMatchMaker }              from './match-maker-ui.js';
-import { loadBadges, resetBadges }     from './badges.js';
+import { loadBadges }               from './badges.js';
 import { initMatchMakerV2 }            from './match-maker-ui2.js';
 
 /** Returns true when the V2 engine should be used. */
@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartBtn = document.getElementById('restart-btn');
     if (restartBtn) {
       restartBtn.addEventListener('click', () => {
-        resetBadges();
         initMatchMaker(null, null);
       });
     }

@@ -31,8 +31,9 @@ describe('matchMakerState2 — constants', () => {
     expect(WILD_ELEMENT).toBe('void');
   });
 
-  test('SPECIAL has LINE, CROSS, NOVA, SUPERNOVA', () => {
-    expect(SPECIAL.LINE).toBe('line');
+  test('SPECIAL has LINE_H, LINE_V, CROSS, NOVA, SUPERNOVA', () => {
+    expect(SPECIAL.LINE_H).toBe('line_h');
+    expect(SPECIAL.LINE_V).toBe('line_v');
     expect(SPECIAL.CROSS).toBe('cross');
     expect(SPECIAL.NOVA).toBe('nova');
     expect(SPECIAL.SUPERNOVA).toBe('supernova');
@@ -47,9 +48,9 @@ describe('matchMakerState2 — makeGem', () => {
   });
 
   test('creates gem with a special tile type', () => {
-    const gem = makeGem('forge', SPECIAL.LINE);
+    const gem = makeGem('forge', SPECIAL.LINE_H);
     expect(gem.kind).toBe('forge');
-    expect(gem.special).toBe(SPECIAL.LINE);
+    expect(gem.special).toBe(SPECIAL.LINE_H);
   });
 });
 

@@ -82,7 +82,7 @@ jobs:
         run: |
           # Collect the diff (JS, HTML, CSS only; cap at 30 000 chars for the API)
           DIFF=$(git diff "${BASE_SHA}..${HEAD_SHA}" -- '*.js' '*.html' '*.css' \
-                 | head -c 30000)
+                 | python3 -c 'import sys; sys.stdout.write(sys.stdin.buffer.read().decode("utf-8", errors="ignore")[:30000])')
 
           if [ -z "$DIFF" ]; then
             echo "No JS/HTML/CSS changes to review."

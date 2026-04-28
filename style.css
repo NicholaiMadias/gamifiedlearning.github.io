@@ -166,6 +166,15 @@ body {
   box-shadow: 0 0 32px rgba(240,192,64,0.7);
 }
 
+.gem-dropping {
+  animation: gemDrop 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes gemDrop {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  70%  { transform: translateY(6%);    opacity: 1; }
+  100% { transform: translateY(0);     opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 @media (min-width: 480px) { .hud { flex-direction: row; justify-content: space-between; } }
 @media (min-width: 600px) { :root { --cell-size: 52px; --grid-gap: 5px; } }
