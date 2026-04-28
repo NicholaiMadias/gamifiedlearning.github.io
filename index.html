@@ -58,9 +58,13 @@
     </div>
 
     <!-- HUB VIEW -->
-    <!-- Unlock banner (shown after Bible Journey is completed) -->
+    <!-- Unlock banner (shown after Bible Journey is completed; hidden while in any game view) -->
     <div id="unlock-banner" class="hidden fixed left-0 right-0 z-[400] bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-500/50 px-4 py-3 text-center" style="top:var(--site-nav-height,48px);">
         <p class="text-[10px] font-bold text-yellow-300 tracking-[0.2em] uppercase">🌟 Bible Journey Complete — New games unlocked! Scroll down to explore. 🌟</p>
+        <button id="unlock-banner-close" aria-label="Dismiss unlock notification"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-300/60 hover:text-yellow-300 transition-colors text-base leading-none"
+                style="background:none;border:none;cursor:pointer;padding:0.25rem 0.5rem;"
+                onclick="dismissUnlockBanner()">✕</button>
     </div>
 
     <div id="view-hub" class="h-full overflow-y-auto flex flex-col items-center p-6 text-center w-full max-w-4xl" style="padding-bottom:3rem;">
@@ -243,15 +247,18 @@
         function switchView(viewId) {
             document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
             document.getElementById('hud').classList.add('hidden');
+            const banner = document.getElementById('unlock-banner');
             const view = document.getElementById(viewId);
             if (view) view.classList.remove('hidden');
             if (viewId !== 'view-hub') {
                 document.getElementById('hud').classList.remove('hidden');
+                // Always hide the unlock banner when entering any game view
+                if (banner) banner.classList.add('hidden');
             } else {
-                // Check quiz completion unlock banner
+                // Show the unlock banner on hub (unless the user dismissed it)
                 try {
-                    if (localStorage.getItem('bjComplete') === 'true') {
-                        const banner = document.getElementById('unlock-banner');
+                    if (localStorage.getItem('bjComplete') === 'true' &&
+                        localStorage.getItem('bjBannerDismissed') !== 'true') {
                         if (banner) banner.classList.remove('hidden');
                     }
                 } catch(_) {}
@@ -264,6 +271,12 @@
             if (viewId === 'view-lock') initLock();
             if (viewId === 'view-bible-journey') bjInit();
             if (lockInterval) clearInterval(lockInterval);
+        }
+
+        function dismissUnlockBanner() {
+            const banner = document.getElementById('unlock-banner');
+            if (banner) banner.classList.add('hidden');
+            try { localStorage.setItem('bjBannerDismissed', 'true'); } catch(_) {}
         }
 
         function updateScoreDisplay() {

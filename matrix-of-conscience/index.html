@@ -272,6 +272,7 @@
       const read = mcGetRead();
       const allRead = PILLARS.every((_, i) => read[i]);
       if (allRead) {
+        try { localStorage.setItem('mc_complete', 'true'); } catch(_) {}
         document.getElementById('mc-complete-panel').classList.remove('hidden');
       }
     }
