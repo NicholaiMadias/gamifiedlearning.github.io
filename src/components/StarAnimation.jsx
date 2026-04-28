@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
+// Multiplier converting the config glow value and size into a CSS drop-shadow radius (px)
+const GLOW_SCALE_FACTOR = 0.1;
+
 export default function StarAnimation({ config, size = 128 }) {
   const [frames, setFrames] = useState([]);
   const frameIndex = useRef(0);
@@ -12,11 +15,16 @@ export default function StarAnimation({ config, size = 128 }) {
       for (let i = 0; i < config.frames; i++) {
         const img = new Image();
         img.src = `${config.spritePath}${i}.png`;
-        await img.decode();
+        try {
+          await img.decode();
+        } catch (err) {
+          console.error(`StarAnimation: failed to load frame ${i} for "${config.name}":`, err);
+          continue;
+        }
         loaded.push(img);
       }
       setFrames(loaded);
-      setCurrentFrame(loaded[0]);
+      setCurrentFrame(loaded[0] ?? null);
     }
     loadFrames();
   }, [config]);
@@ -30,15 +38,15 @@ export default function StarAnimation({ config, size = 128 }) {
 
     function animate(now) {
       if (now - lastTime >= frameDuration) {
-        frameIndex.current =
-          (frameIndex.current + 1) % frames.length;
+        const next = (frameIndex.current + 1) % frames.length;
 
-        if (!config.loop && frameIndex.current === frames.length - 1) {
+        if (!config.loop && next === 0) {
           setCurrentFrame(frames[frames.length - 1]);
           return;
         }
 
-        setCurrentFrame(frames[frameIndex.current]);
+        frameIndex.current = next;
+        setCurrentFrame(frames[next]);
         lastTime = now;
       }
       raf.current = requestAnimationFrame(animate);
@@ -56,7 +64,7 @@ export default function StarAnimation({ config, size = 128 }) {
       width={size}
       height={size}
       alt={config.name}
-      style={config.glow ? { filter: `drop-shadow(0 0 ${size * config.glow * 0.1}px gold)` } : undefined}
+      style={config.glow ? { filter: `drop-shadow(0 0 ${size * config.glow * GLOW_SCALE_FACTOR}px gold)` } : undefined}
     />
   );
 }

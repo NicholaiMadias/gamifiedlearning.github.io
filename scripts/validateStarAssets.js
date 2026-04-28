@@ -8,12 +8,10 @@
  * Usage: node scripts/validateStarAssets.js
  */
 
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, readdirSync } from "fs";
 import { join, resolve } from "path";
-import { createRequire } from "module";
 import { fileURLToPath } from "url";
-import { createCanvas, loadImage } from "canvas";
-import { readdirSync } from "fs";
+import { loadImage } from "canvas";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -22,7 +20,6 @@ const PUBLIC_DIR = join(ROOT, "public");
 
 const EXPECTED_MIN_SIZE = 32;   // pixels — minimum acceptable frame dimension
 const EXPECTED_MAX_SIZE = 512;  // pixels — maximum acceptable frame dimension
-const FRAME_PADDING = 0;        // frames are named frame_0.png, frame_1.png (no zero-padding)
 
 let errors = 0;
 let warnings = 0;
@@ -64,8 +61,8 @@ async function validateConfig(configPath) {
     const relPath = `${config.spritePath}${i}.png`;
     const absPath = join(PUBLIC_DIR, relPath.replace(/^\//, ""));
 
-    // Naming check
-    const expectedName = `frame_${i}.png`;
+    // Naming check — the expected filename is derived from spritePath itself
+    const expectedName = relPath.split("/").pop();
     const actualName = absPath.split("/").pop();
     if (actualName !== expectedName) {
       warn(`Frame ${i}: expected filename "${expectedName}", got "${actualName}"`);
