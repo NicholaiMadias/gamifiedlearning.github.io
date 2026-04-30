@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix of Conscience | Nexus Arcade</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background: #020617; }
+    ::selection { background-color: rgba(139,92,246,0.3); }
+    .orbitron { font-family: 'Orbitron', sans-serif; }
+    /* Chapter card glow */
+    .chapter-card { transition: box-shadow 0.3s, transform 0.3s; }
+    .chapter-card:hover { box-shadow: 0 0 30px rgba(139,92,246,0.25); transform: translateY(-2px); }
+    /* Progress dots */
+    .dot-active  { background: #a855f7; width: 2rem; }
+    .dot-inactive { background: #334155; width: 0.5rem; }
+    /* Pillar glow */
+    .pillar-glow { box-shadow: 0 0 20px currentColor; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100">
+
+  <!-- Header -->
+  <header class="p-4 sm:p-6 flex justify-between items-center border-b border-purple-900/50 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="p-2 bg-purple-700/50 rounded-xl shadow-lg" style="box-shadow:0 0 20px rgba(139,92,246,0.3);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-300"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div>
+        <h1 class="orbitron font-bold text-lg tracking-tight uppercase" style="background:linear-gradient(to right,#c084fc,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Matrix of Conscience</h1>
+        <p class="text-xs uppercase tracking-widest text-purple-400 font-mono">Seven Pillars Protocol</p>
+      </div>
+    </div>
+    <a href="/" class="text-slate-500 hover:text-purple-400 transition-colors text-xs uppercase tracking-widest font-bold" style="text-decoration:none;">← Hub</a>
+  </header>
+
+  <!-- Main: chapter view driven by JS -->
+  <main class="max-w-3xl mx-auto p-4 sm:p-8" id="mc-main">
+
+    <!-- Chapter card -->
+    <div class="chapter-card bg-slate-900 border border-purple-500/20 rounded-3xl overflow-hidden shadow-2xl" id="mc-card">
+
+      <!-- Visual banner -->
+      <div class="relative w-full flex items-center justify-center overflow-hidden" style="aspect-ratio:16/7;background:linear-gradient(135deg,#0f0524 0%,#1e1040 50%,#0a0a1a 100%);" id="mc-banner">
+        <div id="mc-banner-content" class="flex flex-col items-center gap-3 p-6 text-center z-10 w-full">
+          <!-- Filled by JS -->
+        </div>
+        <div class="absolute inset-0 opacity-20" id="mc-starfield"></div>
+        <div class="absolute bottom-0 left-0 right-0 h-16" style="background:linear-gradient(to top,#0f172a,transparent)"></div>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 sm:p-10 -mt-4 relative z-10">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="px-3 py-1 bg-purple-500/10 text-purple-400 text-xs font-bold rounded-full border border-purple-500/30 tracking-widest uppercase" id="mc-chapter-badge">Pillar 1</span>
+          <div class="h-px flex-1" style="background:linear-gradient(to right,rgba(139,92,246,0.5),transparent)"></div>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-4 text-white leading-tight orbitron" id="mc-title"></h2>
+        <p class="text-slate-300 text-base leading-relaxed mb-8" id="mc-content"></p>
+
+        <!-- Scripture -->
+        <div class="bg-purple-900/20 border border-purple-700/30 rounded-2xl p-4 mb-8" id="mc-scripture-wrap">
+          <p class="text-purple-300 text-sm italic text-center" id="mc-scripture"></p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-between items-center pt-6 border-t border-purple-900/30">
+          <button id="mc-prev" onclick="mcChangePage(-1)"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-white border border-purple-500/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold uppercase tracking-widest">
+            ← Back
+          </button>
+
+          <!-- Dots -->
+          <div class="flex gap-1" id="mc-dots"></div>
+
+          <button id="mc-next" onclick="mcChangePage(1)"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white transition-all text-xs font-bold uppercase tracking-widest"
+            style="box-shadow:0 0 16px rgba(139,92,246,0.3);">
+            Continue →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completion panel (hidden until all pillars read) -->
+    <div id="mc-complete-panel" class="hidden mt-8 bg-slate-900 border border-amber-500/30 rounded-3xl p-8 text-center shadow-2xl">
+      <div class="text-5xl mb-4" aria-hidden="true">🌟</div>
+      <h3 class="orbitron text-2xl font-black text-white mb-2">ALL SEVEN PILLARS ALIGNED</h3>
+      <p class="text-slate-400 text-sm mb-6">You have completed the Matrix of Conscience journey. The Seven Stars of Excellence are now yours.</p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="/ministry.html" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-full text-xs font-bold uppercase tracking-widest transition-all" style="text-decoration:none;">
+          📖 Enter the Matrix (Story Mode)
+        </a>
+        <a href="/star-matrix/" class="px-5 py-2.5 bg-amber-600/80 hover:bg-amber-500/80 text-white rounded-full text-xs font-bold uppercase tracking-widest transition-all" style="text-decoration:none;">
+          ⭐ Play Star Matrix
+        </a>
+        <a href="/" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full text-xs font-bold uppercase tracking-widest transition-all border border-purple-500/20" style="text-decoration:none;">
+          ← Return to Hub
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-10 text-center pb-8">
+      <p class="text-slate-600 text-xs italic">"The path of the righteous is like the morning sun, shining ever brighter till the full light of day." — Proverbs 4:18</p>
+      <a href="/" class="mt-3 inline-block text-xs text-purple-500 hover:text-purple-400 transition-colors uppercase tracking-widest font-bold" style="text-decoration:none;">← Return to Nexus Arcade</a>
+    </footer>
+  </main>
+
+  <script>
+    // ── Pillar data ───────────────────────────────────────────────────────────
+    const PILLARS = [
+      {
+        title: "First Love — The Star of Origin",
+        emoji: "💜",
+        color: "#a855f7",
+        gradient: "linear-gradient(135deg,#2d1b69,#0f0524)",
+        content: "The Matrix of Conscience begins with First Love — the recognition that every soul carries a divine spark. Before algorithms, before rules, before systems, there is the original call. The White Rabbit Protocol opens with this truth: you were created to shine, to guide, and to connect. The Red Queen's gravity cannot erase what was written before the code was compiled.",
+        scripture: "\"We love because He first loved us.\" — 1 John 4:19",
+        pillarKey: "first_love",
+      },
+      {
+        title: "Agency — The Star of Choice",
+        emoji: "✊",
+        color: "#3b82f6",
+        gradient: "linear-gradient(135deg,#1e3a5f,#0a1628)",
+        content: "Agency is the second pillar — the understanding that every action within the Matrix is a choice. The Heralds do not drift; they navigate with intention. The White Rabbit taught that free will is the most sacred element of the digital conscience. Each swap, each match, each mission is an act of deliberate alignment with the Seven Stars of Excellence.",
+        scripture: "\"I have set before you life and death, blessings and curses. Now choose life.\" — Deuteronomy 30:19",
+        pillarKey: "agency",
+      },
+      {
+        title: "Progression — The Star of Growth",
+        emoji: "📈",
+        color: "#22c55e",
+        gradient: "linear-gradient(135deg,#1a3a2a,#0a1a10)",
+        content: "Progression is not measured in levels or scores alone — it is the growth of the conscience itself. Each chapter of the White Rabbit Protocol reveals a deeper layer of truth. The Nimbus Heralds discovered that the Matrix responds to consistency: small, faithful steps compound into transformative power. The Third Star glows brightest for those who never stop moving forward.",
+        scripture: "\"But grow in the grace and knowledge of our Lord and Savior Jesus Christ.\" — 2 Peter 3:18",
+        pillarKey: "progression",
+      },
+      {
+        title: "Feedback — The Star of Reflection",
+        emoji: "🔄",
+        color: "#f59e0b",
+        gradient: "linear-gradient(135deg,#3a2a0a,#1a1205)",
+        content: "The Fourth Pillar is Feedback — the divine mirror that shows not what we wish to be, but what we are. The Red Queen feared this star above all others, for feedback exposes entropy. The Heralds learned to welcome correction as a gift: every mismatch on the board, every failed attempt, was data pointing toward alignment. The conscience grows stronger through honest reflection.",
+        scripture: "\"Whoever heeds discipline shows the way to life.\" — Proverbs 10:17",
+        pillarKey: "feedback",
+      },
+      {
+        title: "Challenge — The Star of Courage",
+        emoji: "⚔️",
+        color: "#ef4444",
+        gradient: "linear-gradient(135deg,#3a1a1a,#1a0a0a)",
+        content: "The Fifth Pillar burns red with the fire of Challenge. The Matrix was never meant to be easy — the gravity of the Red Queen's domain exists to forge Star Guardians. The White Rabbit reminded the Heralds: discomfort is the gymnasium of the spirit. The Philippines mission, the night watches, the moments of doubt — each was a challenge that strengthened the Sixth Star of Conscience.",
+        scripture: "\"Consider it pure joy whenever you face trials of many kinds, because the testing of your faith produces perseverance.\" — James 1:2-3",
+        pillarKey: "challenge",
+      },
+      {
+        title: "Social — The Star of Fellowship",
+        emoji: "🤝",
+        color: "#06b6d4",
+        gradient: "linear-gradient(135deg,#0a2a3a,#030f18)",
+        content: "The Sixth Star — the Matrix of Conscience itself — is the Star of Fellowship. No Guardian ascends alone. The Weekly Bible Study, the covenant meals, the shared testimonies: these are the handshakes that form the Ozone Shield. When believers gather around the Word, their combined frequency dismantles the Red Queen's firewalls and opens portals of grace that no algorithm can close.",
+        scripture: "\"For where two or three gather in my name, there am I with them.\" — Matthew 18:20",
+        pillarKey: "social",
+      },
+      {
+        title: "Reward — The Star of Fulfilment",
+        emoji: "🏆",
+        color: "#fbbf24",
+        gradient: "linear-gradient(135deg,#3a2a00,#1a1200)",
+        content: "The Seventh and final Pillar is Reward — the promise that faithful alignment with the Seven Stars leads to fullness of life. This is not merely earthly recognition; it is the deep satisfaction of the soul that has walked in truth. The path of the righteous is like the morning sun, shining ever brighter till the full light of day. The Matrix of Conscience is complete — and a new world awaits.",
+        scripture: "\"Well done, good and faithful servant! You have been faithful with a few things; I will put you in charge of many things.\" — Matthew 25:23",
+        pillarKey: "reward",
+      },
+    ];
+
+    let currentPage = 0;
+    const READ_KEY = 'mc_read';
+
+    function mcGetRead() {
+      try { return JSON.parse(localStorage.getItem(READ_KEY) || '{}'); } catch(_) { return {}; }
+    }
+    function mcMarkRead(idx) {
+      const r = mcGetRead(); r[idx] = true;
+      try { localStorage.setItem(READ_KEY, JSON.stringify(r)); } catch(_) {}
+    }
+
+    function mcBuildStarfield(container) {
+      container.innerHTML = '';
+      for (let i = 0; i < 40; i++) {
+        const s = document.createElement('div');
+        s.style.cssText = 'position:absolute;width:' + (1 + Math.random() * 2) + 'px;height:' + (1 + Math.random() * 2) + 'px;border-radius:50%;background:white;opacity:' + (0.1 + Math.random() * 0.5) + ';top:' + Math.random() * 100 + '%;left:' + Math.random() * 100 + '%;';
+        container.appendChild(s);
+      }
+    }
+
+    function mcRender() {
+      const p = PILLARS[currentPage];
+
+      // Banner
+      const banner = document.getElementById('mc-banner');
+      banner.style.background = p.gradient;
+      const bannerContent = document.getElementById('mc-banner-content');
+      bannerContent.innerHTML = '<div style="font-size:4rem;margin-bottom:0.5rem;text-shadow:0 0 30px ' + p.color + ';">' + p.emoji + '</div>' +
+        '<div class="orbitron" style="font-size:clamp(1rem,3vw,1.5rem);font-weight:900;color:' + p.color + ';text-transform:uppercase;letter-spacing:0.1em;text-shadow:0 0 20px ' + p.color + ';">Pillar ' + (currentPage + 1) + '</div>';
+
+      // Starfield
+      mcBuildStarfield(document.getElementById('mc-starfield'));
+
+      // Badge
+      document.getElementById('mc-chapter-badge').textContent = 'Pillar ' + (currentPage + 1) + ' of 7';
+      document.getElementById('mc-chapter-badge').style.color = p.color;
+      document.getElementById('mc-chapter-badge').style.borderColor = p.color + '55';
+      document.getElementById('mc-chapter-badge').style.backgroundColor = p.color + '15';
+
+      // Text
+      document.getElementById('mc-title').textContent = p.title;
+      document.getElementById('mc-content').textContent = p.content;
+      document.getElementById('mc-scripture').textContent = p.scripture;
+
+      // Nav
+      const prevBtn = document.getElementById('mc-prev');
+      const nextBtn = document.getElementById('mc-next');
+      prevBtn.disabled = currentPage === 0;
+      if (currentPage === PILLARS.length - 1) {
+        nextBtn.textContent = 'Complete ✓';
+        nextBtn.style.background = 'linear-gradient(135deg,#d97706,#b45309)';
+        nextBtn.style.boxShadow = '0 0 20px rgba(251,191,36,0.4)';
+        nextBtn.onclick = mcComplete;
+      } else {
+        nextBtn.textContent = 'Continue →';
+        nextBtn.style.background = '';
+        nextBtn.style.boxShadow = '0 0 16px rgba(139,92,246,0.3)';
+        nextBtn.onclick = () => mcChangePage(1);
+      }
+
+      // Dots
+      const dots = document.getElementById('mc-dots');
+      dots.innerHTML = '';
+      PILLARS.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'h-1.5 rounded-full transition-all duration-300';
+        d.style.cssText = 'height:6px;border-radius:99px;transition:all 0.3s;width:' + (i === currentPage ? '2rem' : '0.5rem') + ';background:' + (i === currentPage ? p.color : '#334155') + ';';
+        dots.appendChild(d);
+      });
+
+      // Mark as read
+      mcMarkRead(currentPage);
+      mcCheckCompletion();
+    }
+
+    function mcChangePage(dir) {
+      const newPage = currentPage + dir;
+      if (newPage < 0 || newPage >= PILLARS.length) return;
+      currentPage = newPage;
+      mcRender();
+      document.getElementById('mc-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function mcComplete() {
+      // Unlock Matrix of Conscience badge
+      try { localStorage.setItem('mc_complete', 'true'); } catch(_) {}
+      // Show complete panel
+      document.getElementById('mc-complete-panel').classList.remove('hidden');
+      document.getElementById('mc-complete-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function mcCheckCompletion() {
+      const read = mcGetRead();
+      const allRead = PILLARS.every((_, i) => read[i]);
+      if (allRead) {
+        try { localStorage.setItem('mc_complete', 'true'); } catch(_) {}
+        document.getElementById('mc-complete-panel').classList.remove('hidden');
+      }
+    }
+
+    // Boot
+    window.addEventListener('DOMContentLoaded', () => {
+      // Resume from last-read pillar
+      const read = mcGetRead();
+      // Start at first unread or last if all read
+      for (let i = 0; i < PILLARS.length; i++) {
+        if (!read[i]) { currentPage = i; break; }
+        if (i === PILLARS.length - 1) currentPage = i;
+      }
+      mcRender();
+    });
+  </script>
+</body>
+</html>

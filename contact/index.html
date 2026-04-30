@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Amazing Grace Home Living</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      margin: 0;
+      padding-top: var(--site-nav-height);
+      box-sizing: border-box;
+      min-height: 100vh;
+    }
+
+    .contact-wrapper {
+      max-width: 680px;
+      margin: 3rem auto;
+      padding: 0 1.25rem;
+    }
+
+    .contact-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0, 68, 204, 0.1);
+      overflow: hidden;
+    }
+
+    .contact-header {
+      background: #0044cc;
+      color: #fff;
+      padding: 2rem 2rem 1.5rem;
+    }
+
+    .contact-header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+    }
+
+    .contact-header p {
+      font-size: 0.95rem;
+      opacity: 0.85;
+      margin: 0;
+    }
+
+    .contact-body {
+      padding: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #1a202c;
+      background: #f9fafb;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #0044cc;
+      box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.12);
+      background: #fff;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 130px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 540px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    .submit-btn {
+      display: inline-block;
+      width: 100%;
+      padding: 0.85rem;
+      background: #0044cc;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .submit-btn:hover { background: #003399; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:focus-visible {
+      outline: 2px solid #0044cc;
+      outline-offset: 3px;
+    }
+
+    .contact-note {
+      margin-top: 1.25rem;
+      padding: 0.85rem 1rem;
+      background: #eff6ff;
+      border-left: 4px solid #0044cc;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: #1e40af;
+    }
+
+    .direct-email {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .direct-email a {
+      color: #0044cc;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .direct-email a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAVIGATION -->
+  <nav class="site-nav" aria-label="Site navigation">
+    <div class="nav-container">
+      <div class="site-title">
+        <a href="/">Amazing Grace Home Living</a>
+      </div>
+      <input type="checkbox" id="menu-toggle" class="sr-only">
+      <label for="menu-toggle" class="menu-icon" aria-label="Toggle navigation menu">&#9776;</label>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/">Available Properties</a></li>
+        <li><a href="/contact/" aria-current="page">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="contact-wrapper">
+    <div class="contact-card">
+      <div class="contact-header">
+        <h1>Contact Us</h1>
+        <p>Have a question about a property or want to schedule a visit? We'd love to hear from you.</p>
+      </div>
+
+      <div class="contact-body">
+        <!--
+          This form uses a mailto: action which opens the user's default email client.
+          The subject field and the textarea named "body" are reliably pre-filled.
+          Other form inputs, such as name and phone, may not appear in the composed email in many clients.
+        -->
+        <form
+          action="mailto:gulfnexus@gmail.com"
+          method="POST"
+          enctype="text/plain"
+          aria-label="Contact form"
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Full Name <span aria-hidden="true">*</span></label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Jane Smith"
+                required
+                autocomplete="name"
+              >
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="(813) 555-0100"
+                autocomplete="tel"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address <span aria-hidden="true">*</span></label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="jane@example.com"
+              required
+              autocomplete="email"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <select id="subject" name="subject">
+              <option value="Property Inquiry">Property Inquiry</option>
+              <option value="Schedule a Visit">Schedule a Visit</option>
+              <option value="Application Question">Application Question</option>
+              <option value="General Question">General Question</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message <span aria-hidden="true">*</span></label>
+            <textarea
+              id="message"
+              name="body"
+              placeholder="Tell us how we can help you…"
+              required
+            ></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+
+        <div class="contact-note">
+          Clicking <strong>Send Message</strong> will open your email client with the message pre-filled. Alternatively, email us directly below.
+        </div>
+
+        <div class="direct-email">
+          <a href="mailto:gulfnexus@gmail.com">gulfnexus@gmail.com</a>
+          &nbsp;·&nbsp;
+          <a href="mailto:admin@amazinggracehl.org">admin@amazinggracehl.org</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Dynamic nav-height: keeps --site-nav-height in sync with the actual rendered nav -->
+  <script src="/nav-height.js"></script>
+</body>
+</html>
