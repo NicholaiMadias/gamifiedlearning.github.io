@@ -372,6 +372,7 @@ function onCellKey(e, row, col) {
 
 function attemptSwap(r1, c1, r2, c2) {
   if (moves <= 0) {
+    locked = false;
     showMsg('No moves left — restart to play again!');
     return;
   }
