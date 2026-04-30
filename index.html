@@ -8,19 +8,42 @@
     <link rel="stylesheet" href="style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
-        :root { --neon-blue: #00f2ff; --neon-purple: #bc13fe; --deep-space: #020617; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--deep-space); color: #e2e8f0; margin: 0; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; -webkit-tap-highlight-color: transparent; padding-top: var(--site-nav-height); box-sizing: border-box; }
+        /* ── Seven Stars · Starry Night design tokens ── */
+        :root {
+          --night: #0a0a14;
+          --night-surface: #111122;
+          --night-card: #161628;
+          --gold: #ffd700;
+          --gold-dim: rgba(255, 215, 0, 0.15);
+          --gold-border: rgba(255, 215, 0, 0.25);
+          --gold-glow: rgba(255, 215, 0, 0.35);
+          --star-silver: #c0c0c0;
+          --star-sapphire: #1e90ff;
+          --star-emerald: #50c878;
+          --star-ruby: #e0115f;
+          --star-amethyst: #9966cc;
+          --star-obsidian: #3a3a4a;
+          --text: #e8e0f0;
+          --text-muted: #9090b0;
+          --border: rgba(255, 215, 0, 0.12);
+          --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+          --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+          --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+          --radius: 14px;
+          --radius-sm: 8px;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--night); color: var(--text); margin: 0; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; -webkit-tap-highlight-color: transparent; padding-top: var(--site-nav-height); box-sizing: border-box; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        .nexus-bg { background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%); position: fixed; inset: 0; z-index: -1; }
-        .glass-panel { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .nexus-bg { background-image: radial-gradient(circle at 50% 50%, var(--night-surface) 0%, var(--night) 100%); position: fixed; inset: 0; z-index: -1; }
+        .glass-panel { background: rgba(22, 22, 40, 0.8); backdrop-filter: blur(12px); border: 1px solid var(--border); }
         .grid-container { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; width: 100%; max-width: 500px; aspect-ratio: 1; margin: 0 auto; }
-        .tile { position: relative; border-radius: 8px; cursor: pointer; transition: transform 0.2s, opacity 0.3s; background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.05); }
-        .tile.selected { outline: 3px solid var(--neon-blue); transform: scale(1.1); z-index: 10; box-shadow: 0 0 20px var(--neon-blue); }
-        .key-btn { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 210, 255, 0.2); transition: all 0.2s; }
-        .key-btn:active { background: var(--neon-blue); color: var(--deep-space); transform: scale(0.9); }
-        .cmd-btn { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(0, 242, 255, 0.1); transition: all 0.3s; }
-        .cmd-btn:hover { background: rgba(0, 242, 255, 0.1); border-color: var(--neon-blue); transform: translateY(-2px); }
-        .loader { width: 40px; height: 40px; border: 4px solid #00D2FF; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+        .tile { position: relative; border-radius: var(--radius-sm); cursor: pointer; transition: transform 0.2s, opacity 0.3s; background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.05); }
+        .tile.selected { outline: 3px solid var(--star-sapphire); transform: scale(1.1); z-index: 10; box-shadow: 0 0 20px var(--star-sapphire); }
+        .key-btn { background: rgba(22, 22, 40, 0.6); border: 1px solid rgba(30, 144, 255, 0.2); transition: all 0.2s; }
+        .key-btn:active { background: var(--star-sapphire); color: var(--night); transform: scale(0.9); }
+        .cmd-btn { background: rgba(22, 22, 40, 0.5); border: 1px solid var(--border); transition: all 0.3s; }
+        .cmd-btn:hover { background: var(--gold-dim); border-color: var(--gold); transform: translateY(-2px); }
+        .loader { width: 40px; height: 40px; border: 4px solid var(--star-sapphire); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .hidden { display: none !important; }
     </style>
