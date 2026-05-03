@@ -14,11 +14,13 @@ Done in ~30 seconds. Immediate and irreversible.
 
 🗑️ Delete the GitHub Repo
 
-1. Go to github.com/NicholaiMadias/docker.github.io
+⚠️ Before you continue, double-check that you are deleting the correct repository. Deletion is immediate and irreversible.
+
+1. Go to github.com/<your-org-or-username>/<your-repo>
 2. Click Settings (top tab bar, far right)
 3. Scroll to the bottom — Danger Zone section
 4. Click Delete this repository
-5. GitHub will ask you to type NicholaiMadias/docker.github.io to confirm
+5. GitHub will ask you to type <your-org-or-username>/<your-repo> to confirm
 6. Enter your password or confirm with 2FA if prompted
 
 
