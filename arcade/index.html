@@ -188,10 +188,13 @@
       restartBtn.addEventListener('click', () => initMatchMaker(null, null));
     }
 
-    document.getElementById('overlay-restart-btn').addEventListener('click', () => {
-      document.getElementById('mm-cert-overlay').classList.add('hidden');
-      initMatchMaker(null, null);
-    });
+    const overlayRestartBtn = document.getElementById('overlay-restart-btn');
+    if (overlayRestartBtn) {
+      overlayRestartBtn.addEventListener('click', () => {
+        document.getElementById('mm-cert-overlay').classList.add('hidden');
+        initMatchMaker(null, null);
+      });
+    }
 
     // Handle certificate generation form submission
     document.getElementById('mm-gen-cert-btn').addEventListener('click', async () => {
@@ -202,8 +205,6 @@
       try {
         await generateCertificateFor(playerName);
         // Phase transition is handled inside generateCertificateFor via DOM IDs
-        const phase = document.getElementById('mm-cert-display-phase');
-        if (phase) { phase.classList.remove('hidden'); }
       } finally {
         btn.disabled    = false;
         btn.textContent = 'Generate Certificate';
@@ -221,7 +222,7 @@
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('./sw.js')
+        .register('/sw.js')
         .catch(err => console.warn('[SW] Registration skipped:', err.message));
     }
   </script>

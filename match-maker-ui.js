@@ -372,6 +372,7 @@ function onCellKey(e, row, col) {
 
 function attemptSwap(r1, c1, r2, c2) {
   if (moves <= 0) {
+    locked = false;
     showMsg('No moves left — restart to play again!');
     return;
   }
@@ -450,6 +451,7 @@ function processCascade(isFirstPass = false) {
 }
 
 function highlightMatched(matches) {
+  if (!dom.board) return;
   const cells = dom.board.querySelectorAll('.gem-cell');
   matches.forEach(({ row, col }) => {
     const idx = row * COLS + col;
