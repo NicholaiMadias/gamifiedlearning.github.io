@@ -1,0 +1,31 @@
+🗑️ Delete the Netlify Site
+
+1. Go to app.netlify.com and log in
+2. Click on your site (the one linked to docker.github.io)
+3. Go to Site configuration (left sidebar)
+4. Scroll all the way to the bottom to Danger zone
+5. Click Delete this site
+6. It will ask you to type the site name to confirm — type it and hit Delete
+
+
+Done in ~30 seconds. Immediate and irreversible.
+
+---
+
+🗑️ Delete the GitHub Repo
+
+⚠️ Before you continue, double-check that you are deleting the correct repository. Deletion is immediate and irreversible.
+
+1. Go to github.com/<your-org-or-username>/<your-repo>
+2. Click Settings (top tab bar, far right)
+3. Scroll to the bottom — Danger Zone section
+4. Click Delete this repository
+5. GitHub will ask you to type <your-org-or-username>/<your-repo> to confirm
+6. Enter your password or confirm with 2FA if prompted
+
+
+Also immediate and irreversible.
+
+---
+
+⚡ After both are deleted, the nicholai.org domain (if you had DNS pointing to either) will stop resolving. That’s fine — it frees it up for whatever you build next. Want me to proceed with building the fresh Nicholai.org site we were planning?
