@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logs — Gamified Learning</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    h1   { font-size: 1.5rem; margin-bottom: 1rem; }
+    #logList { list-style: none; padding: 0; }
+    #logList li {
+      border-bottom: 1px solid #eee;
+      padding: 0.4rem 0;
+      font-size: 0.9rem;
+      font-family: monospace;
+    }
+    .badge-info    { color: #0066cc; }
+    .badge-warn    { color: #cc7700; }
+    .badge-error   { color: #cc0000; }
+  </style>
+</head>
+<body>
+  <h1>Activity Logs</h1>
+  <ul id="logList"></ul>
+
+  <script>
+    // ---------------------------------------------------------------------------
+    // Demo-host detection (shared with login.html)
+    // ---------------------------------------------------------------------------
+    function isDemoHost() {
+      const host = location.hostname;
+      return (
+        host === "localhost" ||
+        host === "127.0.0.1" ||
+        host === "" ||                 // file://
+        host.endsWith(".github.io") ||
+        host.includes("demo")
+      );
+    }
+
+    const IS_DEMO_HOST = isDemoHost();
+
+    // ---------------------------------------------------------------------------
+    // Log storage helpers
+    // ---------------------------------------------------------------------------
+    const LOG_KEY = "matrix_audit_logs";
+
+    function loadLogs() {
+      try {
+        return JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function renderLogs(logs) {
+      const list = document.getElementById("logList");
+      if (!logs.length) {
+        list.innerHTML = "<li>No log entries found.</li>";
+        return;
+      }
+      list.innerHTML = logs
+        .slice()
+        .reverse()
+        .map(entry => {
+          const level = (entry.level || "info").toLowerCase();
+          return `<li class="badge-${level}">[${entry.ts || ""}] ${entry.msg || JSON.stringify(entry)}</li>`;
+        })
+        .join("");
+    }
+
+    // ---------------------------------------------------------------------------
+    // Demo seed — run only once per session on demo hosts
+    // ---------------------------------------------------------------------------
+    function seedDemoLogs() {
+      const demo = [
+        { ts: new Date().toISOString(), level: "info",  msg: "Demo: user login succeeded" },
+        { ts: new Date().toISOString(), level: "warn",  msg: "Demo: rate-limit threshold reached" },
+        { ts: new Date().toISOString(), level: "error", msg: "Demo: simulated network error" }
+      ];
+      localStorage.setItem(LOG_KEY, JSON.stringify(demo));
+    }
+
+    if (IS_DEMO_HOST && !localStorage.getItem("demoLogsSeeded")) {
+      seedDemoLogs();
+      localStorage.setItem("demoLogsSeeded", "1");
+    }
+
+    renderLogs(loadLogs());
+  </script>
+</body>
+</html>

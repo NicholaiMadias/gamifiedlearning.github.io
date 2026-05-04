@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnostics — Gamified Learning</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    h1   { font-size: 1.5rem; margin-bottom: 1rem; }
+    #dnsResults p { margin: 0.4rem 0; }
+    button { padding: 0.5rem 1.2rem; font-size: 1rem; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <h1>Network Diagnostics</h1>
+
+  <section>
+    <h2>DNS Tests</h2>
+    <p>Checks DNS reachability for configured hostnames via Google DNS-over-HTTPS.</p>
+    <button id="runDnsTests">Run DNS Tests</button>
+    <div id="dnsResults"></div>
+  </section>
+
+  <script src="js/diagnostics.js"></script>
+  <script>
+    document.getElementById("runDnsTests").addEventListener("click", async () => {
+      const btn = document.getElementById("runDnsTests");
+      btn.disabled = true;
+
+      try {
+        await runDnsTests();
+      } catch (err) {
+        console.error("DNS test failed:", err);
+        alert("DNS test encountered an error. Check console for details.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

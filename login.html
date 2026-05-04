@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Gamified Learning</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f5f5;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.12);
+      padding: 2rem;
+      width: 100%;
+      max-width: 360px;
+    }
+    h1 { margin: 0 0 1.5rem; font-size: 1.4rem; text-align: center; }
+    label { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.6rem;
+      background: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button[type="submit"]:hover { background: #0052a3; }
+    #loginError {
+      color: #cc0000;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    .demo-notice {
+      margin-top: 1rem;
+      padding: 0.5rem 0.75rem;
+      background: #fff8e1;
+      border-left: 3px solid #f9a825;
+      border-radius: 3px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Gamified Learning</h1>
+    <form id="loginForm" novalidate>
+      <label for="username">Username</label>
+      <input type="text" id="username" autocomplete="username" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" autocomplete="current-password" required />
+
+      <button type="submit">Sign in</button>
+      <p id="loginError">Invalid credentials. Please try again.</p>
+    </form>
+
+    <div id="demoNotice" class="demo-notice" style="display:none;">
+      Demo mode — use <strong>admin / admin</strong> to sign in.
+    </div>
+  </div>
+
+  <script>
+    // ---------------------------------------------------------------------------
+    // Environment detection
+    // ---------------------------------------------------------------------------
+    function isDemoHost() {
+      const host = location.hostname;
+      return (
+        host === "localhost" ||
+        host === "127.0.0.1" ||
+        host === "" ||                 // file://
+        host.endsWith(".github.io") ||
+        host.includes("demo")
+      );
+    }
+
+    // ---------------------------------------------------------------------------
+    // Bootstrap
+    // ---------------------------------------------------------------------------
+    (function init() {
+      if (isDemoHost()) {
+        document.getElementById("demoNotice").style.display = "block";
+      }
+
+      // Redirect if already logged in
+      try {
+        const user = JSON.parse(localStorage.getItem("adminUser") || "null");
+        if (user && user.token) {
+          location.href = "index.html";
+        }
+      } catch { /* ignore */ }
+    })();
+
+    // ---------------------------------------------------------------------------
+    // Login handler
+    // ---------------------------------------------------------------------------
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const errorEl = document.getElementById("loginError");
+
+      errorEl.style.display = "none";
+
+      // Demo-host shortcut
+      if (isDemoHost() && username === "admin" && password === "admin") {
+        localStorage.setItem(
+          "adminUser",
+          JSON.stringify({ username: "admin", role: "admin", token: "demo" })
+        );
+        location.href = "index.html";
+        return;
+      }
+
+      // Production auth would go here (e.g. Firebase Auth)
+      errorEl.style.display = "block";
+    });
+  </script>
+</body>
+</html>
