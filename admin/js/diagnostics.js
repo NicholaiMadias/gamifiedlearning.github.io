@@ -42,15 +42,18 @@ export function runBrowserDiagnostics() {
 /**
  * Create an AbortSignal that fires after `ms` milliseconds.
  * Uses AbortSignal.timeout() when available, falls back to AbortController + setTimeout.
+ * Returns `{ signal, cancel }` so callers can clear the fallback timer early.
  *
  * @param {number} ms
- * @returns {AbortSignal}
+ * @returns {{ signal: AbortSignal, cancel: () => void }}
  */
 function timeoutSignal(ms) {
-  if (typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+  if (typeof AbortSignal.timeout === 'function') {
+    return { signal: AbortSignal.timeout(ms), cancel: () => {} };
+  }
   const controller = new AbortController();
-  setTimeout(() => controller.abort(), ms);
-  return controller.signal;
+  const timer = setTimeout(() => controller.abort(), ms);
+  return { signal: controller.signal, cancel: () => clearTimeout(timer) };
 }
 
 /** Well-known hostnames to probe */
@@ -73,16 +76,19 @@ export async function runDnsTests() {
     DNS_TARGETS.map(async ({ host, label }) => {
       const url = `https://${host}/`;
       const t0  = performance.now();
+      const { signal, cancel } = timeoutSignal(5000);
       try {
         await fetch(url, {
           method: 'HEAD',
           mode:   'no-cors',
           cache:  'no-store',
-          signal: timeoutSignal(5000),
+          signal,
         });
         return { host, label, reachable: true, latencyMs: Math.round(performance.now() - t0), error: null };
       } catch (err) {
-        return { host, label, reachable: false, latencyMs: null, error: err.message };
+        return { host, label, reachable: false, latencyMs: null, error: err instanceof Error ? err.message : String(err) };
+      } finally {
+        cancel();
       }
     })
   );

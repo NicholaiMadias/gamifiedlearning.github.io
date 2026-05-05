@@ -74,8 +74,16 @@
   logoutBtn.addEventListener('click', logout);
   nav.appendChild(logoutBtn);
 
-  // Seed demo logs on first visit
-  seedDemoLogs();
+  // Seed demo logs only on demo hosts; use a flag so clearing logs stays durable.
+  const isDemoHost = (() => {
+    const h = location.hostname;
+    return h === '' || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.github.io');
+  })();
+  const DEMO_SEEDED_FLAG = 'matrix_demo_logs_seeded';
+  if (isDemoHost && !localStorage.getItem(DEMO_SEEDED_FLAG)) {
+    seedDemoLogs();
+    localStorage.setItem(DEMO_SEEDED_FLAG, '1');
+  }
 
   function refresh() {
     const filter = document.getElementById('log-filter').value.trim();

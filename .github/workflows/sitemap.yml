@@ -1,0 +1,32 @@
+name: Generate Sitemap
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  sitemap_job:
+    runs-on: ubuntu-latest
+    name: Generate Sitemap
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Sitemap
+        uses: cicirello/generate-sitemap@v1
+        with:
+          base-url-path: https://amazinggracehl.org/
+          include-pdf: false
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'Sitemap Bot'
+          git config --global user.email 'gulfnexus@gmail.com'
+          git add sitemap.xml
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update sitemap"
+          git push
