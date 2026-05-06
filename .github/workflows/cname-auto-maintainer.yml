@@ -25,10 +25,10 @@ jobs:
 
           case "$REPO" in
             "NicholaiMadias/gamifiedlearning.github.io")
-              EXPECTED="amazinggracehomeliving.com"
+              EXPECTED="amazinggracehl.org"
               ;;
             "NicholaiMadias/amazinggracehomeliving.github.io")
-              EXPECTED="amazinggracehomeliving.com"
+              EXPECTED="amazinggracehl.org"
               ;;
             *)
               echo "No case arm exists for repo: $REPO"
@@ -132,4 +132,4 @@ jobs:
           curl --retry 3 --fail -X POST \
             -H "Authorization: Bearer ${WP_API_KEY}" \
             -d "{\"domain\": \"$DOMAIN\"}" \
-            https://www.amazinggracehomeliving.com/wp-json/nexus-sync/v1/add-domain || true
+            https://www.amazinggracehl.org/wp-json/nexus-sync/v1/add-domain || true

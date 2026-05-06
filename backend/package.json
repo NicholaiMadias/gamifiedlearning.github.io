@@ -1,7 +1,7 @@
 {
-  "name": "amazinggracehomeliving-backend",
+  "name": "amazinggracehl-backend",
   "version": "1.0.0",
-  "description": "Store backend for AmazingGraceHomeLiving / Gamified Learning",
+  "description": "Store backend for amazinggracehl.org / Gamified Learning",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
