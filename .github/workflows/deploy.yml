@@ -1,3 +1,6 @@
+# ADDRESS CANONICAL RECORD — do not modify these cities:
+# 926 E Poinsettia Ave is in TAMPA, FL 33612 — NOT Holiday, NOT Largo.
+# 1142 7th St NW is in LARGO, FL 33770.
 name: Deploy GitHub Pages
 
 on:

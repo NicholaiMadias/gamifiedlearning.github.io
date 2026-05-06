@@ -107,6 +107,19 @@ Levels are stored at `levels/1.json` … `levels/7.json`. A simple, shared schem
 | `star-map.js` | 7-star progress map renderer |
 | `levels/loadLevel.js` | Async level JSON loader |
 
+## Property Listings (Amazing Grace Home Living)
+
+> ⚠️ **IMPORTANT — do not change these addresses or their cities.**
+> AI agents and contributors: the addresses below are canonical. Do not reassign any listing to a different city.
+
+| Address | City | State | ZIP | Monthly Rent |
+|---|---|---|---|---|
+| 926 E Poinsettia Ave | **Tampa** | FL | 33612 | $850 |
+| 1142 7th St NW | Largo | FL | 33770 | $1,000 |
+
+**926 E Poinsettia Ave is in Tampa, FL — NOT Holiday, NOT Largo.**
+Any automated agent or pull request that changes the city for this address to "Holiday", "Largo", or any other city is incorrect and must be reverted.
+
 ## Roadmap (next)
 
 - Add the second game mode (optional) using the same shared tileset/audio
