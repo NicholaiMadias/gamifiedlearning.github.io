@@ -1,53 +1,37 @@
-name: Dual Deploy
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Validate CNAME
-        run: |
-          if [ ! -f CNAME ]; then
-            echo "CNAME file not found at repo root"
-            exit 1
-          fi
-          ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="amazinggracehomeliving.com"
-          if [ "$ACTUAL" != "$EXPECTED" ]; then
-            echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
-            exit 1
-          fi
-          echo "CNAME validated: $ACTUAL"
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-      - name: Build static site
-        run: |
-          rm -rf dist
-          mkdir -p dist
-          rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' ./ dist/
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-
-      - name: Sync to WordPress (Gamified Learning)
-        env:
-          WP_API_KEY: ${{ secrets.WP_API_KEY }}
-        run: |
-          test -f dist/index.html
-          CONTENT=$(jq -Rs . < dist/index.html)
-          curl -sSf \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${WP_API_KEY}" \
-            -d "{\"content\": ${CONTENT}}" \
-            https://www.gamifiedlearning.org/wp-json/nexus-sync/v1/update
+        id: deployment
+        uses: actions/deploy-pages@v5
