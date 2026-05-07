@@ -1,0 +1,8 @@
+{
+  "name": "shooting_star",
+  "frames": 5,
+  "frameRate": 18,
+  "loop": true,
+  "trailLength": 0.6,
+  "spritePath": "/assets/stars/shooting/frame_"
+}

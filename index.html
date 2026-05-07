@@ -164,11 +164,11 @@
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Enter the Matrix of Conscience</h2>
                 <p class="text-slate-400 text-[10px]">Seven AI-illustrated chapters of the White Rabbit Protocol — Voice of Jesus Storybook.</p>
             </a>
-            <a href="/matrix-of-conscience/" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-yellow-400" style="text-decoration:none;">
+            <button onclick="switchView('view-bible-journey')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-yellow-400">
                 <div class="w-12 h-12 bg-yellow-500/20 rounded-xl mb-4 flex items-center justify-center text-yellow-400">✝</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Bible Journey</h2>
-                <p class="text-slate-400 text-[10px]">Explore the Seven Pillars — an interactive journey through the White Rabbit Protocol.</p>
-            </a>
+                <p class="text-slate-400 text-[10px]">Test your Bible knowledge — complete the journey to unlock new experiences.</p>
+            </button>
         </div>
 
         <div class="mt-8 flex flex-wrap gap-4 justify-center">
@@ -225,7 +225,7 @@
         </div>
     </div>
 
-    <!-- ACT ONE MATCH-3 (replaces Bible Journey quiz) -->
+    <!-- ACT ONE MATCH-3 -->
     <div id="view-act-one" class="hidden w-full flex flex-col items-center px-4">
         <div class="mb-4 text-center">
             <h2 class="orbitron text-2xl font-black text-orange-400 italic tracking-tight">ACT ONE</h2>
@@ -247,7 +247,7 @@
         </div>
     </div>
 
-    <!-- BIBLE JOURNEY QUIZ (kept for backward compat; now redirects to matrix-of-conscience) -->
+    <!-- BIBLE JOURNEY QUIZ -->
     <div id="view-bible-journey" class="hidden w-full flex flex-col items-center px-4 max-w-md">
         <div class="glass-panel p-8 rounded-[2.5rem] w-full">
             <h2 class="orbitron text-2xl font-bold text-yellow-400 italic mb-6 text-center">✝ BIBLE JOURNEY</h2>
@@ -299,18 +299,6 @@
     </div>
 
     <script>
-        /* ── NexusCredits (inline; mirrors credits.js for non-module pages) ── */
-        const _CREDITS_KEY = 'nexus_credits';
-        function ncGet()    { try { return Math.max(0, parseInt(localStorage.getItem(_CREDITS_KEY)||'0',10)); } catch(_){ return 0; } }
-        function ncSet(v)   { try { localStorage.setItem(_CREDITS_KEY, String(Math.max(0,Math.round(v)))); ncNotify(); } catch(_){} }
-        function ncAdd(pts) { if(pts>0) ncSet(ncGet()+Math.round(pts)); }
-        function ncNotify() {
-            const v = ncGet();
-            ['hub-credits','hud-credits'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=v.toLocaleString(); });
-        }
-        window.addEventListener('storage', e => { if(e.key===_CREDITS_KEY) ncNotify(); });
-        /* ─────────────────────────────────────────────────────────────────── */
-
         const GRAPHICS_API = 'https://script.google.com/macros/s/AKfycbRML3cWX2MAAabhtW_fY0tixmfwfU7rFCxLj788SEl8lOl474T2wRbLzNQ9t1IhCJVUg/exec';
         const BRIDGE_API = 'https://script.google.com/macros/s/AKfycbxj6_tnxRG7JfO1gAZ_OCuCufIoI91zWmRQRw7tDRZ-aehu8eTTRKQTm46LX7Kg1rbNDQ/exec';
         const MISSION_KEY = "WHITE_RABBIT_LEADERBOARD_SECURE_2026";
@@ -331,7 +319,6 @@
             if (view) view.classList.remove('hidden');
             if (viewId !== 'view-hub') {
                 document.getElementById('hud').classList.remove('hidden');
-                ncNotify(); // sync credits in HUD
                 // Always hide the unlock banner when entering any game view
                 if (banner) banner.classList.add('hidden');
                 _clearBannerListeners();
@@ -362,6 +349,7 @@
             if (viewId === 'view-bible-journey') bjInit();
             if (viewId === 'view-act-one') aoInit();
             if (lockInterval) clearInterval(lockInterval);
+            ncNotify();
         }
 
         function _clearBannerListeners() {
@@ -383,142 +371,6 @@
                 setTimeout(ssShowCongratulations, 600);
             }
         }
-
-        // Wire Starlight Seeker score gains to credit gains (patched below checkMatches)
-        let _ssLastScore = 0;
-        function _awardCreditsForScoreDelta(newScore) {
-            const delta = newScore - _ssLastScore;
-            if (delta > 0) { ncAdd(delta); }
-            _ssLastScore = newScore;
-        }
-
-        /* ── ACT ONE MATCH-3 ─────────────────────────────────────────────── */
-        // Uses the same 5-gem set as Match Maker (matchMakerState.js) and the
-        // same visual tile style as the Starlight Seeker 8×8 grid.
-        const AO_GEM_TYPES = ['💖','⭐','✝️','🔥','💧'];
-        const AO_GRID_SIZE  = 7;
-        const AO_SCORE_PER_LEVEL = 300;
-
-        let aoBoard = [], aoSelected = null, aoScore = 0, aoMoves = 30, aoLevel = 1;
-        let aoComplete = false;
-
-        function aoRandomGem() { return AO_GEM_TYPES[Math.floor(Math.random()*AO_GEM_TYPES.length)]; }
-
-        function aoInit() {
-            aoScore = 0; aoMoves = 30; aoLevel = 1; aoSelected = null; aoComplete = false;
-            aoBoard = [];
-            for(let r=0;r<AO_GRID_SIZE;r++){
-                aoBoard[r]=[];
-                for(let c=0;c<AO_GRID_SIZE;c++){
-                    let g;
-                    do { g=aoRandomGem(); } while(
-                        (c>=2&&aoBoard[r][c-1]===g&&aoBoard[r][c-2]===g)||
-                        (r>=2&&aoBoard[r-1][c]===g&&aoBoard[r-2][c]===g)
-                    );
-                    aoBoard[r][c]=g;
-                }
-            }
-            aoRenderGrid(); aoUpdateHUD();
-            const banner=document.getElementById('ao-banner');
-            if(banner) banner.classList.add('hidden');
-        }
-
-        function aoUpdateHUD() {
-            document.getElementById('ao-score').textContent  = aoScore;
-            document.getElementById('ao-credits').textContent = ncGet().toLocaleString();
-            document.getElementById('ao-moves').textContent  = aoMoves;
-            document.getElementById('ao-level').textContent  = aoLevel;
-            ncNotify(); // keep HUD credits in sync
-        }
-
-        function aoRenderGrid() {
-            const grid = document.getElementById('ao-grid');
-            if(!grid) return;
-            grid.style.gridTemplateColumns = `repeat(${AO_GRID_SIZE}, 1fr)`;
-            grid.innerHTML = '';
-            for(let r=0;r<AO_GRID_SIZE;r++){
-                for(let c=0;c<AO_GRID_SIZE;c++){
-                    const tile = document.createElement('div');
-                    tile.className = 'tile' + (aoSelected&&aoSelected.r===r&&aoSelected.c===c?' selected':'');
-                    tile.style.display='flex'; tile.style.alignItems='center'; tile.style.justifyContent='center';
-                    tile.style.fontSize='clamp(1rem,3.5vw,1.5rem)';
-                    tile.textContent = aoBoard[r][c] || '';
-                    tile.onclick = () => aoHandleClick(r,c);
-                    grid.appendChild(tile);
-                }
-            }
-        }
-
-        function aoHandleClick(r,c) {
-            if(aoComplete || aoMoves<=0) return;
-            if(!aoSelected){ aoSelected={r,c}; aoRenderGrid(); return; }
-            const {r:r1,c:c1}=aoSelected;
-            if(r===r1&&c===c1){ aoSelected=null; aoRenderGrid(); return; }
-            const dist=Math.abs(r-r1)+Math.abs(c-c1);
-            if(dist!==1){ aoSelected={r,c}; aoRenderGrid(); return; }
-            // swap
-            const tmp=aoBoard[r1][c1]; aoBoard[r1][c1]=aoBoard[r][c]; aoBoard[r][c]=tmp;
-            aoSelected=null;
-            // check if swap creates a match; if not, revert
-            const matched=aoFindMatches();
-            if(matched.size===0){ const tmp2=aoBoard[r1][c1]; aoBoard[r1][c1]=aoBoard[r][c]; aoBoard[r][c]=tmp2; aoRenderGrid(); return; }
-            aoMoves--;
-            aoResolve();
-        }
-
-        function aoFindMatches() {
-            const matched=new Set();
-            for(let r=0;r<AO_GRID_SIZE;r++){
-                let run=1;
-                for(let c=1;c<=AO_GRID_SIZE;c++){
-                    if(c<AO_GRID_SIZE&&aoBoard[r][c]&&aoBoard[r][c]===aoBoard[r][c-1]) run++;
-                    else { if(run>=3) for(let k=c-run;k<c;k++) matched.add(r+','+k); run=1; }
-                }
-            }
-            for(let c=0;c<AO_GRID_SIZE;c++){
-                let run=1;
-                for(let r=1;r<=AO_GRID_SIZE;r++){
-                    if(r<AO_GRID_SIZE&&aoBoard[r][c]&&aoBoard[r][c]===aoBoard[r-1][c]) run++;
-                    else { if(run>=3) for(let k=r-run;k<r;k++) matched.add(k+','+c); run=1; }
-                }
-            }
-            return matched;
-        }
-
-        function aoResolve() {
-            const matched=aoFindMatches();
-            if(matched.size===0){ aoRenderGrid(); aoCheckLevelUp(); aoCheckGameOver(); return; }
-            const points=matched.size*10;
-            aoScore+=points;
-            ncAdd(points); // 1 credit per point
-            matched.forEach(coord=>{ const[r,c]=coord.split(',').map(Number); aoBoard[r][c]=null; });
-            // gravity
-            for(let c=0;c<AO_GRID_SIZE;c++){
-                let gems=[];
-                for(let r=AO_GRID_SIZE-1;r>=0;r--) if(aoBoard[r][c]!==null) gems.push(aoBoard[r][c]);
-                for(let r=AO_GRID_SIZE-1;r>=0;r--) aoBoard[r][c]=gems.length>0?gems.shift():aoRandomGem();
-            }
-            aoUpdateHUD();
-            setTimeout(aoResolve,200);
-        }
-
-        function aoCheckLevelUp() {
-            if(aoScore>=aoLevel*AO_SCORE_PER_LEVEL){ aoLevel++; aoMoves+=10; aoUpdateHUD(); aoBanner(`Level ${aoLevel}! +10 moves`,'text-green-400'); }
-        }
-
-        function aoCheckGameOver() {
-            if(aoMoves<=0){ aoComplete=true; aoBanner(`Game Over! Score: ${aoScore} — Credits earned: ${aoScore}`,'text-orange-400'); }
-        }
-
-        function aoBanner(msg,cls){
-            const b=document.getElementById('ao-banner'); const t=document.getElementById('ao-banner-text');
-            if(!b||!t) return;
-            t.className='text-sm font-bold '+cls; t.textContent=msg;
-            b.classList.remove('hidden');
-        }
-
-        function aoRestart(){ aoInit(); }
-        /* ─────────────────────────────────────────────────────────────────── */
 
         /** --- DRIVE COMMAND SYSTEM --- **/
         async function executeDriveAction(action, params = {}) {
@@ -637,11 +489,8 @@
             }
             if (toRemove.size > 0) {
                 toRemove.forEach(coord => { const [r, c] = coord.split(',').map(Number); board[r][c].type = null; });
-                const gained = toRemove.size * 10;
-                score += gained;
-                ncAdd(gained); // award 1 credit per point
+                score += toRemove.size * 10; updateScoreDisplay();
                 _awardCreditsForScoreDelta(score);
-                updateScoreDisplay();
                 setTimeout(applyGravity, 300);
             }
         }
@@ -812,8 +661,27 @@
         function ssResetGame() {
             ssGameComplete = false; ssCertDataUrl = null; ssCertId = null;
             score = 0; updateScoreDisplay();
-            document.getElementById('ss-cert-overlay').classList.add('hidden');
             if (gameAssets.length > 0) { createBoard(); renderGrid(); } else { initMatch3(); }
+        }
+
+        /** ── NexusCredits (inline; mirrors credits.js for non-module pages) ── */
+        const _CREDITS_KEY = 'nexus_credits';
+        function ncGet()    { try { return Math.max(0, parseInt(localStorage.getItem(_CREDITS_KEY)||'0',10)); } catch(_){ return 0; } }
+        function ncSet(v)   { try { localStorage.setItem(_CREDITS_KEY, String(Math.max(0,Math.round(v)))); ncNotify(); } catch(_){} }
+        function ncAdd(pts) { if(pts>0) ncSet(ncGet()+Math.round(pts)); }
+        function ncNotify() {
+            const v = ncGet();
+            ['hub-credits','hud-credits'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=v.toLocaleString(); });
+        }
+        window.addEventListener('storage', e => { if(e.key===_CREDITS_KEY) ncNotify(); });
+        /** ─────────────────────────────────────────────────────────────────── */
+
+        // Wire Starlight Seeker score gains to credit gains
+        let _ssLastScore = 0;
+        function _awardCreditsForScoreDelta(newScore) {
+            const delta = newScore - _ssLastScore;
+            if (delta > 0) { ncAdd(delta); }
+            _ssLastScore = newScore;
         }
 
         /** --- BIBLE JOURNEY QUIZ --- **/
@@ -894,6 +762,140 @@
             bjSetProgress(0);
             bjLoad();
         }
+
+        /* ── ACT ONE MATCH-3 ─────────────────────────────────────────────── */
+        const AO_GEM_TYPES = ['💖','⭐','✝️','🔥','💧'];
+        const AO_GRID_SIZE  = 7;
+        const AO_SCORE_PER_LEVEL = 300;
+
+        let aoBoard = [], aoSelected = null, aoScore = 0, aoMoves = 30, aoLevel = 1;
+        let aoComplete = false;
+
+        function aoRandomGem() { return AO_GEM_TYPES[Math.floor(Math.random()*AO_GEM_TYPES.length)]; }
+
+        function aoInit() {
+            aoScore = 0; aoMoves = 30; aoLevel = 1; aoSelected = null; aoComplete = false;
+            aoBoard = [];
+            for(let r=0;r<AO_GRID_SIZE;r++){
+                aoBoard[r]=[];
+                for(let c=0;c<AO_GRID_SIZE;c++){
+                    let g;
+                    do { g=aoRandomGem(); } while(
+                        (c>=2&&aoBoard[r][c-1]===g&&aoBoard[r][c-2]===g)||
+                        (r>=2&&aoBoard[r-1][c]===g&&aoBoard[r-2][c]===g)
+                    );
+                    aoBoard[r][c]=g;
+                }
+            }
+            aoRenderGrid(); aoUpdateHUD();
+            const banner=document.getElementById('ao-banner');
+            if(banner) banner.classList.add('hidden');
+        }
+
+        function aoUpdateHUD() {
+            const sc=document.getElementById('ao-score');
+            const cr=document.getElementById('ao-credits');
+            const mv=document.getElementById('ao-moves');
+            const lv=document.getElementById('ao-level');
+            if(sc) sc.textContent  = aoScore;
+            if(cr) cr.textContent  = ncGet().toLocaleString();
+            if(mv) mv.textContent  = aoMoves;
+            if(lv) lv.textContent  = aoLevel;
+            ncNotify();
+        }
+
+        function aoRenderGrid() {
+            const grid = document.getElementById('ao-grid');
+            if(!grid) return;
+            grid.style.gridTemplateColumns = `repeat(${AO_GRID_SIZE}, 1fr)`;
+            grid.innerHTML = '';
+            for(let r=0;r<AO_GRID_SIZE;r++){
+                for(let c=0;c<AO_GRID_SIZE;c++){
+                    const tile = document.createElement('div');
+                    tile.className = 'tile' + (aoSelected&&aoSelected.r===r&&aoSelected.c===c?' selected':'');
+                    tile.style.cssText='display:flex;align-items:center;justify-content:center;font-size:clamp(1rem,3.5vw,1.5rem);';
+                    tile.textContent = aoBoard[r][c] || '';
+                    tile.onclick = () => aoHandleClick(r,c);
+                    grid.appendChild(tile);
+                }
+            }
+        }
+
+        function aoHandleClick(r,c) {
+            if(aoComplete||aoMoves<=0) return;
+            if(!aoSelected){ aoSelected={r,c}; aoRenderGrid(); return; }
+            const {r:pr,c:pc}=aoSelected;
+            aoSelected=null;
+            if(Math.abs(r-pr)+Math.abs(c-pc)===1){
+                [aoBoard[r][c],aoBoard[pr][pc]]=[aoBoard[pr][pc],aoBoard[r][c]];
+                const matched=aoFindMatches();
+                if(matched.length>0){
+                    aoMoves--;
+                    aoClearMatches(matched);
+                } else {
+                    [aoBoard[r][c],aoBoard[pr][pc]]=[aoBoard[pr][pc],aoBoard[r][c]];
+                }
+            }
+            aoRenderGrid();
+        }
+
+        function aoFindMatches() {
+            const matched=new Set();
+            for(let r=0;r<AO_GRID_SIZE;r++)
+                for(let c=0;c<AO_GRID_SIZE-2;c++)
+                    if(aoBoard[r][c]&&aoBoard[r][c]===aoBoard[r][c+1]&&aoBoard[r][c]===aoBoard[r][c+2])
+                        [c,c+1,c+2].forEach(cc=>matched.add(r+','+cc));
+            for(let c=0;c<AO_GRID_SIZE;c++)
+                for(let r=0;r<AO_GRID_SIZE-2;r++)
+                    if(aoBoard[r][c]&&aoBoard[r][c]===aoBoard[r+1][c]&&aoBoard[r][c]===aoBoard[r+2][c])
+                        [r,r+1,r+2].forEach(rr=>matched.add(rr+','+c));
+            return [...matched];
+        }
+
+        function aoClearMatches(matched) {
+            const pts=matched.length*10;
+            aoScore+=pts;
+            ncAdd(pts);
+            matched.forEach(coord=>{
+                const [r,c]=coord.split(',').map(Number);
+                aoBoard[r][c]=null;
+            });
+            aoApplyGravity();
+            // Level up
+            if(aoScore>=aoLevel*AO_SCORE_PER_LEVEL){ aoLevel++; }
+            // Check game end
+            if(aoMoves<=0){
+                aoComplete=true;
+                const banner=document.getElementById('ao-banner');
+                const text=document.getElementById('ao-banner-text');
+                if(banner&&text){
+                    text.textContent=`Game Over — ${aoScore} pts · ${ncGet().toLocaleString()} credits earned!`;
+                    banner.classList.remove('hidden');
+                }
+            }
+            aoUpdateHUD();
+            aoRenderGrid();
+        }
+
+        function aoApplyGravity() {
+            for(let c=0;c<AO_GRID_SIZE;c++){
+                let empty=[];
+                for(let r=AO_GRID_SIZE-1;r>=0;r--){
+                    if(!aoBoard[r][c]) empty.push(r);
+                    else if(empty.length>0){
+                        aoBoard[empty.shift()][c]=aoBoard[r][c];
+                        aoBoard[r][c]=null;
+                        empty.push(r);
+                    }
+                }
+                empty.forEach(r=>{ aoBoard[r][c]=aoRandomGem(); });
+            }
+            const cascaded=aoFindMatches();
+            if(cascaded.length>0) aoClearMatches(cascaded);
+        }
+
+        function aoRestart() { aoInit(); }
+        /* ─────────────────────────────────────────────────────────────────── */
 
         window.onload = () => { ncNotify(); switchView('view-hub'); };
 

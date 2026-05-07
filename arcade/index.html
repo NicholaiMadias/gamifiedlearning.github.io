@@ -82,8 +82,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Badge banner -->
   <div id="match-badge-banner" class="badge-banner hidden" role="alert" aria-live="assertive"></div>
 
   <!-- Game message -->
@@ -188,7 +186,10 @@
       if (starMapContainer) renderStarMap(starMapContainer);
     }
 
-    // Show credits in the page header and HUD
+    initMatchMaker(null, null);
+    refreshStarMap();
+
+    // Show credits in header and HUD
     function refreshCreditsDisplay() {
       const v = getCredits().toLocaleString();
       const el = document.getElementById('mm-credits-display');
@@ -199,7 +200,7 @@
     onCreditsChange(refreshCreditsDisplay);
     refreshCreditsDisplay();
 
-    // Award credits whenever the match-score element updates
+    // Award credits whenever the score element updates
     let _lastMmScore = 0;
     const scoreEl = document.getElementById('match-score');
     if (scoreEl) {
@@ -212,9 +213,6 @@
         _lastMmScore = newScore;
       }).observe(scoreEl, { childList: true, characterData: true, subtree: true });
     }
-
-    initMatchMaker(null, null);
-    refreshStarMap();
 
     const restartBtn = document.getElementById('match-restart-btn');
     if (restartBtn) {
