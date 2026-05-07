@@ -1,5 +1,5 @@
 # Nexus Arcade Gamified Learning System
-[![Deploy GitHub Pages](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/pages.yml)
+[![Deploy GitHub Pages](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/deploy.yml)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![Version](https://img.shields.io/badge/Version-1.0.0-purple)
@@ -30,7 +30,7 @@ This project uses ES modules, so it must be served via a local static server (br
 
 The site deploys automatically to **[amazinggracehl.org](https://amazinggracehl.org)** via GitHub Actions whenever code is pushed to the `main` branch.
 
-- **Workflow:** `.github/workflows/pages.yml`
+- **Workflow:** `.github/workflows/deploy.yml`
 - **Trigger:** Push to `main` (or manual `workflow_dispatch`)
 - **Deploy target:** `github-pages` environment
 - **Source:** Repository root (`/`)
@@ -54,32 +54,25 @@ The `CNAME` file contains `amazinggracehl.org`. The `cname-auto-maintainer` work
 
 Current gem types used by the match-3 engine (see `matchMakerState.js`):
 
-| Tile ID | Row | Col | Description |
-|---|---|---|---|
-| `planet_mars` | 0 | 0 | Fire planet |
-| `planet_earth` | 0 | 1 | Blue-green planet |
-| `planet_saturn` | 0 | 2 | Ringed planet (orange) |
-| `planet_nebula` | 0 | 3 | Ringed planet (purple) |
-| `red_star` | 1 | 0 | Red crystal star |
-| `blue_star` | 1 | 1 | Blue crystal star |
-| `blue_star_alt` | 1 | 2–3 | Blue star variants |
-| `comet_red` | 2 | 0 | Red comet |
-| `comet_blue` | 2 | 1 | Blue comet |
-| `comet_white` | 2 | 2 | Teal comet |
-| `supernova_red` | 2 | 3 | Red supernova explosion |
-| `supernova_blue` | 3 | 0 | Blue supernova explosion |
+| Tile ID | Emoji | Description |
+|---|---|---|
+| `heart` | ❤️ | Heart gem |
+| `star` | ⭐ | Star gem |
+| `cross` | ✝️ | Cross gem |
+| `flame` | 🔥 | Flame gem |
+| `drop` | 💧 | Water drop gem |
 
 ## Level format
 
-Levels are stored at `levels/1.json` … `levels/7.json`. A simple, shared schema:
+Levels are loaded dynamically via `levels/loadLevel.js`. A simple, shared schema:
 
 ```json
 {
   "level": 1,
   "targetScore": 500,
   "moves": 20,
-  "boardSize": 8,
-  "tileTypes": ["red_star", "yellow_star", "blue_star"]
+  "boardSize": 7,
+  "gemTypes": ["heart", "star", "cross", "flame", "drop"]
 }
 ```
 

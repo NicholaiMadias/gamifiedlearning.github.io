@@ -464,6 +464,7 @@ function checkLevelUp() {
     updateHUD();
     window.dispatchEvent(new CustomEvent('matchmaker-level-complete', { detail: { level: level - 1 } }));
     if (level - 1 >= MAX_LEVEL) {
+      onLevelComplete(level - 1, score, null, null);
       showGameComplete();
     } else {
       showMsg('Level ' + level + ' — Keep going!');
