@@ -13,7 +13,7 @@ A 7×7 gem-matching puzzle game that tracks a **Matrix of Conscience** (Empathy,
 ## What's live right now
 
 - **Primary game:** a match‑3 puzzle (the "Nexus Arcade" core experience)
-- **Progression:** 7‑level "Seven‑Star" track (levels live under `levels/1.json` … `levels/7.json`)
+- **Progression:** 7‑level "Seven‑Star" track (level data is loaded via `levels/loadLevel.js`)
 - **Deployment:** GitHub Pages to **[amazinggracehl.org](https://amazinggracehl.org)**
 
 This repo is intentionally kept **static‑site simple** so Pages deploys are fast and reliable.
