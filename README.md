@@ -30,7 +30,8 @@ This project uses ES modules, so it must be served via a local static server (br
 
 The site deploys automatically to **[amazinggracehl.org](https://amazinggracehl.org)** via GitHub Actions whenever code is pushed to the `main` branch.
 
-- **Workflow:** `NicholaiMadias/Amazing-Grace/.github/workflows/deploy.yml`
+- **Repository:** `NicholaiMadias/Amazing-Grace`
+- **Workflow:** `.github/workflows/deploy.yml`
 - **Trigger:** Push to `main` (or manual `workflow_dispatch`)
 - **Deploy target:** `github-pages` environment
 - **Source:** Repository root (`/`)
