@@ -1,5 +1,5 @@
 # Nexus Arcade Gamified Learning System
-[![Deploy GitHub Pages](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/pages.yml)
+[![Deploy GitHub Pages](https://github.com/NicholaiMadias/Amazing-Grace/actions/workflows/deploy.yml/badge.svg)](https://github.com/NicholaiMadias/Amazing-Grace/actions/workflows/deploy.yml)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![Version](https://img.shields.io/badge/Version-1.0.0-purple)
@@ -30,7 +30,7 @@ This project uses ES modules, so it must be served via a local static server (br
 
 The site deploys automatically to **[amazinggracehl.org](https://amazinggracehl.org)** via GitHub Actions whenever code is pushed to the `main` branch.
 
-- **Workflow:** `.github/workflows/pages.yml`
+- **Workflow:** `NicholaiMadias/Amazing-Grace/.github/workflows/deploy.yml`
 - **Trigger:** Push to `main` (or manual `workflow_dispatch`)
 - **Deploy target:** `github-pages` environment
 - **Source:** Repository root (`/`)
