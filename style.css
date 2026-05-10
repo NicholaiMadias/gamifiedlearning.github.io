@@ -289,4 +289,9 @@ body {
     border-radius: 0;
     font-size: 1rem;
   }
+
+  /* Hide desktop-only nav items on mobile */
+  .site-nav .nav-links li.nav-desktop-only {
+    display: none;
+  }
 }
