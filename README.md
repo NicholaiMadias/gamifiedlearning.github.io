@@ -107,3 +107,67 @@ Levels are stored at `levels/1.json` … `levels/7.json`. A simple, shared schem
 - Add the second game mode (optional) using the same shared tileset/audio
 - Add the "Seven‑Star Ministry" meta‑screen (star map + badges)
 - Add quiz overlay mechanics after the core match‑3 loop is stable
+
+# Nicholai Maro Madias — Cloud Identity & Security Engineer  
+### GitHub Pages Resume • Identity Engineering • Zero Trust • Automation
+
+This repository hosts the public résumé and professional profile site for **Nicholai Maro Madias**, built on top of GitHub Pages.  
+It is a dark‑mode, security‑themed, badge‑enhanced single‑page site designed for:
+
+- Recruiters  
+- Hiring managers  
+- Identity & security engineering teams  
+- Technical partners  
+- Anyone evaluating my cloud, identity, or automation work  
+
+The site is intentionally lightweight, dependency‑free, and optimized for clarity.
+
+---
+
+## Purpose
+
+This repo serves as a **central, stable, and recruiter‑friendly landing page** that complements:
+
+- My GitHub profile  
+- My LinkedIn presence  
+- My Amazing Grace Home Living engineering work  
+- My identity/security engineering portfolio  
+
+It provides a clean, modern presentation of:
+
+- Professional summary  
+- Technical skill stack  
+- Identity/security badges  
+- Work history  
+- Certifications  
+- Contact information  
+
+All without requiring PDFs, downloads, or external viewers.
+
+---
+
+## Features
+
+### **Dark‑Mode Identity/Security Theme**
+Inspired by SOC dashboards, cloud consoles, and Zero Trust UI patterns.
+
+### **Professional Badges**
+Rendered using Shields.io and styled to match the dark theme:
+
+- Identity & Access  
+- Cloud Security  
+- Automation  
+- Networking  
+- Systems Engineering  
+
+### **Fully Static & GitHub Pages Compatible**
+No frameworks, no build steps, no dependencies.  
+Just HTML + CSS.
+
+### **Mobile‑Friendly**
+The layout adapts cleanly to mobile, tablet, and desktop.
+
+---
+
+## Repository Structure
+
