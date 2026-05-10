@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management — Sovereign Matrix</title>
+  <link rel="stylesheet" href="/admin/css/matrix.css">
+</head>
+<body>
+
+<nav class="matrix-nav">
+  <a href="/admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
+  <ul class="nav-links">
+    <li><a href="/admin/index.html">Dashboard</a></li>
+    <li><a href="/admin/users.html" class="active">Users</a></li>
+    <li><a href="/admin/keys.html">Keys</a></li>
+    <li><a href="/admin/diagnostics.html">Diagnostics</a></li>
+    <li><a href="/admin/network-defense.html">Network Defense</a></li>
+    <li><a href="/admin/logs.html">Logs</a></li>
+  </ul>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="page-wrap">
+
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">User Management</h2>
+    <p style="font-size:0.75rem;color:#3a5a3a;margin-bottom:1rem">
+      View all registered users, their roles, badges, donations, and assigned tools.
+      SuperAdmin+ can change roles inline.
+    </p>
+
+    <div id="user-status" class="matrix-alert" style="display:none"></div>
+
+    <div style="overflow-x:auto">
+      <table class="matrix-table" id="user-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Badges</th>
+            <th>Donations</th>
+            <th>Tools</th>
+          </tr>
+        </thead>
+        <tbody id="user-table-body">
+          <tr><td colspan="5" style="text-align:center;color:#555">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  import { requireRole, logout, ROLES } from '/admin/js/admin-router.js';
+  import { db }                          from '/admin/js/auth.js';
+  import { renderUserTable }             from '/admin/js/admin-users.js';
+
+  const user = requireRole(ROLES.ALL_ADMIN);
+  if (!user) throw new Error('Unauthorized');
+
+  document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
+
+  const nav = document.querySelector('.matrix-nav');
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className   = 'btn btn-danger';
+  logoutBtn.style.fontSize = '0.72rem';
+  logoutBtn.style.padding  = '0.3rem 0.75rem';
+  logoutBtn.addEventListener('click', logout);
+  nav.appendChild(logoutBtn);
+
+  renderUserTable(db, user);
+</script>
+
+</body>
+</html>

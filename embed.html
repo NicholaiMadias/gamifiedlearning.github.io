@@ -188,7 +188,7 @@
       /* ── Instance state ────────────────────────────────────────── */
       var grid, selected, score, moves, level;
       var bannerAutohideTimeoutId = null;
-      var chainTimeoutId = null;
+      var runToken = 0; /* incremented by init() to invalidate in-flight chains */
 
       /* ── Helpers ───────────────────────────────────────────────── */
       function randomGem() {
@@ -397,6 +397,7 @@
       }
 
       function resolveMatches() {
+        var myToken = runToken; /* snapshot — stale if init() was called */
         var matches = findMatches(grid);
         if (matches.length === 0) {
           renderGrid();
@@ -412,7 +413,9 @@
         grid = applyGravity(grid);
         renderGrid();
 
-        chainTimeoutId = setTimeout(resolveMatches, CHAIN_DELAY_MS);
+        setTimeout(function() {
+          if (runToken === myToken) resolveMatches();
+        }, CHAIN_DELAY_MS);
       }
 
       function checkLevelUp() {
@@ -433,12 +436,9 @@
 
       /* ── Init / restart ────────────────────────────────────────── */
       function init() {
-        /* Cancel any in-flight chain-reaction or banner autohide from the
-           previous game so they don't mutate fresh state. */
-        if (chainTimeoutId !== null) {
-          clearTimeout(chainTimeoutId);
-          chainTimeoutId = null;
-        }
+        /* Invalidate any in-flight chain-reaction callbacks from the previous
+           game so they don't mutate fresh state (session-token pattern). */
+        runToken++;
         grid     = createInitialGrid();
         selected = null;
         score    = 0;
