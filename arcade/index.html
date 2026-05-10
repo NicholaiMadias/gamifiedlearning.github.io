@@ -54,7 +54,10 @@
   <div class="game-header">
     <a href="/">← Nexus Hub</a>
     <span class="game-title">MATCH MAKER</span>
-    <a href="/arcade/certificates/">📜 Certificates</a>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ffd700;">🪙 <span id="mm-credits-display">0</span></span>
+      <a href="/arcade/certificates/" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-green);text-decoration:none;">📜 Certificates</a>
+    </div>
   </div>
 
   <!-- HUD -->
@@ -73,10 +76,12 @@
         <span class="stat-label">Moves</span>
         <span id="match-moves" class="stat-value">20</span>
       </div>
+      <div class="stat">
+        <span class="stat-label">Credits</span>
+        <span id="mm-hud-credits" class="stat-value" style="color:#ffd700;">0</span>
+      </div>
     </div>
   </div>
-
-  <!-- Badge banner -->
   <div id="match-badge-banner" class="badge-banner hidden" role="alert" aria-live="assertive"></div>
 
   <!-- Game message -->
@@ -174,6 +179,7 @@
     import { initMatchMaker, generateCertificateFor, downloadMatchMakerCertPNG, downloadMatchMakerCertPDF } from '/match-maker-ui.js';
     import { renderStarMap } from '/star-map.js';
     import { onGameLevelComplete } from '/concordance-lens.js';
+    import { addCreditsForPoints, getCredits, onCreditsChange } from '/credits.js';
 
     const starMapContainer = document.getElementById('star-map-container');
     function refreshStarMap() {
@@ -182,6 +188,31 @@
 
     initMatchMaker(null, null);
     refreshStarMap();
+
+    // Show credits in header and HUD
+    function refreshCreditsDisplay() {
+      const v = getCredits().toLocaleString();
+      const el = document.getElementById('mm-credits-display');
+      if (el) el.textContent = v;
+      const hudEl = document.getElementById('mm-hud-credits');
+      if (hudEl) hudEl.textContent = v;
+    }
+    onCreditsChange(refreshCreditsDisplay);
+    refreshCreditsDisplay();
+
+    // Award credits whenever the score element updates
+    let _lastMmScore = 0;
+    const scoreEl = document.getElementById('match-score');
+    if (scoreEl) {
+      new MutationObserver(() => {
+        const newScore = parseInt(scoreEl.textContent || '0', 10);
+        if (newScore > _lastMmScore) {
+          addCreditsForPoints(newScore - _lastMmScore);
+          refreshCreditsDisplay();
+        }
+        _lastMmScore = newScore;
+      }).observe(scoreEl, { childList: true, characterData: true, subtree: true });
+    }
 
     const restartBtn = document.getElementById('match-restart-btn');
     if (restartBtn) {

@@ -74,9 +74,15 @@
             <div class="orbitron text-blue-400 text-sm font-bold tracking-tighter">RESONANCE: <span id="score-display">0</span></div>
             <div class="text-[8px] text-slate-500 uppercase font-bold tracking-[0.2em]">Nexus Arcade Node</div>
         </div>
-        <div id="ai-status" class="flex items-center gap-2">
-            <span class="text-[8px] text-slate-500 uppercase">Starlight AI</span>
-            <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+        <div class="flex items-center gap-3">
+            <div class="text-center">
+                <div class="orbitron text-yellow-400 text-xs font-bold tracking-tighter">🪙 <span id="hud-credits">0</span></div>
+                <div class="text-[7px] text-slate-500 uppercase tracking-[0.2em]">Credits</div>
+            </div>
+            <div id="ai-status" class="flex items-center gap-2">
+                <span class="text-[8px] text-slate-500 uppercase">Starlight AI</span>
+                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
         </div>
     </div>
 
@@ -95,11 +101,22 @@
         <div class="mb-8 mt-4">
             <h1 class="orbitron text-5xl md:text-7xl font-black text-white tracking-tighter mb-2 italic">NEXUS ARCADE</h1>
             <p class="text-blue-400 font-bold tracking-[0.4em] uppercase text-[10px]">Largo &amp; Tampa Operational Nodes</p>
+            <div class="mt-3 inline-flex items-center gap-2 glass-panel px-4 py-2 rounded-full">
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Credits:</span>
+                <span id="hub-credits" class="orbitron text-yellow-400 text-sm font-black">0</span>
+                <a href="/frontend/public/store.html" class="text-[8px] text-cyan-400 font-bold uppercase tracking-[0.15em] hover:text-cyan-300 transition-colors ml-2" style="text-decoration:none;">🛒 Store</a>
+            </div>
         </div>
 
         <!-- ── Core Games ─────────────────────────────────── -->
         <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.25em] mb-4 w-full text-left">▸ Core Games</p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <button onclick="switchView('view-act-one')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-orange-400">
+                <div class="w-12 h-12 bg-orange-500/20 rounded-xl mb-4 flex items-center justify-center text-orange-400">🎭</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Act One</h2>
+                <p class="text-slate-400 text-[10px]">Match-3 adventure — earn credits with every gem you align.</p>
+                <span class="mt-3 inline-block text-[8px] font-bold uppercase tracking-[0.15em] text-orange-500 border border-orange-500/30 rounded-full px-2 py-0.5">Credits</span>
+            </button>
             <button onclick="switchView('view-match3')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-cyan-400">
                 <div class="w-12 h-12 bg-blue-500/20 rounded-xl mb-4 flex items-center justify-center text-blue-400">✨</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Starlight Seeker</h2>
@@ -156,6 +173,7 @@
 
         <div class="mt-8 flex flex-wrap gap-4 justify-center">
             <a href="/arcade/certificates/" class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] hover:text-cyan-400 transition-colors" style="text-decoration:none;">📜 My Certificates</a>
+            <a href="/frontend/public/store.html" class="text-[9px] text-yellow-400 font-bold uppercase tracking-[0.2em] hover:text-yellow-300 transition-colors" style="text-decoration:none;">🛒 Credit Store</a>
         </div>
     </div>
 
@@ -204,6 +222,28 @@
             </div>
             <div id="lock-keypad" class="grid grid-cols-3 gap-3 mb-8"></div>
             <button onclick="resetLock()" class="w-full bg-cyan-500 text-slate-950 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Execute Ghosting</button>
+        </div>
+    </div>
+
+    <!-- ACT ONE MATCH-3 -->
+    <div id="view-act-one" class="hidden w-full flex flex-col items-center px-4">
+        <div class="mb-4 text-center">
+            <h2 class="orbitron text-2xl font-black text-orange-400 italic tracking-tight">ACT ONE</h2>
+            <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em] mt-1">Match gems — earn credits — advance the story</p>
+            <div class="mt-2 flex items-center justify-center gap-4">
+                <span class="text-[10px] text-slate-400">Score: <strong id="ao-score" class="text-orange-400">0</strong></span>
+                <span class="text-[10px] text-slate-400">Credits: <strong id="ao-credits" class="text-yellow-400">0</strong></span>
+                <span class="text-[10px] text-slate-400">Moves: <strong id="ao-moves" class="text-cyan-400">30</strong></span>
+                <span class="text-[10px] text-slate-400">Level: <strong id="ao-level" class="text-green-400">1</strong></span>
+            </div>
+        </div>
+        <div id="ao-grid" class="grid-container"></div>
+        <div id="ao-banner" class="hidden mt-4 px-6 py-3 glass-panel rounded-2xl text-center">
+            <p id="ao-banner-text" class="text-sm font-bold text-orange-400"></p>
+        </div>
+        <div class="mt-4 flex gap-3">
+            <button onclick="aoRestart()" class="cmd-btn px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-orange-400">↺ Restart</button>
+            <a href="/frontend/public/store.html" class="cmd-btn px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-yellow-400" style="text-decoration:none;">🛒 Spend Credits</a>
         </div>
     </div>
 
@@ -283,6 +323,7 @@
                 if (banner) banner.classList.add('hidden');
                 _clearBannerListeners();
             } else {
+                ncNotify(); // refresh credit display on hub return
                 // Show the unlock banner on hub (unless the user dismissed it)
                 try {
                     if (localStorage.getItem('bjComplete') === 'true' &&
@@ -302,11 +343,13 @@
             document.body.style.overflow = 'hidden';
 
             ssGameComplete = false; ssCertDataUrl = null; ssCertId = null;
-            score = 0; updateScoreDisplay();
+            score = 0; _ssLastScore = 0; updateScoreDisplay();
             if (viewId === 'view-match3') initMatch3();
             if (viewId === 'view-lock') initLock();
             if (viewId === 'view-bible-journey') bjInit();
+            if (viewId === 'view-act-one') aoInit();
             if (lockInterval) clearInterval(lockInterval);
+            ncNotify();
         }
 
         function _clearBannerListeners() {
@@ -447,6 +490,7 @@
             if (toRemove.size > 0) {
                 toRemove.forEach(coord => { const [r, c] = coord.split(',').map(Number); board[r][c].type = null; });
                 score += toRemove.size * 10; updateScoreDisplay();
+                _awardCreditsForScoreDelta(score);
                 setTimeout(applyGravity, 300);
             }
         }
@@ -617,8 +661,27 @@
         function ssResetGame() {
             ssGameComplete = false; ssCertDataUrl = null; ssCertId = null;
             score = 0; updateScoreDisplay();
-            document.getElementById('ss-cert-overlay').classList.add('hidden');
             if (gameAssets.length > 0) { createBoard(); renderGrid(); } else { initMatch3(); }
+        }
+
+        /** ── NexusCredits (inline; mirrors credits.js for non-module pages) ── */
+        const _CREDITS_KEY = 'nexus_credits';
+        function ncGet()    { try { return Math.max(0, parseInt(localStorage.getItem(_CREDITS_KEY)||'0',10)); } catch(_){ return 0; } }
+        function ncSet(v)   { try { localStorage.setItem(_CREDITS_KEY, String(Math.max(0,Math.round(v)))); ncNotify(); } catch(_){} }
+        function ncAdd(pts) { if(pts>0) ncSet(ncGet()+Math.round(pts)); }
+        function ncNotify() {
+            const v = ncGet();
+            ['hub-credits','hud-credits'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=v.toLocaleString(); });
+        }
+        window.addEventListener('storage', e => { if(e.key===_CREDITS_KEY) ncNotify(); });
+        /** ─────────────────────────────────────────────────────────────────── */
+
+        // Wire Starlight Seeker score gains to credit gains
+        let _ssLastScore = 0;
+        function _awardCreditsForScoreDelta(newScore) {
+            const delta = newScore - _ssLastScore;
+            if (delta > 0) { ncAdd(delta); }
+            _ssLastScore = newScore;
         }
 
         /** --- BIBLE JOURNEY QUIZ --- **/
@@ -700,7 +763,141 @@
             bjLoad();
         }
 
-        window.onload = () => switchView('view-hub');
+        /* ── ACT ONE MATCH-3 ─────────────────────────────────────────────── */
+        const AO_GEM_TYPES = ['💖','⭐','✝️','🔥','💧'];
+        const AO_GRID_SIZE  = 7;
+        const AO_SCORE_PER_LEVEL = 300;
+
+        let aoBoard = [], aoSelected = null, aoScore = 0, aoMoves = 30, aoLevel = 1;
+        let aoComplete = false;
+
+        function aoRandomGem() { return AO_GEM_TYPES[Math.floor(Math.random()*AO_GEM_TYPES.length)]; }
+
+        function aoInit() {
+            aoScore = 0; aoMoves = 30; aoLevel = 1; aoSelected = null; aoComplete = false;
+            aoBoard = [];
+            for(let r=0;r<AO_GRID_SIZE;r++){
+                aoBoard[r]=[];
+                for(let c=0;c<AO_GRID_SIZE;c++){
+                    let g;
+                    do { g=aoRandomGem(); } while(
+                        (c>=2&&aoBoard[r][c-1]===g&&aoBoard[r][c-2]===g)||
+                        (r>=2&&aoBoard[r-1][c]===g&&aoBoard[r-2][c]===g)
+                    );
+                    aoBoard[r][c]=g;
+                }
+            }
+            aoRenderGrid(); aoUpdateHUD();
+            const banner=document.getElementById('ao-banner');
+            if(banner) banner.classList.add('hidden');
+        }
+
+        function aoUpdateHUD() {
+            const sc=document.getElementById('ao-score');
+            const cr=document.getElementById('ao-credits');
+            const mv=document.getElementById('ao-moves');
+            const lv=document.getElementById('ao-level');
+            if(sc) sc.textContent  = aoScore;
+            if(cr) cr.textContent  = ncGet().toLocaleString();
+            if(mv) mv.textContent  = aoMoves;
+            if(lv) lv.textContent  = aoLevel;
+            ncNotify();
+        }
+
+        function aoRenderGrid() {
+            const grid = document.getElementById('ao-grid');
+            if(!grid) return;
+            grid.style.gridTemplateColumns = `repeat(${AO_GRID_SIZE}, 1fr)`;
+            grid.innerHTML = '';
+            for(let r=0;r<AO_GRID_SIZE;r++){
+                for(let c=0;c<AO_GRID_SIZE;c++){
+                    const tile = document.createElement('div');
+                    tile.className = 'tile' + (aoSelected&&aoSelected.r===r&&aoSelected.c===c?' selected':'');
+                    tile.style.cssText='display:flex;align-items:center;justify-content:center;font-size:clamp(1rem,3.5vw,1.5rem);';
+                    tile.textContent = aoBoard[r][c] || '';
+                    tile.onclick = () => aoHandleClick(r,c);
+                    grid.appendChild(tile);
+                }
+            }
+        }
+
+        function aoHandleClick(r,c) {
+            if(aoComplete||aoMoves<=0) return;
+            if(!aoSelected){ aoSelected={r,c}; aoRenderGrid(); return; }
+            const {r:pr,c:pc}=aoSelected;
+            aoSelected=null;
+            if(Math.abs(r-pr)+Math.abs(c-pc)===1){
+                [aoBoard[r][c],aoBoard[pr][pc]]=[aoBoard[pr][pc],aoBoard[r][c]];
+                const matched=aoFindMatches();
+                if(matched.length>0){
+                    aoMoves--;
+                    aoClearMatches(matched);
+                } else {
+                    [aoBoard[r][c],aoBoard[pr][pc]]=[aoBoard[pr][pc],aoBoard[r][c]];
+                }
+            }
+            aoRenderGrid();
+        }
+
+        function aoFindMatches() {
+            const matched=new Set();
+            for(let r=0;r<AO_GRID_SIZE;r++)
+                for(let c=0;c<AO_GRID_SIZE-2;c++)
+                    if(aoBoard[r][c]&&aoBoard[r][c]===aoBoard[r][c+1]&&aoBoard[r][c]===aoBoard[r][c+2])
+                        [c,c+1,c+2].forEach(cc=>matched.add(r+','+cc));
+            for(let c=0;c<AO_GRID_SIZE;c++)
+                for(let r=0;r<AO_GRID_SIZE-2;r++)
+                    if(aoBoard[r][c]&&aoBoard[r][c]===aoBoard[r+1][c]&&aoBoard[r][c]===aoBoard[r+2][c])
+                        [r,r+1,r+2].forEach(rr=>matched.add(rr+','+c));
+            return [...matched];
+        }
+
+        function aoClearMatches(matched) {
+            const pts=matched.length*10;
+            aoScore+=pts;
+            ncAdd(pts);
+            matched.forEach(coord=>{
+                const [r,c]=coord.split(',').map(Number);
+                aoBoard[r][c]=null;
+            });
+            aoApplyGravity();
+            // Level up
+            if(aoScore>=aoLevel*AO_SCORE_PER_LEVEL){ aoLevel++; }
+            // Check game end
+            if(aoMoves<=0){
+                aoComplete=true;
+                const banner=document.getElementById('ao-banner');
+                const text=document.getElementById('ao-banner-text');
+                if(banner&&text){
+                    text.textContent=`Game Over — ${aoScore} pts · ${ncGet().toLocaleString()} credits earned!`;
+                    banner.classList.remove('hidden');
+                }
+            }
+            aoUpdateHUD();
+            aoRenderGrid();
+        }
+
+        function aoApplyGravity() {
+            for(let c=0;c<AO_GRID_SIZE;c++){
+                let empty=[];
+                for(let r=AO_GRID_SIZE-1;r>=0;r--){
+                    if(!aoBoard[r][c]) empty.push(r);
+                    else if(empty.length>0){
+                        aoBoard[empty.shift()][c]=aoBoard[r][c];
+                        aoBoard[r][c]=null;
+                        empty.push(r);
+                    }
+                }
+                empty.forEach(r=>{ aoBoard[r][c]=aoRandomGem(); });
+            }
+            const cascaded=aoFindMatches();
+            if(cascaded.length>0) aoClearMatches(cascaded);
+        }
+
+        function aoRestart() { aoInit(); }
+        /* ─────────────────────────────────────────────────────────────────── */
+
+        window.onload = () => { ncNotify(); switchView('view-hub'); };
 
     </script>
     <!-- Dynamic nav-height: keeps --site-nav-height in sync with the actual rendered nav -->
