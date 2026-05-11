@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — Sovereign Matrix</title>
+  <link rel="stylesheet" href="/admin/css/matrix.css">
+</head>
+<body>
+
+<canvas id="matrix-rain"></canvas>
+
+<div class="login-wrap">
+  <div class="login-box matrix-card matrix-border">
+    <h1 class="matrix-heading glitch">⬡ SOVEREIGN MATRIX</h1>
+    <p style="text-align:center;font-size:0.75rem;color:#3a5a3a;margin-bottom:1.5rem">
+      Admin Access Terminal
+    </p>
+
+    <div id="login-status" class="matrix-alert" style="display:none"></div>
+
+    <form id="login-form" novalidate>
+      <label for="email">Email</label>
+      <input id="email" type="email" class="matrix-input" placeholder="admin@domain.com" autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password" class="matrix-input" placeholder="••••••••" autocomplete="current-password" required>
+
+      <button type="submit" class="btn btn-neon" style="width:100%;margin-top:0.5rem">
+        AUTHENTICATE
+      </button>
+    </form>
+
+    <p style="font-size:0.7rem;color:#2a3a2a;text-align:center;margin-top:1.25rem">
+      On demo hosts, sample accounts include owner@matrix.dev / superadmin@matrix.dev / admin@matrix.dev
+      <br>(any password of 4+ chars). On non-demo hosts, sign in with a configured administrator account.
+    </p>
+  </div>
+</div>
+
+<script type="module">
+  import { loginWithEmail } from '/admin/js/auth.js';
+  import { getCurrentUser } from '/admin/js/admin-router.js';
+
+  // Already logged in → go to dashboard
+  if (getCurrentUser()) window.location.href = '/admin/index.html';
+
+  const form   = document.getElementById('login-form');
+  const status = document.getElementById('login-status');
+
+  function showMsg(msg, isError = false) {
+    status.textContent = msg;
+    status.className   = `matrix-alert${isError ? ' error' : ''}`;
+    status.style.display = 'block';
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = form.querySelector('button[type="submit"]');
+
+    btn.disabled    = true;
+    btn.textContent = 'Authenticating…';
+
+    try {
+      await loginWithEmail(email, password);
+      showMsg('Access granted. Redirecting…');
+      setTimeout(() => { window.location.href = '/admin/index.html'; }, 800);
+    } catch (err) {
+      showMsg(err.message, true);
+      btn.disabled    = false;
+      btn.textContent = 'AUTHENTICATE';
+    }
+  });
+
+  // Matrix rain canvas
+  (function rain() {
+    const c   = document.getElementById('matrix-rain');
+    const ctx = c.getContext('2d');
+    c.width   = window.innerWidth;
+    c.height  = window.innerHeight;
+    const cols = Math.floor(c.width / 14);
+    const drops = Array(cols).fill(1);
+    setInterval(() => {
+      ctx.fillStyle = 'rgba(0,0,0,0.04)';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = '#00ff41';
+      ctx.font      = '13px monospace';
+      drops.forEach((y, i) => {
+        const char = String.fromCharCode(0x30a0 + Math.random() * 96);
+        ctx.fillText(char, i * 14, y * 14);
+        if (y * 14 > c.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      });
+    }, 50);
+  })();
+</script>
+
+</body>
+</html>

@@ -18,7 +18,8 @@ export const WILD_ELEMENT = 'void';
 
 /** Special tile type constants */
 export const SPECIAL = {
-  LINE:      'line',
+  LINE_H:    'line_h',   // Horizontal line clear (spawned from a horizontal 4-match)
+  LINE_V:    'line_v',   // Vertical line clear   (spawned from a vertical 4-match)
   CROSS:     'cross',
   NOVA:      'nova',
   SUPERNOVA: 'supernova',

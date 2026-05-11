@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Keys — Sovereign Matrix</title>
+  <link rel="stylesheet" href="/admin/css/matrix.css">
+</head>
+<body>
+
+<nav class="matrix-nav">
+  <a href="/admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
+  <ul class="nav-links">
+    <li><a href="/admin/index.html">Dashboard</a></li>
+    <li><a href="/admin/users.html">Users</a></li>
+    <li><a href="/admin/keys.html" class="active">Keys</a></li>
+    <li><a href="/admin/diagnostics.html">Diagnostics</a></li>
+    <li><a href="/admin/network-defense.html">Network Defense</a></li>
+    <li><a href="/admin/logs.html">Logs</a></li>
+  </ul>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- Generate Key -->
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Admin Key Generator</h2>
+    <p style="font-size:0.75rem;color:#3a5a3a;margin-bottom:1rem">
+      Generate single-use keys that grant admin access upon redemption.
+    </p>
+
+    <label for="key-purpose" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em">
+      Purpose
+    </label>
+    <input id="key-purpose" class="matrix-input" placeholder="e.g. New Admin Onboarding" maxlength="80">
+    <button id="generate-key" class="btn btn-neon">Generate Key</button>
+
+    <div id="generated-key" class="matrix-terminal" style="display:none"></div>
+  </section>
+
+  <!-- Redeem Key -->
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Redeem Key</h2>
+    <p style="font-size:0.75rem;color:#3a5a3a;margin-bottom:1rem">
+      Enter a key and the target user's email to upgrade their role to admin.
+    </p>
+
+    <label for="redeem-email" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em">
+      Target User Email
+    </label>
+    <input id="redeem-email" class="matrix-input" type="email" placeholder="user@example.com" maxlength="120">
+
+    <label for="redeem-code" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em">
+      Key Code
+    </label>
+    <input id="redeem-code" class="matrix-input" placeholder="MTRX-XXXX-XXXX-XXXX" maxlength="20">
+    <button id="redeem-key" class="btn btn-neon">Redeem</button>
+    <pre id="redeem-status" class="matrix-terminal" style="display:none"></pre>
+  </section>
+
+  <!-- Key List -->
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Generated Keys</h2>
+    <div style="overflow-x:auto">
+      <table class="matrix-table" id="key-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Purpose</th>
+            <th>Created</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="key-table-body">
+          <tr><td colspan="4" style="text-align:center;color:#555">No keys generated yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  import { requireRole, logout, ROLES } from '/admin/js/admin-router.js';
+  import { db }                          from '/admin/js/auth.js';
+  import { generateAdminKey, redeemAdminKey, listAdminKeys } from '/admin/js/admin-keys.js';
+
+  const user = requireRole(ROLES.SUPER_PLUS);
+  if (!user) throw new Error('Unauthorized');
+
+  document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
+
+  const nav = document.querySelector('.matrix-nav');
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className   = 'btn btn-danger';
+  logoutBtn.style.fontSize = '0.72rem';
+  logoutBtn.style.padding  = '0.3rem 0.75rem';
+  logoutBtn.addEventListener('click', logout);
+  nav.appendChild(logoutBtn);
+
+  function renderKeys() {
+    const keys  = listAdminKeys();
+    const tbody = document.getElementById('key-table-body');
+    tbody.textContent = '';
+
+    if (keys.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.style.cssText = 'text-align:center;color:#555';
+      td.textContent = 'No keys generated yet.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    keys.forEach(k => {
+      const tr = document.createElement('tr');
+
+      const keyCell = document.createElement('td');
+      keyCell.style.fontFamily = 'monospace';
+      keyCell.style.letterSpacing = '0.05em';
+      keyCell.textContent = k.key;
+
+      const purposeCell = document.createElement('td');
+      purposeCell.textContent = k.purpose;
+
+      const createdAtCell = document.createElement('td');
+      createdAtCell.textContent = new Date(k.createdAt).toLocaleString();
+
+      const statusCell = document.createElement('td');
+      const statusSpan = document.createElement('span');
+      if (k.used) {
+        statusSpan.style.color = '#ff2244';
+        statusSpan.textContent = `Used ${new Date(k.usedAt).toLocaleString()}`;
+      } else {
+        statusSpan.style.color = '#00ff41';
+        statusSpan.textContent = 'Available';
+      }
+      statusCell.appendChild(statusSpan);
+
+      tr.appendChild(keyCell);
+      tr.appendChild(purposeCell);
+      tr.appendChild(createdAtCell);
+      tr.appendChild(statusCell);
+      tbody.appendChild(tr);
+    });
+  }
+
+  renderKeys();
+
+  // Generate
+  document.getElementById('generate-key').addEventListener('click', () => {
+    const purpose = document.getElementById('key-purpose').value.trim();
+    const result  = generateAdminKey(purpose, user.uid);
+    const box     = document.getElementById('generated-key');
+    box.textContent = `Key: ${result.key}\nPurpose: ${result.purpose}\nCreated: ${result.createdAt}`;
+    box.style.display = 'block';
+    renderKeys();
+  });
+
+  // Redeem
+  document.getElementById('redeem-key').addEventListener('click', async () => {
+    const code        = document.getElementById('redeem-code').value.trim();
+    const targetEmail = document.getElementById('redeem-email').value.trim();
+    const status      = document.getElementById('redeem-status');
+    const btn         = document.getElementById('redeem-key');
+
+    btn.disabled    = true;
+    btn.textContent = 'Redeeming…';
+
+    const result = await redeemAdminKey(db, code, targetEmail);
+    status.textContent    = result.message;
+    status.style.display  = 'block';
+    status.style.color    = result.success ? 'var(--matrix-green)' : 'var(--matrix-red)';
+
+    btn.disabled    = false;
+    btn.textContent = 'Redeem';
+    renderKeys();
+  });
+</script>
+
+</body>
+</html>
