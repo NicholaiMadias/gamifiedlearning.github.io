@@ -10,6 +10,9 @@
     body { font-family: 'Inter', sans-serif; background: #020617; }
     ::selection { background-color: rgba(139,92,246,0.3); }
     .orbitron { font-family: 'Orbitron', sans-serif; }
+    /* Cosmic canvas background */
+    #cosmic-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    body > *:not(#cosmic-canvas) { position: relative; z-index: 1; }
     /* Chapter card glow */
     .chapter-card { transition: box-shadow 0.3s, transform 0.3s; }
     .chapter-card:hover { box-shadow: 0 0 30px rgba(139,92,246,0.25); transform: translateY(-2px); }
@@ -21,6 +24,8 @@
   </style>
 </head>
 <body class="min-h-screen text-slate-100">
+  <!-- Cosmic starfield canvas background -->
+  <canvas id="cosmic-canvas" aria-hidden="true"></canvas>
 
   <!-- Header -->
   <header class="p-4 sm:p-6 flex justify-between items-center border-b border-purple-900/50 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
@@ -288,6 +293,93 @@
       }
       mcRender();
     });
+  </script>
+
+  <!-- Cosmic starfield background -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('cosmic-canvas');
+      const ctx = canvas.getContext('2d');
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Build star field
+      const stars = [];
+      for (let i = 0; i < 250; i++) {
+        stars.push({
+          x:       Math.random() * canvas.width,
+          y:       Math.random() * canvas.height,
+          size:    Math.random() * 1.5 + 0.5,
+          twinkle: Math.random() * Math.PI * 2   // phase offset
+        });
+      }
+
+      let shootingStar = null;
+      function spawnShootingStar() {
+        if (!shootingStar && Math.random() < 0.002) {
+          shootingStar = {
+            x:    Math.random() * canvas.width,
+            y:    Math.random() * canvas.height * 0.3,
+            vx:   -(8 + Math.random() * 4),
+            vy:   3 + Math.random() * 2,
+            life: 0
+          };
+        }
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Nebula gradient (desktop only for perf)
+        if (!isMobile) {
+          const g = ctx.createRadialGradient(
+            canvas.width * 0.5, canvas.height * 0.4, 50,
+            canvas.width * 0.5, canvas.height * 0.4, canvas.width * 0.9
+          );
+          g.addColorStop(0, 'rgba(80,20,120,0.25)');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Twinkling stars
+        const t = Date.now() * 0.002;
+        stars.forEach(s => {
+          const tw = (Math.sin(t + s.twinkle) + 1) / 2;
+          ctx.fillStyle = `rgba(255,255,255,${0.5 + tw * 0.5})`;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Shooting star
+        spawnShootingStar();
+        if (shootingStar) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+          ctx.lineWidth   = 2;
+          ctx.beginPath();
+          ctx.moveTo(shootingStar.x, shootingStar.y);
+          ctx.lineTo(shootingStar.x + shootingStar.vx * 3, shootingStar.y + shootingStar.vy * 3);
+          ctx.stroke();
+          shootingStar.x    += shootingStar.vx;
+          shootingStar.y    += shootingStar.vy;
+          shootingStar.life += 1;
+          if (shootingStar.x < -50 || shootingStar.y > canvas.height || shootingStar.life > 80) {
+            shootingStar = null;
+          }
+        }
+
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+    })();
   </script>
 </body>
 </html>
