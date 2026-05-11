@@ -30,12 +30,13 @@ This project uses ES modules, so it must be served via a local static server (br
 
 The site deploys automatically to **[amazinggracehl.org](https://amazinggracehl.org)** via GitHub Actions whenever code is pushed to the `main` branch.
 
-- **Workflow:** `.github/workflows/deploy.yml`
+- **Repository:** `NicholaiMadias/gamifiedlearning.github.io`
+- **Primary workflow:** `.github/workflows/deploy.yml` (official `actions/deploy-pages` pipeline)
 - **Trigger:** Push to `main` (or manual `workflow_dispatch`)
 - **Deploy target:** `github-pages` environment
 - **Source:** Repository root (`/`)
 
-Only one workflow deploys to Pages. The `concurrency: group: "pages"` setting prevents race conditions if two pushes happen quickly.
+Other Pages-related workflows (`.github/workflows/jekyll-gh-pages.yml` and `.github/workflows/dual-deploy.yml`) also run on `push` to `main`. The `concurrency: group: "pages"` setting is defined in `jekyll-gh-pages.yml` (not in `deploy.yml`).
 
 ### Pull Request Previews
 
@@ -170,4 +171,3 @@ The layout adapts cleanly to mobile, tablet, and desktop.
 ---
 
 ## Repository Structure
-
