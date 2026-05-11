@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Sovereign Matrix</title>
+  <link rel="stylesheet" href="/admin/css/matrix.css">
+</head>
+<body>
+
+<nav class="matrix-nav">
+  <a href="/admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
+  <ul class="nav-links">
+    <li><a href="/admin/index.html" class="active">Dashboard</a></li>
+    <li><a href="/admin/users.html">Users</a></li>
+    <li><a href="/admin/keys.html">Keys</a></li>
+    <li><a href="/admin/diagnostics.html">Diagnostics</a></li>
+    <li><a href="/admin/network-defense.html">Network Defense</a></li>
+    <li><a href="/admin/logs.html">Logs</a></li>
+  </ul>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="page-wrap">
+
+  <section class="matrix-card matrix-border">
+    <h1 class="matrix-heading glitch">Sovereign Matrix Admin Dashboard</h1>
+    <p style="font-size:0.78rem;color:#3a5a3a;margin-bottom:0.5rem">
+      Logged in as <strong id="user-role-display"></strong>
+    </p>
+
+    <div class="admin-grid">
+      <a href="/admin/users.html" class="admin-tile">
+        <h3>User Management</h3>
+        <p>Roles, permissions, tools</p>
+      </a>
+
+      <a href="/admin/keys.html" class="admin-tile" id="tile-keys">
+        <h3>Admin Keys</h3>
+        <p>Generate &amp; redeem admin access</p>
+      </a>
+
+      <a href="/admin/diagnostics.html" class="admin-tile">
+        <h3>Diagnostics Console</h3>
+        <p>Browser &amp; DNS troubleshooting</p>
+      </a>
+
+      <a href="/admin/network-defense.html" class="admin-tile" id="tile-netdef">
+        <h3>Network Defense</h3>
+        <p>Assign Nexus Defense tools</p>
+      </a>
+
+      <a href="/admin/logs.html" class="admin-tile">
+        <h3>Audit Logs</h3>
+        <p>System events &amp; security logs</p>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  import { requireRole, logout, ROLES } from '/admin/js/admin-router.js';
+
+  const user = requireRole(ROLES.ALL_ADMIN);
+  if (!user) throw new Error('Unauthorized');
+
+  // Show current user info
+  document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
+  document.getElementById('user-role-display').textContent = `${user.email} — ${user.role}`;
+
+  // Hide tiles that require higher role
+  if (!ROLES.SUPER_PLUS.includes(user.role)) {
+    const keysLink   = document.getElementById('tile-keys');
+    const netdefLink = document.getElementById('tile-netdef');
+    if (keysLink)   { keysLink.style.opacity = '0.35'; keysLink.style.pointerEvents = 'none'; keysLink.title = 'Requires superAdmin+'; }
+    if (netdefLink) { netdefLink.style.opacity = '0.35'; netdefLink.style.pointerEvents = 'none'; netdefLink.title = 'Requires superAdmin+'; }
+  }
+
+  // Logout button (add one to the nav)
+  const nav = document.querySelector('.matrix-nav');
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className   = 'btn btn-danger';
+  logoutBtn.style.fontSize = '0.72rem';
+  logoutBtn.style.padding  = '0.3rem 0.75rem';
+  logoutBtn.addEventListener('click', logout);
+  nav.appendChild(logoutBtn);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Star Matrix | Nexus Arcade</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
+    :root {
+      --neon-blue:   #00f2ff;
+      --neon-purple: #bc13fe;
+      --neon-gold:   #fbbf24;
+      --deep-space:  #020617;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #1a0533 0%, #020617 70%);
+      color: #e2e8f0; margin: 0; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .orbitron { font-family: 'Orbitron', sans-serif; }
+    .game-header {
+      width: 100%; max-width: 580px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid rgba(188,19,254,0.2);
+    }
+    .game-header a {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; text-decoration: none; color: #94a3b8;
+      transition: color 0.2s;
+    }
+    .game-header a:hover { color: var(--neon-purple); }
+    .game-header a.cert-link { color: var(--neon-gold); }
+    .game-header a.cert-link:hover { color: #fcd34d; }
+    .game-title {
+      font-family: 'Orbitron', monospace; font-size: 0.85rem;
+      font-weight: 900; color: #fff; letter-spacing: 0.05em;
+    }
+
+    /* HUD */
+    .hud {
+      width: 100%; max-width: 580px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 20px; background: rgba(15,23,42,0.6);
+      border-bottom: 1px solid rgba(188,19,254,0.1);
+    }
+    .hud-stat { text-align: center; }
+    .hud-label { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; }
+    .hud-value { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--neon-purple); }
+    .hud-value.gold { color: var(--neon-gold); }
+    .hud-value.cyan { color: var(--neon-blue); }
+
+    /* Board */
+    .board-wrapper {
+      width: 100%; max-width: 580px;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 16px 12px;
+    }
+    .star-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+      width: 100%;
+      max-width: 490px;
+      aspect-ratio: 1;
+    }
+    .star-cell {
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(1.2rem, 4vw, 1.8rem);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .star-cell.selected {
+      border-color: var(--neon-blue);
+      transform: scale(1.12);
+      box-shadow: 0 0 18px var(--neon-blue);
+      z-index: 10;
+    }
+    .star-cell.matched {
+      animation: matchPop 0.35s ease forwards;
+    }
+    @keyframes matchPop {
+      0%   { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0);   opacity: 0; }
+    }
+    .star-cell[data-type="supernova"]  { background: rgba(251,191,36,0.15); }
+    .star-cell[data-type="shooting"]   { background: rgba(0,242,255,0.12); }
+    .star-cell[data-type="gem"]        { background: rgba(52,211,153,0.12); }
+    .star-cell[data-type="rank"]       { background: rgba(188,19,254,0.15); }
+    .star-cell[data-type="cosmic"]     { background: rgba(248,113,113,0.12); }
+
+    /* Progress bar */
+    .progress-wrap {
+      width: 100%; max-width: 490px; margin-top: 12px;
+    }
+    .progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #64748b; margin-bottom: 4px;
+    }
+    .progress-bar-outer {
+      height: 6px; background: rgba(255,255,255,0.05);
+      border-radius: 99px; overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+      transition: width 0.4s ease;
+    }
+
+    /* Hint text */
+    .hint-text {
+      font-size: 0.6rem; color: #475569; text-transform: uppercase;
+      letter-spacing: 0.2em; text-align: center; margin-top: 10px;
+    }
+
+    /* Star legend */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; margin-top: 12px; max-width: 490px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.6rem; color: #64748b;
+    }
+
+    /* Certificate overlay */
+    .cert-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(2,6,23,0.97); overflow-y: auto; padding: 1.5rem;
+    }
+    .cert-overlay.hidden { display: none !important; }
+    .cert-overlay h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.4rem, 5vw, 2.2rem); font-weight: 900; color: #fff;
+      margin-bottom: 0.5rem; text-shadow: 0 0 20px var(--neon-purple);
+      text-align: center;
+    }
+    .cert-canvas { max-width: min(90vw, 760px); border: 1px solid rgba(188,19,254,0.3); border-radius: 8px; margin-bottom: 1rem; }
+    .cert-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 1rem; }
+    .cert-btn {
+      padding: 0.6rem 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(15,23,42,0.8); font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .cert-btn.purple { color: var(--neon-purple); }
+    .cert-btn.purple:hover { border-color: var(--neon-purple); background: rgba(188,19,254,0.08); }
+    .cert-btn.cyan { color: var(--neon-blue); }
+    .cert-btn.cyan:hover { border-color: var(--neon-blue); background: rgba(0,242,255,0.08); }
+    .cert-btn.gold { color: var(--neon-gold); }
+    .cert-btn.gold:hover { border-color: var(--neon-gold); background: rgba(251,191,36,0.08); }
+    .cert-btn.green { color: #4ade80; }
+    .cert-btn.green:hover { border-color: #4ade80; background: rgba(74,222,128,0.08); }
+
+    /* Name input */
+    .name-input {
+      width: 100%; max-width: 320px; padding: 0.6rem 1rem;
+      border-radius: 12px; background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(255,255,255,0.1); color: #fff;
+      font-size: 0.9rem; outline: none; margin-bottom: 0.75rem;
+    }
+    .name-input:focus { border-color: var(--neon-purple); }
+    .play-again-btn {
+      background: none; border: none; color: #475569; font-size: 0.6rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em;
+      cursor: pointer; margin-top: 0.5rem; transition: color 0.2s;
+    }
+    .play-again-btn:hover { color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <!-- Page header -->
+  <div class="game-header">
+    <a href="/">← Nexus Hub</a>
+    <span class="game-title orbitron">STAR MATRIX</span>
+    <a href="/arcade/certificates/" class="cert-link">📜 Certificates</a>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-stat">
+      <div class="hud-label">Score</div>
+      <div class="hud-value purple" id="sm-score">0</div>
+    </div>
+    <div class="hud-stat">
+      <div class="hud-label">Target</div>
+      <div class="hud-value gold" id="sm-target">1000</div>
+    </div>
+    <div class="hud-stat">
+      <div class="hud-label">Combo</div>
+      <div class="hud-value cyan" id="sm-combo">×1</div>
+    </div>
+    <div class="hud-stat">
+      <div class="hud-label">Moves</div>
+      <div class="hud-value" id="sm-moves">30</div>
+    </div>
+  </div>
+
+  <!-- Board -->
+  <div class="board-wrapper">
+    <div class="star-grid" id="sm-grid" role="grid" aria-label="Star Matrix game board"></div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Mission Progress</span>
+        <span id="sm-pct">0%</span>
+      </div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="sm-progress" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend" aria-label="Star types">
+      <div class="legend-item">🌟 Supernova</div>
+      <div class="legend-item">💫 Shooting</div>
+      <div class="legend-item">💎 Gem</div>
+      <div class="legend-item">⭐ Rank</div>
+      <div class="legend-item">✨ Cosmic</div>
+    </div>
+
+    <p class="hint-text">Tap two adjacent stars to swap · Match 3+ of the same type</p>
+  </div>
+
+  <!-- Certificate overlay -->
+  <div id="sm-cert-overlay" class="cert-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="sm-cert-title">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:3rem;margin-bottom:0.75rem;" aria-hidden="true">🌟</div>
+      <h2 id="sm-cert-title">STAR MATRIX CLEARED!</h2>
+      <p style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--neon-purple);font-weight:700;">Seven Stars Protocol Achieved</p>
+    </div>
+
+    <div id="sm-name-phase" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:320px;">
+      <label for="sm-player-name" style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.15em;color:#94a3b8;margin-bottom:0.5rem;">Your name for the certificate</label>
+      <input id="sm-player-name" type="text" maxlength="30" placeholder="Star Guardian" class="name-input"
+             autocomplete="name" aria-label="Player name for certificate">
+      <button class="cert-btn purple" id="sm-gen-btn">Generate Certificate</button>
+    </div>
+
+    <div id="sm-cert-phase" style="display:none;flex-direction:column;align-items:center;gap:0.75rem;width:100%;">
+      <canvas id="sm-cert-canvas" class="cert-canvas" aria-label="Completion certificate"></canvas>
+      <div class="cert-actions">
+        <button class="cert-btn cyan" onclick="smCertPNG()">⬇ Download PNG</button>
+        <button class="cert-btn purple" onclick="smCertPDF()">🖨 Save as PDF</button>
+        <a class="cert-btn green" href="/arcade/certificates/">📜 My Certificates</a>
+      </div>
+    </div>
+
+    <button class="play-again-btn" onclick="smReset()">↩ Play Again</button>
+  </div>
+
+  <script>
+    // ── Star types ──────────────────────────────────────────────────────────
+    const STAR_TYPES = [
+      { id: 'supernova', emoji: '🌟' },
+      { id: 'shooting',  emoji: '💫' },
+      { id: 'gem',       emoji: '💎' },
+      { id: 'rank',      emoji: '⭐' },
+      { id: 'cosmic',    emoji: '✨' },
+    ];
+    const GRID_SIZE   = 7;
+    const TARGET      = 1000;
+    const MAX_MOVES   = 30;
+
+    let board = [];
+    let selected = null;
+    let score = 0;
+    let moves = MAX_MOVES;
+    let combo = 1;
+    let gameOver = false;
+    let certDataUrl = null;
+    let certId = null;
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    function smInit() {
+      score = 0; moves = MAX_MOVES; combo = 1; gameOver = false;
+      selected = null; certDataUrl = null; certId = null;
+      createBoard();
+      smRender();
+      smUpdateHUD();
+    }
+
+    function createBoard() {
+      board = [];
+      for (let r = 0; r < GRID_SIZE; r++) {
+        board[r] = [];
+        for (let c = 0; c < GRID_SIZE; c++) {
+          board[r][c] = randomStar();
+        }
+      }
+      // Ensure no pre-existing matches
+      let attempts = 0;
+      while (findMatches().length > 0 && attempts < 200) {
+        for (let r = 0; r < GRID_SIZE; r++)
+          for (let c = 0; c < GRID_SIZE; c++)
+            board[r][c] = randomStar();
+        attempts++;
+      }
+    }
+
+    function randomStar() {
+      return STAR_TYPES[Math.floor(Math.random() * STAR_TYPES.length)];
+    }
+
+    // ── Render ───────────────────────────────────────────────────────────────
+    function smRender() {
+      const grid = document.getElementById('sm-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const star = board[r][c];
+          const cell = document.createElement('div');
+          cell.className = 'star-cell' + (selected && selected.r === r && selected.c === c ? ' selected' : '');
+          cell.setAttribute('data-type', star.id);
+          cell.setAttribute('role', 'gridcell');
+          cell.setAttribute('aria-label', star.id + ' star');
+          cell.textContent = star.emoji;
+          cell.addEventListener('click', () => smHandleClick(r, c));
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    // ── HUD ──────────────────────────────────────────────────────────────────
+    function smUpdateHUD() {
+      document.getElementById('sm-score').textContent = score;
+      document.getElementById('sm-combo').textContent = '×' + combo;
+      document.getElementById('sm-moves').textContent = moves;
+      const pct = Math.min(100, Math.round((score / TARGET) * 100));
+      document.getElementById('sm-pct').textContent = pct + '%';
+      const bar = document.getElementById('sm-progress');
+      bar.style.width = pct + '%';
+      bar.setAttribute('aria-valuenow', pct);
+    }
+
+    // ── Click handler ────────────────────────────────────────────────────────
+    function smHandleClick(r, c) {
+      if (gameOver) return;
+      if (selected === null) {
+        selected = { r, c };
+      } else {
+        const dist = Math.abs(r - selected.r) + Math.abs(c - selected.c);
+        if (dist === 1) {
+          smSwap(selected.r, selected.c, r, c);
+        }
+        selected = null;
+      }
+      smRender();
+    }
+
+    function smSwap(r1, c1, r2, c2) {
+      if (moves <= 0 || gameOver) return;
+      const tmp = board[r1][c1];
+      board[r1][c1] = board[r2][c2];
+      board[r2][c2] = tmp;
+      const matches = findMatches();
+      if (matches.length === 0) {
+        // Revert
+        board[r2][c2] = board[r1][c1];
+        board[r1][c1] = tmp;
+      } else {
+        moves--;
+        smRender();
+        smUpdateHUD();
+        setTimeout(() => smResolveMatches(), 300);
+      }
+    }
+
+    // ── Match logic ──────────────────────────────────────────────────────────
+    function findMatches() {
+      const matched = new Set();
+      // Horizontal
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE - 2; c++) {
+          if (board[r][c] && board[r][c].id === board[r][c+1].id && board[r][c].id === board[r][c+2].id) {
+            matched.add(r + ',' + c);
+            matched.add(r + ',' + (c+1));
+            matched.add(r + ',' + (c+2));
+          }
+        }
+      }
+      // Vertical
+      for (let c = 0; c < GRID_SIZE; c++) {
+        for (let r = 0; r < GRID_SIZE - 2; r++) {
+          if (board[r][c] && board[r][c].id === board[r+1][c].id && board[r][c].id === board[r+2][c].id) {
+            matched.add(r + ',' + c);
+            matched.add((r+1) + ',' + c);
+            matched.add((r+2) + ',' + c);
+          }
+        }
+      }
+      return Array.from(matched).map(k => { const [r,c] = k.split(',').map(Number); return {r,c}; });
+    }
+
+    function smResolveMatches() {
+      if (gameOver) return;
+      const matches = findMatches();
+      if (matches.length === 0) {
+        combo = 1;
+        smUpdateHUD();
+        smCheckGameEnd();
+        return;
+      }
+      // Award points
+      const pts = matches.length * 10 * combo;
+      score += pts;
+      if (matches.length >= 5) combo = Math.min(combo + 1, 5);
+      smUpdateHUD();
+
+      // Clear matched cells
+      matches.forEach(({ r, c }) => { board[r][c] = null; });
+      smRender();
+      setTimeout(() => { smApplyGravity(); smRender(); setTimeout(smResolveMatches, 250); }, 300);
+    }
+
+    function smApplyGravity() {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        let bottom = GRID_SIZE - 1;
+        for (let r = GRID_SIZE - 1; r >= 0; r--) {
+          if (board[r][c] !== null) {
+            board[bottom][c] = board[r][c];
+            if (bottom !== r) board[r][c] = null;
+            bottom--;
+          }
+        }
+        for (let r = bottom; r >= 0; r--) {
+          board[r][c] = randomStar();
+        }
+      }
+    }
+
+    function smCheckGameEnd() {
+      if (score >= TARGET && !gameOver) {
+        gameOver = true;
+        setTimeout(smShowCert, 600);
+        return;
+      }
+      if (moves <= 0 && !gameOver) {
+        gameOver = true;
+        setTimeout(() => {
+          if (confirm('No moves left! Score: ' + score + '\n\nPlay again?')) smInit();
+        }, 300);
+      }
+    }
+
+    // ── Certificate ──────────────────────────────────────────────────────────
+    function smGenCertId() {
+      try {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+          return 'SM-' + crypto.randomUUID().replace(/-/g,'').slice(0,12).toUpperCase();
+        }
+      } catch(_) {}
+      return 'SM-' + Date.now().toString(36).toUpperCase();
+    }
+
+    function smShowCert() {
+      document.getElementById('sm-name-phase').style.display = 'flex';
+      document.getElementById('sm-cert-phase').style.display = 'none';
+      document.getElementById('sm-cert-overlay').classList.remove('hidden');
+      setTimeout(() => document.getElementById('sm-player-name').focus(), 100);
+    }
+
+    async function smGenerateCert() {
+      const btn = document.getElementById('sm-gen-btn');
+      const playerName = (document.getElementById('sm-player-name').value || '').trim().slice(0, 30) || 'Star Guardian';
+      if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+      try {
+        certId = smGenCertId();
+        const gameTitle = 'Star Matrix';
+        const completionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        try {
+          const cert = { id: certId, player: playerName, game: gameTitle, date: completionDate, score };
+          const certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
+          certs.push(cert);
+          localStorage.setItem('arcade-certificates', JSON.stringify(certs));
+          // Mark Star Matrix complete for unlock purposes
+          localStorage.setItem('sm_complete', 'true');
+        } catch(_) {}
+        const canvas = document.getElementById('sm-cert-canvas');
+        await smCertDraw(canvas, playerName, gameTitle, completionDate, certId, score);
+        certDataUrl = canvas.toDataURL('image/png');
+        document.getElementById('sm-name-phase').style.display = 'none';
+        document.getElementById('sm-cert-phase').style.display = 'flex';
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Generate Certificate'; }
+      }
+    }
+
+    async function smCertDraw(canvas, playerName, gameTitle, completionDate, id, finalScore) {
+      await document.fonts.ready;
+      const ctx = canvas.getContext('2d');
+      const W = 760, H = 540;
+      canvas.width = W; canvas.height = H;
+      // Background
+      const bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0, '#020617'); bg.addColorStop(0.5, '#0f0524'); bg.addColorStop(1, '#020617');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      // Stars bg
+      for (let i = 0; i < 60; i++) {
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.05 + (i % 4) * 0.05) + ')';
+        ctx.fillRect(((i * 137 + 20) % (W - 40)) + 20, ((i * 89 + 20) % (H - 40)) + 20, 1.5, 1.5);
+      }
+      // Border
+      ctx.strokeStyle = '#bc13fe'; ctx.lineWidth = 3; ctx.strokeRect(12, 12, W-24, H-24);
+      ctx.strokeStyle = 'rgba(251,191,36,0.3)'; ctx.lineWidth = 1; ctx.strokeRect(20, 20, W-40, H-40);
+      // Corner stars
+      ctx.font = '20px serif';
+      ctx.textAlign = 'center';
+      ['🌟','🌟','🌟','🌟'].forEach((s, i) => {
+        const x = i < 2 ? 28 : W-28;
+        const y = i % 2 === 0 ? 28 : H-18;
+        ctx.fillText(s, x, y);
+      });
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#bc13fe'; ctx.font = 'bold 24px monospace';
+      ctx.fillText('CERTIFICATE OF COMPLETION', W/2, 78);
+      ctx.strokeStyle = 'rgba(188,19,254,0.3)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(80,96); ctx.lineTo(W-80,96); ctx.stroke();
+      ctx.fillStyle = '#fbbf24'; ctx.font = '10px monospace';
+      ctx.fillText('STAR MATRIX  ·  NEXUS ARCADE', W/2, 116);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '14px sans-serif';
+      ctx.fillText('This certifies that', W/2, 170);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 38px monospace';
+      ctx.fillText(playerName, W/2, 228);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '14px sans-serif';
+      ctx.fillText('has successfully navigated the', W/2, 272);
+      ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 26px monospace';
+      ctx.fillText(gameTitle, W/2, 318);
+      ctx.fillStyle = '#bc13fe'; ctx.font = '12px monospace';
+      ctx.fillText('Final Score: ' + finalScore + ' · Stars Aligned', W/2, 356);
+      ctx.strokeStyle = 'rgba(188,19,254,0.2)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(80,390); ctx.lineTo(W-80,390); ctx.stroke();
+      ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif';
+      ctx.fillText('Completed: ' + completionDate, W/2, 418);
+      ctx.fillStyle = '#334155'; ctx.font = '10px monospace';
+      ctx.fillText('Certificate ID: ' + id, W/2, 442);
+    }
+
+    function smCertPNG() {
+      if (!certDataUrl) return;
+      const a = document.createElement('a');
+      a.download = 'star-matrix-certificate-' + (certId || 'nexus') + '.png';
+      a.href = certDataUrl; a.click();
+    }
+
+    function smCertPDF() {
+      if (!certDataUrl) return;
+      const win = window.open('', '_blank', 'noopener');
+      if (!win) { alert('Please allow pop-ups to save the certificate as PDF.'); return; }
+      win.opener = null; // Belt-and-suspenders: noopener may not clear opener in all contexts
+      win.document.write('<!DOCTYPE html><html><head><title>Certificate — Star Matrix</title>' +
+        '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#020617;display:flex;justify-content:center;align-items:center;min-height:100vh}img{width:100%;max-width:760px}@media print{body{background:white}}</style>' +
+        '</head><body><img src="' + certDataUrl + '">' +
+        '<script>setTimeout(function(){window.print()},400);<\/script></body></html>');
+      win.document.close();
+    }
+
+    function smReset() {
+      document.getElementById('sm-cert-overlay').classList.add('hidden');
+      smInit();
+    }
+
+    // ── Boot ─────────────────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', function () {
+      // Wire up certificate name input events
+      const nameInput = document.getElementById('sm-player-name');
+      if (nameInput) nameInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') smGenerateCert(); });
+      const genBtn = document.getElementById('sm-gen-btn');
+      if (genBtn) genBtn.addEventListener('click', smGenerateCert);
+      smInit();
+    });
+  </script>
+</body>
+</html>
