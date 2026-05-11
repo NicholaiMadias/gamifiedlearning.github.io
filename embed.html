@@ -157,7 +157,7 @@
 
       <div class="mm-banner mm-hidden"></div>
 
-      <button type="button" class="mm-restart-btn">↺ Restart</button>
+      <button type="button" class="mm-restart-btn" aria-label="Restart game">↺ Restart</button>
     </div>
 
     <script>
@@ -311,7 +311,7 @@
             cell.dataset.col = c;
             cell.setAttribute('aria-label', gem + ' gem at row ' + (r + 1) + ', column ' + (c + 1));
             cell.textContent = gemIcon(gem);
-            if (isResolving) cell.disabled = true;
+            cell.disabled = isResolving;
             cell.addEventListener('click', makeCellHandler(r, c));
             container.appendChild(cell);
           }
