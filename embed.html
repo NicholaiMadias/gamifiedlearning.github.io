@@ -8,8 +8,8 @@
     embed.html — self-contained Match Maker widget.
 
     Multi-instance safe: drop as many copies of the .mm-embed block
-    (from <div class="mm-embed"> through its closing </div>) into the
-    same WordPress page and each instance runs independently.
+    (from <div class="mm-embed" data-mm-instance> through its closing </div>)
+    into the same WordPress page and each instance runs independently.
 
     How it works:
     • Every game element is identified by a CLASS, never a document-global ID.
@@ -136,9 +136,11 @@
     EMBED WIDGET
     When injecting into WordPress you need TWO things:
 
-    1. STYLES (once per page) — copy the entire <style> … </style> block
-       from this file's <head> into your theme's Custom CSS or a Custom HTML
-       block that appears before any widget instance.
+    1. STYLES (once per page) — two options:
+       a) Custom CSS: paste only the CSS rules between the <style> and </style>
+          tags (not the tags themselves) into Appearance → Customize → Additional CSS.
+       b) Custom HTML: paste the full <style> … </style> block into a Custom HTML
+          block that appears before any widget instance.
 
     2. WIDGET INSTANCE (repeat as needed) — copy from
        <div class="mm-embed" data-mm-instance> through its closing </div>
