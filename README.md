@@ -31,12 +31,12 @@ This project uses ES modules, so it must be served via a local static server (br
 The site deploys automatically to **[amazinggracehl.org](https://amazinggracehl.org)** via GitHub Actions whenever code is pushed to the `main` branch.
 
 - **Repository:** `NicholaiMadias/gamifiedlearning.github.io`
-- **Workflow:** `.github/workflows/deploy.yml`
+- **Primary workflow:** `.github/workflows/deploy.yml`
 - **Trigger:** Push to `main` (or manual `workflow_dispatch`)
 - **Deploy target:** `github-pages` environment
 - **Source:** Repository root (`/`)
 
-Only one workflow deploys to Pages. The `concurrency: group: "pages"` setting prevents race conditions if two pushes happen quickly.
+Other Pages-related workflows exist in this repo, but this section tracks the primary production deploy workflow above. The `concurrency: group: "pages"` setting prevents race conditions if two pushes happen quickly.
 
 ### Pull Request Previews
 
