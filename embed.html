@@ -93,6 +93,7 @@
 
     .mm-embed .mm-cell:hover  { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
     .mm-embed .mm-cell:active { transform: scale(0.94); }
+    .mm-embed .mm-cell:disabled { cursor: default; opacity: 0.65; pointer-events: none; }
 
     /* ── Badge banner ─────────────────────────────────────────────────────── */
     .mm-embed .mm-banner {
@@ -156,7 +157,7 @@
 
       <div class="mm-banner mm-hidden"></div>
 
-      <button class="mm-restart-btn">↺ Restart</button>
+      <button type="button" class="mm-restart-btn">↺ Restart</button>
     </div>
 
     <script>
@@ -188,7 +189,8 @@
       /* ── Instance state ────────────────────────────────────────── */
       var grid, selected, score, moves, level;
       var bannerAutohideTimeoutId = null;
-      var runToken = 0; /* incremented by init() to invalidate in-flight chains */
+      var runToken = 0;    /* incremented by init() to invalidate in-flight chains */
+      var isResolving = false; /* true while a chain reaction is in progress */
 
       /* ── Helpers ───────────────────────────────────────────────── */
       function randomGem() {
@@ -309,6 +311,7 @@
             cell.dataset.col = c;
             cell.setAttribute('aria-label', gem + ' gem at row ' + (r + 1) + ', column ' + (c + 1));
             cell.textContent = gemIcon(gem);
+            if (isResolving) cell.disabled = true;
             cell.addEventListener('click', makeCellHandler(r, c));
             container.appendChild(cell);
           }
@@ -356,6 +359,7 @@
       }
 
       function onCellClick(r, c) {
+        if (isResolving) return;
         if (moves <= 0) return;
 
         if (!selected) {
@@ -393,6 +397,7 @@
         selected = null;
         moves--;
         updateStats();
+        isResolving = true;
         resolveMatches();
       }
 
@@ -400,6 +405,7 @@
         var myToken = runToken; /* snapshot — stale if init() was called */
         var matches = findMatches(grid);
         if (matches.length === 0) {
+          isResolving = false; /* re-enable input before final render */
           renderGrid();
           checkLevelUp();
           checkGameOver();
@@ -439,6 +445,7 @@
         /* Invalidate any in-flight chain-reaction callbacks from the previous
            game so they don't mutate fresh state (session-token pattern). */
         runToken++;
+        isResolving = false;
         grid     = createInitialGrid();
         selected = null;
         score    = 0;
