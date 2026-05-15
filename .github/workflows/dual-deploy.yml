@@ -1,22 +1,28 @@
-name: Dual Deploy
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
-    # Only deploy on direct pushes to main, not on PRs
-    if: github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Validate CNAME
         run: |
@@ -32,30 +38,17 @@ jobs:
           fi
           echo "CNAME validated: $ACTUAL"
 
-      - name: Build static site
-        run: |
-          rm -rf dist
-          mkdir -p dist
-          rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' ./ dist/
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          keep_files: true
-
-      - name: Sync to WordPress (Gamified Learning)
-        env:
-          WP_API_KEY: ${{ secrets.WP_API_KEY }}
-        run: |
-          test -f dist/index.html
-          CONTENT=$(jq -Rs . < dist/index.html)
-          curl -sSf \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${WP_API_KEY}" \
-            -d "{\"content\": ${CONTENT}}" \
-            https://www.gamifiedlearning.org/wp-json/nexus-sync/v1/update
+        id: deployment
+        uses: actions/deploy-pages@v5
 
   # ── Gemini AI Code Review ────────────────────────────────────────────────────
   # Runs in parallel with the deploy job on pull requests.
