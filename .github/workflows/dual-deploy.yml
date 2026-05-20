@@ -80,6 +80,11 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "GEMINI_API_KEY is unavailable; skipping Gemini review."
+            exit 0
+          fi
+
           # Collect the diff (JS, HTML, CSS only; cap at 30 000 chars for the API)
           DIFF=$(git diff "${BASE_SHA}..${HEAD_SHA}" -- '*.js' '*.html' '*.css' \
                  | python3 -c 'import sys; sys.stdout.write(sys.stdin.buffer.read().decode("utf-8", errors="ignore")[:30000])')
@@ -90,11 +95,11 @@ jobs:
           fi
 
           PROMPT="You are an expert code reviewer for a browser-based game written in vanilla JS/HTML/CSS. \
-Review the following git diff for: \
-1) Security vulnerabilities (XSS, injection, etc.) \
-2) Performance issues (unnecessary reflows, large loops, memory leaks) \
-3) General code quality (naming, logic, error handling). \
-Be concise and actionable. If there are no issues, say so."
+          Review the following git diff for: \
+          1) Security vulnerabilities (XSS, injection, etc.) \
+          2) Performance issues (unnecessary reflows, large loops, memory leaks) \
+          3) General code quality (naming, logic, error handling). \
+          Be concise and actionable. If there are no issues, say so."
 
           # Combine prompt and diff, then JSON-encode with jq for safety
           PAYLOAD=$(jq -n \
@@ -113,9 +118,14 @@ Be concise and actionable. If there are no issues, say so."
             RESPONSE="$FALLBACK_MSG"
           fi
 
-          gh pr comment "$PR_NUMBER" --body "## 🤖 Gemini AI Code Review
+          COMMENT_BODY=$(cat <<EOF
+          ## 🤖 Gemini AI Code Review
 
-${RESPONSE}
+          ${RESPONSE}
 
----
-*This review was generated automatically and is informational only.*"
+          ---
+          *This review was generated automatically and is informational only.*
+          EOF
+          )
+
+          gh pr comment "$PR_NUMBER" --body "$COMMENT_BODY"
