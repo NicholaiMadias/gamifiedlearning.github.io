@@ -37,7 +37,7 @@ The site deploys automatically to **[nicholai.org](https://nicholai.org)** via G
 - **Deploy target:** `github-pages` environment
 - **Source:** Repository root (`/`)
 
-Other Pages-related workflows (`.github/workflows/jekyll-gh-pages.yml` and `.github/workflows/dual-deploy.yml`) also run on `push` to `main`. The `concurrency: group: "pages"` setting is defined in `jekyll-gh-pages.yml` (not in `deploy.yml`).
+Additional workflows in this repo include `.github/workflows/github-pages-preview.yml` for pull request previews and `.github/workflows/store-ci.yml` for store/backend CI.
 
 ### Pull Request Previews
 
