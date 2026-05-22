@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Match Maker | Nexus Arcade</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon.png">
+  <link rel="apple-touch-icon" href="/Assets/favicon.png">
+  <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/style.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
@@ -54,7 +58,10 @@
   <div class="game-header">
     <a href="/">← Nexus Hub</a>
     <span class="game-title">MATCH MAKER</span>
-    <a href="/arcade/certificates/">📜 Certificates</a>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ffd700;">🪙 <span id="mm-credits-display">0</span></span>
+      <a href="/arcade/certificates/" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-green);text-decoration:none;">📜 Certificates</a>
+    </div>
   </div>
 
   <!-- HUD -->
@@ -73,10 +80,12 @@
         <span class="stat-label">Moves</span>
         <span id="match-moves" class="stat-value">20</span>
       </div>
+      <div class="stat">
+        <span class="stat-label">Credits</span>
+        <span id="mm-hud-credits" class="stat-value" style="color:#ffd700;">0</span>
+      </div>
     </div>
   </div>
-
-  <!-- Badge banner -->
   <div id="match-badge-banner" class="badge-banner hidden" role="alert" aria-live="assertive"></div>
 
   <!-- Game message -->
@@ -174,6 +183,7 @@
     import { initMatchMaker, generateCertificateFor, downloadMatchMakerCertPNG, downloadMatchMakerCertPDF } from '/match-maker-ui.js';
     import { renderStarMap } from '/star-map.js';
     import { onGameLevelComplete } from '/concordance-lens.js';
+    import { addCreditsForPoints, getCredits, onCreditsChange } from '/credits.js';
 
     const starMapContainer = document.getElementById('star-map-container');
     function refreshStarMap() {
@@ -183,15 +193,43 @@
     initMatchMaker(null, null);
     refreshStarMap();
 
+    // Show credits in header and HUD
+    function refreshCreditsDisplay() {
+      const v = getCredits().toLocaleString();
+      const el = document.getElementById('mm-credits-display');
+      if (el) el.textContent = v;
+      const hudEl = document.getElementById('mm-hud-credits');
+      if (hudEl) hudEl.textContent = v;
+    }
+    onCreditsChange(refreshCreditsDisplay);
+    refreshCreditsDisplay();
+
+    // Award credits whenever the score element updates
+    let _lastMmScore = 0;
+    const scoreEl = document.getElementById('match-score');
+    if (scoreEl) {
+      new MutationObserver(() => {
+        const newScore = parseInt(scoreEl.textContent || '0', 10);
+        if (newScore > _lastMmScore) {
+          addCreditsForPoints(newScore - _lastMmScore);
+          refreshCreditsDisplay();
+        }
+        _lastMmScore = newScore;
+      }).observe(scoreEl, { childList: true, characterData: true, subtree: true });
+    }
+
     const restartBtn = document.getElementById('match-restart-btn');
     if (restartBtn) {
       restartBtn.addEventListener('click', () => initMatchMaker(null, null));
     }
 
-    document.getElementById('overlay-restart-btn').addEventListener('click', () => {
-      document.getElementById('mm-cert-overlay').classList.add('hidden');
-      initMatchMaker(null, null);
-    });
+    const overlayRestartBtn = document.getElementById('overlay-restart-btn');
+    if (overlayRestartBtn) {
+      overlayRestartBtn.addEventListener('click', () => {
+        document.getElementById('mm-cert-overlay').classList.add('hidden');
+        initMatchMaker(null, null);
+      });
+    }
 
     // Handle certificate generation form submission
     document.getElementById('mm-gen-cert-btn').addEventListener('click', async () => {
@@ -202,8 +240,6 @@
       try {
         await generateCertificateFor(playerName);
         // Phase transition is handled inside generateCertificateFor via DOM IDs
-        const phase = document.getElementById('mm-cert-display-phase');
-        if (phase) { phase.classList.remove('hidden'); }
       } finally {
         btn.disabled    = false;
         btn.textContent = 'Generate Certificate';
@@ -221,7 +257,7 @@
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('/sw.js', { scope: '/' })
+        .register('/sw.js')
         .catch(err => console.warn('[SW] Registration skipped:', err.message));
     }
   </script>
