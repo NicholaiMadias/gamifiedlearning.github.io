@@ -1,7 +1,21 @@
-import matrixModule from "./modules/matrix.js";
-import arcadeModule from "./modules/arcade.js";
-import housingModule from "./modules/housing.js";
+import { Router } from "express";
+import exampleModule from "./example.js";
+import { getHUDState } from "./hud.js";
 
-router.use("/matrix", matrixModule);
-router.use("/arcade", arcadeModule);
-router.use("/housing", housingModule);
+const router = Router();
+
+router.get("/status", (req, res) => {
+  res.json({
+    os: "Nexus",
+    status: "operational",
+    modules: ["example"]
+  });
+});
+
+router.get("/hud", (req, res) => {
+  res.json(getHUDState());
+});
+
+router.use("/example", exampleModule);
+
+export default router;
