@@ -15,7 +15,13 @@ export function getHUDState() {
       }
     },
     nexus: {
-      boot: bootState,
+      boot: {
+        started: bootState.started,
+        completed: bootState.completed,
+        timestamp: bootState.timestamp,
+        modulesLoaded: bootState.modulesLoaded,
+        errorCount: bootState.errors.length
+      },
       timestamp: new Date().toISOString()
     }
   };
