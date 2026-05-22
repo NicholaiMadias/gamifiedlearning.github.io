@@ -108,20 +108,26 @@ export function findMatches(grid) {
     return { row, col };
   });
 
-  return classifyShapes(basicMatches);
+  return classifyShapes(grid, basicMatches);
 }
 
-function classifyShapes(basicMatches) {
+function classifyShapes(grid, basicMatches) {
   const byCell = new Map();
   for (const m of basicMatches) {
     byCell.set(`${m.row},${m.col}`, { ...m, neighbors: [] });
   }
 
-  // Build 4-directional adjacency
+  // Build 4-directional adjacency only between cells of the same gem type
+  // so that touching runs of different types are not merged into one component.
   for (const cell of byCell.values()) {
+    const cellType = grid[cell.row]?.[cell.col]?.type;
     for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const key = `${cell.row + dr},${cell.col + dc}`;
-      if (byCell.has(key)) cell.neighbors.push(byCell.get(key));
+      const nr = cell.row + dr;
+      const nc = cell.col + dc;
+      const key = `${nr},${nc}`;
+      if (byCell.has(key) && grid[nr]?.[nc]?.type === cellType) {
+        cell.neighbors.push(byCell.get(key));
+      }
     }
   }
 
@@ -218,10 +224,17 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
   const next = grid.map(row => [...row]);
   const toClear = new Set(matches.map(m => `${m.row},${m.col}`));
 
-  // Capture pre-existing specials that are part of this match before clearing anything
+  // Capture pre-existing specials that are part of this match before clearing anything.
+  // Also record the gem's own type so supernova can clear all gems of that colour
+  // even after the origin cell has been nulled.
   const preExistingSpecials = matches
     .filter(m => next[m.row][m.col]?.special)
-    .map(m => ({ row: m.row, col: m.col, type: next[m.row][m.col].special }));
+    .map(m => ({
+      row:     m.row,
+      col:     m.col,
+      type:    next[m.row][m.col].special,
+      gemType: next[m.row][m.col].type,
+    }));
 
   // Place newly-created special gems (remove those cells from the clear list so they persist)
   for (const s of specials) {
@@ -241,7 +254,7 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
 
   // Trigger ONLY pre-existing specials that were part of the match
   for (const ps of preExistingSpecials) {
-    triggerSpecial(next, ps.row, ps.col, ps.type, comboLevel);
+    triggerSpecial(next, ps.row, ps.col, ps.type, comboLevel, ps.gemType);
   }
 
   return next;
@@ -250,7 +263,7 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
 /**
  * Clears cells affected by a special gem in-place.
  */
-export function triggerSpecial(grid, row, col, type, comboLevel = 1) {
+export function triggerSpecial(grid, row, col, type, comboLevel = 1, gemType = null) {
   const rows = grid.length;
   const cols = grid[0].length;
 
@@ -270,8 +283,9 @@ export function triggerSpecial(grid, row, col, type, comboLevel = 1) {
       }
     }
   } else if (type === 'supernova') {
-    // Capture the target type before any cells are cleared
-    const targetType = grid[row][col]?.type;
+    // Use the pre-captured gemType so the correct colour is cleared even after
+    // the origin cell has already been nulled by applyMatches.
+    const targetType = gemType || grid[row][col]?.type;
     if (!targetType) return;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {

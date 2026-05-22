@@ -2,7 +2,12 @@ import list from './dailyChallenges.json' assert { type: 'json' };
 
 export function getTodayChallenge() {
   const today = new Date().toDateString();
-  const saved = JSON.parse(localStorage.getItem('daily') || '{}');
+  let saved = {};
+  try {
+    saved = JSON.parse(localStorage.getItem('daily') || '{}');
+  } catch (e) {
+    saved = {};
+  }
 
   if (saved.date === today) return saved;
 
@@ -19,12 +24,39 @@ export function updateDailyProgress(key, value) {
   localStorage.setItem('daily', JSON.stringify(data));
 }
 
+/**
+ * Safe evaluator for challenge `check` expressions.
+ * Supports simple `field op value` comparisons where field is a known state key.
+ * Uses no eval/Function — avoids arbitrary code execution.
+ */
+function safeCheck(expr, state) {
+  const OPS = [
+    ['>=', (a, b) => a >= b],
+    ['<=', (a, b) => a <= b],
+    ['===', (a, b) => a === b],
+    ['!==', (a, b) => a !== b],
+    ['>', (a, b) => a > b],
+    ['<', (a, b) => a < b],
+    ['==', (a, b) => a == b],
+  ];
+  for (const [op, fn] of OPS) {
+    const idx = expr.indexOf(op);
+    if (idx !== -1) {
+      const field = expr.slice(0, idx).trim();
+      const valueStr = expr.slice(idx + op.length).trim();
+      const value = Number(valueStr);
+      if (!Object.prototype.hasOwnProperty.call(state, field) || !Number.isFinite(value)) return false;
+      return fn(state[field], value);
+    }
+  }
+  return false;
+}
+
 export function checkDailyCompletion(state) {
   const data = getTodayChallenge();
   const expr = data.challenge.check;
 
-  const fn = new Function('state', `return ${expr}`);
-  if (fn(state)) {
+  if (safeCheck(expr, state)) {
     localStorage.setItem('dailyComplete', 'true');
     return true;
   }

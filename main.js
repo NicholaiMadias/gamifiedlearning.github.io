@@ -11,11 +11,11 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { initMatchMaker }   from './match-maker-ui.js';
-import { loadBadges }       from './badges.js';
-import { initMatchMakerV2 } from './match-maker-ui2.js';
-import { renderStarMap }    from './star-map.js';
-import { onGameLevelComplete } from './concordance-lens.js';
+import { initMatchMaker }              from './match-maker-ui.js';
+import { loadBadges, resetBadges }     from './badges.js';
+import { initMatchMakerV2 }            from './match-maker-ui2.js';
+import { renderStarMap }               from './star-map.js';
+import { onGameLevelComplete }         from './concordance-lens.js';
 
 /** Returns true when the V2 engine should be used. */
 function isV2Enabled() {
@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartBtn = document.getElementById('match-restart-btn');
     if (restartBtn) {
       restartBtn.addEventListener('click', () => {
+        resetBadges();
         initMatchMaker(null, null);
       });
     }
