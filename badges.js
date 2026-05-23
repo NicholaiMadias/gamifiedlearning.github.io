@@ -34,7 +34,19 @@ export function onLevelComplete(completedLevel, currentScore, db, user) {
 }
 
 export function loadBadges() {
-  try { const s = localStorage.getItem('glm-badges'); if (s) earnedBadges = JSON.parse(s); } catch (e) { earnedBadges = []; }
+  try {
+    const s = localStorage.getItem('glm-badges');
+    if (!s) {
+      earnedBadges = [];
+      return earnedBadges;
+    }
+    const parsed = JSON.parse(s);
+    earnedBadges = Array.isArray(parsed) && parsed.every(item => typeof item === 'string')
+      ? parsed
+      : [];
+  } catch (e) {
+    earnedBadges = [];
+  }
   return earnedBadges;
 }
 
