@@ -37,6 +37,7 @@ export function getSpawnedSpecial(matchCells) {
     const isVerticalMatch = cols.size === 1;
     if (isHorizontalMatch) return SPECIAL.LINE_V;
     if (isVerticalMatch) return SPECIAL.LINE_H;
+    return null;
   }
   return null;
 }
@@ -58,14 +59,14 @@ export function activateSpecial(grid, r, c) {
 
   switch (gem.special) {
     case SPECIAL.LINE_H:
-      // Clear entire row (horizontal)
+      // Clear entire row (spawned from vertical 4-match)
       for (let col = 0; col < GRID_SIZE; col++) {
         clearedCells.push({ r, c: col });
       }
       break;
 
     case SPECIAL.LINE_V:
-      // Clear entire column (vertical)
+      // Clear entire column (spawned from horizontal 4-match)
       for (let row = 0; row < GRID_SIZE; row++) {
         clearedCells.push({ r: row, c });
       }
