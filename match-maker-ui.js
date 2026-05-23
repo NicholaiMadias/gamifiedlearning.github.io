@@ -169,9 +169,10 @@ function triggerSupernova(row, col) {
     const idx = r * COLS + c;
     if (cells[idx]) cells[idx].classList.add('supernova-blast');
   });
-  score += Math.floor(SUPERNOVA_BONUS * getScoreMultiplier());
+  const supernovaAward = Math.floor(SUPERNOVA_BONUS * getScoreMultiplier());
+  score += supernovaAward;
   bumpConscience(blasted.length, true);
-  showMsg('SUPERNOVA! +' + SUPERNOVA_BONUS); updateHUD();
+  showMsg('SUPERNOVA! +' + supernovaAward); updateHUD();
   setTimeout(() => {
     grid = clearMatches(grid, blasted);
     grid = applyGravity(grid); renderBoard(); updateHUD();

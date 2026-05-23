@@ -18,7 +18,8 @@ export const WILD_ELEMENT = 'void';
 
 /** Special tile type constants */
 export const SPECIAL = {
-  LINE:      'line',
+  LINE_H:    'line_h',
+  LINE_V:    'line_v',
   CROSS:     'cross',
   NOVA:      'nova',
   SUPERNOVA: 'supernova',

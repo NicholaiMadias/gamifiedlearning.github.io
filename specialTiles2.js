@@ -14,7 +14,7 @@ import { SPECIAL, GRID_SIZE } from './matchMakerState2.js';
  *   7+ cells  → SUPERNOVA (full-board clear)
  *   L/T shape → CROSS     (row + column clear)
  *   5 cells   → NOVA      (3×3 area clear)
- *   4 cells   → LINE      (full row or column clear)
+ *   4 cells   → LINE_H/LINE_V (axis-aware line clear)
  *   3 cells   → null      (no special)
  *
  * @param {Array<{r:number, c:number}>} matchCells - Flat matched cell list
@@ -32,7 +32,12 @@ export function getSpawnedSpecial(matchCells) {
   if (rows.size > 1 && cols.size > 1) return SPECIAL.CROSS;
 
   if (count >= 5) return SPECIAL.NOVA;
-  if (count >= 4) return SPECIAL.LINE;
+  if (count >= 4) {
+    const isHorizontalMatch = rows.size === 1;
+    const isVerticalMatch = cols.size === 1;
+    if (isHorizontalMatch) return SPECIAL.LINE_V;
+    if (isVerticalMatch) return SPECIAL.LINE_H;
+  }
   return null;
 }
 
@@ -52,10 +57,17 @@ export function activateSpecial(grid, r, c) {
   const clearedCells = [];
 
   switch (gem.special) {
-    case SPECIAL.LINE:
+    case SPECIAL.LINE_H:
       // Clear entire row (horizontal)
       for (let col = 0; col < GRID_SIZE; col++) {
         clearedCells.push({ r, c: col });
+      }
+      break;
+
+    case SPECIAL.LINE_V:
+      // Clear entire column (vertical)
+      for (let row = 0; row < GRID_SIZE; row++) {
+        clearedCells.push({ r: row, c });
       }
       break;
 
