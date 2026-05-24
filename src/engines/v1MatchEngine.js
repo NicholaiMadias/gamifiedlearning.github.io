@@ -1,6 +1,7 @@
 function findPowerUpSpawns(matchCoordinates = []) {
   if (!Array.isArray(matchCoordinates) || matchCoordinates.length !== 4) return null;
 
+  // Match orientation maps to the opposite line clear direction by design.
   const isHorizontalMatch = matchCoordinates.every(({ row }) => row === matchCoordinates[0].row);
   if (isHorizontalMatch) return 'LINE_V';
 
