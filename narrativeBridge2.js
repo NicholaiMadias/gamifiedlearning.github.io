@@ -35,12 +35,22 @@ const BEAT_MESSAGES = {
 };
 
 /**
- * Creates a beat object with shallow immutability.
- * The returned beat and its `ctx` property are both frozen via Object.freeze,
- * preventing addition, removal, or reassignment of their top-level keys.
- * If any ctx value is itself an object its internal properties remain mutable.
- * In practice, all ctx values are primitives (strings/numbers) so this is
- * effectively deep-immutable for all current beat types.
+ * Recursively deep-freezes an object and all nested objects.
+ * @param {object} obj
+ * @returns {object} The frozen object
+ */
+function deepFreeze(obj) {
+  Object.getOwnPropertyNames(obj).forEach(name => {
+    const value = obj[name];
+    if (value && typeof value === 'object') deepFreeze(value);
+  });
+  return Object.freeze(obj);
+}
+
+/**
+ * Creates a deeply immutable beat object.
+ * The returned beat and its `ctx` property (including any nested objects)
+ * are recursively frozen via Object.freeze, preventing mutation at any depth.
  * @param {string} type - One of BEAT_TYPE values
  * @param {object} [ctx] - Context data for the beat message
  * @returns {{ type: string, message: string, ctx: object, timestamp: number }}
@@ -49,7 +59,7 @@ export function createBeat(type, ctx = {}) {
   if (!ALL_BEAT_TYPES.has(type)) {
     throw new Error(`Unknown beat type: "${type}"`);
   }
-  const frozenCtx = Object.freeze(Object.assign({}, ctx));
+  const frozenCtx = deepFreeze(Object.assign({}, ctx));
   const message = BEAT_MESSAGES[type](frozenCtx);
   return Object.freeze({ type, message, ctx: frozenCtx, timestamp: Date.now() });
 }

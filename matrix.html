@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix of Conscience | Nexus Arcade</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #020617; }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        #cosmic-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        body > *:not(#cosmic-canvas) { position: relative; z-index: 1; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100">
+    <canvas id="cosmic-canvas"></canvas>
+    
+    <header class="p-6 flex justify-between items-center border-b border-purple-900/50 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
+        <div>
+            <h1 class="orbitron font-bold text-lg tracking-tight uppercase" style="background:linear-gradient(to right,#c084fc,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Matrix of Conscience</h1>
+            <p class="text-xs uppercase tracking-widest text-purple-400 font-mono">Seven Pillars Protocol</p>
+        </div>
+        <a href="/" class="text-slate-500 hover:text-purple-400 transition-colors text-xs uppercase tracking-widest font-bold">← Hub</a>
+    </header>
+
+    <main class="max-w-3xl mx-auto p-8" id="mc-main">
+        <div id="mc-card" class="bg-slate-900 border border-purple-500/20 rounded-3xl p-10 shadow-2xl">
+            <h2 id="mc-title" class="text-3xl font-bold mb-4 orbitron">Initializing...</h2>
+            <p id="mc-content" class="text-slate-300 mb-8">Loading the Seven Pillars Protocol...</p>
+            <div class="flex justify-between items-center border-t border-purple-900/30 pt-6">
+                <button id="mc-prev" class="px-5 py-2.5 rounded-full bg-slate-800 text-xs font-bold uppercase tracking-widest">Back</button>
+                <div id="mc-dots" class="flex gap-1"></div>
+                <button id="mc-next" class="px-5 py-2.5 rounded-full bg-purple-600 text-xs font-bold uppercase tracking-widest">Continue</button>
+            </div>
+        </div>
+    </main>
+
+    </body>
+</html>
