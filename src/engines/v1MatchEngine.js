@@ -27,6 +27,7 @@ function supernovaBlast(grid, row, col, powerType, clearCallback) {
 
   if (powerType === 'LINE_V') {
     for (let r = 0; r < (grid?.rows ?? 0); r++) clearCallback(r, col);
+    return;
   }
 }
 
