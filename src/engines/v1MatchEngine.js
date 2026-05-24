@@ -1,11 +1,11 @@
 function findPowerUpSpawns(matchCoordinates = []) {
   if (!Array.isArray(matchCoordinates) || matchCoordinates.length !== 4) return null;
 
-  const sameRow = matchCoordinates.every(({ row }) => row === matchCoordinates[0].row);
-  if (sameRow) return 'LINE_V';
+  const isHorizontalMatch = matchCoordinates.every(({ row }) => row === matchCoordinates[0].row);
+  if (isHorizontalMatch) return 'LINE_V';
 
-  const sameCol = matchCoordinates.every(({ col }) => col === matchCoordinates[0].col);
-  if (sameCol) return 'LINE_H';
+  const isVerticalMatch = matchCoordinates.every(({ col }) => col === matchCoordinates[0].col);
+  if (isVerticalMatch) return 'LINE_H';
 
   return null;
 }
