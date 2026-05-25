@@ -1,5 +1,7 @@
 const request = require('supertest');
 
+const DONATION_TO_CREDITS_RATE = 300;
+
 describe('store backend', () => {
   let app;
 
@@ -18,7 +20,7 @@ describe('store backend', () => {
   it('recalculates player credits from points and donations', async () => {
     const points = 10;
     const donated = 1.5;
-    const expectedCredits = points + Math.floor(donated * 300);
+    const expectedCredits = points + Math.floor(donated * DONATION_TO_CREDITS_RATE);
 
     const response = await request(app)
       .post('/update-credits')
