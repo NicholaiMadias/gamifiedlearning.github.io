@@ -1,13 +1,13 @@
 const request = require('supertest');
 
-const DONATION_TO_CREDITS_RATE = 300;
-
 describe('store backend', () => {
   let app;
+  let donationToCreditsRate;
 
   beforeEach(() => {
     jest.resetModules();
     app = require('../server');
+    ({ CREDITS_PER_DOLLAR: donationToCreditsRate } = require('../models/Player'));
   });
 
   it('returns a health payload', async () => {
@@ -20,7 +20,7 @@ describe('store backend', () => {
   it('recalculates player credits from points and donations', async () => {
     const points = 10;
     const donated = 1.5;
-    const expectedCredits = points + Math.floor(donated * DONATION_TO_CREDITS_RATE);
+    const expectedCredits = points + Math.floor(donated * donationToCreditsRate);
 
     const response = await request(app)
       .post('/update-credits')
