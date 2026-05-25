@@ -2,12 +2,12 @@ const request = require('supertest');
 
 describe('store backend', () => {
   let app;
-  let donationToCreditsRate;
+  let creditsPerDollar;
 
   beforeEach(() => {
     jest.resetModules();
     app = require('../server');
-    ({ CREDITS_PER_DOLLAR: donationToCreditsRate } = require('../models/Player'));
+    ({ CREDITS_PER_DOLLAR: creditsPerDollar } = require('../models/Player'));
   });
 
   it('returns a health payload', async () => {
@@ -20,7 +20,7 @@ describe('store backend', () => {
   it('recalculates player credits from points and donations', async () => {
     const points = 10;
     const donated = 1.5;
-    const expectedCredits = points + Math.floor(donated * donationToCreditsRate);
+    const expectedCredits = points + Math.floor(donated * creditsPerDollar);
 
     const response = await request(app)
       .post('/update-credits')
@@ -35,7 +35,7 @@ describe('store backend', () => {
     });
   });
 
-  it('allows purchasing an admin-created item with available credits', async () => {
+  it('purchases an admin-created item with sufficient credits', async () => {
     const startingPoints = 75;
     const itemCost = 50;
     const addItemResponse = await request(app)
