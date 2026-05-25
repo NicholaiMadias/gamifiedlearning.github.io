@@ -12,7 +12,7 @@ const request = require('supertest');
 let app;
 beforeEach(() => {
   jest.resetModules();
-  app = require('../backend/server');
+  app = require('../server');
 });
 
 describe('Health check', () => {
