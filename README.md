@@ -1,4 +1,4 @@
-# Nexus OS 
+# Nexus OS
 
 [![Deploy GitHub Pages](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/deploy.yml)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
@@ -46,6 +46,11 @@ Pull requests publish a live preview at `/pr-<number>/` via `.github/workflows/g
 ### CNAME / Custom Domain
 
 The `CNAME` file contains `nicholai.org`. The `validate-cname.yml` workflow validates that it matches the expected domain on pull requests.
+
+## Development
+
+- Install dependencies: `npm ci`
+- Run tests: `npm test`
 
 ## Tileset tile IDs
 
@@ -110,17 +115,17 @@ Levels are stored at `levels/1.json` … `levels/7.json`. A simple, shared schem
 - Add the "Seven‑Star Ministry" meta‑screen (star map + badges)
 - Add quiz overlay mechanics after the core match‑3 loop is stable
 
-# Nicholai Maro Madias — Cloud Identity & Security Engineer  
+# Nicholai Maro Madias — Cloud Identity & Security Engineer
 ### GitHub Pages Resume • Identity Engineering • Zero Trust • Automation
 
-This repository hosts the public résumé and professional profile site for **Nicholai Maro Madias**, built on top of GitHub Pages.  
+This repository hosts the public résumé and professional profile site for **Nicholai Maro Madias**, built on top of GitHub Pages.
 It is a dark‑mode, security‑themed, badge‑enhanced single‑page site designed for:
 
-- Recruiters  
-- Hiring managers  
-- Identity & security engineering teams  
-- Technical partners  
-- Anyone evaluating my cloud, identity, or automation work  
+- Recruiters
+- Hiring managers
+- Identity & security engineering teams
+- Technical partners
+- Anyone evaluating my cloud, identity, or automation work
 
 The site is intentionally lightweight, dependency‑free, and optimized for clarity.
 
@@ -130,19 +135,19 @@ The site is intentionally lightweight, dependency‑free, and optimized for clar
 
 This repo serves as a **central, stable, and recruiter‑friendly landing page** that complements:
 
-- My GitHub profile  
-- My LinkedIn presence  
-- My Amazing Grace Home Living engineering work  
-- My identity/security engineering portfolio  
+- My GitHub profile
+- My LinkedIn presence
+- My Amazing Grace Home Living engineering work
+- My identity/security engineering portfolio
 
 It provides a clean, modern presentation of:
 
-- Professional summary  
-- Technical skill stack  
-- Identity/security badges  
-- Work history  
-- Certifications  
-- Contact information  
+- Professional summary
+- Technical skill stack
+- Identity/security badges
+- Work history
+- Certifications
+- Contact information
 
 All without requiring PDFs, downloads, or external viewers.
 
@@ -156,14 +161,14 @@ Inspired by SOC dashboards, cloud consoles, and Zero Trust UI patterns.
 ### **Professional Badges**
 Rendered using Shields.io and styled to match the dark theme:
 
-- Identity & Access  
-- Cloud Security  
-- Automation  
-- Networking  
-- Systems Engineering  
+- Identity & Access
+- Cloud Security
+- Automation
+- Networking
+- Systems Engineering
 
 ### **Fully Static & GitHub Pages Compatible**
-No frameworks, no build steps, no dependencies.  
+No frameworks, no build steps, no dependencies.
 Just HTML + CSS.
 
 ### **Mobile‑Friendly**
