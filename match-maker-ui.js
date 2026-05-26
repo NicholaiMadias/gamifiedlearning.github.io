@@ -16,6 +16,7 @@ import {
   GRID_SIZE,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
+import { attachDragToConnect } from './ui/drag-to-connect.js';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const ROWS          = GRID_SIZE;
@@ -48,6 +49,7 @@ let conscience;
 let pendingTimeout = null;
 let _certDataUrl   = null;
 let _certId        = null;
+let _detachDrag    = null;
 
 // ── DOM helpers ──────────────────────────────────────────────────────────────
 function cacheDom() {
@@ -125,6 +127,8 @@ function renderBoard() {
       const gem  = grid[r][c];
       const cell = document.createElement('div');
       cell.className = 'gem-cell';
+      cell.dataset.row = String(r);
+      cell.dataset.col = String(c);
       if (gem) {
         cell.className += ' gem-' + gem.type;
         cell.textContent = gem.special
@@ -479,6 +483,24 @@ function checkLevelUp() {
 export function initMatchMaker(db, user) {
   if (pendingTimeout) { clearTimeout(pendingTimeout); pendingTimeout = null; }
   cacheDom();
+  if (dom.board) {
+    if (_detachDrag) _detachDrag();
+    _detachDrag = attachDragToConnect(dom.board, {
+      cellSelector: '.gem-cell',
+      getCoord: el => {
+        const row = Number(el.dataset.row);
+        const col = Number(el.dataset.col);
+        if (!Number.isFinite(row) || !Number.isFinite(col)) return null;
+        return { row, col };
+      },
+      canConnect: (from, to) => isAdjacent(from.row, from.col, to.row, to.col),
+      onConnect: (from, to) => {
+        if (locked) return;
+        // Preserve click/keyboard semantics; drag simply performs the same adjacent swap action.
+        attemptSwap(from.row, from.col, to.row, to.col);
+      },
+    });
+  }
   grid             = createGrid();
   score            = 0;
   moves            = 20;

@@ -1,4 +1,4 @@
-function findPowerUpSpawns(matchCoordinates = []) {
+export function findPowerUpSpawns(matchCoordinates = []) {
   if (!Array.isArray(matchCoordinates) || matchCoordinates.length !== 4) return null;
 
   // Match orientation maps to the opposite line clear direction by design.
@@ -11,13 +11,13 @@ function findPowerUpSpawns(matchCoordinates = []) {
   return null;
 }
 
-function placePowerUp(grid, row, col, powerType) {
+export function placePowerUp(grid, row, col, powerType) {
   if (!grid?.matrix?.[row]?.[col]) return;
   grid.matrix[row][col].special = powerType;
   grid.matrix[row][col].type = 'SPECIAL';
 }
 
-function supernovaBlast(grid, row, col, powerType, clearCallback) {
+export function supernovaBlast(grid, row, col, powerType, clearCallback) {
   if (typeof clearCallback !== 'function') return;
 
   if (powerType === 'LINE_H') {
@@ -30,5 +30,3 @@ function supernovaBlast(grid, row, col, powerType, clearCallback) {
     return;
   }
 }
-
-module.exports = { findPowerUpSpawns, supernovaBlast, placePowerUp };
