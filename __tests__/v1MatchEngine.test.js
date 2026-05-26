@@ -1,4 +1,4 @@
-const { findPowerUpSpawns, supernovaBlast, placePowerUp } = require('../src/engines/v1MatchEngine');
+import { findPowerUpSpawns, supernovaBlast, placePowerUp } from '../src/engines/v1MatchEngine.js';
 
 describe('V1 Power-Up Engine - Match Detection & Explosion Verification', () => {
   let mockGrid;

@@ -85,7 +85,7 @@ body {
 .match-grid {
   display: grid; grid-template-columns: repeat(7, var(--cell-size)); grid-template-rows: repeat(7, var(--cell-size));
   gap: var(--grid-gap); padding: 10px; background: var(--bg-surface);
-  border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.06); touch-action: manipulation;
+  border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.06); touch-action: none;
 }
 
 .gem-cell {
@@ -97,6 +97,18 @@ body {
 .gem-cell:hover { transform: scale(1.08); z-index: 2; }
 .gem-cell:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; z-index: 3; }
 .gem-cell.selected { box-shadow: var(--shadow-glow), 0 0 20px rgba(88,166,255,0.5); transform: scale(1.12); z-index: 3; }
+.gem-cell.drag-origin {
+  outline: 2px solid rgba(0,242,255,0.85);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-glow), 0 0 22px rgba(0,242,255,0.35);
+  z-index: 4;
+}
+.gem-cell.drag-target {
+  outline: 2px dashed rgba(188,19,254,0.9);
+  outline-offset: 2px;
+  box-shadow: 0 0 18px rgba(188,19,254,0.25);
+  z-index: 4;
+}
 .gem-cell.matched { animation: gemExplode 0.35s ease-out forwards; }
 .gem-cell.dropping { animation: gemDrop 0.3s ease-out; }
 
