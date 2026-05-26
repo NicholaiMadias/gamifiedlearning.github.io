@@ -11,14 +11,45 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
+        :root { --anchor-stability: 1; }
         body { font-family: 'Inter', sans-serif; background: #020617; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        #cosmic-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        body > *:not(#cosmic-canvas) { position: relative; z-index: 1; }
+        #web-of-minds {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
+        #cognitive-lattice {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            opacity: 0.45;
+        }
+        #anchor-thread-core {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 420px;
+            height: 420px;
+            z-index: 0;
+            pointer-events: none;
+            filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.4));
+        }
+        body > header, body > main { position: relative; z-index: 2; }
     </style>
 </head>
 <body class="min-h-screen text-slate-100">
-    <canvas id="cosmic-canvas"></canvas>
+    <canvas id="web-of-minds"></canvas>
+    <canvas id="cognitive-lattice"></canvas>
+    <canvas id="anchor-thread-core"></canvas>
     
     <header class="p-6 flex justify-between items-center border-b border-purple-900/50 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div>
@@ -28,7 +59,17 @@
         <a href="/" class="text-slate-500 hover:text-purple-400 transition-colors text-xs uppercase tracking-widest font-bold">← Hub</a>
     </header>
 
-    <main class="max-w-3xl mx-auto p-8" id="mc-main">
+    <main class="max-w-5xl mx-auto p-8 grid gap-6 md:grid-cols-[1.2fr_2fr_1.2fr]" id="mc-main">
+        <section id="stats-panel" class="bg-slate-900/95 border border-cyan-500/20 rounded-3xl p-6 shadow-2xl">
+            <h2 class="orbitron text-sm tracking-widest uppercase text-cyan-300 mb-4">Conscience Stats</h2>
+            <ul class="space-y-3 text-xs tracking-widest uppercase">
+                <li class="flex justify-between"><span>Karma</span><span id="stat-karma">0</span></li>
+                <li class="flex justify-between"><span>Wisdom</span><span id="stat-wisdom">0</span></li>
+                <li class="flex justify-between"><span>Integrity</span><span id="stat-integrity">100</span></li>
+                <li class="flex justify-between"><span>Community</span><span id="stat-community">0</span></li>
+            </ul>
+        </section>
+
         <div id="mc-card" class="bg-slate-900 border border-purple-500/20 rounded-3xl p-10 shadow-2xl">
             <h2 id="mc-title" class="text-3xl font-bold mb-4 orbitron">Initializing...</h2>
             <p id="mc-content" class="text-slate-300 mb-8">Loading the Seven Pillars Protocol...</p>
@@ -38,7 +79,264 @@
                 <button id="mc-next" class="px-5 py-2.5 rounded-full bg-purple-600 text-xs font-bold uppercase tracking-widest">Continue</button>
             </div>
         </div>
+
+        <section id="decision-panel" class="bg-slate-900/95 border border-amber-500/20 rounded-3xl p-6 shadow-2xl">
+            <h2 class="orbitron text-sm tracking-widest uppercase text-amber-300 mb-4">Thread Actions</h2>
+            <div class="flex flex-col gap-2">
+                <button data-stat="karma" class="px-3 py-2 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-xs font-bold uppercase tracking-widest">Heal Mind (+Karma)</button>
+                <button data-stat="wisdom" class="px-3 py-2 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 text-xs font-bold uppercase tracking-widest">Insight (+Wisdom)</button>
+                <button data-stat="integrity" class="px-3 py-2 rounded-full bg-green-500/20 hover:bg-green-500/30 text-xs font-bold uppercase tracking-widest">Stabilize (+Integrity)</button>
+                <button data-stat="community" class="px-3 py-2 rounded-full bg-purple-500/20 hover:bg-purple-500/30 text-xs font-bold uppercase tracking-widest">Unify (+Community)</button>
+                <button id="distort-btn" class="mt-2 px-3 py-2 rounded-full bg-red-500/20 hover:bg-red-500/30 text-xs font-bold uppercase tracking-widest">Red Queen Distort</button>
+            </div>
+        </section>
+
+        <section id="lore-panel" class="md:col-span-3 bg-slate-900/95 border border-purple-500/20 rounded-3xl p-6 shadow-2xl text-xs tracking-wide text-slate-300">
+            The Anchor Thread now renders as a harmonic gold core with breathing rings and distortion resistance.
+            The Cognitive Lattice overlays the world-state and shifts from cyan to gold as wisdom rises.
+        </section>
     </main>
 
+    <script>
+        const webCanvas = document.getElementById('web-of-minds');
+        const webCtx = webCanvas.getContext('2d');
+        const latticeCanvas = document.getElementById('cognitive-lattice');
+        const latticeCtx = latticeCanvas.getContext('2d');
+        const coreCanvas = document.getElementById('anchor-thread-core');
+        const coreCtx = coreCanvas.getContext('2d');
+
+        const profile = { stats: { karma: 0, wisdom: 0, integrity: 100, community: 0 } };
+
+        let webTick = 0;
+        let latticeTick = 0;
+        let latticeIntensity = 0.6;
+        let latticeDistortion = 0;
+        let anchorTick = 0;
+        let anchorBaseResonance = 1;
+        let anchorPulseBoost = 0;
+        let anchorDistortion = 0;
+        let anchorSpeedBoost = 0;
+
+        function resizeWeb() {
+            webCanvas.width = window.innerWidth;
+            webCanvas.height = window.innerHeight;
+        }
+        function resizeLattice() {
+            latticeCanvas.width = window.innerWidth;
+            latticeCanvas.height = window.innerHeight;
+        }
+        function resizeCore() {
+            coreCanvas.width = 420;
+            coreCanvas.height = 420;
+        }
+        resizeWeb();
+        resizeLattice();
+        resizeCore();
+        window.addEventListener('resize', () => {
+            resizeWeb();
+            resizeLattice();
+            resizeCore();
+        });
+
+        function drawWebOfMinds() {
+            webTick += 0.006;
+            const w = webCanvas.width;
+            const h = webCanvas.height;
+            webCtx.clearRect(0, 0, w, h);
+            for (let i = 0; i < 24; i++) {
+                const t = webTick + i * 0.5;
+                const x = ((i * 97) % w) + Math.sin(t) * 60;
+                const y = ((i * 61) % h) + Math.cos(t * 0.8) * 60;
+                webCtx.beginPath();
+                webCtx.fillStyle = 'rgba(120, 90, 255, 0.24)';
+                webCtx.arc(x, y, 2.2, 0, Math.PI * 2);
+                webCtx.fill();
+            }
+            requestAnimationFrame(drawWebOfMinds);
+        }
+
+        function drawAnchorThread() {
+            const resonance = Math.max(1, anchorBaseResonance + anchorPulseBoost - anchorDistortion * 0.1);
+            const stability = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--anchor-stability')) || 1;
+            const wobble = Math.max(0.18, 1 - stability * 0.7);
+            anchorTick += 0.01 + anchorSpeedBoost;
+            anchorSpeedBoost *= 0.95;
+
+            coreCtx.clearRect(0, 0, 420, 420);
+            const cx = 210;
+            const cy = 210;
+
+            coreCtx.beginPath();
+            coreCtx.strokeStyle = `rgba(255, 215, 0, ${0.4 + Math.sin(anchorTick) * 0.1})`;
+            coreCtx.lineWidth = 4;
+            coreCtx.arc(cx, cy, 150 + Math.sin(anchorTick * 2) * 10 * wobble * resonance, 0, Math.PI * 2);
+            coreCtx.stroke();
+
+            const ringCount = profile.stats.community > 100 ? 4 : 3;
+            for (let i = 0; i < ringCount; i++) {
+                coreCtx.beginPath();
+                coreCtx.strokeStyle = 'rgba(255, 215, 0, 0.25)';
+                coreCtx.lineWidth = 2;
+                const angle = anchorTick * (0.5 + i * 0.2);
+                const radius = 80 + i * 25;
+                for (let a = 0; a <= Math.PI * 2; a += 0.05) {
+                    const x = cx + Math.cos(a + angle) * radius;
+                    const y = cy + Math.sin(a - angle) * radius * (0.6 + wobble * 0.25);
+                    if (a === 0) coreCtx.moveTo(x, y);
+                    else coreCtx.lineTo(x, y);
+                }
+                coreCtx.closePath();
+                coreCtx.stroke();
+            }
+
+            coreCtx.beginPath();
+            coreCtx.fillStyle = 'rgba(255, 215, 0, 0.8)';
+            coreCtx.shadowBlur = 40;
+            coreCtx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+            coreCtx.arc(cx, cy, 40 + Math.sin(anchorTick * 3) * 4 * resonance, 0, Math.PI * 2);
+            coreCtx.fill();
+            coreCtx.shadowBlur = 0;
+
+            requestAnimationFrame(drawAnchorThread);
+        }
+
+        function drawHex(cx, cy, r) {
+            latticeCtx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = Math.PI / 3 * i + latticeTick * 0.1 * latticeIntensity;
+                const x = cx + r * Math.cos(angle);
+                const y = cy + r * Math.sin(angle) * 0.9;
+                if (i === 0) latticeCtx.moveTo(x, y);
+                else latticeCtx.lineTo(x, y);
+            }
+            latticeCtx.closePath();
+            latticeCtx.stroke();
+        }
+
+        function drawLattice() {
+            const wisdom = window.currentWisdom || 0;
+            latticeTick += 0.01 + wisdom * 0.00005;
+            const w = latticeCanvas.width;
+            const h = latticeCanvas.height;
+            latticeCtx.clearRect(0, 0, w, h);
+
+            const size = 40;
+            const hexHeight = Math.sqrt(3) * size;
+            const vertDist = hexHeight;
+            const horizDist = 1.5 * size;
+
+            const goldFactor = Math.min(1, wisdom / 150);
+            const r = Math.floor(8 * (1 - goldFactor) + 255 * goldFactor);
+            const g = Math.floor(247 * (1 - goldFactor) + 215 * goldFactor);
+            const b = Math.floor(254 * (1 - goldFactor) + 0 * goldFactor);
+            latticeCtx.lineWidth = 0.7;
+            latticeCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.18 * latticeIntensity})`;
+            latticeCtx.globalAlpha = goldFactor > 0.9 ? 0.8 + Math.sin(latticeTick * 2) * 0.2 : 1;
+            if (goldFactor > 0.8) {
+                latticeCtx.shadowBlur = 15 * goldFactor;
+                latticeCtx.shadowColor = `rgba(255, 215, 0, ${0.4 * goldFactor})`;
+            } else {
+                latticeCtx.shadowBlur = 0;
+            }
+
+            for (let row = -1; row < h / vertDist + 2; row++) {
+                for (let col = -1; col < w / horizDist + 2; col++) {
+                    const x = col * horizDist + (row % 2 === 0 ? 0 : horizDist / 2);
+                    const y = row * vertDist * 0.5;
+                    const dx = Math.sin(latticeTick + x * 0.01) * latticeDistortion * 2;
+                    const dy = Math.cos(latticeTick + y * 0.01) * latticeDistortion * 2;
+                    drawHex(x + dx, y + dy, size);
+                }
+            }
+            latticeCtx.globalAlpha = 1;
+            requestAnimationFrame(drawLattice);
+        }
+
+        function updateStatsView() {
+            document.getElementById('stat-karma').textContent = profile.stats.karma;
+            document.getElementById('stat-wisdom').textContent = profile.stats.wisdom;
+            document.getElementById('stat-integrity').textContent = profile.stats.integrity;
+            document.getElementById('stat-community').textContent = profile.stats.community;
+        }
+
+        function updateAnchorThread(stats) {
+            anchorBaseResonance = 1 + (stats.karma || 0) / 200;
+            document.documentElement.style.setProperty('--anchor-stability', Math.min(1, (stats.integrity || 0) / 150));
+            anchorSpeedBoost += (stats.wisdom || 0) * 0.00002;
+            if ((stats.community || 0) > 100) window.extraUnityRings = true;
+        }
+
+        function updateCognitiveLattice(stats) {
+            window.currentWisdom = stats.wisdom || 0;
+            latticeIntensity = 0.6 + (stats.wisdom || 0) / 150;
+            const integrity = stats.integrity || 0;
+            const corruptionFactor = Math.max(0, 1 - integrity / 150);
+            latticeDistortion = corruptionFactor * 3;
+        }
+
+        function anchorPulse() {
+            anchorPulseBoost += 0.8;
+            setTimeout(() => { anchorPulseBoost -= 0.8; }, 1200);
+        }
+
+        function applyDistortion(amount) {
+            window.distortionLevel = amount;
+            anchorDistortion = amount;
+            anchorBaseResonance = Math.max(1, anchorBaseResonance - amount * 0.1);
+        }
+
+        function wisdomSpike() {
+            const original = latticeIntensity;
+            latticeIntensity += 0.8;
+            setTimeout(() => { latticeIntensity = original; }, 800);
+        }
+
+        function insightBurst() {
+            const original = latticeIntensity;
+            latticeIntensity += 1.2;
+            setTimeout(() => { latticeIntensity = original; }, 600);
+            const oldWisdom = window.currentWisdom || 0;
+            window.currentWisdom = 200;
+            setTimeout(() => { window.currentWisdom = oldWisdom; }, 300);
+        }
+
+        function syncFromStats() {
+            updateAnchorThread(profile.stats);
+            updateCognitiveLattice(profile.stats);
+            updateStatsView();
+        }
+
+        document.querySelectorAll('#decision-panel [data-stat]').forEach(button => {
+            button.addEventListener('click', () => {
+                const stat = button.getAttribute('data-stat');
+                const prevWisdom = profile.stats.wisdom;
+                profile.stats[stat] = Math.min(200, (profile.stats[stat] || 0) + 12);
+                syncFromStats();
+                anchorPulse();
+                if (stat === 'wisdom' && profile.stats.wisdom - prevWisdom >= 12) {
+                    wisdomSpike();
+                    if (profile.stats.wisdom >= 150) insightBurst();
+                }
+            });
+        });
+        document.getElementById('distort-btn').addEventListener('click', () => {
+            applyDistortion(2);
+            setTimeout(() => applyDistortion(0), 1000);
+            syncFromStats();
+        });
+
+        window.updateAnchorThread = updateAnchorThread;
+        window.updateCognitiveLattice = updateCognitiveLattice;
+        window.anchorPulse = anchorPulse;
+        window.applyDistortion = applyDistortion;
+        window.wisdomSpike = wisdomSpike;
+        window.insightBurst = insightBurst;
+        window.profile = profile;
+
+        syncFromStats();
+        drawWebOfMinds();
+        drawAnchorThread();
+        drawLattice();
+    </script>
     </body>
 </html>
