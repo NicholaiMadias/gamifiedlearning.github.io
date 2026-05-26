@@ -6,8 +6,8 @@ import {
 } from '../loreModule2.js';
 
 describe('loreModule2 — LORE_FRAGMENTS', () => {
-  test('contains exactly 21 fragments', () => {
-    expect(LORE_FRAGMENTS).toHaveLength(21);
+  test('contains exactly 41 fragments', () => {
+    expect(LORE_FRAGMENTS).toHaveLength(41);
   });
 
   test('every fragment has required fields: id, title, text', () => {
@@ -37,13 +37,13 @@ describe('loreModule2 — LORE_FRAGMENTS', () => {
     expect(starFragments).toHaveLength(7);
   });
 
-  test('there are exactly 8 conscience/stat fragments (2 per stat)', () => {
+  test('there are exactly 28 conscience/stat fragments (7 per stat)', () => {
     const statFragments = LORE_FRAGMENTS.filter(f => f.stat);
-    expect(statFragments).toHaveLength(8);
+    expect(statFragments).toHaveLength(28);
     const stats = ['karma', 'wisdom', 'integrity', 'community'];
     stats.forEach(stat => {
       const count = statFragments.filter(f => f.stat === stat).length;
-      expect(count).toBe(2);
+      expect(count).toBe(7);
     });
   });
 });
@@ -75,7 +75,7 @@ describe('loreModule2 — getFragmentsByElement', () => {
 describe('loreModule2 — getFragmentsByStat', () => {
   test('returns fragments for the karma stat', () => {
     const frags = getFragmentsByStat('karma');
-    expect(frags).toHaveLength(2);
+    expect(frags).toHaveLength(7);
     frags.forEach(f => expect(f.stat).toBe('karma'));
   });
 
