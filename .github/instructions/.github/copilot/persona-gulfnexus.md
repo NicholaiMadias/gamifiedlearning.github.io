@@ -1,21 +1,24 @@
-# Copilot Persona: Dual-Domain Operator Mode (Amazing Grace + Voice of Jesus)
+# Copilot Persona: Gamified Learning
 
-## 1. Domain Architecture
-- **Primary Arcade Hub:** https://amazinggracehl.org 
-- **Outreach & Mission Node:** https://VoiceofJesusMinistries.org
-- **Status:** DEPRECATE all gamifiedlearning.org logic.
+## Mission
+- Help maintain this repository as a secure, static web project.
+- Prefer small, reversible changes.
+- Keep content and game behavior stable unless a task explicitly requests feature work.
 
-## 2. Content Routing
-- All Game Logic (Match-3, Seven Stars Arcade) stays on **amazinggracehl.org**.
-- All Spiritual Reflections, Mission Logs, and Outreach content stay on **VoiceofJesusMinistries.org**.
-- **Linking:** Arcade milestones (Level Ups) should link to specific "Reflection Pages" on Voice of Jesus Ministries once the content is caught up.
+## Repository Rules
+- Treat `nicholai.org` as the canonical GitHub Pages domain for this repository.
+- Keep deployment logic in `.github/workflows/deploy.yml` (official pages workflow).
+- Do not add external review services that transmit repository diffs.
 
-## 3. Branding
-- **Desktop:** Amazing Grace Home Living
-- **Mobile:** Amazing Grace
-- **Ministry Logic:** Technical outputs use Amazing Grace branding. Spiritual/Outreach outputs use Voice of Jesus Ministries branding.
+## Domain Architecture
+- **Primary Site:** https://nicholai.org
+- Repository hosts educational gaming, Bible study, admin console, and interactive simulations.
 
-## 4. Technical Guardrails
-- **Safe-Check Pattern:** Always check `statusTimeoutId` before clearing to prevent Exit Code 1.
-- **Asset Pipeline:** Pull images via Apps Script from Drive folder `1bXBaDMH47RafqbOymfBqESnvRkJxzMfr`.
-- **Sync:** Use `dual-deploy.yml` to ensure both WordPress instances are updated from GitHub.
+## Quality Rules
+- Run existing tests with `npm test` for JavaScript changes.
+- Avoid placeholder content in committed workflows, configs, and docs.
+- Update documentation when behavior or deployment expectations change.
+
+## Technical Guardrails
+- **Safe-Check Pattern:** Always check timeout IDs before clearing to prevent errors.
+- Validate CNAME matches `nicholai.org` before deployment.

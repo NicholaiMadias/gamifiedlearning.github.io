@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nexus Arcade | Amazing Grace</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon.png">
+    <link rel="apple-touch-icon" href="/Assets/favicon.png">
+    <link rel="manifest" href="/manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
     <style>
@@ -53,6 +57,7 @@
     <nav class="site-nav" aria-label="Site navigation">
       <div class="nav-container">
         <div class="site-title">
+          <img src="/Assets/logo.PNG" alt="Logo" class="nav-logo">
           <a href="/">Amazing Grace Home Living</a>
         </div>
         <input type="checkbox" id="menu-toggle" class="sr-only">
@@ -61,6 +66,8 @@
           <li><a href="/">Home</a></li>
           <li><a href="/">Available Properties</a></li>
           <li><a href="/contact/">Contact</a></li>
+          <li class="nav-desktop-only"><a href="/about/">About</a></li>
+          <li class="nav-desktop-only"><a href="/privacy/">Privacy Policy</a></li>
         </ul>
       </div>
     </nav>
@@ -127,7 +134,7 @@
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Number Lock</h2>
                 <p class="text-slate-400 text-[10px]">Disrupt the Red Queen's behavioral baseline.</p>
             </button>
-            <a href="/arcade/" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-green-400" style="text-decoration:none;">
+            <a href="/matrix/" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-green-400" style="text-decoration:none;">
                 <div class="w-12 h-12 bg-green-500/20 rounded-xl mb-4 flex items-center justify-center text-green-400">🎮</div>
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Match Maker</h2>
                 <p class="text-slate-400 text-[10px]">7-level championship mode — earn certificates and stars.</p>

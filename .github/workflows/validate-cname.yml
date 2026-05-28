@@ -19,7 +19,7 @@ jobs:
           EXPECTED=""
           case "${{ github.repository }}" in
             "NicholaiMadias/gamifiedlearning.github.io")
-              EXPECTED="amazinggracehl.org"
+              EXPECTED="app.AmazingGraceHL.org"
               ;;
             "NicholaiMadias/Amazing-Grace")
               EXPECTED="amazinggracehl.org"

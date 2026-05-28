@@ -19,6 +19,7 @@ import { NarrativeBridge2, BEAT_TYPE }                 from './narrativeBridge2.
 import { SevenStarNarrative2 }                         from './sevenStarNarrative2.js';
 import { CanvasParticleSystem }                        from './fx/canvasParticles2.js';
 import { pulse, flashBoard }                           from './fx/domPulse2.js';
+import { attachDragToConnect }                         from './ui/drag-to-connect.js';
 
 const CASCADE_DELAY = 220;
 
@@ -76,6 +77,7 @@ let sevenStar       = null;
 let particles       = null;
 let pendingTimeout  = null;
 let pendingTimeouts = new Set();
+let _detachDrag     = null;
 
 const dom = {};
 
@@ -463,6 +465,26 @@ function checkLevelUp() {
  */
 export function initMatchMakerV2(db, user) {
   cacheDom();
+
+  if (dom.board) {
+    if (_detachDrag) _detachDrag();
+    _detachDrag = attachDragToConnect(dom.board, {
+      cellSelector: '.gem-cell-v2',
+      getCoord: el => {
+        const row = Number(el.dataset.row);
+        const col = Number(el.dataset.col);
+        if (!Number.isFinite(row) || !Number.isFinite(col)) return null;
+        return { row, col };
+      },
+      canConnect: (from, to) => canSwap(grid, from.row, from.col, to.row, to.col),
+      onConnect: (from, to) => {
+        if (locked) return;
+        attemptSwap(from.row, from.col, to.row, to.col);
+      },
+      originClass: 'drag-origin',
+      targetClass: 'drag-target',
+    });
+  }
 
   // Clear all outstanding timers to prevent stale callbacks from mutating new game state
   pendingTimeouts.forEach(id => clearTimeout(id));

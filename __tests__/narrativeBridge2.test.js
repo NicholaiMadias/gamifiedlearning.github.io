@@ -1,4 +1,5 @@
 import { createBeat, BEAT_TYPE, NarrativeBridge2 } from '../narrativeBridge2.js';
+import { jest } from '@jest/globals';
 
 describe('narrativeBridge2 — createBeat', () => {
   test('creates a beat with the specified type', () => {

@@ -1,6 +1,7 @@
 import { SevenStarNarrative2 } from '../sevenStarNarrative2.js';
 import { NarrativeBridge2, BEAT_TYPE } from '../narrativeBridge2.js';
 import { LORE_FRAGMENTS } from '../loreModule2.js';
+import { jest } from '@jest/globals';
 
 function makeBridgeAndStar() {
   const onBeat = jest.fn();
