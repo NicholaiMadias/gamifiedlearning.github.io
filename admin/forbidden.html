@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Forbidden — Sovereign Matrix</title>
+  <link rel="stylesheet" href="/admin/css/matrix.css">
+</head>
+<body>
+
+<div class="forbidden-wrap">
+  <div class="code">403</div>
+  <h1 class="matrix-heading glitch">ACCESS DENIED</h1>
+  <p style="color:#555;font-size:0.85rem">You do not have permission to view this page.</p>
+  <a href="/admin/index.html" class="btn btn-neon" style="margin-top:1rem">← Dashboard</a>
+  <a href="/admin/login.html" class="btn btn-danger" style="margin-top:0.5rem">Logout</a>
+</div>
+
+<script type="module">
+  import { logout } from '/admin/js/admin-router.js';
+  document.querySelector('.btn-danger').addEventListener('click', e => {
+    e.preventDefault();
+    logout();
+  });
+</script>
+
+</body>
+</html>

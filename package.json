@@ -5,41 +5,15 @@
   "type": "module",
   "scripts": {
     "lint": "eslint . --ext .js",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "build": "rm -rf dist && mkdir -p dist && rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' --exclude 'node_modules' --exclude 'package.json' --exclude 'package-lock.json' --exclude 'jest.config.cjs' --exclude '.eslintrc.json' --exclude '__tests__/' --exclude '**/__tests__/' --exclude 'netlify.toml' ./ dist/"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "es2021": true
-    },
-    "ignorePatterns": [
-      "dist/"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "__tests__/**/*.js"
-        ],
-        "env": {
-          "node": true
-        },
-        "globals": {
-          "describe": "readonly",
-          "test": "readonly",
-          "it": "readonly",
-          "expect": "readonly",
-          "jest": "readonly",
-          "beforeEach": "readonly",
-          "afterEach": "readonly",
-          "beforeAll": "readonly",
-          "afterAll": "readonly"
-        }
-      }
-    ]
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "build": "node scripts/build-static.mjs"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "babel-jest": "^29.7.0",
     "eslint": "^8.57.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }
