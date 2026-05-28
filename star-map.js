@@ -1,9 +1,17 @@
 import { getProgress } from './progression.js';
 
-export function renderStarMap(container) {
+/**
+ * Render a star progress map.
+ *
+ * @param {HTMLElement} container - Container element for the star map
+ * @param {Object} [options] - Optional configuration
+ * @param {Function} [options.onNodeClick] - Optional click handler (index, completed) => void
+ */
+export function renderStarMap(container, options = {}) {
   container.innerHTML = '';
 
   const p = getProgress();
+  const { onNodeClick } = options;
 
   const wrapper = document.createElement('div');
   wrapper.style.display = 'grid';
@@ -16,7 +24,27 @@ export function renderStarMap(container) {
   for (let i = 1; i <= 7; i++) {
     const completed = i <= p.total;
     const star = document.createElement('div');
-    star.setAttribute('role', 'img');
+
+    // When onNodeClick is provided, make the control keyboard-accessible
+    if (onNodeClick) {
+      star.setAttribute('role', 'button');
+      star.setAttribute('tabindex', '0');
+      star.style.cursor = 'pointer';
+
+      const activate = () => onNodeClick(i, completed);
+
+      star.addEventListener('click', activate);
+      star.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activate();
+        }
+      });
+    } else {
+      // Display-only mode
+      star.setAttribute('role', 'img');
+    }
+
     star.setAttribute('aria-label', completed ? `Star ${i} — completed` : `Star ${i} — locked`);
     star.style.width = '100%';
     star.style.maxWidth = '64px';

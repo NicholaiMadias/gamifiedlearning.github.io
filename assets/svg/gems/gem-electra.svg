@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <!-- Electra — A-type — Ice Blue/Sapphire — Virtue: Vision — Gem: Brilliant-cut octagon -->
+  <defs>
+    <radialGradient id="gGemElectra" cx="38%" cy="28%" r="68%">
+      <stop offset="0%"   stop-color="#F2F9FF"/>
+      <stop offset="45%"  stop-color="#5EB4FF"/>
+      <stop offset="100%" stop-color="#0855C8"/>
+    </radialGradient>
+    <filter id="glowGemElectra" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Outer girdle octagon -->
+  <polygon points="47,25 41,10 25,3 9,10 3,25 9,40 25,47 41,40"
+           fill="url(#gGemElectra)" stroke="#0440A8" stroke-width="1.5" filter="url(#glowGemElectra)"/>
+  <!-- Inner table facet -->
+  <polygon points="38,25 34,15 25,12 16,15 12,25 16,35 25,38 34,35"
+           fill="#D8EEFF" opacity="0.55"/>
+  <!-- Crown facet lines -->
+  <line x1="47" y1="25" x2="38" y2="25" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="41" y1="10" x2="34" y2="15" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="25" y1="3"  x2="25" y2="12" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="9"  y1="10" x2="16" y2="15" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="3"  y1="25" x2="12" y2="25" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="9"  y1="40" x2="16" y2="35" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="25" y1="47" x2="25" y2="38" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="41" y1="40" x2="34" y2="35" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <!-- Specular highlight (upper-left) -->
+  <ellipse cx="17" cy="13" rx="4.5" ry="3" fill="#FFFFFF" opacity="0.45"/>
+</svg>

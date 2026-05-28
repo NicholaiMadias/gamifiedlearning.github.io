@@ -1,0 +1,110 @@
+/* =============================================================
+   neon-theme.css — Shared neon/dark base theme for Arcade pages
+   Amazing Grace Home Living — amazinggracehl.org
+   ============================================================= */
+
+/* ── Base reset & tokens ── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --neon-bg:        #0a0f1e;
+    --neon-surface:   #0f172a;
+    --neon-surface2:  #1e293b;
+    --neon-border:    #1e2d45;
+    --neon-cyan:      #0ff3ff;
+    --neon-cyan-dim:  rgba(15, 243, 255, 0.15);
+    --neon-gold:      #ffd700;
+    --neon-text:      #e8faff;
+    --neon-muted:     #94a3b8;
+    --neon-radius:    12px;
+    --neon-shadow:    0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Body ── */
+.neon-body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--neon-bg);
+    color: var(--neon-text);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.neon-body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 10%, rgba(15, 243, 255, 0.04) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 90%, rgba(167, 139, 250, 0.04) 0%, transparent 55%),
+        var(--neon-bg);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ── Main container ── */
+.neon-main {
+    padding: 2rem 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ── Typography ── */
+.neon-body h1,
+.neon-body h2,
+.neon-body h3 {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.5px;
+    color: var(--neon-text);
+    line-height: 1.2;
+}
+
+.neon-body p {
+    font-family: 'Inter', sans-serif;
+    color: var(--neon-muted);
+    line-height: 1.65;
+}
+
+/* ── Links ── */
+.neon-body a {
+    color: var(--neon-cyan);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.neon-body a:hover {
+    color: #fff;
+}
+
+/* ── Focus visible ── */
+*:focus-visible {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 3px;
+}
+
+/* ── Neon card surface ── */
+.neon-card {
+    background: var(--neon-surface2);
+    border: 1px solid var(--neon-border);
+    border-radius: var(--neon-radius);
+    padding: 1.5rem;
+    box-shadow: var(--neon-shadow);
+}
+
+/* ── Divider ── */
+.neon-divider {
+    border: none;
+    border-top: 1px solid var(--neon-border);
+    margin: 2rem 0;
+}
+
+/* ── Reduced-motion guard ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}

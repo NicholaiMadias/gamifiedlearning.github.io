@@ -1,0 +1,10 @@
+import"./modulepreload-polyfill-Dezn_h7o.js";var e=[{icon:`🔦`,title:`Expose the Matrix`,desc:`Electra uncovers the Red Queen's hidden architecture and restores the Signal of Truth across the Seven Star Grid — a six-chapter digital parable of conscience and revelation.`,href:`../../stories/expose-the-matrix/`,badge:`Genesis Foundations · Book 3`,badgeClass:`badge-red`,btnLabel:`▶ Enter the Grid`,btnClass:`btn-red`,bg:`radial-gradient(circle at 40% 35%,rgba(239,68,68,0.25),transparent 60%),radial-gradient(circle at 75% 70%,rgba(167,139,250,0.20),transparent 55%),#0a0010`,cardClass:`card-expose`},{icon:`🏮`,title:`The Lamp in the Window`,desc:`A story of hope, community, and the light that never goes out — following Ruth's journey from instability to a stable home at Amazing Grace.`,href:`../../stories/books/the-lamp-in-the-window.html`,badge:`Storybook · Faith`,badgeClass:`badge-amber`,btnLabel:`▶ Read the Story`,btnClass:`btn-amber`,bg:`radial-gradient(circle at 40% 35%,rgba(251,191,36,0.25),transparent 60%),radial-gradient(circle at 75% 70%,rgba(52,211,153,0.20),transparent 55%),#0a0900`,cardClass:`card-lamp`}];function t(e){let t=document.createElement(`a`);return t.className=`ma-card ${e.cardClass}`,t.href=e.href,t.setAttribute(`aria-label`,e.title),t.innerHTML=`
+    <div class="ma-card-hero" style="background:${e.bg}" aria-hidden="true">${e.icon}</div>
+    <div class="ma-card-body">
+      <div class="ma-card-icon" aria-hidden="true">${e.icon}</div>
+      <div class="ma-card-title">${e.title}</div>
+      <div class="ma-card-desc">${e.desc}</div>
+      <span class="ma-badge ${e.badgeClass}">${e.badge}</span>
+      <span class="ma-btn ${e.btnClass}" aria-hidden="true">${e.btnLabel}</span>
+    </div>
+  `,t}function n(){let n=document.getElementById(`matrix-app-grid`);n&&e.forEach(e=>n.appendChild(t(e)))}typeof document<`u`&&(document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,n):n());

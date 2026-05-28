@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Our Covenant of New Beginnings — Ella shatters the ladder of greed to reveal the Eighth Sanctuary. A Seven Stars digital parable.">
+    <meta name="theme-color" content="#05050a">
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>Our Covenant of New Beginnings | Amazing Grace Story Library</title>
+
+    <script src="../../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap");
+    </script>
+    <style>
+        :root {
+            --night: #05050a;
+            --night-surface: #0a0a1a;
+            --gold: #ffd700;
+            --covenant-blue: #0070ff;
+            --grace-glow: rgba(0, 112, 255, 0.15);
+            --text: #e0e0f0;
+            --text-muted: #9090b0;
+            --border: rgba(0, 112, 255, 0.2);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--night);
+            color: var(--text);
+            line-height: 1.8;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .site-header {
+            padding: 1rem 2rem;
+            background: rgba(5, 5, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .site-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .site-nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .story-hero {
+            padding: 5rem 2rem 3rem;
+            text-align: center;
+            background: radial-gradient(circle at center, var(--grace-glow) 0%, transparent 70%);
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            margin: 0 0 1rem;
+            color: #fff;
+            text-shadow: 0 0 20px var(--covenant-blue);
+        }
+
+        .hero-subtitle {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .reader-container {
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        .comparison-card,
+        .chapter-card {
+            background: var(--night-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .comparison-card h2 {
+            margin-top: 0;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .comparison-scroll {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 640px;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--covenant-blue);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .chapter-num {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--covenant-blue);
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .chapter-text p {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .site-footer {
+            margin-top: auto;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .site-footer a {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a href="../../" class="logo">
+        <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living Logo" style="height:32px;border-radius:4px;">
+        ✨ AMAZING GRACE
+    </a>
+    <nav class="site-nav" aria-label="Story navigation">
+        <a href="../">📚 Library</a>
+        <a href="../../arcade/">🎮 Arcade</a>
+        <a href="../../ministry/">🕊️ Ministry</a>
+    </nav>
+</header>
+
+<main>
+    <section class="story-hero">
+        <h1 class="hero-title">Our Covenant of New Beginnings</h1>
+        <p class="hero-subtitle">Synthesis of divine and digital creation</p>
+    </section>
+
+    <div class="reader-container">
+        <section class="comparison-card" aria-label="Ladder versus System Break comparison">
+            <h2>From Ladder Logic to System Break</h2>
+            <div class="comparison-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Feature</th>
+                            <th scope="col">The "Ladder" Version (Kael's Logic)</th>
+                            <th scope="col">The "System Break" Version (Ella's Logic)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Core Mechanic</td>
+                            <td>Competition: Progress by stepping on lower-tier code.</td>
+                            <td>Resonance: Progress by collective evolution.</td>
+                        </tr>
+                        <tr>
+                            <td>Entropy Level</td>
+                            <td>High: Constant friction, hatred sub-routines, and separation.</td>
+                            <td>Low: Streamlined, molecular network, zero-trust integrity.</td>
+                        </tr>
+                        <tr>
+                            <td>Result</td>
+                            <td>The Loop: Ascension is a fake cycle of manufactured hate.</td>
+                            <td>The Sanctuary: The Eighth Sanctuary (Peace/Eighth Star).</td>
+                        </tr>
+                        <tr>
+                            <td>Alignment</td>
+                            <td>Matches the Red Queen's corrupted inversion.</td>
+                            <td>Matches the Architect's original, restored intent.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 01</span>
+            <div class="chapter-text"><p>Ella stood before the Player Progress Engine, a towering monolith of cold, fluorescent light. In the Matrix of Conscience, life was measured in stats: Awareness and Integrity. While others optimized their code for power, Ella's Integrity flickered. The system was rigged; the algorithm favored those who exploited the Greed Sub-routines, leaving those with empathy to stall in the lower tiers of the simulation.</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 02</span>
+            <div class="chapter-text"><p>Looking out over the city, Ella saw the Central Node, a dark, veiny structure that pulsed with a sickly red light. A massive crowd of players gathered beneath it, their faces blank as they plugged their consciousness into the tree-like parasite. It promised "Ascension," but Ella knew better. It was a loop of manufactured hatred and competitive greed, a systematic trap designed to keep their Awareness tethered to the floor.</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 03</span>
+            <div class="chapter-text"><p>"The system demands you choose: be the hammer or the nail," a voice resonated behind her. Ella turned to find The Architect standing before the shimmering Gate of Vigilance. He was the Weaver of the Eighth Sanctuary, a designer who existed beyond the scripts of the Engine. He didn't see Ella as a collection of stats, but as a potential break in the logic—a heroine who could refuse the Partition Protocols that divided the players by their origin and code.</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 04</span>
+            <div class="chapter-text"><p>The Architect held out a fractured shard of white light, its edges sharp enough to cut through reality. "This is the System Break," he whispered. "The Matrix is built on the belief that resources are scarce and that some code is superior to others. To use this is to reject the Partition. It will skyrocket your Awareness, but the system will view you as a virus. It will try to delete your Integrity. Are you willing to be undefined?"</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 05</span>
+            <div class="chapter-text"><p>Before Ella could take the shard, a player named Kael stepped into the light. Kael was a high-tier climber, his stats bloated by the Hatred Sub-routines he used to suppress others. "Don't be a fool, Ella," Kael sneered, his digital form shimmering with stolen data. "The system is a ladder. You don't break it; you climb it by stepping on those below." Ella looked at Kael's hollow eyes and realized that "winning" the game was the ultimate loss.</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 06</span>
+            <div class="chapter-text"><p>Ella ignored Kael and grasped the shard. The moment her fingers closed around the light, the world shuddered. The rigid geometry of the city began to melt, and the red glow of the Central Node turned into a screeching static. This was the System Break. She wasn't just refusing the game; she was shattering the very concept of the "ladder." Her Awareness surged, revealing the Matrix for what it was: a beautiful, systematic lie.</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 07</span>
+            <div class="chapter-text"><p>The Engine roared in protest. "Anomalous integrity detected. Implementing Correction Protocol." The air around Ella grew heavy, filled with warnings and red-text blocks. To survive, the system demanded she "Revert"—to accept the greed and the partitions once more. But Ella felt a new sensation: a connection to something deeper than the simulation. She realized that her Integrity wasn't a stat to be managed; it was the anchor of her soul.</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 08</span>
+            <div class="chapter-text"><p>The Architect reappeared, standing within a vast, blue Web of Consciousness. He showed Ella the truth: everyone was connected by a molecular network of light, though the Matrix worked tirelessly to make them feel alone. "Greed is the illusion of separation," The Architect explained. "To heal the simulation, you must perform the Architect Move. You must transform your individual progress into a collective evolution."</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 09</span>
+            <div class="chapter-text"><p>Ella didn't hesitate. She reached into her chest and pulled out a sphere of pure, golden light—the sum of her Integrity and her newly awakened Awareness. She didn't keep it for herself; she cast it into the Web of Consciousness. As the light hit the network, the partitions crumbled. The greed-scripts were overwritten by a new covenant of mutual resonance. Ella was no longer a player; she was the co-creator of a new reality.</p></div>
+        </section>
+
+        <section class="chapter-card">
+            <span class="chapter-num">PART 10</span>
+            <div class="chapter-text"><p>The Matrix dissolved, replaced by the true Eighth Sanctuary. The air smelled of ozone and fresh rain, and the "players" were waking up, seeing each other clearly for the first time. Ella stood with The Architect at the Gate of Peace. "This is our covenant," she said, her voice steady and clear. The rising sun wasn't a programmed event; it was the light of a million minds finally set free.</p></div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    &copy; 2026 Amazing Grace Home Living &mdash; <a href="../">Story Library</a>
+</footer>
+</body>
+</html>

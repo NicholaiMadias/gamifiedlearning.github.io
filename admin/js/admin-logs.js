@@ -6,6 +6,7 @@
  */
 
 const LOGS_STORE = 'matrix_audit_logs';
+let logTableBody;
 
 /**
  * Polyfill for crypto.randomUUID() — falls back to getRandomValues on older browsers.
@@ -22,12 +23,12 @@ function randomUUID() {
 }
 
 /**
- * Record an event in the audit log.
+ * Record a new audit log entry.
  * Called internally by other modules (or Firebase Cloud Functions in prod).
  *
- * @param {string} action - Event action label (e.g. 'LOGIN', 'ROLE_CHANGE').
- * @param {string} uid    - UID of the user performing the action.
- * @param {string} [detail=''] - Optional human-readable detail string.
+ * @param {string} action - The action type (e.g. 'LOGIN', 'ROLE_CHANGE').
+ * @param {string} uid - The user ID performing the action.
+ * @param {string} [detail] - Optional detail string.
  */
 export function logEvent(action, uid, detail = '') {
   const logs = loadLogs();
@@ -55,14 +56,15 @@ function loadLogs() {
  * @param {{ limit?: number, filterAction?: string }} opts
  */
 export async function renderAuditLogs(_db, opts = {}) {
-  const tbody = document.getElementById('log-table-body');
+  const tbody = getLogTableBody();
   if (!tbody) return;
 
   let logs = loadLogs();
 
   if (opts.filterAction) {
+    const normalizedFilter = opts.filterAction.toLowerCase();
     logs = logs.filter(l =>
-      l.action.toLowerCase().includes(opts.filterAction.toLowerCase())
+      l.action.toLowerCase().includes(normalizedFilter)
     );
   }
 
@@ -82,6 +84,14 @@ export async function renderAuditLogs(_db, opts = {}) {
       <td>${esc(l.detail)}</td>
     </tr>
   `).join('');
+}
+
+function getLogTableBody() {
+  if (!logTableBody) {
+    logTableBody = document.getElementById('log-table-body');
+  }
+
+  return logTableBody;
 }
 
 function esc(str) {

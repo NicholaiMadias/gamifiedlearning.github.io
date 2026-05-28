@@ -6,15 +6,18 @@
 import { recordLevelComplete } from './progression.js';
 
 const BADGE_TIERS = [
-  { level: 1,  name: 'Seedling',  emoji: '\uD83C\uDF31', desc: 'Planted the first seed of knowledge' },
-  { level: 2,  name: 'Charged',   emoji: '\u26A1',       desc: 'Electrified by curiosity' },
-  { level: 3,  name: 'On Fire',   emoji: '\uD83D\uDD25', desc: 'Burning through challenges' },
-  { level: 4,  name: 'Diamond',   emoji: '\uD83D\uDC8E', desc: 'Unbreakable focus and clarity' },
-  { level: 6,  name: 'Champion',  emoji: '\uD83C\uDFC6', desc: 'Master of the Matrix' },
-  { level: 7,  name: 'Supernova', emoji: '\uD83C\uDF1F', desc: 'Cosmic energy — the stars align for you' }
+  { level: 1,  name: 'Seedling',  emoji: '🌱', desc: 'Planted the first seed of knowledge' },
+  { level: 3,  name: 'Charged',   emoji: '⚡',  desc: 'Electrified by curiosity' },
+  { level: 5,  name: 'On Fire',   emoji: '🔥', desc: 'Burning through challenges' },
+  { level: 8,  name: 'Diamond',   emoji: '💎', desc: 'Unbreakable focus and clarity' },
+  { level: 12, name: 'Champion',  emoji: '🏆', desc: 'Master of the Matrix' },
+  { level: 15, name: 'Supernova', emoji: '🌟', desc: 'Cosmic energy — the stars align for you' }
 ];
 
 let earnedBadges = [];
+// Initialise from localStorage immediately so earnedBadges is always in sync
+// before any onLevelComplete() call — prevents badges re-triggering on reload.
+loadBadges();
 
 function showBadgeBanner(badge) {
   const banner = document.getElementById('match-badge-banner');
@@ -43,7 +46,7 @@ export function loadBadges() {
       earnedBadges = [];
     } else {
       const parsed = JSON.parse(s);
-      earnedBadges = Array.isArray(parsed) && parsed.every(badge => typeof badge === 'string') ? parsed : [];
+      earnedBadges = Array.isArray(parsed) ? parsed.filter(b => typeof b === 'string') : [];
     }
   } catch (e) {
     earnedBadges = [];

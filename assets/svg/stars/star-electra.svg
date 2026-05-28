@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <!-- Electra — A-type — Blue-White — Virtue: Vision — Shape: Diamond -->
+  <defs>
+    <radialGradient id="gElectra" cx="40%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#E8F4FF"/>
+      <stop offset="50%" stop-color="#60A8E8"/>
+      <stop offset="100%" stop-color="#1A6AB8"/>
+    </radialGradient>
+    <filter id="glowElectra">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <polygon points="25,2 47,25 25,48 3,25"
+           fill="url(#gElectra)" stroke="#1050A0" stroke-width="1" filter="url(#glowElectra)"/>
+  <polygon points="25,10 39,25 25,40 11,25"
+           fill="#DDEEFF" opacity="0.35"/>
+</svg>

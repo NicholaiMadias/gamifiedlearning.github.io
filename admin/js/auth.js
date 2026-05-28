@@ -48,7 +48,11 @@ function getDemoUsers() {
 }
 
 function saveDemoUsers(users) {
-  localStorage.setItem(DEMO_USERS_KEY, JSON.stringify(users));
+  try {
+    localStorage.setItem(DEMO_USERS_KEY, JSON.stringify(users));
+  } catch {
+    /* storage blocked (private mode / quota exceeded) — continue without persisting */
+  }
 }
 
 function seedDemoUsers() {
@@ -90,12 +94,12 @@ function seedDemoUsers() {
 /**
  * True when running on a local/dev/preview host.
  * Demo seeding and the permissive demo-login path are disabled on production
- * hostnames (e.g. admin.amazinggracehl.org) so demo credentials are never
+ * hostnames (e.g. amazinggracehl.org) so demo credentials are never
  * available on the live site.
  */
 const IS_DEMO_HOST = (() => {
   const h = location.hostname;
-  return h === 'localhost' || h === '127.0.0.1' || h === '' || h.endsWith('.github.io');
+  return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.github.io');
 })();
 
 if (IS_DEMO_HOST) seedDemoUsers();
@@ -203,21 +207,15 @@ export const db = {
 /* ── Login helper ────────────────────────────────────────── */
 
 /**
- * Authenticate with email + password.
- * Checks demo users store; replace with real Firebase Auth in production.
+ * Authenticate with email + password (demo/localStorage path only).
+ * Firebase Auth has been removed — use demo credentials on local/preview hosts.
  *
  * @param {string} email
  * @param {string} password
  * @returns {Promise<{ uid: string, email: string, role: string }>}
  */
 export async function loginWithEmail(email, password) {
-  // Demo path: only active on local/preview hosts.
-  // On production, this path is disabled so the shim accounts are never accessible.
-  if (!IS_DEMO_HOST) {
-    throw new Error('Live Firebase Auth is required on this host. Configure firebase-config.js.');
-  }
-
-  // Demo: accept any non-empty password for seeded accounts
+  // Demo: accept any non-empty password for seeded accounts.
   const users = getDemoUsers();
   const entry = Object.entries(users).find(
     ([, u]) => u.email.toLowerCase() === email.toLowerCase()
@@ -226,9 +224,6 @@ export async function loginWithEmail(email, password) {
   if (!entry) throw new Error('No account found for that email.');
   if (!password || password.length < 4) throw new Error('Invalid password.');
 
-  // Allow any role to create a session; page-level guards and tool checks
-  // enforce access after login (e.g. a 'user' with the diagnostics tool assigned
-  // can log in here and be admitted by canAccessDiagnostics on that page).
   const [uid, user] = entry;
 
   const session = { uid, email: user.email, role: user.role };

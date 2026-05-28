@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <!-- Celaeno — Neutral — Silver-Gray — Virtue: Sustenance — Shape: Circle -->
+  <defs>
+    <radialGradient id="gCelaeno" cx="40%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#F0F0F4"/>
+      <stop offset="50%" stop-color="#A0A8B8"/>
+      <stop offset="100%" stop-color="#484C58"/>
+    </radialGradient>
+    <filter id="glowCelaeno">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="25" cy="25" r="22"
+          fill="url(#gCelaeno)" stroke="#383C48" stroke-width="1" filter="url(#glowCelaeno)"/>
+  <circle cx="25" cy="25" r="13"
+          fill="#ECECF0" opacity="0.35"/>
+</svg>
