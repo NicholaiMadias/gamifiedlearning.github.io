@@ -63,6 +63,10 @@ export function initMatchMaker(dbRef, userRef) {
     clearTimeout(resolveTimeoutId);
     resolveTimeoutId = null;
   }
+  if (statusTimeoutId) {
+    clearTimeout(statusTimeoutId);
+    statusTimeoutId = null;
+  }
   grid = createInitialGrid();
   renderGrid();
   renderStore();
@@ -177,6 +181,7 @@ function resolveMatches() {
   resolving = true;
   const groups = findMatches(grid);
   if (groups.length === 0) {
+    resolveTimeoutId = null;
     comboChain = 0;
     comboMultiplier = 1;
     resolving = false;
@@ -210,7 +215,11 @@ function resolveMatches() {
 
   if (resolveTimeoutId) clearTimeout(resolveTimeoutId);
   resolveTimeoutId = setTimeout(() => {
-    if (currentRun !== runId) return;
+    if (currentRun !== runId) {
+      resolveTimeoutId = null;
+      return;
+    }
+    resolveTimeoutId = null;
     resolveMatches();
   }, CHAIN_REACTION_DELAY_MS);
 }
@@ -222,7 +231,8 @@ function deriveSpecialSpawns(groups) {
     const anchor = group[Math.floor(group.length / 2)];
     const sameRow = group.every(p => p.r === group[0].r);
     const sameCol = group.every(p => p.c === group[0].c);
-    const special = sameRow ? 'row' : sameCol ? 'col' : 'bomb';
+    if (!sameRow && !sameCol) return;
+    const special = sameRow ? 'row' : 'col';
     const kind = grid[anchor.r][anchor.c]?.kind || 'star';
     spawns.push({ r: anchor.r, c: anchor.c, kind, special });
 
@@ -275,6 +285,10 @@ function addMoves(amount) {
 }
 
 function injectSpecial(special) {
+  if (resolving) {
+    flashStatus('Wait for chain reaction to finish');
+    return;
+  }
   const openCells = [];
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
@@ -296,6 +310,10 @@ function specialLabel(special) {
 }
 
 function purchase(item) {
+  if (resolving) {
+    flashStatus('Wait for chain reaction to finish');
+    return;
+  }
   if (shards < item.cost) {
     flashStatus('Not enough shards');
     return;
@@ -350,6 +368,7 @@ function updateStats() {
   if (comboEl) comboEl.textContent = `${comboMultiplier.toFixed(1)}x`;
   if (chainEl) chainEl.textContent = comboChain > 0 ? `Chain ${comboChain}` : 'Chain 0';
   if (shardEl) shardEl.textContent = shards;
+  updateStoreAvailability();
 
   // Add visual feedback for active combos
   const comboChip = comboEl?.closest('.momentum-chip');
@@ -361,6 +380,13 @@ function updateStats() {
   if (chainChip) {
     chainChip.classList.toggle('active', comboChain > 0);
   }
+}
+
+function updateStoreAvailability() {
+  const buttons = document.querySelectorAll('.store-item');
+  buttons.forEach(button => {
+    button.disabled = resolving;
+  });
 }
 
 function checkLevelUp() {

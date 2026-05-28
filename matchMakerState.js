@@ -70,28 +70,40 @@ export function findMatches(grid) {
 
   // Horizontal runs
   for (let r = 0; r < GRID_SIZE; r++) {
-    let run = [{ r, c: 0 }];
-    for (let c = 1; c <= GRID_SIZE; c++) {
-      if (c < GRID_SIZE && grid[r][c] && grid[r][c - 1] && sameKind(grid[r][c], grid[r][c - 1])) {
+    let run = [];
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (run.length === 0) {
         run.push({ r, c });
       } else {
-        if (run.length >= 3) groups.push(run);
-        run = [{ r, c }];
+        const prev = run[run.length - 1];
+        if (grid[r][c] && grid[prev.r][prev.c] && sameKind(grid[r][c], grid[prev.r][prev.c])) {
+          run.push({ r, c });
+        } else {
+          if (run.length >= 3) groups.push(run);
+          run = [{ r, c }];
+        }
       }
     }
+    if (run.length >= 3) groups.push(run);
   }
 
   // Vertical runs
   for (let c = 0; c < GRID_SIZE; c++) {
-    let run = [{ r: 0, c }];
-    for (let r = 1; r <= GRID_SIZE; r++) {
-      if (r < GRID_SIZE && grid[r][c] && grid[r - 1][c] && sameKind(grid[r][c], grid[r - 1][c])) {
+    let run = [];
+    for (let r = 0; r < GRID_SIZE; r++) {
+      if (run.length === 0) {
         run.push({ r, c });
       } else {
-        if (run.length >= 3) groups.push(run);
-        run = [{ r, c }];
+        const prev = run[run.length - 1];
+        if (grid[r][c] && grid[prev.r][prev.c] && sameKind(grid[r][c], grid[prev.r][prev.c])) {
+          run.push({ r, c });
+        } else {
+          if (run.length >= 3) groups.push(run);
+          run = [{ r, c }];
+        }
       }
     }
+    if (run.length >= 3) groups.push(run);
   }
 
   return groups;
