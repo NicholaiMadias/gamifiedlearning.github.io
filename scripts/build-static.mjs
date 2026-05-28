@@ -4,7 +4,13 @@ import path from 'node:path';
 const repoRoot = process.cwd();
 const distDir = path.join(repoRoot, 'dist');
 
-const skip = new Set(['.git', '.github', 'node_modules', 'dist']);
+const skip = new Set([
+  '.git', '.github', 'node_modules', 'dist',
+  'package.json', 'package-lock.json', '.npmrc',
+  '.eslintrc.json', 'jest.config.cjs', 'babel.config.cjs',
+  '__tests__', 'tests', 'coverage',
+  'netlify.toml', 'backend', 'scripts',
+]);
 
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });

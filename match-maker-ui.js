@@ -338,7 +338,7 @@ function onCellClick(row, col) {
   } else if (selected.row === row && selected.col === col) {
     selected = null;
     renderBoard();
-  } else if (isAdjacent(selected.row, selected.col, row, col)) {
+  } else if (canSwap(grid, selected.row, selected.col, row, col)) {
     attemptSwap(selected.row, selected.col, row, col);
   } else {
     selected = { row, col };
@@ -457,9 +457,11 @@ function processCascade(isFirstPass = false) {
 function highlightMatched(matches) {
   if (!dom.board) return;
   const cells = dom.board.querySelectorAll('.gem-cell');
-  matches.forEach(({ row, col }) => {
-    const idx = row * COLS + col;
-    if (cells[idx]) cells[idx].classList.add('matched');
+  matches.forEach(group => {
+    group.forEach(({ r, c }) => {
+      const idx = r * COLS + c;
+      if (cells[idx]) cells[idx].classList.add('matched');
+    });
   });
 }
 
