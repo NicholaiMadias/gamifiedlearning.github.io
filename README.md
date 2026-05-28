@@ -1,5 +1,6 @@
-# Nexus Arcade Gamified Learning System
-[![Deploy GitHub Pages](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/pages.yml)
+# Nexus OS
+
+[![Deploy GitHub Pages](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/NicholaiMadias/gamifiedlearning.github.io/actions/workflows/deploy.yml)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![Version](https://img.shields.io/badge/Version-1.0.0-purple)
@@ -14,7 +15,8 @@ A 7×7 gem-matching puzzle game that tracks a **Matrix of Conscience** (Empathy,
 
 - **Primary game:** a match‑3 puzzle (the "Nexus Arcade" core experience)
 - **Progression:** 7‑level "Seven‑Star" track (levels live under `levels/1.json` … `levels/7.json`)
-- **Deployment:** GitHub Pages to **[amazinggracehl.org](https://amazinggracehl.org)**
+- **Deployment:** GitHub Pages to **`app.AmazingGraceHL.org`**
+- **Primary game URL:** `/matrix/` (Matrix of Conscience)
 
 This repo is intentionally kept **static‑site simple** so Pages deploys are fast and reliable.
 
@@ -28,27 +30,29 @@ This project uses ES modules, so it must be served via a local static server (br
 
 ## Deployment (GitHub Pages)
 
-The site deploys automatically to **[amazinggracehl.org](https://amazinggracehl.org)** via GitHub Actions whenever code is pushed to the `main` branch.
+The site deploys automatically to **`app.AmazingGraceHL.org`** via GitHub Actions whenever code is pushed to the `main` branch.
 
-- **Workflow:** `.github/workflows/pages.yml`
+- **Repository:** `NicholaiMadias/gamifiedlearning.github.io`
+- **Primary workflow:** `.github/workflows/deploy.yml` (official `actions/deploy-pages` pipeline)
 - **Trigger:** Push to `main` (or manual `workflow_dispatch`)
 - **Deploy target:** `github-pages` environment
 - **Source:** Repository root (`/`)
 
-Only one workflow deploys to Pages. The `concurrency: group: "pages"` setting prevents race conditions if two pushes happen quickly.
+Additional workflows in this repo include `.github/workflows/github-pages-preview.yml` for pull request previews and `.github/workflows/store-ci.yml` for store/backend CI.
 
-### Pull Request Checks
+### Pull Request Previews
 
-When a pull request is opened against `main`, the same workflow runs a **build-only** validation step:
-
-- Checks that no Git merge conflict markers (`<<<<<<<`, `>>>>>>>`) remain in HTML files.
-- Verifies all required game DOM element IDs are present in `index.html`.
-
-No deployment happens for PRs—only for pushes to `main`.
+Pull requests publish a live preview at `/pr-<number>/` via `.github/workflows/github-pages-preview.yml`.
 
 ### CNAME / Custom Domain
 
-The `CNAME` file contains `amazinggracehl.org`. The `cname-auto-maintainer` workflow will open a PR to restore it if it ever changes.
+The `CNAME` file contains `app.AmazingGraceHL.org`. The `.github/workflows/validate-cname.yml` workflow validates that it matches the expected domain on pull requests.
+
+## Development
+
+- Install dependencies: `npm ci`
+- Run tests: `npm test -- --passWithNoTests`
+- Build static output: `npm run build`
 
 ## Tileset tile IDs
 
@@ -112,3 +116,66 @@ Levels are stored at `levels/1.json` … `levels/7.json`. A simple, shared schem
 - Add the second game mode (optional) using the same shared tileset/audio
 - Add the "Seven‑Star Ministry" meta‑screen (star map + badges)
 - Add quiz overlay mechanics after the core match‑3 loop is stable
+
+# Nicholai Maro Madias — Cloud Identity & Security Engineer
+### GitHub Pages Resume • Identity Engineering • Zero Trust • Automation
+
+This repository hosts the public résumé and professional profile site for **Nicholai Maro Madias**, built on top of GitHub Pages.
+It is a dark‑mode, security‑themed, badge‑enhanced single‑page site designed for:
+
+- Recruiters
+- Hiring managers
+- Identity & security engineering teams
+- Technical partners
+- Anyone evaluating my cloud, identity, or automation work
+
+The site is intentionally lightweight, dependency‑free, and optimized for clarity.
+
+---
+
+## Purpose
+
+This repo serves as a **central, stable, and recruiter‑friendly landing page** that complements:
+
+- My GitHub profile
+- My LinkedIn presence
+- My Amazing Grace Home Living engineering work
+- My identity/security engineering portfolio
+
+It provides a clean, modern presentation of:
+
+- Professional summary
+- Technical skill stack
+- Identity/security badges
+- Work history
+- Certifications
+- Contact information
+
+All without requiring PDFs, downloads, or external viewers.
+
+---
+
+## Features
+
+### **Dark‑Mode Identity/Security Theme**
+Inspired by SOC dashboards, cloud consoles, and Zero Trust UI patterns.
+
+### **Professional Badges**
+Rendered using Shields.io and styled to match the dark theme:
+
+- Identity & Access
+- Cloud Security
+- Automation
+- Networking
+- Systems Engineering
+
+### **Fully Static & GitHub Pages Compatible**
+No frameworks, no build steps, no dependencies.
+Just HTML + CSS.
+
+### **Mobile‑Friendly**
+The layout adapts cleanly to mobile, tablet, and desktop.
+
+---
+
+## Repository Structure

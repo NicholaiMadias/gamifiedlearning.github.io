@@ -5,6 +5,9 @@ on:
     paths:
       - 'CNAME'
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -16,10 +19,10 @@ jobs:
           EXPECTED=""
           case "${{ github.repository }}" in
             "NicholaiMadias/gamifiedlearning.github.io")
-              EXPECTED="amazinggracehl.org"
+              EXPECTED="app.AmazingGraceHL.org"
               ;;
             "NicholaiMadias/Amazing-Grace")
-              EXPECTED="amazinggracehomeliving.com"
+              EXPECTED="amazinggracehl.org"
               ;;
             "Gamified-Learning-Matrix/Gamified-Learning")
               EXPECTED="gamifiedlearning.org"
