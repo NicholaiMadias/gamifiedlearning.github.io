@@ -29,9 +29,8 @@ let comboChain = 0;
 let comboMultiplier = 1;
 let db = null;
 let user = null;
-let storeBound = false;
 let resolveTimer = null;
-let bannerHideTimer = null;
+let toastHideTimer = null;
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 320;
@@ -59,9 +58,9 @@ export function initMatchMaker(dbRef, userRef) {
     clearTimeout(resolveTimer);
     resolveTimer = null;
   }
-  if (bannerHideTimer) {
-    clearTimeout(bannerHideTimer);
-    bannerHideTimer = null;
+  if (toastHideTimer) {
+    clearTimeout(toastHideTimer);
+    toastHideTimer = null;
   }
   db = dbRef;
   user = userRef;
@@ -78,6 +77,8 @@ export function initMatchMaker(dbRef, userRef) {
   updateStats();
   const banner = document.getElementById('match-badge-banner');
   if (banner) banner.classList.add('hidden');
+  const toast = document.getElementById('match-toast');
+  if (toast) toast.classList.add('hidden');
 }
 
 function renderGrid(highlightSet = new Set()) {
@@ -88,6 +89,7 @@ function renderGrid(highlightSet = new Set()) {
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
       const cellData = grid[r][c];
+      if (!cellData) continue;
       const cell = document.createElement('button');
       cell.type = 'button';
       cell.className = 'match-cell';
@@ -435,8 +437,7 @@ function deriveSpecialSpawns(groups) {
     if (group.length < 4) return;
     const anchor = group[Math.floor(group.length / 2)];
     const sameRow = group.every(p => p.r === group[0].r);
-    const sameCol = group.every(p => p.c === group[0].c);
-    const special = sameRow ? 'row' : sameCol ? 'col' : 'bomb';
+    const special = sameRow ? 'row' : 'col';
     const kind = grid[anchor.r][anchor.c]?.kind || 'star';
     spawns.push({ r: anchor.r, c: anchor.c, kind, special });
 
@@ -492,8 +493,12 @@ function injectSpecial(special) {
   const openCells = [];
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
-      openCells.push({ r, c });
+      if (!grid[r][c]?.special) openCells.push({ r, c });
     }
+  }
+  if (openCells.length === 0) {
+    flashStatus('No open cells available');
+    return;
   }
   const target = openCells[Math.floor(Math.random() * openCells.length)];
   const existingKind = grid[target.r][target.c]?.kind || 'star';
@@ -520,7 +525,6 @@ function purchase(item) {
 }
 
 function renderStore() {
-  if (storeBound) return;
   const container = document.getElementById('match-store-items');
   if (!container) return;
   container.innerHTML = '';
@@ -535,7 +539,6 @@ function renderStore() {
     btn.onclick = () => purchase(item);
     container.appendChild(btn);
   });
-  storeBound = true;
 }
 
 function updateStats() {
@@ -996,14 +999,14 @@ function checkGameOver() {
 
 <<<<<<< HEAD
 function flashStatus(text) {
-  const banner = document.getElementById('match-badge-banner');
-  if (banner) {
-    banner.textContent = text;
-    banner.classList.remove('hidden');
-    if (bannerHideTimer) clearTimeout(bannerHideTimer);
-    bannerHideTimer = setTimeout(() => {
-      banner.classList.add('hidden');
-      bannerHideTimer = null;
+  const toast = document.getElementById('match-toast');
+  if (toast) {
+    toast.textContent = text;
+    toast.classList.remove('hidden');
+    if (toastHideTimer) clearTimeout(toastHideTimer);
+    toastHideTimer = setTimeout(() => {
+      toast.classList.add('hidden');
+      toastHideTimer = null;
     }, 2000);
   }
 }

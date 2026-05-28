@@ -219,6 +219,21 @@
 
     .match-badge-banner.hidden { display: none; }
 
+    .match-toast {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #c8ffe0;
+      background: rgba(13, 42, 25, 0.92);
+      border: 1px solid #00ff4140;
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      margin-top: 0.4rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+    }
+
+    .match-toast.hidden { display: none; }
+
     .match-restart-btn {
       display: block;
       margin: 0.8rem auto 0;
@@ -533,6 +548,7 @@
       <div class="board-wrap">
         <div class="match-grid" id="match-grid"></div>
         <div id="match-badge-banner" class="match-badge-banner hidden"></div>
+        <div id="match-toast" class="match-toast hidden"></div>
       </div>
 
       <div class="store">
