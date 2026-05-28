@@ -1,0 +1,102 @@
+name: Asset Integrity
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Scan for invalid local references
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const repo = process.cwd();
+          const exts = new Set(['.html', '.css', '.js']);
+          const skipDirs = new Set(['.git', '.github', 'node_modules', 'dist']);
+          const missing = [];
+
+          function walk(dir, out = []) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              if (entry.isDirectory()) {
+                if (!skipDirs.has(entry.name)) walk(path.join(dir, entry.name), out);
+                continue;
+              }
+              const full = path.join(dir, entry.name);
+              if (exts.has(path.extname(entry.name))) out.push(full);
+            }
+            return out;
+          }
+
+          function normalizeRef(ref) {
+            if (!ref) return null;
+            const clean = ref.trim().split('#')[0].split('?')[0];
+            if (!clean) return null;
+            if (/^(https?:|mailto:|tel:|data:|javascript:)/i.test(clean)) return null;
+            if (clean.startsWith('//')) return null;
+            return clean;
+          }
+
+          function candidates(filePath, ref) {
+            const fromDir = path.resolve(path.dirname(filePath), ref);
+            if (ref.startsWith('/')) return [path.resolve(repo, '.' + ref)];
+            return [fromDir];
+          }
+
+          const patterns = [
+            /(?:src|href)\s*=\s*["']([^"']+)["']/gi,
+            /url\(\s*["']?([^"')]+)["']?\s*\)/gi,
+            /import\s+(?:[^'"]+from\s+)?["']([^"']+)["']/gi,
+            /import\(\s*["']([^"']+)["']\s*\)/gi
+          ];
+
+          for (const file of walk(repo)) {
+            const text = fs.readFileSync(file, 'utf8');
+            for (const re of patterns) {
+              re.lastIndex = 0;
+              let m;
+              while ((m = re.exec(text)) !== null) {
+                const raw = m[1];
+                const ref = normalizeRef(raw);
+                if (!ref) continue;
+                if (!ref.startsWith('/') && !ref.startsWith('./') && !ref.startsWith('../')) continue;
+
+                const possiblePaths = candidates(file, ref).flatMap(p => {
+                  if (path.extname(p)) return [p];
+                  return [p, `${p}.html`, path.join(p, 'index.html')];
+                });
+                const found = possiblePaths.some(p => fs.existsSync(p));
+                if (!found) {
+                  missing.push({
+                    file: path.relative(repo, file),
+                    ref
+                  });
+                }
+              }
+            }
+          }
+
+          if (missing.length) {
+            console.error('Invalid local references found:');
+            for (const m of missing) {
+              console.error(`- ${m.file} -> ${m.ref}`);
+            }
+            process.exit(1);
+          }
+          console.log('Asset integrity check passed.');
+          NODE
