@@ -1,6 +1,6 @@
 /**
  * Engine2.test.js — Unit tests for the Match Maker game engine (matchMakerState)
- * Run with: npx jest --testPathPattern="Engine2" --verbose
+ * Run with: npm test -- --testPathPattern="Engine2" --verbose
  */
 
 import {
