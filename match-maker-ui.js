@@ -21,6 +21,7 @@ let comboMultiplier = 1;
 let db = null;
 let user = null;
 let storeBound = false;
+let resolveTimer = null;
 let bannerHideTimer = null;
 
 const SCORE_PER_LEVEL = 500;
@@ -45,6 +46,14 @@ const GEM_IMAGES = {
 };
 
 export function initMatchMaker(dbRef, userRef) {
+  if (resolveTimer) {
+    clearTimeout(resolveTimer);
+    resolveTimer = null;
+  }
+  if (bannerHideTimer) {
+    clearTimeout(bannerHideTimer);
+    bannerHideTimer = null;
+  }
   db = dbRef;
   user = userRef;
   score = 0;
@@ -60,10 +69,6 @@ export function initMatchMaker(dbRef, userRef) {
   updateStats();
   const banner = document.getElementById('match-badge-banner');
   if (banner) banner.classList.add('hidden');
-  if (bannerHideTimer) {
-    clearTimeout(bannerHideTimer);
-    bannerHideTimer = null;
-  }
 }
 
 function renderGrid(highlightSet = new Set()) {
@@ -202,7 +207,10 @@ function resolveMatches() {
   grid = clearMatches(grid, matchCells, spawns);
   grid = applyGravity(grid);
 
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  resolveTimer = setTimeout(() => {
+    resolveTimer = null;
+    resolveMatches();
+  }, CHAIN_REACTION_DELAY_MS);
 }
 
 function deriveSpecialSpawns(groups) {
