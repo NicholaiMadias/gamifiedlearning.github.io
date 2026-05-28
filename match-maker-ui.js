@@ -5,11 +5,11 @@
  * (c) 2026 NicholaiMadias — MIT License
  */
 
-import { createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
+import { GRID_SIZE, createInitialGrid, canSwap, applySwap, findMatches, clearMatches, applyGravity } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
-const COLS          = 7;
-const ROWS          = 7;
+const COLS          = GRID_SIZE;
+const ROWS          = GRID_SIZE;
 const CASCADE_DELAY = 200;
 const BASE_POINTS   = 50;
 const CHAIN_BONUS   = 25;
