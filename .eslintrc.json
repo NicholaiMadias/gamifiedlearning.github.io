@@ -23,7 +23,8 @@
         "__tests__/**/*.js"
       ],
       "env": {
-        "node": true
+        "node": true,
+        "jest": true
       },
       "globals": {
         "describe": "readonly",
