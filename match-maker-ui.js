@@ -181,6 +181,7 @@ function resolveMatches() {
   resolving = true;
   const groups = findMatches(grid);
   if (groups.length === 0) {
+    if (resolveTimeoutId) clearTimeout(resolveTimeoutId);
     resolveTimeoutId = null;
     comboChain = 0;
     comboMultiplier = 1;
