@@ -1,6 +1,6 @@
 export const GRID_SIZE = 7;
 
-const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
 function randomGemType() {
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
@@ -298,7 +298,7 @@ export function triggerSpecial(grid, row, col, type, comboLevel = 1, gemType = n
 /**
  * Applies gravity: shifts non-null cells down, fills top with new gem objects.
  */
-export function applyGravity(grid) {
+export function applyGravityWithBuffs(grid, buffs = {}) {
   const next = grid.map(row => [...row]);
   for (let c = 0; c < GRID_SIZE; c++) {
     const gems = [];
@@ -310,4 +310,11 @@ export function applyGravity(grid) {
     }
   }
   return next;
+}
+
+/**
+ * Applies gravity: shifts non-null cells down, fills top with new random gems.
+ */
+export function applyGravity(grid) {
+  return applyGravityWithBuffs(grid, {});
 }

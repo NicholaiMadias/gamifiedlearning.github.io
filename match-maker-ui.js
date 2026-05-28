@@ -71,6 +71,42 @@ function cacheDom() {
   };
 }
 
+// ── Matrix buffs ───────────────────────────────────────────────────────────
+
+/**
+ * Returns which Matrix buffs are currently active based on conscience scores.
+ *   empathy  > 70 → heartBoost   : Heart tiles spawn +10 % more often
+ *   justice  > 60 → autoResolve  : Invalid swaps don't cost a move
+ *   wisdom   > 40 → hintReady    : Hint system active
+ *   growth   > 80 → xpBoost      : Score multiplier +20 %
+ */
+function getActiveBuffs() {
+  return {
+    heartBoost:  conscience.empathy > BUFF_EMPATHY_THRESHOLD,
+    autoResolve: conscience.justice > BUFF_JUSTICE_THRESHOLD,
+    hintReady:   conscience.wisdom  > BUFF_WISDOM_THRESHOLD,
+    xpBoost:     conscience.growth  > BUFF_GROWTH_THRESHOLD,
+  };
+}
+
+function updateBuffBadge() {
+  if (!dom.buffBadge) return;
+  const b = getActiveBuffs();
+  const active = [];
+  if (b.heartBoost)  active.push('💖 +Heart');
+  if (b.autoResolve) active.push('⚖️ Free Miss');
+  if (b.hintReady)   active.push('🧠 Hint');
+  if (b.xpBoost)     active.push('🌱 +20% XP');
+  if (active.length) {
+    dom.buffBadge.textContent = active.join(' · ');
+    dom.buffBadge.style.display = '';
+  } else {
+    dom.buffBadge.style.display = 'none';
+  }
+}
+
+// ── HUD ───────────────────────────────────────────────────────────────────
+
 function updateHUD() {
   if (dom.score) dom.score.textContent = score;
   if (dom.level) dom.level.textContent = level;
@@ -95,6 +131,14 @@ function updateConscience() {
     }
     if (dom[k]?.pct) dom[k].pct.textContent = pct + '%';
   });
+  updateBuffBadge();
+}
+
+function pulseBuffRow(rowEl) {
+  if (!rowEl) return;
+  rowEl.classList.remove('buff-pulse');
+  void rowEl.offsetWidth; // restart animation
+  rowEl.classList.add('buff-pulse');
 }
 
 function bumpConscience(matchCount) {
@@ -102,6 +146,38 @@ function bumpConscience(matchCount) {
   const key  = keys[Math.floor(Math.random() * keys.length)];
   conscience[key] = Math.min(100, (conscience[key] || 0) + matchCount * 2);
   updateConscience();
+
+  // Pulse newly activated buff rows
+  const curr = getActiveBuffs();
+  if (curr.heartBoost  && !prevBuffs.heartBoost)  pulseBuffRow(dom.rowEmpathy);
+  if (curr.autoResolve && !prevBuffs.autoResolve) pulseBuffRow(dom.rowJustice);
+  if (curr.hintReady   && !prevBuffs.hintReady)   pulseBuffRow(dom.rowWisdom);
+  if (curr.xpBoost     && !prevBuffs.xpBoost)     pulseBuffRow(dom.rowGrowth);
+  prevBuffs = curr;
+}
+
+// ── Messages ──────────────────────────────────────────────────────────────
+
+function showMsg(text, duration = 1500) {
+  if (!dom.msg) return;
+  dom.msg.textContent = text;
+  clearTimeout(msgTimer);
+  if (duration > 0) {
+    msgTimer = setTimeout(() => { if (dom.msg) dom.msg.textContent = ''; }, duration);
+  }
+}
+
+function showCombo(chain) {
+  if (!dom.combo) return;
+  const labels = ['', '', 'Combo!', 'Combo ×3!', 'Combo ×4!', 'Combo ×5!', '✨ Supernova!'];
+  dom.combo.textContent = chain < labels.length ? labels[chain] : '✨ SUPERNOVA!';
+  dom.combo.classList.remove('combo-pop');
+  void dom.combo.offsetWidth; // restart animation
+  dom.combo.classList.add('combo-pop');
+  clearTimeout(comboTimer);
+  comboTimer = setTimeout(() => {
+    if (dom.combo) { dom.combo.textContent = ''; dom.combo.classList.remove('combo-pop'); }
+  }, 900);
 }
 
 function showMsg(text) {
@@ -331,7 +407,7 @@ export function downloadMatchMakerCertPDF() {
 
 // ── Input handlers ───────────────────────────────────────────────────────────
 function onCellClick(row, col) {
-  if (locked) return;
+  if (locked || gameOver) return;
   if (!selected) {
     selected = { row, col };
     renderBoard();
@@ -347,16 +423,13 @@ function onCellClick(row, col) {
 }
 
 function onCellKey(e, row, col) {
-  let targetR = row;
-  let targetC = col;
-
+  let targetR = row, targetC = col;
   switch (e.key) {
     case 'ArrowUp':    targetR = Math.max(0, row - 1);        break;
     case 'ArrowDown':  targetR = Math.min(ROWS - 1, row + 1); break;
     case 'ArrowLeft':  targetC = Math.max(0, col - 1);        break;
     case 'ArrowRight': targetC = Math.min(COLS - 1, col + 1); break;
-    case 'Enter':
-    case ' ':
+    case 'Enter': case ' ':
       e.preventDefault();
       onCellClick(row, col);
       return;
@@ -364,15 +437,15 @@ function onCellKey(e, row, col) {
       selected = null;
       renderBoard();
       return;
-    default:
-      return;
+    default: return;
   }
-
   e.preventDefault();
   const idx   = targetR * COLS + targetC;
   const cells = dom.board.querySelectorAll('.gem-cell');
   if (cells[idx]) cells[idx].focus();
 }
+
+// ── Swap & cascade ────────────────────────────────────────────────────────
 
 function attemptSwap(r1, c1, r2, c2) {
   if (moves <= 0) {
@@ -402,6 +475,7 @@ function attemptSwap(r1, c1, r2, c2) {
       renderBoard();
       pendingTimeout = setTimeout(() => { showMsg(''); pendingTimeout = null; }, 1200);
       locked = false;
+      checkGameOver();
     }, CASCADE_DELAY);
   } else {
     processCascade(true);
@@ -465,10 +539,83 @@ function highlightMatched(matches) {
   });
 }
 
+// ── Seven Stars — lavender clue system ────────────────────────────────────
+
+function updateLavenderProgress() {
+  const pct = Math.min(lavenderPending / LAVENDER_CLUE_THRESHOLD, 1) * 100;
+  if (dom.lavPending) dom.lavPending.textContent = lavenderPending;
+  if (dom.lavFill)    dom.lavFill.style.width = pct + '%';
+}
+
+function handleLavenderMatch(count) {
+  lavenderPending += count;
+  updateLavenderProgress();
+  while (lavenderPending >= LAVENDER_CLUE_THRESHOLD) {
+    lavenderPending -= LAVENDER_CLUE_THRESHOLD;
+    clueFragments++;
+    updateLavenderProgress();
+    updateHUD();
+    revealClue(clueFragments);
+  }
+}
+
+const CLUE_TEXTS = [
+  '🌸 Clue 1: "A lavender scent lingers near the Seven Stars lens…"',
+  '🌸 Clue 2: "Dr. Reed keeps lavender sachets on her writing desk…"',
+  '🌸 Clue 3: "Lord Blackwood wore lavender cologne at dinner that night…"',
+];
+
+function revealClue(n) {
+  if (n <= CLUE_TEXTS.length) {
+    const text = CLUE_TEXTS[n - 1];
+    showMsg(text, 3500);
+    // Append to clue history log
+    if (dom.clueHistory) {
+      const entry = document.createElement('p');
+      entry.className = 'clue-entry';
+      entry.textContent = text;
+      dom.clueHistory.appendChild(entry);
+    }
+    // Shake the clue card
+    if (dom.clueCard) {
+      dom.clueCard.classList.remove('clue-shake');
+      void dom.clueCard.offsetWidth;
+      dom.clueCard.classList.add('clue-shake');
+    }
+  }
+  // After 3 clues, show the suspect panel, then shake + glow it
+  if (n === CLUE_TEXTS.length && !chosenSuspect && dom.suspect) {
+    dom.suspect.style.display = '';
+  }
+  // Shake + glow only when the panel is actually visible
+  if (dom.suspect && dom.suspect.style.display !== 'none') {
+    dom.suspect.classList.remove('clue-shake');
+    void dom.suspect.offsetWidth; // force reflow to restart animation
+    dom.suspect.classList.add('clue-shake');
+    dom.suspect.addEventListener('animationend', () => dom.suspect.classList.remove('clue-shake'), { once: true });
+  }
+}
+
+function chooseSuspect(suspect) {
+  chosenSuspect = suspect;
+  if (suspect === 'reed') {
+    conscience.wisdom = Math.min(100, conscience.wisdom + 15);
+    showMsg('🧠 Dr. Reed — Wisdom +15!', 2500);
+  } else {
+    conscience.justice = Math.min(100, conscience.justice + 15);
+    showMsg('⚖️ Lord Blackwood — Justice +15!', 2500);
+  }
+  updateConscience();
+  if (dom.suspect) dom.suspect.style.display = 'none';
+}
+
+// ── Level & game-over ─────────────────────────────────────────────────────
+
 function checkLevelUp() {
   const threshold = 500 * level;
   if (score >= threshold) {
     level++;
+    movesLeft += 5; // bonus moves for reaching a new level
     updateHUD();
     window.dispatchEvent(new CustomEvent('matchmaker-level-complete', { detail: { level: level - 1 } }));
     if (level - 1 >= MAX_LEVEL) {
@@ -521,5 +668,5 @@ export function initMatchMaker(db, user) {
   updateHUD();
   updateConscience();
   renderBoard();
-  showMsg('Match the gems — align your conscience');
+  showMsg('Match the gems — align your conscience', 2000);
 }
