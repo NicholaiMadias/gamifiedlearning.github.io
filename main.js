@@ -38,6 +38,56 @@ function applyVersionLayout(v2) {
   if (v2Section) v2Section.classList.toggle('hidden', !v2);
 }
 
+function setupRestartModalA11y() {
+  const restartModal = document.getElementById('restart-modal-overlay') || document.getElementById('confirm-modal');
+  if (!restartModal) return;
+
+  const getFocusable = () => Array.from(
+    restartModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'),
+  ).filter(el => !el.hasAttribute('disabled'));
+  const cancelButton = document.getElementById('restart-confirm-no') || document.getElementById('confirm-no');
+  const restartTrigger = document.getElementById('match-restart-btn') || document.getElementById('restart-btn');
+  let lastFocusedEl = null;
+  let wasOpen = false;
+
+  const isOpen = () => !restartModal.classList.contains('hidden') && !restartModal.hasAttribute('hidden');
+  const syncModalFocus = () => {
+    if (isOpen()) {
+      if (!wasOpen) {
+        lastFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        wasOpen = true;
+      }
+      (cancelButton || getFocusable()[0])?.focus();
+      return;
+    }
+    if (wasOpen) {
+      wasOpen = false;
+      (lastFocusedEl || restartTrigger)?.focus();
+    }
+  };
+
+  document.addEventListener('keydown', e => {
+    if (!isOpen() || e.key !== 'Tab') return;
+    const focusable = getFocusable();
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  new MutationObserver(syncModalFocus).observe(restartModal, {
+    attributes: true,
+    attributeFilter: ['class', 'hidden'],
+  });
+  syncModalFocus();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const v2 = isV2Enabled();
   applyVersionLayout(v2);
@@ -70,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initMatchMaker(null, null);
       });
     }
+    setupRestartModalA11y();
 
     // Refresh star map whenever a level is completed
     window.addEventListener('matchmaker-level-complete', refreshStarMap);
