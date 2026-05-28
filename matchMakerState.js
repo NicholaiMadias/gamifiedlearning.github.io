@@ -3,7 +3,7 @@ export const GRID_SIZE = 7;
 const BASE_GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
 export function makeGem(kind, special = null) {
-  return { kind, special };
+  return { kind, type: kind, special, createdBy: null };
 }
 
 function cloneGrid(grid) {
@@ -16,8 +16,10 @@ function randomGem() {
 
 function sameKind(a, b) {
   if (!a || !b) return false;
-  if (a.kind === 'wild' || b.kind === 'wild') return true;
-  return a.kind === b.kind;
+  const aKind = a.kind ?? a.type;
+  const bKind = b.kind ?? b.type;
+  if (aKind === 'wild' || bKind === 'wild') return true;
+  return aKind === bKind;
 }
 
 /**
@@ -50,6 +52,10 @@ export function canSwap(grid, r1, c1, r2, c2) {
   return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
 }
 
+export function isAdjacent(r1, c1, r2, c2) {
+  return canSwap(null, r1, c1, r2, c2);
+}
+
 /**
  * Returns a new grid with the two cells swapped.
  */
@@ -67,6 +73,8 @@ export function applySwap(grid, r1, c1, r2, c2) {
  */
 export function findMatches(grid) {
   const groups = [];
+  const horizontalRuns = [];
+  const verticalRuns = [];
 
   // Horizontal runs
   for (let r = 0; r < GRID_SIZE; r++) {
@@ -79,12 +87,18 @@ export function findMatches(grid) {
         if (grid[r][c] && grid[prev.r][prev.c] && sameKind(grid[r][c], grid[prev.r][prev.c])) {
           run.push({ r, c });
         } else {
-          if (run.length >= 3) groups.push(run);
+          if (run.length >= 3) {
+            groups.push(run);
+            horizontalRuns.push(run);
+          }
           run = [{ r, c }];
         }
       }
     }
-    if (run.length >= 3) groups.push(run);
+    if (run.length >= 3) {
+      groups.push(run);
+      horizontalRuns.push(run);
+    }
   }
 
   // Vertical runs
@@ -98,14 +112,50 @@ export function findMatches(grid) {
         if (grid[r][c] && grid[prev.r][prev.c] && sameKind(grid[r][c], grid[prev.r][prev.c])) {
           run.push({ r, c });
         } else {
-          if (run.length >= 3) groups.push(run);
+          if (run.length >= 3) {
+            groups.push(run);
+            verticalRuns.push(run);
+          }
           run = [{ r, c }];
         }
       }
     }
-    if (run.length >= 3) groups.push(run);
+    if (run.length >= 3) {
+      groups.push(run);
+      verticalRuns.push(run);
+    }
   }
 
+  const matchMap = new Map();
+  groups.forEach(group => {
+    group.forEach(({ r, c }) => {
+      matchMap.set(`${r}:${c}`, { row: r, col: c });
+    });
+  });
+
+  const hCells = new Set(horizontalRuns.flat().map(({ r, c }) => `${r}:${c}`));
+  const vCells = new Set(verticalRuns.flat().map(({ r, c }) => `${r}:${c}`));
+  const specialsMap = new Map();
+
+  matchMap.forEach((cell, posKey) => {
+    if (hCells.has(posKey) && vCells.has(posKey)) {
+      specialsMap.set(posKey, { row: cell.row, col: cell.col, specialType: 'bomb' });
+    }
+  });
+
+  const addMidpointSpecial = (run, specialType) => {
+    if (run.length < 4) return;
+    const mid = run[Math.floor(run.length / 2)];
+    const posKey = `${mid.r}:${mid.c}`;
+    if (!specialsMap.has(posKey)) {
+      specialsMap.set(posKey, { row: mid.r, col: mid.c, specialType });
+    }
+  };
+  horizontalRuns.forEach(run => addMidpointSpecial(run, run.length >= 5 ? 'supernova' : 'row'));
+  verticalRuns.forEach(run => addMidpointSpecial(run, run.length >= 5 ? 'supernova' : 'col'));
+
+  groups.matches = [...matchMap.values()];
+  groups.specials = [...specialsMap.values()];
   return groups;
 }
 
@@ -122,6 +172,25 @@ export function clearMatches(grid, matchCells, replacements = []) {
   });
   return next;
 }
+
+export function applyMatches(grid, matchResult) {
+  const matches = matchResult?.matches
+    ? matchResult.matches.map(({ row, col }) => ({ r: row, c: col }))
+    : (matchResult || []);
+  const replacements = (matchResult?.specials || []).map(({ row, col, specialType }) => {
+    const current = grid[row]?.[col];
+    return {
+      r: row,
+      c: col,
+      kind: current?.kind ?? current?.type ?? 'star',
+      special: specialType === 'supernova' ? 'wild' : specialType,
+    };
+  });
+  return clearMatches(grid, matches, replacements);
+}
+
+export const createGrid = createInitialGrid;
+export const swapGems = applySwap;
 
 /**
  * Applies gravity: shifts non-null cells down, fills top with new random gems.
