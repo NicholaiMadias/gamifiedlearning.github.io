@@ -22,9 +22,12 @@ function randomUUID() {
 }
 
 /**
+ * Record an event in the audit log.
  * Called internally by other modules (or Firebase Cloud Functions in prod).
  *
- * @param {{ action: string, uid: string, detail?: string }} event
+ * @param {string} action - Event action label (e.g. 'LOGIN', 'ROLE_CHANGE').
+ * @param {string} uid    - UID of the user performing the action.
+ * @param {string} [detail=''] - Optional human-readable detail string.
  */
 export function logEvent(action, uid, detail = '') {
   const logs = loadLogs();

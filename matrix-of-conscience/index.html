@@ -403,4 +403,68 @@
         drawLattice();
     </script>
     </body>
+<script>
+(function(){
+  // Cosmic canvas starfield
+  var c=document.getElementById('cosmic-canvas');
+  var ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  window.addEventListener('resize',resize);resize();
+  var stars=[];for(var i=0;i<200;i++)stars.push({x:Math.random()*c.width,y:Math.random()*c.height,s:Math.random()*1.5+0.3,t:Math.random()*6});
+  function renderStars(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(function(s){var a=(Math.sin(Date.now()*0.001+s.t)+1)/2;ctx.fillStyle='rgba(255,255,255,'+(0.3+a*0.7)+')';ctx.beginPath();ctx.arc(s.x,s.y,s.s,0,Math.PI*2);ctx.fill();});
+    requestAnimationFrame(renderStars);
+  }
+  renderStars();
+
+  // Seven Pillars content
+  var PILLARS=[
+    {title:'Pillar I — Awareness',content:'The first step is seeing clearly. Awareness is the light that dispels illusion, revealing the true nature of the self and the world. Practice mindful observation without judgment.'},
+    {title:'Pillar II — Empathy',content:'Empathy bridges the gap between self and other. When we feel with others, not just for them, we unlock the deepest form of human connection and understanding.'},
+    {title:'Pillar III — Accountability',content:'Taking ownership of our actions — past and present — is the foundation of integrity. Accountability is not punishment; it is the path back to wholeness.'},
+    {title:'Pillar IV — Courage',content:'Courage is not the absence of fear but the decision that something else is more important. Every act of genuine courage advances the collective conscience.'},
+    {title:'Pillar V — Compassion',content:'Compassion transforms suffering into service. When we meet pain — our own or another\'s — with an open heart, we become instruments of healing.'},
+    {title:'Pillar VI — Wisdom',content:'Wisdom is the integration of knowledge and experience, tempered by humility. It asks us to hold complexity without collapsing into certainty.'},
+    {title:'Pillar VII — Action',content:'All the awareness, empathy, and wisdom in the world mean nothing without aligned action. The seventh pillar calls us to move — purposefully, consistently, and with love.'}
+  ];
+  var idx=0;
+  var title=document.getElementById('mc-title');
+  var content=document.getElementById('mc-content');
+  var prev=document.getElementById('mc-prev');
+  var next=document.getElementById('mc-next');
+  var dots=document.getElementById('mc-dots');
+  var progress=JSON.parse(localStorage.getItem('mc-progress')||'{}');
+
+  function renderDots(){
+    dots.innerHTML='';
+    PILLARS.forEach(function(_,i){
+      var d=document.createElement('div');
+      d.style.cssText='width:8px;height:8px;border-radius:50%;background:'+(i===idx?'#a855f7':(progress[i]?'#7c3aed':'#334155'))+';transition:background 0.3s';
+      dots.appendChild(d);
+    });
+  }
+
+  function show(i){
+    idx=i;
+    title.textContent=PILLARS[i].title;
+    content.textContent=PILLARS[i].content;
+    prev.disabled=(i===0);
+    prev.style.opacity=i===0?'0.4':'1';
+    next.textContent=(i===PILLARS.length-1)?'Complete':'Continue';
+    renderDots();
+  }
+
+  prev.addEventListener('click',function(){if(idx>0)show(idx-1);});
+  next.addEventListener('click',function(){
+    progress[idx]=true;
+    localStorage.setItem('mc-progress',JSON.stringify(progress));
+    if(idx<PILLARS.length-1){show(idx+1);}else{
+      document.getElementById('mc-card').innerHTML='<div class="text-center py-8"><div class="text-6xl mb-6">🌌</div><h2 class="text-3xl font-bold orbitron mb-4" style="background:linear-gradient(to right,#c084fc,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Protocol Complete</h2><p class="text-slate-300 mb-8">You have traversed all Seven Pillars of the Matrix of Conscience.</p><a href="/" class="inline-block px-8 py-3 rounded-full bg-purple-600 text-sm font-bold uppercase tracking-widest hover:bg-purple-500 transition-colors" style="text-decoration:none;color:#fff;">← Return to Hub</a></div>';
+    }
+  });
+
+  show(0);
+})();
+</script>
 </html>
