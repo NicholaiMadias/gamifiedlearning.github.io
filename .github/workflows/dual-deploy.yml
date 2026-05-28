@@ -47,7 +47,22 @@ jobs:
         run: |
           rm -rf dist
           mkdir -p dist
-          rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' --exclude 'node_modules' ./ dist/
+          rsync -av \
+            --exclude 'dist' \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'node_modules' \
+            --exclude 'package.json' \
+            --exclude 'package-lock.json' \
+            --exclude '.npmrc' \
+            --exclude '.eslintrc' \
+            --exclude '.eslintrc.*' \
+            --exclude 'eslint.config.*' \
+            --exclude 'jest.config.*' \
+            --exclude '__tests__' \
+            --exclude '**/__tests__' \
+            --exclude 'coverage' \
+            ./ dist/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
