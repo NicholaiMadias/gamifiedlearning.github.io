@@ -1,9 +1,30 @@
 export const GRID_SIZE = 7;
 
+<<<<<<< HEAD
+const BASE_GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+
+export function makeGem(kind, special = null) {
+  return { kind, special };
+}
+
+function cloneGrid(grid) {
+  return grid.map(row => row.map(cell => (cell ? { ...cell } : null)));
+}
+
+function randomGem() {
+  return makeGem(BASE_GEM_TYPES[Math.floor(Math.random() * BASE_GEM_TYPES.length)]);
+}
+
+function sameKind(a, b) {
+  if (!a || !b) return false;
+  if (a.kind === 'wild' || b.kind === 'wild') return true;
+  return a.kind === b.kind;
+=======
 export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
 function randomGemType() {
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
+>>>>>>> origin/main
 }
 
 function makeGem(type) {
@@ -22,8 +43,13 @@ export function createInitialGrid() {
       do {
         gemType = randomGemType();
       } while (
+<<<<<<< HEAD
+        (c >= 2 && sameKind(grid[r][c - 1], { kind: gem.kind }) && sameKind(grid[r][c - 2], { kind: gem.kind })) ||
+        (r >= 2 && sameKind(grid[r - 1][c], { kind: gem.kind }) && sameKind(grid[r - 2][c], { kind: gem.kind }))
+=======
         (c >= 2 && grid[r][c - 1]?.type === gemType && grid[r][c - 2]?.type === gemType) ||
         (r >= 2 && grid[r - 1][c]?.type === gemType && grid[r - 2][c]?.type === gemType)
+>>>>>>> origin/main
       );
       grid[r][c] = makeGem(gemType);
     }
@@ -52,7 +78,7 @@ export function isAdjacent(r1, c1, r2, c2) {
  * Returns a new grid with the two cells swapped.
  */
 export function applySwap(grid, r1, c1, r2, c2) {
-  const next = grid.map(row => [...row]);
+  const next = cloneGrid(grid);
   const tmp = next[r1][c1];
   next[r1][c1] = next[r2][c2];
   next[r2][c2] = tmp;
@@ -67,6 +93,19 @@ export const swapGems = applySwap;
  * Returns { matches: [{row, col}…], specials: [{row, col, specialType}…] }.
  */
 export function findMatches(grid) {
+<<<<<<< HEAD
+  const groups = [];
+
+  // Horizontal runs
+  for (let r = 0; r < GRID_SIZE; r++) {
+    let run = [{ r, c: 0 }];
+    for (let c = 1; c <= GRID_SIZE; c++) {
+      if (c < GRID_SIZE && grid[r][c] && grid[r][c - 1] && sameKind(grid[r][c], grid[r][c - 1])) {
+        run.push({ r, c });
+      } else {
+        if (run.length >= 3) groups.push(run);
+        run = [{ r, c }];
+=======
   const rows = grid.length;
   const cols = grid[0].length;
   const matched = new Set();
@@ -83,10 +122,22 @@ export function findMatches(grid) {
           for (let k = runStart; k < c; k++) matched.add(`${r},${k}`);
         }
         runStart = c;
+>>>>>>> origin/main
       }
     }
   }
 
+<<<<<<< HEAD
+  // Vertical runs
+  for (let c = 0; c < GRID_SIZE; c++) {
+    let run = [{ r: 0, c }];
+    for (let r = 1; r <= GRID_SIZE; r++) {
+      if (r < GRID_SIZE && grid[r][c] && grid[r - 1][c] && sameKind(grid[r][c], grid[r - 1][c])) {
+        run.push({ r, c });
+      } else {
+        if (run.length >= 3) groups.push(run);
+        run = [{ r, c }];
+=======
   // Vertical segments
   for (let c = 0; c < cols; c++) {
     let runStart = 0;
@@ -99,10 +150,27 @@ export function findMatches(grid) {
           for (let k = runStart; k < r; k++) matched.add(`${k},${c}`);
         }
         runStart = r;
+>>>>>>> origin/main
       }
     }
   }
 
+<<<<<<< HEAD
+  return groups;
+}
+
+/**
+ * Returns a new grid with matched cells set to null and optional replacements placed.
+ */
+export function clearMatches(grid, matchCells, replacements = []) {
+  const next = cloneGrid(grid);
+  matchCells.forEach(({ r, c }) => {
+    next[r][c] = null;
+  });
+  replacements.forEach(repl => {
+    next[repl.r][repl.c] = makeGem(repl.kind || randomGem().kind, repl.special || null);
+  });
+=======
   const basicMatches = Array.from(matched).map(s => {
     const [row, col] = s.split(',').map(Number);
     return { row, col };
@@ -309,6 +377,7 @@ export function applyGravityWithBuffs(grid, buffs = {}) {
       next[r][c] = gems.length > 0 ? gems.shift() : makeGem(randomGemType());
     }
   }
+>>>>>>> origin/main
   return next;
 }
 
@@ -316,5 +385,19 @@ export function applyGravityWithBuffs(grid, buffs = {}) {
  * Applies gravity: shifts non-null cells down, fills top with new random gems.
  */
 export function applyGravity(grid) {
+<<<<<<< HEAD
+  const next = cloneGrid(grid);
+  for (let c = 0; c < GRID_SIZE; c++) {
+    const gems = [];
+    for (let r = GRID_SIZE - 1; r >= 0; r--) {
+      if (next[r][c] !== null) gems.push(next[r][c]);
+    }
+    for (let r = GRID_SIZE - 1; r >= 0; r--) {
+      next[r][c] = gems.length > 0 ? gems.shift() : randomGem();
+    }
+  }
+  return next;
+=======
   return applyGravityWithBuffs(grid, {});
+>>>>>>> origin/main
 }
