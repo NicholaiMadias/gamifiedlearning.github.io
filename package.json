@@ -4,9 +4,39 @@
   "description": "Gamified Learning Matrix — mobile-first educational gaming platform",
   "type": "module",
   "scripts": {
-    "lint": "eslint *.js",
+    "lint": "eslint . --ext .js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "build": "rm -rf dist && mkdir -p dist && rsync -av --exclude 'dist' --exclude '.git' --exclude '.github' --exclude 'node_modules' ./ dist/"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "es2021": true
+    },
+    "ignorePatterns": [
+      "dist/"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "__tests__/**/*.js"
+        ],
+        "env": {
+          "node": true
+        },
+        "globals": {
+          "describe": "readonly",
+          "test": "readonly",
+          "it": "readonly",
+          "expect": "readonly",
+          "jest": "readonly",
+          "beforeEach": "readonly",
+          "afterEach": "readonly",
+          "beforeAll": "readonly",
+          "afterAll": "readonly"
+        }
+      }
+    ]
   },
   "devDependencies": {
     "eslint": "^8.57.0",
