@@ -1,4 +1,10 @@
 {
+  "extends": [
+    "eslint:recommended"
+  ],
+  "ignorePatterns": [
+    "dist/"
+  ],
   "env": {
     "browser": true,
     "es2022": true
@@ -7,6 +13,27 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "overrides": [
+    {
+      "files": [
+        "__tests__/**/*.js"
+      ],
+      "env": {
+        "node": true
+      },
+      "globals": {
+        "describe": "readonly",
+        "test": "readonly",
+        "it": "readonly",
+        "expect": "readonly",
+        "jest": "readonly",
+        "beforeEach": "readonly",
+        "afterEach": "readonly",
+        "beforeAll": "readonly",
+        "afterAll": "readonly"
+      }
+    }
+  ],
   "rules": {
     "no-unused-vars": "warn",
     "no-console": "off"
