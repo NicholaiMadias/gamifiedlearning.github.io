@@ -21,6 +21,7 @@ let comboMultiplier = 1;
 let db = null;
 let user = null;
 let storeBound = false;
+let bannerHideTimer = null;
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 320;
@@ -59,6 +60,10 @@ export function initMatchMaker(dbRef, userRef) {
   updateStats();
   const banner = document.getElementById('match-badge-banner');
   if (banner) banner.classList.add('hidden');
+  if (bannerHideTimer) {
+    clearTimeout(bannerHideTimer);
+    bannerHideTimer = null;
+  }
 }
 
 function renderGrid(highlightSet = new Set()) {
@@ -69,10 +74,12 @@ function renderGrid(highlightSet = new Set()) {
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
       const cellData = grid[r][c];
-      const cell = document.createElement('div');
+      const cell = document.createElement('button');
+      cell.type = 'button';
       cell.className = 'match-cell';
       cell.dataset.row = r;
       cell.dataset.col = c;
+      cell.setAttribute('aria-label', `Gem ${cellData.kind} at row ${r + 1}, column ${c + 1}`);
       cell.classList.add(`gem-${cellData.kind}`);
       if (cellData.special) cell.classList.add(`special-${cellData.special}`);
       if (highlightSet.has(key(r, c))) cell.classList.add('matching');
@@ -372,7 +379,11 @@ function flashStatus(text) {
   if (banner) {
     banner.textContent = text;
     banner.classList.remove('hidden');
-    setTimeout(() => banner.classList.add('hidden'), 2000);
+    if (bannerHideTimer) clearTimeout(bannerHideTimer);
+    bannerHideTimer = setTimeout(() => {
+      banner.classList.add('hidden');
+      bannerHideTimer = null;
+    }, 2000);
   }
 }
 
