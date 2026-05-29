@@ -245,7 +245,7 @@ export function clearMatches(grid, matchCells, replacements = []) {
 /**
  * Applies match results from `findMatches` and keeps newly-created specials.
  */
-export function applyMatches(grid, matchResult, comboLevel = 1) {
+export function applyMatches(grid, matchResult) {
   const matches = matchResult?.matches || [];
   const specials = matchResult?.specials || [];
   const next = cloneGrid(grid);
@@ -276,7 +276,7 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
   }
 
   for (const ps of preExistingSpecials) {
-    triggerSpecial(next, ps.row, ps.col, ps.type, comboLevel, ps.gemType);
+    triggerSpecial(next, ps.row, ps.col, ps.type, ps.gemType);
   }
 
   return next;
@@ -285,7 +285,7 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
 /**
  * Clears cells affected by a special gem in-place.
  */
-export function triggerSpecial(grid, row, col, type, comboLevel = 1, gemType = null) {
+export function triggerSpecial(grid, row, col, type, gemType = null) {
   const rows = grid.length;
   const cols = grid[0].length;
 

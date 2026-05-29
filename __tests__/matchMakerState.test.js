@@ -91,7 +91,7 @@ describe('matchMakerState (v1) — match detection and special classification', 
       ])
     );
 
-    const next = applyMatches(grid, res, 1);
+    const next = applyMatches(grid, res);
     expect(next[3][3]).toEqual(
       expect.objectContaining({ type: 'wild', kind: 'wild', special: 'supernova' })
     );
@@ -111,7 +111,7 @@ describe('matchMakerState (v1) — match detection and special classification', 
     grid[4][3] = gem(t);
 
     const res = findMatches(grid);
-    const next = applyMatches(grid, res, 1);
+    const next = applyMatches(grid, res);
 
     // Special should exist at the intersection and not be null.
     expect(next[3][3]).not.toBeNull();
@@ -138,7 +138,7 @@ describe('matchMakerState (v1) — match detection and special classification', 
     const supernovaSpec = res.specials.find(s => s.specialType === 'supernova');
     expect(supernovaSpec).toBeDefined();
 
-    const next = applyMatches(grid, res, 1);
+    const next = applyMatches(grid, res);
     const supernovaCell = next[supernovaSpec.row][supernovaSpec.col];
 
     // Supernova should be a wildcard gem
