@@ -39,11 +39,11 @@ const STORE_ITEMS = [
 
 // Gem image mapping
 const GEM_IMAGES = {
-  'heart': 'IMG_2669.png',
-  'star': 'IMG_2670.png',
-  'cross': 'IMG_2671.png',
-  'flame': 'IMG_2673.png',
-  'drop': 'IMG_2674.png',
+  'heart': null,
+  'star': 'gold_star.png',
+  'cross': null,
+  'flame': null,
+  'drop': 'shooting_star.png',
   'wild': null // Will use emoji for wild
 };
 
@@ -186,6 +186,7 @@ function resolveMatches() {
     comboChain = 0;
     comboMultiplier = 1;
     resolving = false;
+    updateStoreAvailability();
     renderGrid();
     checkLevelUp();
     checkGameOver();
@@ -416,7 +417,10 @@ function flashStatus(text) {
     banner.textContent = text;
     banner.classList.remove('hidden');
     if (statusTimeoutId) clearTimeout(statusTimeoutId);
-    statusTimeoutId = setTimeout(() => banner.classList.add('hidden'), 2000);
+    statusTimeoutId = setTimeout(() => {
+      banner.classList.add('hidden');
+      statusTimeoutId = null;
+    }, 2000);
   }
 }
 

@@ -1,25 +1,36 @@
 export const GRID_SIZE = 7;
+export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
-const BASE_GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
+function cellType(cell) {
+  return cell?.type ?? cell?.kind ?? null;
+}
 
-export function makeGem(kind, special = null) {
-  return { kind, type: kind, special, createdBy: null };
+export function makeGem(type, special = null, createdBy = null) {
+  return { type, kind: type, special, createdBy };
 }
 
 function cloneGrid(grid) {
-  return grid.map(row => row.map(cell => (cell ? { ...cell } : null)));
+  return grid.map(row => row.map(cell => {
+    if (!cell) return null;
+    const type = cellType(cell);
+    return { ...cell, type, kind: type };
+  }));
+}
+
+function randomGemType() {
+  return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
 }
 
 function randomGem() {
-  return makeGem(BASE_GEM_TYPES[Math.floor(Math.random() * BASE_GEM_TYPES.length)]);
+  return makeGem(randomGemType());
 }
 
 function sameKind(a, b) {
-  if (!a || !b) return false;
-  const aKind = a.kind ?? a.type;
-  const bKind = b.kind ?? b.type;
-  if (aKind === 'wild' || bKind === 'wild') return true;
-  return aKind === bKind;
+  const aType = cellType(a);
+  const bType = cellType(b);
+  if (!aType || !bType) return false;
+  if (aType === 'wild' || bType === 'wild') return true;
+  return aType === bType;
 }
 
 /**
@@ -34,14 +45,16 @@ export function createInitialGrid() {
       do {
         gem = randomGem();
       } while (
-        (c >= 2 && sameKind(grid[r][c - 1], { kind: gem.kind }) && sameKind(grid[r][c - 2], { kind: gem.kind })) ||
-        (r >= 2 && sameKind(grid[r - 1][c], { kind: gem.kind }) && sameKind(grid[r - 2][c], { kind: gem.kind }))
+        (c >= 2 && sameKind(grid[r][c - 1], gem) && sameKind(grid[r][c - 2], gem)) ||
+        (r >= 2 && sameKind(grid[r - 1][c], gem) && sameKind(grid[r - 2][c], gem))
       );
       grid[r][c] = gem;
     }
   }
   return grid;
 }
+
+export const createGrid = createInitialGrid;
 
 /**
  * Returns true if the two cells are adjacent (share an edge).
@@ -67,96 +80,149 @@ export function applySwap(grid, r1, c1, r2, c2) {
   return next;
 }
 
+export const swapGems = applySwap;
+
 /**
- * Finds all horizontal and vertical matches of 3 or more.
- * Returns an array of match arrays, each match being an array of {r, c} objects.
+ * Finds horizontal and vertical groups of 3+.
+ * Returns an array of groups for UI compatibility, with `.matches` and `.specials`
+ * properties for test/engine compatibility.
  */
 export function findMatches(grid) {
   const groups = [];
-  const horizontalRuns = [];
-  const verticalRuns = [];
 
   // Horizontal runs
   for (let r = 0; r < GRID_SIZE; r++) {
-    let run = [];
-    for (let c = 0; c < GRID_SIZE; c++) {
-      if (run.length === 0) {
+    let run = [{ r, c: 0 }];
+    for (let c = 1; c <= GRID_SIZE; c++) {
+      const prev = c - 1 < GRID_SIZE ? grid[r][c - 1] : null;
+      const curr = c < GRID_SIZE ? grid[r][c] : null;
+      if (curr && prev && sameKind(curr, prev)) {
         run.push({ r, c });
       } else {
-        const prev = run[run.length - 1];
-        if (grid[r][c] && grid[prev.r][prev.c] && sameKind(grid[r][c], grid[prev.r][prev.c])) {
-          run.push({ r, c });
-        } else {
-          if (run.length >= 3) {
-            groups.push(run);
-            horizontalRuns.push(run);
-          }
-          run = [{ r, c }];
-        }
+        if (run.length >= 3) groups.push(run);
+        run = c < GRID_SIZE ? [{ r, c }] : [];
       }
-    }
-    if (run.length >= 3) {
-      groups.push(run);
-      horizontalRuns.push(run);
     }
   }
 
   // Vertical runs
   for (let c = 0; c < GRID_SIZE; c++) {
-    let run = [];
-    for (let r = 0; r < GRID_SIZE; r++) {
-      if (run.length === 0) {
+    let run = [{ r: 0, c }];
+    for (let r = 1; r <= GRID_SIZE; r++) {
+      const prev = r - 1 < GRID_SIZE ? grid[r - 1][c] : null;
+      const curr = r < GRID_SIZE ? grid[r][c] : null;
+      if (curr && prev && sameKind(curr, prev)) {
         run.push({ r, c });
       } else {
-        const prev = run[run.length - 1];
-        if (grid[r][c] && grid[prev.r][prev.c] && sameKind(grid[r][c], grid[prev.r][prev.c])) {
-          run.push({ r, c });
-        } else {
-          if (run.length >= 3) {
-            groups.push(run);
-            verticalRuns.push(run);
-          }
-          run = [{ r, c }];
-        }
+        if (run.length >= 3) groups.push(run);
+        run = r < GRID_SIZE ? [{ r, c }] : [];
       }
-    }
-    if (run.length >= 3) {
-      groups.push(run);
-      verticalRuns.push(run);
     }
   }
 
-  const matchMap = new Map();
+  const unique = new Set();
   groups.forEach(group => {
-    group.forEach(({ r, c }) => {
-      matchMap.set(`${r}:${c}`, { row: r, col: c });
-    });
+    group.forEach(({ r, c }) => unique.add(`${r},${c}`));
+  });
+  const matches = [...unique].map(key => {
+    const [row, col] = key.split(',').map(Number);
+    return { row, col };
   });
 
-  const hCells = new Set(horizontalRuns.flat().map(({ r, c }) => `${r}:${c}`));
-  const vCells = new Set(verticalRuns.flat().map(({ r, c }) => `${r}:${c}`));
-  const specialsMap = new Map();
-
-  matchMap.forEach((cell, posKey) => {
-    if (hCells.has(posKey) && vCells.has(posKey)) {
-      specialsMap.set(posKey, { row: cell.row, col: cell.col, specialType: 'bomb' });
-    }
-  });
-
-  const addMidpointSpecial = (run, specialType) => {
-    if (run.length < 4) return;
-    const mid = run[Math.floor(run.length / 2)];
-    const posKey = `${mid.r}:${mid.c}`;
-    if (!specialsMap.has(posKey)) {
-      specialsMap.set(posKey, { row: mid.r, col: mid.c, specialType });
-    }
-  };
-  horizontalRuns.forEach(run => addMidpointSpecial(run, run.length >= 5 ? 'supernova' : 'row'));
-  verticalRuns.forEach(run => addMidpointSpecial(run, run.length >= 5 ? 'supernova' : 'col'));
-
-  groups.matches = [...matchMap.values()];
-  groups.specials = [...specialsMap.values()];
+  const specials = classifyShapes(grid, matches);
+  groups.matches = matches;
+  groups.specials = specials;
   return groups;
+}
+
+function classifyShapes(grid, matches) {
+  const byCell = new Map();
+  for (const m of matches) {
+    byCell.set(`${m.row},${m.col}`, { ...m, neighbors: [] });
+  }
+
+  for (const cell of byCell.values()) {
+    const type = cellType(grid[cell.row]?.[cell.col]);
+    for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nr = cell.row + dr;
+      const nc = cell.col + dc;
+      const key = `${nr},${nc}`;
+      if (byCell.has(key) && cellType(grid[nr]?.[nc]) === type) {
+        cell.neighbors.push(byCell.get(key));
+      }
+    }
+  }
+
+  const specials = [];
+  const visited = new Set();
+
+  for (const start of byCell.values()) {
+    const startKey = `${start.row},${start.col}`;
+    if (visited.has(startKey)) continue;
+
+    const queue = [start];
+    const component = [];
+    visited.add(startKey);
+
+    while (queue.length) {
+      const cur = queue.shift();
+      component.push(cur);
+      for (const n of cur.neighbors) {
+        const nk = `${n.row},${n.col}`;
+        if (!visited.has(nk)) {
+          visited.add(nk);
+          queue.push(n);
+        }
+      }
+    }
+
+    specials.push(...classifyComponent(component));
+  }
+
+  return specials;
+}
+
+function classifyComponent(component) {
+  if (component.length < 4) return [];
+
+  const rows = component.map(c => c.row);
+  const cols = component.map(c => c.col);
+  const height = Math.max(...rows) - Math.min(...rows) + 1;
+  const width = Math.max(...cols) - Math.min(...cols) + 1;
+  const sorted = [...component].sort((a, b) => (a.row - b.row) || (a.col - b.col));
+  const midIdx = Math.floor(sorted.length / 2);
+
+  // 5+ in line -> supernova
+  if (component.length >= 5 && (height === 1 || width === 1)) {
+    const center = sorted[midIdx];
+    return [{ row: center.row, col: center.col, specialType: 'supernova' }];
+  }
+
+  // T/L shape (5+ spanning 2+ rows and cols) -> bomb
+  if (component.length >= 5 && height >= 2 && width >= 2) {
+    const compSet = new Set(component.map(c => `${c.row},${c.col}`));
+    const degrees = new Map(component.map(cell => [
+      `${cell.row},${cell.col}`,
+      [[0, 1], [0, -1], [1, 0], [-1, 0]].reduce(
+        (n, [dr, dc]) => n + (compSet.has(`${cell.row + dr},${cell.col + dc}`) ? 1 : 0),
+        0,
+      ),
+    ]));
+
+    const intersection = component.reduce((best, cell) =>
+      degrees.get(`${cell.row},${cell.col}`) > degrees.get(`${best.row},${best.col}`) ? cell : best,
+    component[0]);
+
+    return [{ row: intersection.row, col: intersection.col, specialType: 'bomb' }];
+  }
+
+  // 4 in line -> directional line clear
+  if (component.length === 4 && (height === 1 || width === 1)) {
+    const center = sorted[midIdx];
+    return [{ row: center.row, col: center.col, specialType: height === 1 ? 'lineH' : 'lineV' }];
+  }
+
+  return [];
 }
 
 /**
@@ -164,34 +230,88 @@ export function findMatches(grid) {
  */
 export function clearMatches(grid, matchCells, replacements = []) {
   const next = cloneGrid(grid);
-  matchCells.forEach(({ r, c }) => {
+  matchCells.forEach(cell => {
+    const r = cell.r ?? cell.row;
+    const c = cell.c ?? cell.col;
     next[r][c] = null;
   });
   replacements.forEach(repl => {
-    next[repl.r][repl.c] = makeGem(repl.kind || randomGem().kind, repl.special || null);
+    const type = repl.type ?? repl.kind ?? randomGemType();
+    next[repl.r][repl.c] = makeGem(type, repl.special || null, repl.createdBy || null);
   });
   return next;
 }
 
-export function applyMatches(grid, matchResult) {
-  const matches = matchResult?.matches
-    ? matchResult.matches.map(({ row, col }) => ({ r: row, c: col }))
-    : (matchResult || []);
-  const replacements = (matchResult?.specials || []).map(({ row, col, specialType }) => {
-    const current = grid[row]?.[col];
-    const isWild = specialType === 'supernova';
-    return {
-      r: row,
-      c: col,
-      kind: isWild ? 'wild' : (current?.kind ?? current?.type ?? 'star'),
-      special: isWild ? 'wild' : specialType,
-    };
-  });
-  return clearMatches(grid, matches, replacements);
+/**
+ * Applies match results from `findMatches` and keeps newly-created specials.
+ */
+export function applyMatches(grid, matchResult, comboLevel = 1) {
+  const matches = matchResult?.matches || [];
+  const specials = matchResult?.specials || [];
+  const next = cloneGrid(grid);
+  const toClear = new Set(matches.map(m => `${m.row},${m.col}`));
+
+  const preExistingSpecials = matches
+    .filter(m => next[m.row]?.[m.col]?.special)
+    .map(m => ({
+      row: m.row,
+      col: m.col,
+      type: next[m.row][m.col].special,
+      gemType: cellType(next[m.row][m.col]),
+    }));
+
+  for (const s of specials) {
+    const key = `${s.row},${s.col}`;
+    if (!toClear.has(key)) continue;
+    toClear.delete(key);
+    const existingType = cellType(next[s.row]?.[s.col]) || 'star';
+    next[s.row][s.col] = makeGem(existingType, s.specialType, 'shape');
+  }
+
+  for (const key of toClear) {
+    const [r, c] = key.split(',').map(Number);
+    next[r][c] = null;
+  }
+
+  for (const ps of preExistingSpecials) {
+    triggerSpecial(next, ps.row, ps.col, ps.type, comboLevel, ps.gemType);
+  }
+
+  return next;
 }
 
-export const createGrid = createInitialGrid;
-export const swapGems = applySwap;
+/**
+ * Clears cells affected by a special gem in-place.
+ */
+export function triggerSpecial(grid, row, col, type, comboLevel = 1, gemType = null) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+
+  const mark = (r, c) => {
+    if (r < 0 || r >= rows || c < 0 || c >= cols) return;
+    grid[r][c] = null;
+  };
+
+  if (type === 'lineH' || type === 'row') {
+    for (let c = 0; c < cols; c++) mark(row, c);
+  } else if (type === 'lineV' || type === 'col') {
+    for (let r = 0; r < rows; r++) mark(r, col);
+  } else if (type === 'bomb') {
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        mark(row + dr, col + dc);
+      }
+    }
+  } else if (type === 'supernova') {
+    const targetType = gemType || cellType(grid[row]?.[col]);
+    if (!targetType) return;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (cellType(grid[r][c]) === targetType) mark(r, c);
+      }
+    }
+  }
+}
 
 /**
  * Applies gravity: shifts non-null cells down, fills top with new random gems.

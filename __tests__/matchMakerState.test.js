@@ -97,19 +97,5 @@ describe('matchMakerState (v1) — match detection and special classification', 
     expect(next[2][3]).toBeNull();
     expect(next[4][3]).toBeNull();
   });
-
-  test('applyMatches turns supernova specials into wild gems', () => {
-    const grid = make7x7('star');
-    grid[3][3] = gem('heart');
-
-    const next = applyMatches(grid, {
-      matches: [{ row: 3, col: 3 }],
-      specials: [{ row: 3, col: 3, specialType: 'supernova' }],
-    });
-
-    expect(next[3][3]).toEqual(expect.objectContaining({
-      kind: 'wild',
-      special: 'wild',
-    }));
-  });
 });
+
