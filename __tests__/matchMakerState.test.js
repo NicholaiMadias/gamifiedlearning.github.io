@@ -93,7 +93,7 @@ describe('matchMakerState (v1) — match detection and special classification', 
 
     const next = applyMatches(grid, res, 1);
     expect(next[3][3]).toEqual(
-      expect.objectContaining({ type: t, special: 'supernova' })
+      expect.objectContaining({ type: 'wild', kind: 'wild', special: 'supernova' })
     );
     expect(next[3][1]).toBeNull();
     expect(next[3][2]).toBeNull();
