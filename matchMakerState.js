@@ -179,11 +179,12 @@ export function applyMatches(grid, matchResult) {
     : (matchResult || []);
   const replacements = (matchResult?.specials || []).map(({ row, col, specialType }) => {
     const current = grid[row]?.[col];
+    const isWild = specialType === 'supernova';
     return {
       r: row,
       c: col,
-      kind: current?.kind ?? current?.type ?? 'star',
-      special: specialType === 'supernova' ? 'wild' : specialType,
+      kind: isWild ? 'wild' : (current?.kind ?? current?.type ?? 'star'),
+      special: isWild ? 'wild' : specialType,
     };
   });
   return clearMatches(grid, matches, replacements);
