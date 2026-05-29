@@ -12,6 +12,28 @@ const { findOrCreate, getPlayer } = require('../models/Player');
 const { addItem, getAllItems, getItemById } = require('../models/StoreItem');
 const { logTransaction } = require('../models/Transaction');
 
+function getAdminApiKey(req) {
+  const headerToken = req.get('x-admin-api-key');
+  if (headerToken) return headerToken;
+
+  const authHeader = req.get('authorization') || '';
+  const [scheme, token] = authHeader.split(/\s+/, 2);
+  return scheme === 'Bearer' ? token : undefined;
+}
+
+function requireAdmin(req, res, next) {
+  const expectedKey = process.env.ADMIN_API_KEY;
+  if (!expectedKey) {
+    return res.status(503).json({ error: 'Admin API key is not configured' });
+  }
+
+  if (getAdminApiKey(req) !== expectedKey) {
+    return res.status(403).json({ error: 'Admin access denied' });
+  }
+
+  return next();
+}
+
 /* ------------------------------------------------------------------ */
 /*  POST /update-credits                                                */
 /*  Body: { playerId, points, donated }                                 */
@@ -107,7 +129,7 @@ router.post('/purchase', (req, res) => {
 /*  GET /admin/store-items                                              */
 /*  Returns all store items.                                            */
 /* ------------------------------------------------------------------ */
-router.get('/admin/store-items', (req, res) => {
+router.get('/admin/store-items', requireAdmin, (req, res) => {
   return res.json({ items: getAllItems().map(i => i.toJSON()) });
 });
 
@@ -116,7 +138,7 @@ router.get('/admin/store-items', (req, res) => {
 /*  Body: { name, description, cost }                                   */
 /*  Adds a new item to the store.                                       */
 /* ------------------------------------------------------------------ */
-router.post('/admin/add-item', (req, res) => {
+router.post('/admin/add-item', requireAdmin, (req, res) => {
   const { name, description, cost } = req.body;
 
   if (!name || typeof name !== 'string' || name.trim() === '') {

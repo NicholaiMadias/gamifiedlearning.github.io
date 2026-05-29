@@ -3,10 +3,14 @@
     "eslint:recommended"
   ],
   "ignorePatterns": [
-    "dist/"
+    "dist/",
+    "daily.js",
+    "levelSystem.js",
+    "sevenStars.js"
   ],
   "env": {
     "browser": true,
+    "node": true,
     "es2022": true
   },
   "parserOptions": {
@@ -15,12 +19,20 @@
   },
   "rules": {
     "no-unused-vars": "warn",
+    "no-empty": [
+      "error",
+      {
+        "allowEmptyCatch": true
+      }
+    ],
     "no-console": "off"
   },
   "overrides": [
     {
       "files": [
-        "__tests__/**/*.js"
+        "__tests__/**/*.js",
+        "backend/__tests__/**/*.js",
+        "tests/**/*.js"
       ],
       "env": {
         "node": true,
@@ -35,7 +47,17 @@
         "beforeEach": "readonly",
         "afterEach": "readonly",
         "beforeAll": "readonly",
-        "afterAll": "readonly"
+        "afterAll": "readonly",
+        "fail": "readonly"
+      }
+    },
+    {
+      "files": [
+        "backend/**/*.js",
+        "tests/**/*.js"
+      ],
+      "env": {
+        "node": true
       }
     }
   ]

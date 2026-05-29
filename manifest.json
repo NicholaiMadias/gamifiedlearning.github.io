@@ -2,7 +2,7 @@
   "name": "Nexus Arcade | Amazing Grace",
   "short_name": "Nexus Arcade",
   "description": "The Gamified Learning Matrix portal for Amazing Grace Home Living.",
-  "start_url": "https://amazinggracehl.org/arcade",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#020617",
