@@ -5,6 +5,7 @@
 
 'use strict';
 
+const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 
@@ -18,7 +19,13 @@ function getAdminApiKey(req) {
 
   const authHeader = req.get('authorization') || '';
   const [scheme, token] = authHeader.split(/\s+/, 2);
-  return scheme === 'Bearer' ? token : undefined;
+  return scheme === 'Bearer' ? token : null;
+}
+
+function isValidAdminApiKey(candidate, expected) {
+  const candidateHash = crypto.createHash('sha256').update(candidate || '').digest();
+  const expectedHash = crypto.createHash('sha256').update(expected).digest();
+  return crypto.timingSafeEqual(candidateHash, expectedHash);
 }
 
 function requireAdmin(req, res, next) {
@@ -27,7 +34,7 @@ function requireAdmin(req, res, next) {
     return res.status(503).json({ error: 'Admin API key is not configured' });
   }
 
-  if (getAdminApiKey(req) !== expectedKey) {
+  if (!isValidAdminApiKey(getAdminApiKey(req), expectedKey)) {
     return res.status(403).json({ error: 'Admin access denied' });
   }
 
