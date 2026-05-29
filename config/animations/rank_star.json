@@ -1,0 +1,7 @@
+{
+  "name": "rank_star",
+  "frames": 1,
+  "frameRate": 0,
+  "loop": false,
+  "spritePath": "/assets/icons/rank_frame_"
+}

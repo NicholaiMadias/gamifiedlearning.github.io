@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stories archive from Amazing Grace Home Living.">
+    <meta name="theme-color" content="#020617">
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+    <title>Stories Archive | Amazing Grace Home Living</title>
+
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: #0f172a;
+            --border: #1e293b;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --neon-blue: #0ea5e9;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(2, 6, 23, 0.96);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .logo img {
+            height: 42px;
+            width: auto;
+            border-radius: 6px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: nowrap;      /* keep nav on a single row */
+            white-space: nowrap;    /* prevent link text from wrapping */
+            gap: 0.75rem;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 0.8rem;
+            border-radius: 999px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.nav-active-page {
+            background: rgba(56, 189, 248, 0.14);
+            color: #fff;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 4rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 2.75rem);
+            margin: 0 0 0.5rem;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0 0 2rem;
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: rgba(15, 23, 42, 1);
+            border-color: var(--accent);
+        }
+
+        .section-heading {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .story-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .story-list li {
+            margin: 0.75rem 0;
+        }
+
+        .story-link {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+
+        .story-link:hover {
+            color: #7dd3fc;
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            text-align: center;
+            padding: 1.5rem 1rem 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../#properties">Listings</a>
+                <a href="../library/">Library</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="../ministry/">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <a href="../library/" class="back-link">
+            <span>←</span>
+            <span>Back to Library</span>
+        </a>
+
+        <h1>📚 Stories Archive</h1>
+        <p class="subtitle">Complete archive of all stories and articles from Amazing Grace Home Living.</p>
+
+        <h2 class="section-heading">All Stories</h2>
+        <ul id="story-list" class="story-list" aria-label="Story list">
+            <!-- Stories will be loaded dynamically -->
+        </ul>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; Tampa and Largo, Florida</p>
+    </footer>
+
+    <script>
+        function esc(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        async function loadStories() {
+            var list = document.getElementById('story-list');
+            var errorDiv = document.createElement('p');
+            errorDiv.style.color = '#fecaca';
+
+            try {
+                var res = await fetch('./library.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status + ' loading library.json');
+
+                var data = await res.json();
+                var entries = Array.isArray(data.entries) ? data.entries : [];
+
+                if (!entries.length) {
+                    errorDiv.textContent = 'No stories found in the library.';
+                    list.appendChild(errorDiv);
+                    return;
+                }
+
+                entries.forEach(function (entry) {
+                    var href = entry.path || (entry.slug ? './' + entry.slug + '/' : '#');
+                    var li = document.createElement('li');
+                    var link = document.createElement('a');
+                    link.className = 'story-link';
+                    link.href = href;
+                    link.textContent = entry.title || 'Untitled';
+                    li.appendChild(link);
+                    list.appendChild(li);
+                });
+            } catch (err) {
+                console.error('Failed to load stories', err);
+                errorDiv.textContent = 'Failed to load stories: ' + String(err);
+                list.appendChild(errorDiv);
+            }
+        }
+
+        loadStories();
+    </script>
+</body>
+</html>

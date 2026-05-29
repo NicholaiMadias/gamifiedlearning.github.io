@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazing Grace Island Hope Quiz</title>
+  <meta name="description" content="A self-contained offline Bible quiz for students. Download once and play without internet.">
+  <style>
+    :root {
+      --bg: #081120;
+      --panel: #0f1b33;
+      --panel-2: #132448;
+      --text: #ecf4ff;
+      --muted: #b4c7e7;
+      --accent: #7ee7d8;
+      --accent-2: #ffd166;
+      --good: #22c55e;
+      --bad: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #16305f 0%, var(--bg) 55%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    .app {
+      width: min(720px, 100%);
+      background: rgba(8, 17, 32, 0.92);
+      border: 1px solid rgba(126, 231, 216, 0.22);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+    }
+
+    p { line-height: 1.6; color: var(--muted); }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 1rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(255, 209, 102, 0.16);
+      color: var(--accent-2);
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(19, 36, 72, 0.98), rgba(15, 27, 51, 0.98));
+      border-radius: 16px;
+      padding: 1rem;
+      border: 1px solid rgba(180, 199, 231, 0.14);
+      margin-top: 1rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .stat {
+      flex: 1 1 140px;
+      background: rgba(126, 231, 216, 0.09);
+      border-radius: 14px;
+      padding: 0.85rem;
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .answers {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 0.95rem 1rem;
+      text-align: left;
+      color: var(--text);
+      background: rgba(126, 231, 216, 0.12);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(126, 231, 216, 0.22);
+      outline: 2px solid rgba(126, 231, 216, 0.28);
+      outline-offset: 2px;
+    }
+
+    button[disabled] {
+      cursor: default;
+      transform: none;
+      opacity: 0.92;
+    }
+
+    .correct { background: rgba(34, 197, 94, 0.22) !important; }
+    .incorrect { background: rgba(239, 68, 68, 0.22) !important; }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .actions button {
+      flex: 1 1 180px;
+      text-align: center;
+      background: rgba(255, 209, 102, 0.18);
+    }
+
+    .verse {
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      border-left: 4px solid var(--accent-2);
+      background: rgba(255, 209, 102, 0.08);
+      border-radius: 12px;
+      color: #fff7dd;
+    }
+
+    .storage-status {
+      margin-top: 0.75rem;
+      color: #ffd7d7;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <span class="badge">Offline-ready HTML game</span>
+    <h1>🏝️ Amazing Grace Island Hope Quiz</h1>
+    <p>This file is fully self-contained. Once downloaded, students can open it from any computer or phone and play without an internet connection.</p>
+
+    <section class="stats" aria-label="Game statistics">
+      <div class="stat">
+        <span class="stat-label">Question</span>
+        <span id="question-count" class="stat-value">1 / 5</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Score</span>
+        <span id="score" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Best Score</span>
+        <span id="best-score" class="stat-value">0</span>
+      </div>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <h2 id="question-title">Loading question…</h2>
+      <p id="question-text"></p>
+      <div id="answer-list" class="answers"></div>
+      <div id="verse" class="verse" hidden></div>
+      <p id="storage-status" class="storage-status" hidden></p>
+      <div class="actions">
+        <button type="button" id="next-btn" hidden>Next Question</button>
+        <button type="button" id="restart-btn">Play Again</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const QUESTIONS = [
+      {
+        title: 'Question 1',
+        text: 'When Jesus taught about light, what did He say a lamp should not be placed under?',
+        answers: ['A basket', 'A table', 'A mountain', 'A river'],
+        correct: 0,
+        verse: 'Matthew 5:15 — “Neither do people light a lamp and put it under a basket.”'
+      },
+      {
+        title: 'Question 2',
+        text: 'How many days and nights did it rain during Noah’s flood?',
+        answers: ['7', '12', '40', '70'],
+        correct: 2,
+        verse: 'Genesis 7:12 — “And rain fell on the earth forty days and forty nights.”'
+      },
+      {
+        title: 'Question 3',
+        text: 'Which fruit of the Spirit is especially needed when serving a remote community with care?',
+        answers: ['Jealousy', 'Kindness', 'Fear', 'Pride'],
+        correct: 1,
+        verse: 'Galatians 5:22 — “The fruit of the Spirit is love, joy, peace, patience, kindness…”'
+      },
+      {
+        title: 'Question 4',
+        text: 'What did Jesus say grows from faith the size of a mustard seed?',
+        answers: ['A treasure chest', 'A great tree', 'A new temple', 'A white stone'],
+        correct: 1,
+        verse: 'Matthew 13:31-32 — The kingdom of heaven is like a mustard seed that grows into a tree.'
+      },
+      {
+        title: 'Question 5',
+        text: 'Who encouraged believers by saying, “Be strong and courageous” as they moved forward?',
+        answers: ['Joshua', 'Pilate', 'Saul', 'Jonah'],
+        correct: 0,
+        verse: 'Joshua 1:9 — “Be strong and courageous. Do not be afraid; do not be discouraged.”'
+      }
+    ];
+
+    const questionCount = document.getElementById('question-count');
+    const scoreEl = document.getElementById('score');
+    const bestScoreEl = document.getElementById('best-score');
+    const titleEl = document.getElementById('question-title');
+    const textEl = document.getElementById('question-text');
+    const answerList = document.getElementById('answer-list');
+    const verseEl = document.getElementById('verse');
+    const storageStatusEl = document.getElementById('storage-status');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    const STORAGE_KEY = 'amazing-grace-quiz-island-hope-best-score';
+
+    let index = 0;
+    let score = 0;
+    let locked = false;
+    let bestScore = 0;
+
+    function showStorageWarning(message) {
+      if (!storageStatusEl) return;
+      storageStatusEl.hidden = false;
+      storageStatusEl.setAttribute('role', 'alert');
+      storageStatusEl.textContent = message;
+    }
+
+    function readBestScore() {
+      try {
+        return Number(localStorage.getItem(STORAGE_KEY) || 0);
+      } catch {
+        showStorageWarning('Best score saving is disabled. This may be due to browser privacy settings, incognito mode, or storage limits.');
+        return 0;
+      }
+    }
+
+    function writeBestScore(value) {
+      try {
+        if (value > bestScore) {
+          localStorage.setItem(STORAGE_KEY, String(value));
+          bestScore = value;
+        }
+      } catch {
+        showStorageWarning('Best score saving is unavailable because of browser privacy settings or storage limits.');
+      }
+    }
+
+    function renderQuestion() {
+      const question = QUESTIONS[index];
+      locked = false;
+      questionCount.textContent = `${index + 1} / ${QUESTIONS.length}`;
+      scoreEl.textContent = String(score);
+      bestScoreEl.textContent = String(bestScore);
+      titleEl.textContent = question.title;
+      textEl.textContent = question.text;
+      verseEl.hidden = true;
+      verseEl.textContent = '';
+      nextBtn.hidden = true;
+      answerList.replaceChildren();
+
+      question.answers.forEach((answer, answerIndex) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = answer;
+        button.addEventListener('click', () => chooseAnswer(answerIndex));
+        answerList.appendChild(button);
+      });
+    }
+
+    function chooseAnswer(answerIndex) {
+      if (locked) return;
+      locked = true;
+
+      const question = QUESTIONS[index];
+      const buttons = answerList.querySelectorAll('button');
+
+      buttons.forEach((button, idx) => {
+        button.disabled = true;
+        if (idx === question.correct) button.classList.add('correct');
+        if (idx === answerIndex && idx !== question.correct) button.classList.add('incorrect');
+      });
+
+      if (answerIndex === question.correct) {
+        score += 20;
+        scoreEl.textContent = String(score);
+      }
+
+      writeBestScore(score);
+      bestScoreEl.textContent = String(bestScore);
+      verseEl.hidden = false;
+      verseEl.textContent = question.verse;
+      nextBtn.hidden = false;
+      nextBtn.textContent = index === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+    }
+
+    function nextQuestion() {
+      if (index < QUESTIONS.length - 1) {
+        index += 1;
+        renderQuestion();
+        return;
+      }
+
+      titleEl.textContent = 'Mission Complete';
+      textEl.textContent = `You finished with ${score} points. Keep this file and share it with another student so they can play offline too.`;
+      answerList.replaceChildren();
+      verseEl.hidden = false;
+      verseEl.textContent = score === 100
+        ? 'Excellent work! Psalm 119:105 — “Your word is a lamp to my feet and a light to my path.”'
+        : 'Try again and grow stronger. Proverbs 3:5-6 — “Trust in the Lord with all your heart…”';
+      nextBtn.hidden = true;
+      questionCount.textContent = `${QUESTIONS.length} / ${QUESTIONS.length}`;
+    }
+
+    function restartGame() {
+      index = 0;
+      score = 0;
+      renderQuestion();
+    }
+
+    nextBtn.addEventListener('click', nextQuestion);
+    restartBtn.addEventListener('click', restartGame);
+    bestScore = readBestScore();
+    renderQuestion();
+  </script>
+</body>
+</html>

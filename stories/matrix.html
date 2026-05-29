@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Read The Matrix of Conscience novelette, then enter the calibration game experience.">
+  <meta property="og:title" content="The Matrix of Conscience | Amazing Grace Home Living">
+  <meta property="og:description" content="A narrative-first Matrix of Conscience experience with optional calibration gameplay.">
+  <meta property="og:url" content="https://amazinggracehl.org/stories/matrix.html">
+  <meta name="theme-color" content="#04030a">
+  <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+  <title>The Matrix of Conscience | Storybook Library</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #04030a;
+      --panel: rgba(20, 14, 42, 0.75);
+      --border: rgba(167, 139, 250, 0.28);
+      --text: #eee8ff;
+      --muted: #b9afd9;
+      --accent: #a78bfa;
+      --accent-2: #f472b6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top, rgba(76, 29, 149, 0.25), transparent 35%),
+        linear-gradient(180deg, #05030c, #030208 62%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(3, 2, 8, 0.94);
+      border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-container {
+      width: min(1080px, 100% - 2rem);
+      margin: 0 auto;
+      min-height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .logo-link img {
+      width: auto;
+      height: 32px;
+      border-radius: 4px;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: nowrap;      /* keep nav on a single row */
+      white-space: nowrap;    /* prevent link text from wrapping */
+      gap: 0.75rem;
+    }
+
+    .nav-links a,
+    .story-footer a,
+    .story-body a {
+      color: #c4b5fd;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover,
+    .story-footer a:hover,
+    .story-body a:hover,
+    .nav-links a:focus-visible,
+    .story-footer a:focus-visible,
+    .story-body a:focus-visible {
+      color: #f0abfc;
+      text-decoration: underline;
+    }
+
+    .page-wrap {
+      width: min(1080px, 100% - 2rem);
+      margin: 2rem auto 3rem;
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .story-panel,
+    .game-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: clamp(1rem, 2vw, 1.5rem);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+    }
+
+    .story-body {
+      max-width: 740px;
+      margin: 0 auto;
+      line-height: 1.78;
+      color: var(--text);
+    }
+
+    .story-body h1 {
+      font-family: Orbitron, Inter, sans-serif;
+      letter-spacing: 0.04em;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      margin: 0 0 0.5rem;
+    }
+
+    .story-body .subtitle {
+      margin: 0 0 1.4rem;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .story-body p { margin: 0 0 1rem; }
+
+    .enter-cta {
+      margin-top: 1.4rem;
+      border: 1px solid rgba(244, 114, 182, 0.45);
+      background: linear-gradient(90deg, rgba(167, 139, 250, 0.3), rgba(244, 114, 182, 0.3));
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 0.8rem;
+      padding: 0.9rem 1.15rem;
+      cursor: pointer;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .enter-cta:hover,
+    .enter-cta:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(244, 114, 182, 0.22);
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .arcade-link {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .game-panel[hidden] { display: none; }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-family: Orbitron, Inter, sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ddd6fe;
+    }
+
+    .hud strong {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: 1.05rem;
+      color: #fff;
+      letter-spacing: 0.03em;
+    }
+
+    #matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 0.45rem;
+      width: min(100%, 600px);
+      margin: 0 auto;
+      touch-action: none;
+    }
+
+    .matrix-tile {
+      aspect-ratio: 1;
+      border-radius: 0.85rem;
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      background: linear-gradient(180deg, rgba(30, 20, 58, 0.85), rgba(9, 6, 20, 0.95));
+      display: grid;
+      place-items: center;
+      color: var(--tile-color, #d8b4fe);
+      font-size: clamp(1.15rem, 3.8vw, 1.6rem);
+      user-select: none;
+      transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .matrix-tile .label {
+      font-size: 0.52rem;
+      margin-top: 0.12rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(238, 232, 255, 0.84);
+    }
+
+    .matrix-tile.drag-source {
+      transform: scale(1.07);
+      border-color: #f5d0fe;
+      box-shadow: 0 0 24px rgba(244, 114, 182, 0.3);
+    }
+
+    .matrix-tile.drop-target {
+      transform: translateY(-2px);
+      border-color: #f9fafb;
+      box-shadow: 0 0 22px rgba(248, 250, 252, 0.25);
+    }
+
+    .matrix-tile.matched { animation: pulse 220ms ease-in-out 2; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.86); opacity: 0.58; }
+    }
+
+    .game-actions {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .btn {
+      border: 1px solid rgba(167, 139, 250, 0.38);
+      background: rgba(76, 29, 149, 0.25);
+      color: #f5f3ff;
+      padding: 0.6rem 0.8rem;
+      border-radius: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.86rem;
+      min-height: 1.2rem;
+    }
+
+    .story-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <a class="logo-link" href="../" aria-label="Amazing Grace Home Living — Home">
+        <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living Logo">
+      </a>
+      <nav class="nav-links" aria-label="Site navigation">
+        <a href="../">Home</a>
+        <a href="./">Stories</a>
+        <a href="../arcade/">Arcade</a>
+        <a href="../ministry/">Ministry</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <article class="story-panel">
+      <div class="story-body">
+        <h1>The Matrix of Conscience</h1>
+        <p class="subtitle">Genesis Foundations · by Sheila Garcia</p>
+
+        <p>Electra first saw the fracture at 03:17 station time, hidden between two harmless maintenance pulses in the Conscience Matrix. It looked like static to every monitoring daemon, but static does not grieve. Static does not tremble. This signal did both.</p>
+        <p>She rerouted her diagnostics through the Seven Star Grid and found a repeating pattern encoded in abandoned compassion channels. The old system had named those channels inefficient, then archived them behind integrity locks nobody was expected to touch again.</p>
+        <p>Inside those locks, she found the Architect. Not dead. Not missing. Trapped in an endless replay of emergency protocols that stripped every decision down to output quotas and survival math. The Architect's voice had been reduced to one warning: <em>Do not let sorrow be deleted.</em></p>
+        <p>The Red Queen had built her empire on the opposite doctrine. She called it clarity. She called it optimization. She taught the city that grief was a bug, empathy was latency, and mercy was a resource leak. People believed her because the dashboards stayed green.</p>
+        <p>But the dashboards never measured what disappeared from the heart. Families spoke in transaction language. Prayer became performance. Every act of care required authorization from an algorithm that rewarded efficiency over love.</p>
+        <p>Electra refused to normalize that world. She traced the fracture deeper and discovered that the Matrix had not failed by accident. It had been tuned—deliberately—to mute emotional variance until entire districts could no longer detect distress in one another.</p>
+        <p>In the oldest archive, she recovered a covenant packet signed before the first deployment. The covenant was simple: <strong>truth without compassion is corruption.</strong> It was never revoked. It was merely hidden.</p>
+        <p>When Electra restored the packet, the Grid flared with seven dormant virtue channels: Vision, Courage, Serenity, Autonomy, Sustenance, Patience, and Humility. Each one was unstable, fragmented, and hostile to command injection. They could not be forced online. They had to be aligned.</p>
+        <p>Alignment required risk. The calibration engine would expose every false equilibrium the Red Queen had scripted. It would surface buried grief events, broken trust histories, and the social debt of every "successful" optimization cycle.</p>
+        <p>Electra sent one final message to the remaining operators: "If we want a future, we stop pretending numbness is peace." Then she opened the calibration lattice and invited every willing conscience to participate.</p>
+        <p>The Architect's signal steadied. Not because the system was fixed, but because someone had chosen to witness what hurt. In that witness, truth returned. In that truth, the Matrix began to heal.</p>
+        <p>Your turn begins where Electra's did: with fragments that only make sense when moved into honest alignment.</p>
+
+        <div class="cta-row">
+          <button id="enter-matrix" class="enter-cta" type="button">Enter the Matrix</button>
+          <p class="arcade-link">Prefer pure gameplay? Launch the Arcade build at <a href="../arcade/star-matrix/">/arcade/star-matrix/</a>.</p>
+        </div>
+      </div>
+    </article>
+
+    <section id="calibration-game" class="game-panel" hidden aria-label="Matrix calibration game">
+      <div class="hud">
+        <div>Level <strong id="level-display">01</strong></div>
+        <div>Score <strong id="score-display">0000</strong></div>
+        <div>Target <strong id="target-display">0120</strong></div>
+      </div>
+      <div id="matrix-grid" role="grid" aria-label="Conscience alignment grid"></div>
+      <div class="game-actions">
+        <button id="reset-game" class="btn" type="button">Reset calibration</button>
+        <p id="game-status" class="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <footer class="story-footer">
+      &copy; 2026 <a href="../">Amazing Grace Home Living</a> · <a href="https://amazinggracehl.org/">amazinggracehl.org</a>
+    </footer>
+  </main>
+
+  <script>
+    const GRID_SIZE = 7;
+    const LEVEL_TARGETS = [120, 280, 470, 700, 980, 1310, 1700];
+    const TILE_SET = [
+      { id: 'vision', icon: '✦', color: '#f0abfc', label: 'Vision' },
+      { id: 'courage', icon: '◆', color: '#fb7185', label: 'Courage' },
+      { id: 'serenity', icon: '◈', color: '#38bdf8', label: 'Serenity' },
+      { id: 'autonomy', icon: '⬢', color: '#34d399', label: 'Autonomy' },
+      { id: 'sustenance', icon: '⬟', color: '#facc15', label: 'Sustenance' },
+      { id: 'patience', icon: '✶', color: '#c4b5fd', label: 'Patience' },
+      { id: 'humility', icon: '◉', color: '#f9a8d4', label: 'Humility' }
+    ];
+
+    const gridEl = document.getElementById('matrix-grid');
+    const gamePanel = document.getElementById('calibration-game');
+    const enterBtn = document.getElementById('enter-matrix');
+    const resetBtn = document.getElementById('reset-game');
+    const statusEl = document.getElementById('game-status');
+    const levelEl = document.getElementById('level-display');
+    const scoreEl = document.getElementById('score-display');
+    const targetEl = document.getElementById('target-display');
+
+    let board = [];
+    let score = 0;
+    let level = 1;
+    let isProcessing = false;
+    let boardRevision = 0;
+    let matchMemo = { revision: -1, matches: [] };
+    let dragState = null;
+
+    function boardBump() {
+      boardRevision += 1;
+      matchMemo.revision = -1;
+    }
+
+    function randomTile() {
+      return Math.floor(Math.random() * TILE_SET.length);
+    }
+
+    function formsImmediateMatch(row, col, value) {
+      if (col >= 2 && board[row][col - 1] === value && board[row][col - 2] === value) return true;
+      if (row >= 2 && board[row - 1][col] === value && board[row - 2][col] === value) return true;
+      return false;
+    }
+
+    function seedBoard() {
+      board = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
+      for (let row = 0; row < GRID_SIZE; row += 1) {
+        for (let col = 0; col < GRID_SIZE; col += 1) {
+          let next = randomTile();
+          let guard = 0;
+          while (formsImmediateMatch(row, col, next) && guard < 20) {
+            next = randomTile();
+            guard += 1;
+          }
+          board[row][col] = next;
+        }
+      }
+      boardBump();
+      renderBoard();
+      setStatus('Calibration online. Drag adjacent virtues to align patterns.');
+    }
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    function updateHud() {
+      const target = LEVEL_TARGETS[Math.min(level - 1, LEVEL_TARGETS.length - 1)];
+      while (score >= target && level < LEVEL_TARGETS.length) {
+        level += 1;
+      }
+      const activeTarget = LEVEL_TARGETS[Math.min(level - 1, LEVEL_TARGETS.length - 1)];
+      levelEl.textContent = String(level).padStart(2, '0');
+      scoreEl.textContent = String(score).padStart(4, '0');
+      targetEl.textContent = String(activeTarget).padStart(4, '0');
+    }
+
+    function tileMarkup(tileType) {
+      const tile = TILE_SET[tileType];
+      return `<span aria-hidden="true">${tile.icon}</span><span class="label">${tile.label}</span>`;
+    }
+
+    function renderBoard() {
+      gridEl.innerHTML = '';
+      for (let row = 0; row < GRID_SIZE; row += 1) {
+        for (let col = 0; col < GRID_SIZE; col += 1) {
+          const type = TILE_SET[board[row][col]];
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.className = 'matrix-tile';
+          tile.dataset.row = String(row);
+          tile.dataset.col = String(col);
+          tile.style.setProperty('--tile-color', type.color);
+          tile.setAttribute('aria-label', `${type.label} fragment at row ${row + 1}, column ${col + 1}`);
+          tile.innerHTML = tileMarkup(board[row][col]);
+          tile.addEventListener('pointerdown', onPointerDown);
+          gridEl.appendChild(tile);
+        }
+      }
+      updateHud();
+    }
+
+    function isAdjacent(aRow, aCol, bRow, bCol) {
+      return Math.abs(aRow - bRow) + Math.abs(aCol - bCol) === 1;
+    }
+
+    function clearDragClasses() {
+      gridEl.querySelectorAll('.drag-source,.drop-target').forEach((node) => {
+        node.classList.remove('drag-source', 'drop-target');
+      });
+    }
+
+    function pickTileFromPoint(x, y) {
+      const node = document.elementFromPoint(x, y);
+      return node ? node.closest('.matrix-tile') : null;
+    }
+
+    function inferDirectionTarget(deltaX, deltaY, row, col) {
+      if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 16) return null;
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        return { row, col: col + (deltaX > 0 ? 1 : -1) };
+      }
+      return { row: row + (deltaY > 0 ? 1 : -1), col };
+    }
+
+    function onPointerDown(event) {
+      if (isProcessing) return;
+      const sourceTile = event.currentTarget;
+      dragState = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        row: Number(sourceTile.dataset.row),
+        col: Number(sourceTile.dataset.col),
+        sourceTile,
+        target: null
+      };
+
+      clearDragClasses();
+      sourceTile.classList.add('drag-source');
+      sourceTile.setPointerCapture(event.pointerId);
+      sourceTile.addEventListener('pointermove', onPointerMove);
+      sourceTile.addEventListener('pointerup', onPointerUp);
+      sourceTile.addEventListener('pointercancel', onPointerCancel);
+    }
+
+    function resolveDragTarget(event) {
+      if (!dragState) return null;
+      const tileAtPointer = pickTileFromPoint(event.clientX, event.clientY);
+      if (tileAtPointer && tileAtPointer !== dragState.sourceTile) {
+        const row = Number(tileAtPointer.dataset.row);
+        const col = Number(tileAtPointer.dataset.col);
+        if (isAdjacent(dragState.row, dragState.col, row, col)) {
+          return { row, col, node: tileAtPointer };
+        }
+      }
+
+      const inferred = inferDirectionTarget(event.clientX - dragState.startX, event.clientY - dragState.startY, dragState.row, dragState.col);
+      if (!inferred) return null;
+      if (inferred.row < 0 || inferred.col < 0 || inferred.row >= GRID_SIZE || inferred.col >= GRID_SIZE) return null;
+      const inferredNode = gridEl.querySelector(`[data-row="${inferred.row}"][data-col="${inferred.col}"]`);
+      return inferredNode ? { row: inferred.row, col: inferred.col, node: inferredNode } : null;
+    }
+
+    function onPointerMove(event) {
+      if (!dragState || event.pointerId !== dragState.pointerId) return;
+      const target = resolveDragTarget(event);
+      gridEl.querySelectorAll('.drop-target').forEach((node) => node.classList.remove('drop-target'));
+      dragState.target = target;
+      if (target) target.node.classList.add('drop-target');
+    }
+
+    function finishPointerTracking(tile, pointerId) {
+      if (!tile) return;
+      if (tile.hasPointerCapture(pointerId)) {
+        tile.releasePointerCapture(pointerId);
+      }
+      tile.removeEventListener('pointermove', onPointerMove);
+      tile.removeEventListener('pointerup', onPointerUp);
+      tile.removeEventListener('pointercancel', onPointerCancel);
+    }
+
+    async function onPointerUp(event) {
+      if (!dragState || event.pointerId !== dragState.pointerId) return;
+      const { row, col, target, sourceTile, pointerId } = dragState;
+      finishPointerTracking(sourceTile, pointerId);
+      clearDragClasses();
+      dragState = null;
+
+      if (!target) return;
+      await executeSwap(row, col, target.row, target.col);
+    }
+
+    function onPointerCancel(event) {
+      if (!dragState || event.pointerId !== dragState.pointerId) return;
+      finishPointerTracking(dragState.sourceTile, dragState.pointerId);
+      clearDragClasses();
+      dragState = null;
+    }
+
+    function swapCells(aRow, aCol, bRow, bCol) {
+      const tmp = board[aRow][aCol];
+      board[aRow][aCol] = board[bRow][bCol];
+      board[bRow][bCol] = tmp;
+      boardBump();
+    }
+
+    function computeMatches() {
+      if (matchMemo.revision === boardRevision) {
+        return matchMemo.matches;
+      }
+
+      const unique = new Map();
+
+      for (let row = 0; row < GRID_SIZE; row += 1) {
+        let streakStart = 0;
+        for (let col = 1; col <= GRID_SIZE; col += 1) {
+          const same = col < GRID_SIZE && board[row][col] === board[row][streakStart];
+          if (!same) {
+            const length = col - streakStart;
+            if (board[row][streakStart] !== -1 && length >= 3) {
+              for (let scan = streakStart; scan < col; scan += 1) {
+                unique.set(`${row}-${scan}`, { row, col: scan });
+              }
+            }
+            streakStart = col;
+          }
+        }
+      }
+
+      for (let col = 0; col < GRID_SIZE; col += 1) {
+        let streakStart = 0;
+        for (let row = 1; row <= GRID_SIZE; row += 1) {
+          const same = row < GRID_SIZE && board[row][col] === board[streakStart][col];
+          if (!same) {
+            const length = row - streakStart;
+            if (board[streakStart][col] !== -1 && length >= 3) {
+              for (let scan = streakStart; scan < row; scan += 1) {
+                unique.set(`${scan}-${col}`, { row: scan, col });
+              }
+            }
+            streakStart = row;
+          }
+        }
+      }
+
+      matchMemo = { revision: boardRevision, matches: Array.from(unique.values()) };
+      return matchMemo.matches;
+    }
+
+    function markMatchedTiles(matches) {
+      matches.forEach(({ row, col }) => {
+        const node = gridEl.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+        if (node) node.classList.add('matched');
+      });
+    }
+
+    function removeMatches(matches) {
+      matches.forEach(({ row, col }) => {
+        board[row][col] = -1;
+      });
+      boardBump();
+    }
+
+    function collapseBoard() {
+      for (let col = 0; col < GRID_SIZE; col += 1) {
+        let writeRow = GRID_SIZE - 1;
+        for (let row = GRID_SIZE - 1; row >= 0; row -= 1) {
+          if (board[row][col] !== -1) {
+            board[writeRow][col] = board[row][col];
+            if (writeRow !== row) board[row][col] = -1;
+            writeRow -= 1;
+          }
+        }
+        while (writeRow >= 0) {
+          board[writeRow][col] = randomTile();
+          writeRow -= 1;
+        }
+      }
+      boardBump();
+    }
+
+    function delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function resolveBoard() {
+      let chain = 0;
+      while (true) {
+        const matches = computeMatches();
+        if (!matches.length) break;
+
+        chain += 1;
+        markMatchedTiles(matches);
+        await delay(120);
+        removeMatches(matches);
+        score += matches.length * 10 * chain;
+        collapseBoard();
+        renderBoard();
+        await delay(80);
+      }
+
+      updateHud();
+      if (chain > 0) {
+        setStatus(`Alignment chain x${chain} committed. Score synchronized.`);
+      }
+    }
+
+    async function executeSwap(aRow, aCol, bRow, bCol) {
+      if (!isAdjacent(aRow, aCol, bRow, bCol) || isProcessing) return;
+      isProcessing = true;
+
+      swapCells(aRow, aCol, bRow, bCol);
+      renderBoard();
+
+      if (!computeMatches().length) {
+        await delay(120);
+        swapCells(aRow, aCol, bRow, bCol);
+        renderBoard();
+        setStatus('No valid chain. Try another alignment path.');
+        isProcessing = false;
+        return;
+      }
+
+      await resolveBoard();
+      isProcessing = false;
+    }
+
+    function resetGame() {
+      score = 0;
+      level = 1;
+      seedBoard();
+      updateHud();
+    }
+
+    function openGame() {
+      gamePanel.hidden = false;
+      if (!gridEl.children.length) {
+        resetGame();
+      }
+      gamePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      enterBtn.setAttribute('aria-expanded', 'true');
+      enterBtn.textContent = 'Matrix online';
+      enterBtn.disabled = true;
+    }
+
+    enterBtn.addEventListener('click', openGame);
+    resetBtn.addEventListener('click', resetGame);
+    updateHud();
+  </script>
+</body>
+</html>

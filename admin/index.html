@@ -1,96 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — Sovereign Matrix</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon.png">
-  <link rel="apple-touch-icon" href="/Assets/favicon.png">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="stylesheet" href="/admin/css/matrix.css">
-</head>
-<body>
+<section id="notice" class="matrix-card matrix-border" style="margin-top:1.5rem">
+  <p style="font-size:0.85rem;color:#b0c8b0">
+    Potential login issues detected. To ensure uninterrupted troubleshooting, all tools below are available
+    <strong>without requiring login</strong>. These links are safe for all users.
+  </p>
+</section>
 
-<nav class="matrix-nav">
-  <a href="/admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
-  <ul class="nav-links">
-    <li><a href="/admin/index.html" class="active">Dashboard</a></li>
-    <li><a href="/admin/users.html">Users</a></li>
-    <li><a href="/admin/keys.html">Keys</a></li>
-    <li><a href="/admin/diagnostics.html">Diagnostics</a></li>
-    <li><a href="/admin/network-defense.html">Network Defense</a></li>
-    <li><a href="/admin/logs.html">Logs</a></li>
+<section id="public-diagnostics" class="matrix-card matrix-border" style="margin-top:1rem">
+  <h2 class="matrix-heading">Diagnostic Tools (No Login Required)</h2>
+  <ul style="line-height:2.2;font-size:0.85rem;color:#b0c8b0;padding-left:1.25rem">
+    <li><a href="https://toolbox.googleapps.com/apps/browserinfo" target="_blank" rel="noopener noreferrer"><strong>Browserinfo</strong></a> — Captures browser details.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/useragent" target="_blank" rel="noopener noreferrer"><strong>Useragent</strong></a> — Analyzes user-agent strings.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/checkmx" target="_blank" rel="noopener noreferrer"><strong>Check MX</strong></a> — Validates MX records.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/dig" target="_blank" rel="noopener noreferrer"><strong>Dig</strong></a> — Web-based DNS lookup tool.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/har_analyzer" target="_blank" rel="noopener noreferrer"><strong>HAR Analyzer</strong></a> — Reviews HAR files.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/loganalyzer" target="_blank" rel="noopener noreferrer"><strong>Log Analyzer</strong></a> — Processes Chrome/Workspace logs.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/loganalyzer2" target="_blank" rel="noopener noreferrer"><strong>Log Analyzer 2</strong></a> — Handles large log files.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/messageheader" target="_blank" rel="noopener noreferrer"><strong>Messageheader</strong></a> — Analyzes email headers.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/encode_decode" target="_blank" rel="noopener noreferrer"><strong>Encode/Decode</strong></a> — Converts data formats.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/screen_recorder" target="_blank" rel="noopener noreferrer"><strong>Screen Recorder</strong></a> — Captures screen and audio.</li>
   </ul>
-  <span class="nav-user" id="nav-user"></span>
-</nav>
+</section>
 
-<div class="page-wrap">
+</div> <script type="module">
+  import { getCurrentUser, injectMasterKeyModal } from '/admin/js/admin-router.js';
 
-  <section class="matrix-card matrix-border">
-    <h1 class="matrix-heading glitch">Sovereign Matrix Admin Dashboard</h1>
-    <p style="font-size:0.78rem;color:#3a5a3a;margin-bottom:0.5rem">
-      Logged in as <strong id="user-role-display"></strong>
-    </p>
+  injectMasterKeyModal();
 
-    <div class="admin-grid">
-      <a href="/admin/users.html" class="admin-tile">
-        <h3>User Management</h3>
-        <p>Roles, permissions, tools</p>
-      </a>
+  const user = getCurrentUser();
+  const displayEmail = user.email || 'guest@local';
+  const roleText = `${displayEmail} (${user.role})`;
 
-      <a href="/admin/keys.html" class="admin-tile" id="tile-keys">
-        <h3>Admin Keys</h3>
-        <p>Generate &amp; redeem admin access</p>
-      </a>
+  const navUser = document.getElementById('nav-user');
+  const roleDisplay = document.getElementById('user-role-display');
 
-      <a href="/admin/diagnostics.html" class="admin-tile">
-        <h3>Diagnostics Console</h3>
-        <p>Browser &amp; DNS troubleshooting</p>
-      </a>
-
-      <a href="/admin/network-defense.html" class="admin-tile" id="tile-netdef">
-        <h3>Network Defense</h3>
-        <p>Assign Nexus Defense tools</p>
-      </a>
-
-      <a href="/admin/logs.html" class="admin-tile">
-        <h3>Audit Logs</h3>
-        <p>System events &amp; security logs</p>
-      </a>
-    </div>
-  </section>
-
-</div>
-
-<script type="module">
-  import { requireRole, logout, ROLES } from '/admin/js/admin-router.js';
-
-  const user = requireRole(ROLES.ALL_ADMIN);
-  if (!user) throw new Error('Unauthorized');
-
-  // Show current user info
-  document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
-  document.getElementById('user-role-display').textContent = `${user.email} — ${user.role}`;
-
-  // Hide tiles that require higher role
-  if (!ROLES.SUPER_PLUS.includes(user.role)) {
-    const keysLink   = document.getElementById('tile-keys');
-    const netdefLink = document.getElementById('tile-netdef');
-    if (keysLink)   { keysLink.style.opacity = '0.35'; keysLink.style.pointerEvents = 'none'; keysLink.title = 'Requires superAdmin+'; }
-    if (netdefLink) { netdefLink.style.opacity = '0.35'; netdefLink.style.pointerEvents = 'none'; netdefLink.title = 'Requires superAdmin+'; }
-  }
-
-  // Logout button (add one to the nav)
-  const nav = document.querySelector('.matrix-nav');
-  const logoutBtn = document.createElement('button');
-  logoutBtn.textContent = 'Logout';
-  logoutBtn.className   = 'btn btn-danger';
-  logoutBtn.style.fontSize = '0.72rem';
-  logoutBtn.style.padding  = '0.3rem 0.75rem';
-  logoutBtn.addEventListener('click', logout);
-  nav.appendChild(logoutBtn);
+  if (navUser) navUser.textContent = roleText;
+  if (roleDisplay) roleDisplay.textContent = `${displayEmail} — ${user.role}`;
 </script>
-
-</body>
-</html>

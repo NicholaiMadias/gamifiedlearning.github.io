@@ -1,0 +1,22 @@
+/* --- SVG Icon Integration & Glow --- */
+.nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor; /* Inherits color from nav-gold, nav-ruby, etc. */
+  filter: drop-shadow(0 0 5px currentColor);
+  vertical-align: middle;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  margin-right: 0.35rem;
+}
+
+.nav-btn:hover .nav-icon {
+  transform: scale(1.15) rotate(5deg);
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+/* Ensure virtue colors are mapped correctly */
+.nav-gold { color: var(--gold); }
+.nav-sapphire { color: var(--star-sapphire); }
+.nav-silver { color: var(--star-silver); }
+.nav-ruby { color: var(--star-ruby); }
+.nav-amethyst { color: var(--star-amethyst); }

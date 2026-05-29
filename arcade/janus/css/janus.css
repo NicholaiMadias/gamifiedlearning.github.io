@@ -1,0 +1,115 @@
+/**
+ * janus.css - Dual-phase metaphysical UI styles.
+ */
+
+:root {
+  --janus-white: #e2e8f0;
+  --janus-scarlet: #ff0040;
+  --janus-bg: #020617;
+  --janus-panel: rgba(15, 23, 42, 0.85);
+  --janus-border: rgba(126, 255, 216, 0.15);
+}
+
+* { box-sizing: border-box; }
+
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--janus-bg);
+  color: var(--janus-white);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+#janus-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#janus-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#janus-ui {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+
+#janus-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--janus-border);
+  background: var(--janus-panel);
+}
+
+.engine-id {
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #7effd8;
+}
+
+#janus-console {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  align-items: flex-end;
+}
+
+#janus-console-log {
+  width: 100%;
+  max-width: 400px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 11px;
+  color: #64748b;
+  pointer-events: auto;
+  background: rgba(0,0,0,0.3);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.dialogue-entry {
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.origin-arachne { color: var(--janus-white); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+.origin-queen { color: var(--janus-scarlet); text-shadow: 0 0 10px rgba(255,0,64,0.5); }
+
+#janus-controls {
+  padding: 20px;
+  display: flex;
+  gap: 15px;
+  pointer-events: auto;
+}
+
+button {
+  background: transparent;
+  border: 1px solid var(--janus-border);
+  color: var(--janus-white);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: var(--janus-border);
+  border-color: #7effd8;
+  color: #7effd8;
+}

@@ -1,0 +1,24 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Alcyone — Serenity (Type F) — Soft 6-Point Star (Star of David geometry) -->
+  <path
+    d="M64 16 L74 44 L104 44 L80 62 L90 90 L64 74 L38 90 L48 62 L24 44 L54 44 Z"
+    fill="none"
+    stroke="var(--star-alcyone-glow)"
+    stroke-width="3"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M64 38 L80 64 L64 90 L48 64 Z
+       M44 54 L84 54 L64 86 Z"
+    fill="var(--star-alcyone-core)"
+    stroke="none"
+    opacity="0.9"
+  />
+  <path
+    d="M64 20 L73 46 L100 46 L78 62 L86 88 L64 74 L42 88 L50 62 L28 46 L55 46 Z"
+    fill="var(--star-alcyone-core)"
+    stroke="var(--star-alcyone-glow)"
+    stroke-width="5"
+    stroke-linejoin="round"
+  />
+</svg>

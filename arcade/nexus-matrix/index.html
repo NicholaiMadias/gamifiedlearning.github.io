@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nexus Arcade — Matrix of Conscience</title>
+<script src="../../assets/vendor/hosted-only.js"></script>
+<style>
+  :root {
+    --bg: #020617;
+    --panel: #0f172a;
+    --accent: #7effd8;
+    --accent2: #8b5cf6;
+    --danger: #ff0040;
+    --text: #e2e8f0;
+    --mono: 'Courier New', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    touch-action: none;
+  }
+  #sidebar {
+    width: 320px;
+    background: var(--panel);
+    border-right: 1px solid #1e293b;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 10;
+  }
+  #sidebar h1 {
+    font-size: 16px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  #sidebar .sub {
+    font-size: 10px;
+    color: #64748b;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .routine {
+    padding: 12px;
+    border: 1px solid #1e293b;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(0,0,0,0.2);
+  }
+  .routine:hover {
+    border-color: var(--accent);
+    background: #1e293b;
+  }
+  .routine.active {
+    border-color: var(--accent2);
+    background: #1e1b4b;
+  }
+  .routine .title { color: var(--accent); font-size: 13px; font-weight: bold; }
+  .routine .desc { color: #94a3b8; font-size: 10px; margin-top: 4px; line-height: 1.4; }
+
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, #1a0533 0%, #020617 70%);
+  }
+  #console {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-size: 10px;
+    color: #64748b;
+    max-width: 300px;
+    pointer-events: none;
+    max-height: 100px;
+    overflow-y: hidden;
+  }
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  #sm-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    width: 100%;
+    aspect-ratio: 1;
+    background: rgba(255,255,255,0.02);
+    border: 2px solid var(--accent2);
+    padding: 6px;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+    touch-action: none;
+  }
+  .star-cell {
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    user-select: none;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: transform 0.1s, box-shadow 0.1s;
+    touch-action: none;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .star-cell.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent);
+    z-index: 5;
+  }
+  .star-cell.matched { animation: pop 0.3s ease forwards; }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); opacity: 0.5; }
+    100% { transform: scale(0); opacity: 0; }
+  }
+
+  #hud {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    text-align: right;
+    font-size: 12px;
+    pointer-events: none;
+  }
+  #hud .stat { margin-bottom: 4px; }
+  #hud .label { color: #64748b; margin-right: 8px; }
+  #hud .value { color: var(--accent); font-weight: bold; }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.95);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+  }
+  .overlay.active { display: flex; }
+  .overlay h2 { font-size: 24px; color: var(--accent); margin-bottom: 16px; }
+  .overlay p { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
+
+  button {
+    background: var(--accent2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-family: var(--mono);
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  button:hover { background: #a78bfa; }
+
+  .store-panel {
+    margin-top: auto;
+    border-top: 1px solid #1e293b;
+    padding-top: 20px;
+  }
+  .store-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    margin-bottom: 8px;
+    color: #94a3b8;
+  }
+  .store-item button {
+    padding: 4px 8px;
+    font-size: 9px;
+    margin-top: 0;
+  }
+
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #1e293b; padding: 16px; }
+    #main { flex: 1; min-height: 400px; }
+    #hud { top: auto; bottom: 16px; right: 16px; }
+    #console { top: 16px; left: 16px; }
+  }
+</style>
+  <script type="module" crossorigin src="../../assets/arcadeNexusMatrix-6t-Fds1W.js"></script>
+  <link rel="modulepreload" crossorigin href="../../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../../assets/matchmaker-BIZ3nePJ.js">
+</head>
+<body>
+<div id="sidebar">
+  <h1>NEXUS MATRIX</h1>
+  <div class="sub">AMAZING GRACE // VERSION 2.0.7</div>
+  
+  <div class="routine" data-mode="stars">
+    <div class="title">[STAR_MATRIX.exe]</div>
+    <div class="desc">Standard celestial alignment. Target: 1000. Stability: Nominal.</div>
+  </div>
+
+  <div class="routine" data-mode="conscience">
+    <div class="title">[CONSCIENCE_INIT.sys]</div>
+    <div class="desc">7-level virtue calibration. Higher stakes, adaptive difficulty.</div>
+  </div>
+
+  <div class="routine" data-mode="classic">
+    <div class="title">[GEM_MASTER.bin]</div>
+    <div class="desc">Endless gem processing. Classic arcade loop. High score focus.</div>
+  </div>
+
+  <div class="routine" data-mode="spider">
+    <div class="title">[SPIDER_PROTOCOL.exe]</div>
+    <div class="desc">Reflex training. High speed, low move count. Precision required.</div>
+  </div>
+
+  <div class="store-panel">
+    <div class="sub">VIRTUE UPGRADES</div>
+    <div class="store-item">
+        <span>SPIRIT GUIDE</span>
+        <button id="buy-guide">1000 PWR</button>
+    </div>
+    <div class="store-item">
+        <span>PWR BURST</span>
+        <button id="buy-burst">500 PWR</button>
+    </div>
+    <div class="store-item">
+        <input type="text" id="promo-code" placeholder="PROMO" style="width: 60px; background: #000; border: 1px solid #334155; color: var(--accent); font-size: 9px; padding: 2px 4px;">
+        <button id="run-promo">RUN</button>
+    </div>
+  </div>
+
+  <a href="../" style="margin-top: 24px; color: #64748b; font-size: 10px; text-decoration: none;">&lt;&lt; RETURN TO ARCADE</a>
+</div>
+
+<div id="main">
+  <div id="console">
+    [ SYSTEM BOOT SUCCESSFUL ]<br>
+    [ LOADING ASSETS... DONE ]<br>
+    [ SYNCING WITH FIREBASE... OK ]<br>
+    <span id="log-text">> Select a protocol to begin.</span>
+  </div>
+
+  <div id="hud">
+    <div class="stat"><span class="label">SCORE</span><span class="value" id="sm-score">0</span></div>
+    <div class="stat"><span class="label">TARGET</span><span class="value" id="sm-target">1000</span></div>
+    <div class="stat"><span class="label">MOVES</span><span class="value" id="sm-moves">30</span></div>
+    <div class="stat"><span class="label">COMBO</span><span class="value" id="sm-combo">x1</span></div>
+  </div>
+
+  <div class="game-container">
+    <div id="sm-grid"></div>
+  </div>
+
+  <div id="sm-overlay" class="overlay">
+    <h2 id="overlay-title">MISSION COMPLETE</h2>
+    <p id="overlay-desc">You have successfully aligned the matrix.</p>
+    <button id="overlay-btn">INITIALIZE REBOOT</button>
+  </div>
+</div>
+
+</body>
+</html>

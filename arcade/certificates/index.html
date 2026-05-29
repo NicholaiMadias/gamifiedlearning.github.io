@@ -1,15 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Certificates | Nexus Arcade</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon.png">
-  <link rel="apple-touch-icon" href="/Assets/favicon.png">
-  <link rel="manifest" href="/manifest.json">
+  <title>My Certificates | Nexus Arcade — Amazing Grace</title>
+  <script src="../../assets/vendor/hosted-only.js"></script>
+  <script>
+    window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap");
+  </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
     :root {
       --neon-blue:   #00f2ff;
       --neon-purple: #bc13fe;
@@ -36,10 +60,66 @@
       max-width: 860px; margin: 0 auto 2rem;
       display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
     }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
     .page-header h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; color: #fff; }
     .page-header p  { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--neon-blue); margin-top: 0.25rem; }
     .back-link { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); text-decoration: none; white-space: nowrap; padding-top: 0.4rem; }
     .back-link:hover { color: var(--neon-blue); }
+
+    /* 3D glowing star */
+    .glow-star {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(251,191,36,0.35), rgba(188,19,254,0.12) 55%, rgba(0,242,255,0.08) 80%, rgba(0,0,0,0) 100%);
+      box-shadow:
+        0 0 18px rgba(188,19,254,0.24),
+        0 0 32px rgba(0,242,255,0.12),
+        inset 0 0 18px rgba(251,191,36,0.14);
+      transform-style: preserve-3d;
+      animation: starSpin 7s linear infinite;
+      border: 1px solid rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+    .glow-star::before {
+      content: '';
+      position: absolute;
+      inset: -20%;
+      background: conic-gradient(from 220deg, rgba(0,242,255,0.0), rgba(0,242,255,0.25), rgba(188,19,254,0.0), rgba(251,191,36,0.28), rgba(0,242,255,0.0));
+      filter: blur(8px);
+      opacity: 0.9;
+      animation: starSheen 2.8s ease-in-out infinite;
+      transform: translateZ(-10px);
+    }
+    .glow-star svg {
+      width: 26px;
+      height: 26px;
+      filter: drop-shadow(0 0 14px rgba(251,191,36,0.6)) drop-shadow(0 0 22px rgba(188,19,254,0.35));
+      transform: translateZ(18px);
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes starSpin {
+      0%   { transform: rotateX(18deg) rotateY(0deg) rotateZ(0deg); }
+      100% { transform: rotateX(18deg) rotateY(360deg) rotateZ(360deg); }
+    }
+    @keyframes starSheen {
+      0%, 100% { opacity: 0.75; transform: rotate(0deg) translateZ(-10px); }
+      50%      { opacity: 1; transform: rotate(180deg) translateZ(-10px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .glow-star { animation: none; }
+      .glow-star::before { animation: none; }
+    }
 
     /* Certificate cards */
     .cert-list { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
@@ -80,15 +160,26 @@
     /* Divider */
     .count-label { max-width: 860px; margin: 0 auto 0.75rem; font-size: 0.65rem; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
   </style>
+  <script type="module" crossorigin src="../../assets/arcadeCertificates-BBxJchFl.js"></script>
+  <link rel="modulepreload" crossorigin href="../../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../../assets/firebase-BjiTomjT.js">
+  <link rel="modulepreload" crossorigin href="../../assets/nexus-firestore-BfeRvaK7.js">
 </head>
 <body>
   <!-- Header -->
   <div class="page-header">
-    <div>
-      <h1>CERTIFICATES</h1>
-      <p>Nexus Arcade — Completion Records</p>
+    <div class="header-left">
+      <div class="glow-star" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" role="presentation">
+          <path d="M12 2.2l2.9 6.1 6.7.9-4.9 4.7 1.2 6.7L12 17.9 6.1 20.6l1.2-6.7L2.4 9.2l6.7-.9L12 2.2z" fill="rgba(251,191,36,0.95)"/>
+        </svg>
+      </div>
+      <div>
+        <h1>CERTIFICATES</h1>
+        <p>Nexus Arcade — Completion Records</p>
+      </div>
     </div>
-    <a class="back-link" href="/arcade/">← Back to Arcade</a>
+    <a class="back-link" href="../">← Back to Arcade</a>
   </div>
 
   <!-- Certificate list (populated by JS) -->
@@ -100,52 +191,8 @@
     <div class="icon" aria-hidden="true">🎮</div>
     <h2>No Certificates Yet</h2>
     <p>Complete a game to earn your first certificate.</p>
-    <a class="play-btn" href="/arcade/">▶ Play Match Maker</a>
+    <a class="play-btn" href="../">▶ Play Now</a>
   </div>
-
-  <script>
-    (function () {
-      let certs = [];
-      try {
-        certs = JSON.parse(localStorage.getItem('arcade-certificates') || '[]');
-      } catch (_) { /* storage unavailable */ }
-
-      const list       = document.getElementById('cert-list');
-      const emptyState = document.getElementById('empty-state');
-      const countLabel = document.getElementById('count-label');
-
-      if (!Array.isArray(certs) || certs.length === 0) {
-        emptyState.style.display = '';
-        return;
-      }
-
-      countLabel.textContent = certs.length + ' certificate' + (certs.length !== 1 ? 's' : '') + ' earned';
-
-      // Show newest first
-      certs.slice().reverse().forEach(function (cert) {
-        var card = document.createElement('div');
-        card.className = 'cert-card';
-        card.innerHTML =
-          '<div class="cert-meta">' +
-            '<div class="cert-game">' + esc(cert.game || 'Unknown Game') + '</div>' +
-            '<div class="cert-player">Player: <span>' + esc(cert.player || 'Player') + '</span></div>' +
-            '<div class="cert-detail">Completed: ' + esc(cert.date || '—') +
-              (cert.score != null ? ' &nbsp;·&nbsp; Score: ' + esc(String(cert.score)) : '') +
-            '</div>' +
-            '<div class="cert-id">ID: ' + esc(cert.id || '—') + '</div>' +
-          '</div>' +
-          '<div class="cert-icon" aria-hidden="true">🏆</div>';
-        list.appendChild(card);
-      });
-
-      function esc(str) {
-        return String(str)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
-    })();
-  </script>
+
 </body>
 </html>

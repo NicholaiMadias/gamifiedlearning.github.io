@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <!--
+    master-atlas.svg — Nexus Arcade V2 SVG Sprite Atlas
+    7 elemental icons: radiant, tide, verdant, forge, aether, umbra, void
+    (c) 2026 NicholaiMadias — MIT License
+  -->
+
+  <!-- RADIANT — sun with 8 rays -->
+  <symbol id="icon-radiant" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="9" fill="currentColor"/>
+    <line x1="24" y1="3"  x2="24" y2="11" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="24" y1="37" x2="24" y2="45" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="3"  y1="24" x2="11" y2="24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="37" y1="24" x2="45" y2="24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="8.3"  y1="8.3"  x2="13.9" y2="13.9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="34.1" y1="34.1" x2="39.7" y2="39.7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="39.7" y1="8.3"  x2="34.1" y2="13.9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="13.9" y1="34.1" x2="8.3"  y2="39.7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- TIDE — overlapping wave arcs -->
+  <symbol id="icon-tide" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 20 Q10 13 16 20 Q22 27 28 20 Q34 13 44 20"
+          stroke="currentColor" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M4 29 Q10 22 16 29 Q22 36 28 29 Q34 22 44 29"
+          stroke="currentColor" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.65"/>
+  </symbol>
+
+  <!-- VERDANT — simple leaf with midrib -->
+  <symbol id="icon-verdant" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 6 C10 10 8 26 12 36 C16 44 24 44 24 44 C24 44 32 44 36 36 C40 26 38 10 24 6 Z"
+          fill="currentColor"/>
+    <line x1="24" y1="6" x2="24" y2="44"
+          stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M24 20 Q30 24 32 30" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M24 28 Q18 32 16 36" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- FORGE — teardrop flame with inner highlight -->
+  <symbol id="icon-forge" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 4 C17 12 11 18 13 27 C15 36 20 42 24 44 C28 42 33 36 35 27 C37 18 31 12 24 4 Z"
+          fill="currentColor"/>
+    <path d="M24 18 C21 22 19 26 20 30 C21 34 24 38 24 38 C24 38 27 34 28 30 C29 26 27 22 24 18 Z"
+          fill="rgba(255,220,80,0.55)"/>
+  </symbol>
+
+  <!-- AETHER — 4-pointed star / diamond sparkle -->
+  <symbol id="icon-aether" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 3 L26.5 21.5 L45 24 L26.5 26.5 L24 45 L21.5 26.5 L3 24 L21.5 21.5 Z"
+          fill="currentColor"/>
+    <path d="M24 10 L25.5 22.5 L38 24 L25.5 25.5 L24 38 L22.5 25.5 L10 24 L22.5 22.5 Z"
+          fill="rgba(255,255,255,0.25)"/>
+  </symbol>
+
+  <!-- UMBRA — crescent moon -->
+  <symbol id="icon-umbra" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 8 A17 17 0 1 0 30 40 A11 11 0 1 1 30 8 Z"
+          fill="currentColor"/>
+  </symbol>
+
+  <!-- VOID — concentric rings / singularity -->
+  <symbol id="icon-void" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="18" fill="currentColor"/>
+    <circle cx="24" cy="24" r="12" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="2"/>
+    <circle cx="24" cy="24" r="6"  fill="none" stroke="rgba(255,255,255,0.20)" stroke-width="2"/>
+    <circle cx="24" cy="24" r="2"  fill="rgba(255,255,255,0.40)"/>
+  </symbol>
+
+</svg>

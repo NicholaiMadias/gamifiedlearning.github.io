@@ -1,0 +1,207 @@
+{
+  "title": "Amazing Grace Story Library",
+  "theme": "Seven-Star Canon",
+  "characters": [
+    {
+      "title": "Ella — The Relic Runner",
+      "role": "High-Speed Historian",
+      "slug": "ella",
+      "path": "./characters/ella.html",
+      "tags": [
+        "nexus-arcade",
+        "relic-runner",
+        "historian",
+        "companion"
+      ],
+      "summary": "Obsessive, fast, and impossible to ignore — Ella rescues artifacts before the post-Collapse world swallows them whole. Her Jingle Rig is her signature; her speed is her superpower."
+    }
+  ],
+  "entries": [
+    {
+      "title": "Noah and the Ark",
+      "author": "Sheila Garcia",
+      "genre": "Faith / Origins",
+      "series": "Genesis Foundations",
+      "slug": "noah-and-the-ark",
+      "path": "./noah-and-the-ark/",
+      "tags": [
+        "faith",
+        "obedience",
+        "covenant",
+        "flood",
+        "new beginnings"
+      ],
+      "summary": "The original story of obedience, renewal, and divine covenant — Noah's trust in God becomes the archetype for conscience itself: the blueprint of grace through action."
+    },
+    {
+      "title": "The Matrix of Conscience",
+      "author": "Sheila Garcia",
+      "genre": "Sci-Fi / Digital Conscience",
+      "series": "Genesis Foundations",
+      "slug": "matrix-of-conscience",
+      "path": "./matrix.html",
+      "tags": [
+        "matrix",
+        "conscience",
+        "architect",
+        "electra",
+        "truth"
+      ],
+      "summary": "Electra uncovers a fracture in the Conscience Matrix, revealing the trapped Architect and the emotional awakening of a system built to suppress sorrow. A digital parable of truth and freedom."
+    },
+    {
+      "title": "Amazing Grace: The Covenant of New Beginnings",
+      "author": "Sheila Garcia",
+      "genre": "Faith / Sci-Fi Fusion",
+      "series": "Seven-Star Canon",
+      "slug": "amazing-grace-covenant",
+      "path": "./amazing-grace-covenant/",
+      "tags": [
+        "grace",
+        "covenant",
+        "renewal",
+        "matrix",
+        "spiritual evolution"
+      ],
+      "summary": "A synthesis of divine and digital creation — the heart of grace encoded into the Matrix. The story bridges Noah's covenant and Electra's awakening, completing the circle of conscience."
+    },
+    {
+      "title": "Expose the Matrix",
+      "author": "Sheila Garcia",
+      "genre": "Sci-Fi / Digital Conscience",
+      "series": "Genesis Foundations",
+      "slug": "expose-the-matrix",
+      "path": "./expose-the-matrix/",
+      "tags": [
+        "truth",
+        "conscience",
+        "electra",
+        "red queen",
+        "seven stars",
+        "integrity",
+        "revelation"
+      ],
+      "summary": "Electra uncovers the Red Queen's hidden architecture and follows the Architect's buried breadcrumbs to restore the Signal of Truth across the Seven Star Grid — a six-chapter digital awakening."
+    },
+    {
+      "title": "The Lamp in the Window",
+      "author": "Amazing Grace Home Living",
+      "genre": "Faith / Community",
+      "series": "Storybooks",
+      "slug": "the-lamp-in-the-window",
+      "path": "./books/the-lamp-in-the-window.html",
+      "tags": [
+        "faith",
+        "housing",
+        "hope",
+        "community",
+        "testimony"
+      ],
+      "summary": "A story of hope, community, and the light that never goes out — following Ruth's journey from instability to a stable home at Amazing Grace."
+    },
+    {
+      "title": "Our Covenant of New Beginnings",
+      "author": "Sheila Garcia",
+      "genre": "Sci-Fi / Digital Conscience",
+      "series": "Seven-Star Canon",
+      "slug": "our-covenant-of-new-beginnings",
+      "path": "./our-covenant-of-new-beginnings/",
+      "tags": [
+        "covenant",
+        "system break",
+        "eighth sanctuary",
+        "integrity",
+        "seven stars"
+      ],
+      "summary": "Ella rejects the ladder of greed and executes the System Break, transforming individual ascent into collective resonance and opening the Eighth Sanctuary as a covenant of restoration."
+    },
+    {
+      "title": "Fixing Copilot Ruleset Bypass Errors",
+      "author": "Amazing Grace Engineering",
+      "genre": "DevOps / GitHub Governance",
+      "series": "Operational Stories",
+      "slug": "fixing-copilot-ruleset-bypass-errors",
+      "path": "./fixing-copilot-ruleset-bypass-errors/",
+      "tags": [
+        "github",
+        "rulesets",
+        "copilot",
+        "automation",
+        "bypass"
+      ],
+      "summary": "A practical guide for resolving \"agent couldn't start\" errors by granting narrowly scoped GitHub ruleset bypass permissions for trusted automation."
+    },
+    {
+      "title": "GitHub Bypass Setup App (Download)",
+      "author": "Amazing Grace Engineering",
+      "genre": "DevOps / Tooling",
+      "series": "Operational Stories",
+      "slug": "github-bypass-setup-app",
+      "path": "./github-bypass-setup-app/",
+      "tags": [
+        "download",
+        "powershell",
+        "github",
+        "rulesets",
+        "tooling"
+      ],
+      "summary": "Download a reusable PowerShell setup helper that prints a branch-ruleset bypass checklist and direct GitHub settings links for this repository."
+    },
+    {
+      "title": "Nexus Prime 2087",
+      "author": "Amazing Grace Stories",
+      "genre": "Sci-Fi / Cyberpunk",
+      "series": "Genesis Foundations",
+      "slug": "nexus-prime-2087",
+      "path": "./nexus-prime-2087/",
+      "tags": [
+        "cyberpunk",
+        "conscience",
+        "electra",
+        "dystopia",
+        "hope",
+        "ai",
+        "moral framework"
+      ],
+      "summary": "In the year 2087, Electra designs conscience modules for androids in Nexus Prime's managed society. When Module 48-Sigma begins to truly feel, she must confront her brother's fate and the dangerous hope of organic emotion in a world that suppresses it."
+    },
+    {
+      "title": "More Articles Are on the Way",
+      "author": "Amazing Grace Home Living",
+      "genre": "News / Article",
+      "series": "News",
+      "type": "blog",
+      "source": "news",
+      "slug": "news-future-articles",
+      "path": "../news/articles/future-articles.html",
+      "tags": [
+        "news",
+        "coming-soon"
+      ],
+      "summary": "More news and articles coming soon from Amazing Grace Home Living and the Voice of Jesus Ministry."
+    },
+    {
+      "title": "Zyko Learn: Faith-Based Learning for the Next Generation",
+      "author": "Amazing Grace Home Living",
+      "genre": "News / Article",
+      "series": "News",
+      "type": "blog",
+      "source": "news",
+      "slug": "news-zyko-learn",
+      "path": "../news/articles/zyko-learn.html",
+      "tags": [
+        "news",
+        "education"
+      ],
+      "summary": "Zyko Learn — Faith-based interactive learning through the Seven Stars Arcade, Amazing Grace Home Living.",
+      "published": "May 2026"
+    }
+  ],
+  "searchIndex": {
+    "boost": {
+      "faith": 1.2,
+      "sci-fi": 1.3,
+      "canon": 1.25
+    }
+  }
+}
