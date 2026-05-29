@@ -75,6 +75,32 @@ describe('matchMakerState (v1) — match detection and special classification', 
     );
   });
 
+  test('findMatches classifies a 5-cell line as a supernova and applyMatches preserves it', () => {
+    const grid = make7x7('star');
+    const t = 'heart';
+    grid[3][1] = gem(t);
+    grid[3][2] = gem(t);
+    grid[3][3] = gem(t);
+    grid[3][4] = gem(t);
+    grid[3][5] = gem(t);
+
+    const res = findMatches(grid);
+    expect(res.specials).toEqual(
+      expect.arrayContaining([
+        { row: 3, col: 3, specialType: 'supernova' },
+      ])
+    );
+
+    const next = applyMatches(grid, res, 1);
+    expect(next[3][3]).toEqual(
+      expect.objectContaining({ type: t, special: 'supernova' })
+    );
+    expect(next[3][1]).toBeNull();
+    expect(next[3][2]).toBeNull();
+    expect(next[3][4]).toBeNull();
+    expect(next[3][5]).toBeNull();
+  });
+
   test('applyMatches clears matched cells but keeps newly-created specials', () => {
     const grid = make7x7('star');
     const t = 'cross';
@@ -98,4 +124,3 @@ describe('matchMakerState (v1) — match detection and special classification', 
     expect(next[4][3]).toBeNull();
   });
 });
-

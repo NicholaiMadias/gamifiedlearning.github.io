@@ -23,6 +23,12 @@ function getAdminApiKey(req) {
 }
 
 function isValidAdminApiKey(candidate, expected) {
+  if (typeof expected !== 'string' || expected.length === 0) {
+    return false;
+  }
+  if (typeof candidate !== 'string') {
+    return false;
+  }
   const candidateHash = crypto.createHash('sha256').update(candidate || '').digest();
   const expectedHash = crypto.createHash('sha256').update(expected).digest();
   return crypto.timingSafeEqual(candidateHash, expectedHash);
