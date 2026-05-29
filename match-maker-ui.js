@@ -37,14 +37,18 @@ const STORE_ITEMS = [
   { id: 'wild', label: 'Rainbow Wild', cost: 4, detail: 'Adds a wild gem that links any combo.', action: () => injectSpecial('wild') },
 ];
 
+const STAR_SHEET_URL = 'https://github.com/user-attachments/assets/ffa6a239-a672-4607-974f-ab1fb0475410';
+const SHOOTING_STAR_FX_URL = 'https://github.com/user-attachments/assets/b2877683-8436-49bd-8bc8-69fdfbf9f717';
+const SUPERNOVA_FX_URL = 'https://github.com/user-attachments/assets/7d098ae2-7b30-4cdd-a1f9-45ef3083211c';
+
 // Gem image mapping
 const GEM_IMAGES = {
   'heart': null,
-  'star': 'gold_star.png',
+  'star': STAR_SHEET_URL,
   'cross': null,
   'flame': null,
-  'drop': 'shooting_star.png',
-  'wild': null // Will use emoji for wild
+  'drop': SHOOTING_STAR_FX_URL,
+  'wild': STAR_SHEET_URL,
 };
 
 export function initMatchMaker(dbRef, userRef) {
@@ -462,6 +466,9 @@ function createParticles(matchCells) {
         'wild': '#7effd8'
       };
       particle.style.background = colors[cell?.kind] || '#7effd8';
+      if (cell?.kind === 'star') particle.style.backgroundImage = `url('${STAR_SHEET_URL}')`;
+      if (cell?.kind === 'drop') particle.style.backgroundImage = `url('${SHOOTING_STAR_FX_URL}')`;
+      if (cell?.special === 'wild') particle.style.backgroundImage = `url('${SUPERNOVA_FX_URL}')`;
 
       // Position relative to cell
       const offsetX = rect.left - containerRect.left + rect.width / 2;
