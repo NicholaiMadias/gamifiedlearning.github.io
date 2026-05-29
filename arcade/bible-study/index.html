@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Amazing Grace Bible Study Quiz — test your knowledge of scripture with multiple-choice questions from the Old and New Testament.">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Bible Study Quiz — Amazing Grace Nexus Arcade">
+    <meta property="og:description" content="Test your knowledge of scripture with multiple-choice questions drawn from the Old and New Testament.">
+    <meta property="og:url" content="https://amazinggracehl.org/arcade/bible-study">
+
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>Bible Study Quiz | Nexus Arcade — Amazing Grace</title>
+
+    <script src="../../assets/vendor/tailwindcss.js"></script>
+    <script src="../../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@700;900&family=Playfair+Display:wght@700&display=swap");
+    </script>
+    <style>
+        :root {
+            --bg:        #0f172a;
+            --surface:   #1e293b;
+            --surface2:  #0f172a;
+            --border:    #334155;
+            --accent:    #34d399;
+            --accent2:   #ffd700;
+            --ag-text:      #e2e8f0;
+            --ag-text-muted:#94a3b8;
+            --header-bg: #0f172a;
+            --nav-btn:   #1e3a8a;
+            --nav-btn-h: #2563eb;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--ag-text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        @media (prefers-reduced-motion: no-preference) { body { scroll-behavior: smooth; } }
+        *:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+        /* ── Header ── */
+        .site-header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+        .logo img { height: 36px; width: auto; border-radius: 4px; }
+        .main-nav { display: flex; gap: 0.5rem; align-items: center; }
+        .nav-btn {
+            text-decoration: none;
+            color: var(--ag-text);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            background: var(--nav-btn);
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active { background: var(--nav-btn-h); color: white; }
+        .menu-toggle { display: none; background: none; border: 1px solid var(--border); color: var(--ag-text); border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 1.1rem; }
+        @media (max-width: 640px) {
+            .main-nav { display: none; flex-direction: column; position: absolute; top: 64px; right: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem; gap: 0.4rem; z-index: 100; min-width: 160px; }
+            .main-nav.show { display: flex; }
+            .menu-toggle { display: block; }
+        }
+
+        /* ── Portal bar ── */
+        .portal-bar { display: flex; justify-content: center; gap: 0.5rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .portal-link { text-decoration: none; color: var(--ag-text-muted); font-size: 0.8rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 999px; transition: color 0.2s, background 0.2s; }
+        .portal-link:hover, .portal-link.active { color: white; background: rgba(255,255,255,0.08); }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 1.5rem 2rem 0;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+        .back-link:hover { opacity: 1; }
+
+        /* ── Game header ── */
+        .game-header {
+            text-align: center;
+            padding: 2rem 1.5rem 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .game-header-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .game-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            font-weight: 900;
+            color: var(--accent);
+            margin: 0 0 0.5rem;
+            letter-spacing: 0.04em;
+        }
+        .game-header p { color: var(--ag-text-muted); font-size: 0.9rem; line-height: 1.65; margin: 0; }
+
+        /* ── Quiz container ── */
+        main { flex: 1; padding-bottom: 3rem; }
+
+        .quiz-wrap {
+            max-width: 640px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        /* ── HUD ── */
+        .quiz-hud {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .hud-stat { text-align: center; }
+        .hud-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ag-text-muted); margin-bottom: 0.2rem; }
+        .hud-value { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; color: white; }
+        .hud-value.credits { color: var(--accent2); }
+
+        /* ── Progress bar ── */
+        .progress-track { background: var(--surface); border-radius: 999px; height: 6px; margin-bottom: 1.5rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.4s ease; }
+
+        /* ── Question card ── */
+        .question-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        .question-meta { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ag-text-muted); margin-bottom: 0.75rem; }
+        .question-text {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: white;
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+        .choices { display: flex; flex-direction: column; gap: 0.6rem; }
+        .choice-btn {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--ag-text);
+            font-size: 0.9rem;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(52,211,153,0.06); transform: translateX(2px); }
+        .choice-btn:disabled { cursor: default; }
+        .choice-btn.correct { border-color: #34d399; background: rgba(52,211,153,0.12); color: white; }
+        .choice-btn.wrong   { border-color: #f87171; background: rgba(248,113,113,0.10); color: #f87171; }
+        .choice-key {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .choice-btn.correct .choice-key { background: rgba(52,211,153,0.2); border-color: #34d399; }
+        .choice-btn.wrong   .choice-key { background: rgba(248,113,113,0.15); border-color: #f87171; }
+
+        /* ── Feedback ── */
+        .feedback-bar {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .feedback-bar.show { display: flex; }
+        .feedback-bar.correct-fb { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: #34d399; }
+        .feedback-bar.wrong-fb   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
+        .feedback-bar .fb-verse  { color: var(--ag-text-muted); font-style: italic; font-size: 0.8rem; margin-top: 0.3rem; }
+
+        /* ── Next button ── */
+        .next-btn {
+            display: none;
+            margin: 0 auto;
+            padding: 0.75rem 2rem;
+            background: var(--accent);
+            color: #012916;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.1s;
+        }
+        .next-btn.show { display: block; }
+        .next-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+        /* ── Completion screen ── */
+        .completion-card {
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            max-width: 560px;
+            margin: 0 auto;
+            box-shadow: 0 0 40px rgba(52,211,153,0.15);
+        }
+        .completion-card .trophy { font-size: 3.5rem; margin-bottom: 0.75rem; }
+        .completion-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 4vw, 1.9rem);
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .completion-card p { color: var(--ag-text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.25rem; }
+        .score-banner {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .score-item { text-align: center; }
+        .score-item .val { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; color: white; }
+        .score-item .val.credits { color: var(--accent2); }
+        .score-item .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ag-text-muted); margin-top: 0.2rem; }
+        .restart-btn {
+            padding: 0.75rem 2rem;
+            background: var(--accent);
+            color: #012916;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: filter 0.2s;
+        }
+        .restart-btn:hover { filter: brightness(1.1); }
+        .arcade-btn {
+            padding: 0.75rem 2rem;
+            background: rgba(255,255,255,0.07);
+            color: var(--ag-text);
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0.5rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: border-color 0.2s;
+        }
+        .arcade-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ── Intro card ── */
+        .intro-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 560px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .intro-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 0.75rem;
+        }
+        .intro-card p { color: var(--ag-text-muted); font-size: 0.875rem; line-height: 1.65; margin-bottom: 1rem; }
+        .start-btn {
+            padding: 0.75rem 2rem;
+            background: var(--accent);
+            color: #012916;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+        .start-btn:hover { filter: brightness(1.1); }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../../#properties">Listings</a>
+                <a href="../../stories/">Stories</a>
+                <a href="../" class="active" aria-current="page">Arcade</a>
+                <a href="../../ministry/">Ministry</a>
+                <a href="../../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="portal-bar" role="navigation" aria-label="Portal navigation">
+        <a href="../../#properties" class="portal-link">🏠 Listings</a>
+        <a href="../" class="portal-link active" aria-current="page">🎮 Arcade</a>
+        <a href="../../ministry/" class="portal-link">🕊️ Ministry</a>
+        <a href="../../contact/" class="portal-link">✉️ Contact</a>
+    </div>
+
+    <main>
+        <a href=".." class="back-link" aria-label="Back to Arcade">← Back to Arcade</a>
+
+        <div class="game-header">
+            <div class="game-header-icon">📖</div>
+            <h1>Bible Study Quiz</h1>
+            <p>Test your knowledge of scripture — Old and New Testament. Each correct answer earns credits toward your Nexus Arcade progress.</p>
+        </div>
+
+        <div class="quiz-wrap">
+
+            <!-- Intro screen -->
+            <div id="screen-intro" class="screen active">
+                    <div class="intro-card">
+                    <h2>Welcome to Bible Study</h2>
+                    <p>Answer <strong style="color:white">10 multiple-choice questions</strong> drawn from Old and New Testament scripture. Each correct answer earns <strong style="color:#ffd700">10 ⭐ credits</strong>.</p>
+                    <p style="margin-bottom:1.5rem;">Your credits are shared with <a href="../star-matrix/" style="color:var(--accent);font-weight:700;">Star Matrix</a> and <a href="../trinity/" style="color:var(--accent);font-weight:700;">Trinity Match</a>.</p>
+                    <button class="start-btn" onclick="startQuiz()">📖 Begin Quiz</button>
+                </div>
+            </div>
+
+            <!-- Quiz screen -->
+            <div id="screen-quiz" class="screen">
+                <!-- HUD -->
+                <div class="quiz-hud">
+                    <div class="hud-stat">
+                        <div class="hud-label">Question</div>
+                        <div class="hud-value"><span id="q-num">1</span> / <span id="q-total">10</span></div>
+                    </div>
+                    <div class="hud-stat">
+                        <div class="hud-label">Score</div>
+                        <div class="hud-value" id="hud-score">0</div>
+                    </div>
+                    <div class="hud-stat">
+                        <div class="hud-label">⭐ Credits</div>
+                        <div class="hud-value credits" id="hud-credits">0</div>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div class="progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="10" id="progress-bar-wrap">
+                    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+                </div>
+
+                <!-- Question -->
+                <div class="question-card" id="question-card">
+                    <div class="question-meta" id="q-meta"></div>
+                    <div class="question-text" id="q-text"></div>
+                    <div class="choices" id="choices-list"></div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="feedback-bar" id="feedback-bar">
+                    <span id="fb-icon"></span>
+                    <div>
+                        <div id="fb-text"></div>
+                        <div class="fb-verse" id="fb-verse"></div>
+                    </div>
+                </div>
+
+                <!-- Next -->
+                <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+            </div>
+
+            <!-- Completion screen -->
+            <div id="screen-complete" class="screen">
+                <div class="completion-card">
+                    <div class="trophy">🏆</div>
+                    <h2>Quiz Complete!</h2>
+                    <p>You've finished the Bible Study Quiz. Well done, traveler.</p>
+                    <div class="score-banner">
+                        <div class="score-item">
+                            <div class="val" id="final-score">0</div>
+                            <div class="lbl">Points</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="val" id="final-correct">0</div>
+                            <div class="lbl">Correct</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="val credits" id="final-credits">0</div>
+                            <div class="lbl">⭐ Credits Earned</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="restart-btn" onclick="startQuiz()">🔄 Play Again</button>
+                        <a href=".." class="arcade-btn">🎮 Back to Arcade</a>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.quiz-wrap -->
+    </main>
+
+    <script>
+    // ── Question bank ──────────────────────────────────────────────────
+    const ALL_QUESTIONS = [
+        {
+            category: 'Old Testament',
+            question: "How many days and nights did it rain during Noah's flood?",
+            choices: ['7', '20', '40', '120'],
+            correct: 2,
+            verse: 'Genesis 7:12 — "And the rain fell upon the earth forty days and forty nights."'
+        },
+        {
+            category: 'Old Testament',
+            question: 'Who was sold into slavery by his brothers in Egypt?',
+            choices: ['Moses', 'Joseph', 'Benjamin', 'Isaac'],
+            correct: 1,
+            verse: 'Genesis 37:28 — "They sold Joseph to the Ishmaelites for twenty pieces of silver."'
+        },
+        {
+            category: 'Old Testament',
+            question: 'What instrument did David play before King Saul?',
+            choices: ['Trumpet', 'Harp', 'Lyre', 'Flute'],
+            correct: 1,
+            verse: '1 Samuel 16:23 — "David took the harp and played it with his hand."'
+        },
+        {
+            category: 'Old Testament',
+            question: "In which city was Solomon's Temple built?",
+            choices: ['Bethlehem', 'Jericho', 'Jerusalem', 'Nazareth'],
+            correct: 2,
+            verse: '1 Kings 6:1 — "Solomon began to build the house of the LORD in Jerusalem."'
+        },
+        {
+            category: 'Old Testament',
+            question: 'What did God use to write the Ten Commandments?',
+            choices: ['His finger', 'A golden pen', 'Fire', "An angel's quill"],
+            correct: 0,
+            verse: 'Exodus 31:18 — "tablets of stone, written with the finger of God."'
+        },
+        {
+            category: 'New Testament',
+            question: 'In what town was Jesus born?',
+            choices: ['Nazareth', 'Jerusalem', 'Bethlehem', 'Jericho'],
+            correct: 2,
+            verse: 'Luke 2:4–7 — "Joseph went to Bethlehem … she gave birth to her firstborn son."'
+        },
+        {
+            category: 'New Testament',
+            question: 'How many disciples did Jesus choose?',
+            choices: ['7', '10', '12', '70'],
+            correct: 2,
+            verse: 'Luke 6:13 — "He chose twelve of them, whom he also named apostles."'
+        },
+        {
+            category: 'New Testament',
+            question: 'What was the first miracle Jesus performed?',
+            choices: ['Healing the blind', 'Turning water into wine', 'Walking on water', 'Feeding 5,000'],
+            correct: 1,
+            verse: 'John 2:11 — "Jesus performed his first miracle at Cana of Galilee — turning water to wine."'
+        },
+        {
+            category: 'New Testament',
+            question: 'Who baptised Jesus in the Jordan River?',
+            choices: ['Peter', 'Philip', 'John the Baptist', 'Andrew'],
+            correct: 2,
+            verse: 'Matthew 3:13 — "Jesus came from Galilee to the Jordan to be baptized by John."'
+        },
+        {
+            category: 'New Testament',
+            question: 'Which gospel opens with "In the beginning was the Word"?',
+            choices: ['Matthew', 'Mark', 'Luke', 'John'],
+            correct: 3,
+            verse: 'John 1:1 — "In the beginning was the Word, and the Word was with God, and the Word was God."'
+        },
+        {
+            category: 'Old Testament',
+            question: "What was the name of Abraham's wife?",
+            choices: ['Rebekah', 'Leah', 'Sarah', 'Rachel'],
+            correct: 2,
+            verse: 'Genesis 17:15 — "As for Sarai your wife, you shall not call her name Sarai, but Sarah shall be her name."'
+        },
+        {
+            category: 'New Testament',
+            question: 'Which book of the Bible immediately follows John?',
+            choices: ['Romans', 'Acts', 'Galatians', 'Hebrews'],
+            correct: 1,
+            verse: 'Acts 1:1 — "In my former book, Theophilus, I wrote about all that Jesus began to do and to teach."'
+        },
+        {
+            category: 'Old Testament',
+            question: 'Who was the first king of Israel?',
+            choices: ['David', 'Solomon', 'Saul', 'Samuel'],
+            correct: 2,
+            verse: '1 Samuel 10:24 — "Samuel said, \'Do you see the man the LORD has chosen?\' … So they shouted, \'Long live the king!\'"'
+        },
+        {
+            category: 'New Testament',
+            question: 'Which epistle says "faith without works is dead"?',
+            choices: ['Romans', 'James', '1 Corinthians', 'Hebrews'],
+            correct: 1,
+            verse: 'James 2:26 — "For as the body apart from the spirit is dead, so also faith apart from works is dead."'
+        },
+        {
+            category: 'Old Testament',
+            question: 'Which prophet was swallowed by a great fish?',
+            choices: ['Elijah', 'Jonah', 'Ezekiel', 'Amos'],
+            correct: 1,
+            verse: 'Jonah 1:17 — "Now the LORD provided a huge fish to swallow Jonah."'
+        }
+    ];
+
+    const QUESTIONS_PER_ROUND = 10;
+    const CREDITS_PER_CORRECT = 10;
+    const STORAGE_KEY = 'aghl-credits';
+
+    let questions = [];
+    let currentIdx = 0;
+    let score = 0;
+    let correctCount = 0;
+    let sessionCredits = 0;
+    let answered = false;
+
+    // ── Credit helpers ─────────────────────────────────────────────────
+    function loadCredits() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? (JSON.parse(raw).total || 0) : 0;
+        } catch (_) { return 0; }
+    }
+
+    function saveCredits(total) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ total }));
+            window.dispatchEvent(new CustomEvent('credits:updated', { detail: { total } }));
+        } catch (_) {}
+    }
+
+    function awardCredits(amount) {
+        const newTotal = loadCredits() + amount;
+        saveCredits(newTotal);
+        return newTotal;
+    }
+
+    // ── Shuffle helper ─────────────────────────────────────────────────
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ── Screens ────────────────────────────────────────────────────────
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // ── Start ──────────────────────────────────────────────────────────
+    function startQuiz() {
+        questions = shuffle(ALL_QUESTIONS).slice(0, QUESTIONS_PER_ROUND);
+        currentIdx = 0;
+        score = 0;
+        correctCount = 0;
+        sessionCredits = 0;
+        answered = false;
+        updateHUD();
+        showScreen('screen-quiz');
+        renderQuestion();
+    }
+
+    // ── Render question ────────────────────────────────────────────────
+    function renderQuestion() {
+        const q = questions[currentIdx];
+        answered = false;
+
+        document.getElementById('q-num').textContent   = currentIdx + 1;
+        document.getElementById('q-total').textContent = questions.length;
+        document.getElementById('q-meta').textContent  = q.category;
+        document.getElementById('q-text').textContent  = q.question;
+
+        const pct = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-fill').style.width = pct + '%';
+        document.getElementById('progress-bar-wrap').setAttribute('aria-valuenow', currentIdx);
+
+        const list = document.getElementById('choices-list');
+        list.innerHTML = '';
+        const labels = ['A', 'B', 'C', 'D'];
+        q.choices.forEach((text, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.setAttribute('aria-label', `Choice ${labels[i]}: ${text}`);
+            btn.innerHTML = `<span class="choice-key">${labels[i]}</span><span>${text}</span>`;
+            btn.onclick = () => selectChoice(i);
+            list.appendChild(btn);
+        });
+
+        const fb = document.getElementById('feedback-bar');
+        fb.className = 'feedback-bar';
+        document.getElementById('next-btn').classList.remove('show');
+    }
+
+    // ── Handle choice ──────────────────────────────────────────────────
+    function selectChoice(idx) {
+        if (answered) return;
+        answered = true;
+
+        const q = questions[currentIdx];
+        const isCorrect = idx === q.correct;
+        const buttons = document.querySelectorAll('.choice-btn');
+
+        buttons.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === q.correct) btn.classList.add('correct');
+            else if (i === idx)  btn.classList.add('wrong');
+        });
+
+        const fb = document.getElementById('feedback-bar');
+        if (isCorrect) {
+            score += 100;
+            correctCount += 1;
+            sessionCredits += CREDITS_PER_CORRECT;
+            awardCredits(CREDITS_PER_CORRECT);
+            fb.className = 'feedback-bar correct-fb show';
+            document.getElementById('fb-icon').textContent = '✅';
+            document.getElementById('fb-text').textContent = 'Correct! Well done.';
+        } else {
+            fb.className = 'feedback-bar wrong-fb show';
+            document.getElementById('fb-icon').textContent = '❌';
+            document.getElementById('fb-text').textContent = 'Not quite — the correct answer is highlighted above.';
+        }
+        document.getElementById('fb-verse').textContent = q.verse;
+
+        updateHUD();
+        document.getElementById('next-btn').classList.add('show');
+    }
+
+    // ── Next question ──────────────────────────────────────────────────
+    function nextQuestion() {
+        currentIdx += 1;
+        if (currentIdx >= questions.length) {
+            showCompletion();
+        } else {
+            renderQuestion();
+        }
+    }
+
+    // ── Completion ─────────────────────────────────────────────────────
+    function showCompletion() {
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('final-score').textContent   = score;
+        document.getElementById('final-correct').textContent = correctCount + ' / ' + questions.length;
+        document.getElementById('final-credits').textContent = sessionCredits;
+        showScreen('screen-complete');
+    }
+
+    // ── HUD update ─────────────────────────────────────────────────────
+    function updateHUD() {
+        document.getElementById('hud-score').textContent   = score;
+        document.getElementById('hud-credits').textContent = loadCredits();
+    }
+
+    // ── Reflect credit updates from other games ────────────────────────
+    window.addEventListener('credits:updated', updateHUD);
+    window.addEventListener('storage', updateHUD);
+    </script>
+    <script src="../../sw-register.js" defer></script>
+</body>
+</html>

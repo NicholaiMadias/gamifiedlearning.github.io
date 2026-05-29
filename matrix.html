@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Matrix of Conscience — reflective portal for the Matrix of Conscience experience.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" type="image/png" href="./assets/logo-S7NXL_ug.png">
+  <title>Matrix of Conscience | Amazing Grace Home Living</title>
+  <link rel="stylesheet" href="./admin/css/matrix.css">
+  <style>
+    /* ── Page layout ──────────────────────────────────────────── */
+    .page-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 2.5rem 1rem 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.6rem, 5vw, 2.8rem);
+      font-family: var(--font-mono);
+      color: var(--matrix-green);
+      text-shadow: 0 0 18px rgba(0,255,65,0.55);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+    .hero p {
+      color: var(--matrix-text);
+      font-size: 0.88rem;
+      opacity: 0.7;
+    }
+
+    /* ── Tool grid ────────────────────────────────────────────── */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .tool-card {
+      background: var(--matrix-panel);
+      border: 1px solid var(--matrix-border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .tool-card:hover { box-shadow: 0 0 16px rgba(0,255,65,0.18); }
+    .tool-card.locked {
+      border-color: var(--matrix-dim);
+      opacity: 0.55;
+    }
+
+    .tool-card h2 {
+      font-size: 1rem;
+      color: var(--matrix-heading);
+      letter-spacing: 0.06em;
+      margin: 0;
+    }
+    .tool-card p {
+      font-size: 0.8rem;
+      color: var(--matrix-text);
+      margin: 0;
+      flex: 1;
+    }
+
+    .tool-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+    .tool-badge.unlocked { background: var(--matrix-dim); color: var(--matrix-green); border: 1px solid var(--matrix-green); }
+    .tool-badge.locked   { background: #1a0a0a; color: var(--matrix-red); border: 1px solid var(--matrix-red); }
+
+    .tool-hint {
+      font-size: 0.72rem;
+      color: var(--matrix-red);
+      font-style: italic;
+    }
+
+    .btn { cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem; padding: 0.45rem 1rem; border-radius: 4px; border: 1px solid var(--matrix-green); background: transparent; color: var(--matrix-green); transition: background 0.15s, color 0.15s; text-decoration: none; display: inline-block; }
+    .btn:hover, .btn:focus { background: var(--matrix-green); color: var(--matrix-dark); }
+    .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.35; pointer-events: none; }
+
+    /* ── Login modal ──────────────────────────────────────────── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--matrix-panel);
+      border: 1px solid var(--matrix-border);
+      border-radius: 6px;
+      padding: 2rem;
+      width: min(380px, 92vw);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .modal h2 { color: var(--matrix-heading); font-size: 1.1rem; margin: 0; }
+    .modal label { font-size: 0.8rem; color: var(--matrix-text); }
+    .modal input[type="email"],
+    .modal input[type="password"] {
+      width: 100%;
+      background: var(--matrix-dark);
+      border: 1px solid var(--matrix-border);
+      color: var(--matrix-green);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      margin-top: 0.25rem;
+    }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+    #login-error { color: var(--matrix-red); font-size: 0.78rem; min-height: 1em; }
+
+    /* ── Diagnostics panel ────────────────────────────────────── */
+    .diag-section { margin-top: 1.5rem; }
+    .diag-section h3 { color: var(--matrix-heading); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .diag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.4rem;
+    }
+    .diag-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.5rem;
+      background: rgba(0,255,65,0.04);
+      border: 1px solid var(--matrix-dim);
+      border-radius: 3px;
+      gap: 0.5rem;
+    }
+    .diag-key   { color: var(--matrix-text); opacity: 0.7; }
+    .diag-value { color: var(--matrix-green); font-weight: bold; word-break: break-all; }
+    .dns-row    { display: flex; gap: 0.75rem; align-items: center; padding: 0.35rem 0.5rem; border: 1px solid var(--matrix-dim); border-radius: 3px; font-size: 0.75rem; }
+    .dns-dot    { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dns-dot.up   { background: var(--matrix-green); box-shadow: 0 0 6px var(--matrix-green); }
+    .dns-dot.down { background: var(--matrix-red); box-shadow: 0 0 6px var(--matrix-red); }
+    .dns-dot.pend { background: #888; animation: blink 1s linear infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── Nations panel ────────────────────────────────────────── */
+    .nations-panel { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+    .nation-card   { background: rgba(0,255,65,0.05); border: 1px solid var(--matrix-dim); border-radius: 5px; padding: 1rem; }
+    .nation-name   { color: var(--matrix-green); font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .nation-stats  { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-size: 0.75rem; color: var(--matrix-text); }
+    .nation-stat span { color: var(--matrix-cyan); }
+    .nation-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .nation-actions .btn { font-size: 0.72rem; padding: 0.3rem 0.7rem; border-color: var(--matrix-cyan); color: var(--matrix-cyan); }
+    .nation-actions .btn:hover { background: var(--matrix-cyan); color: var(--matrix-dark); }
+    .nation-log { font-size: 0.72rem; color: var(--matrix-text); opacity: 0.55; margin-top: 0.35rem; font-style: italic; }
+
+    /* ── Vision Forge panel ───────────────────────────────────── */
+    .vf-panel  { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+    .vf-prompt { display: flex; gap: 0.5rem; }
+    .vf-prompt input[type="text"] {
+      flex: 1;
+      background: var(--matrix-dark);
+      border: 1px solid var(--matrix-border);
+      color: var(--matrix-green);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: 4px;
+    }
+    .vf-output { min-height: 60px; }
+    .vf-result-img { max-width: 100%; border-radius: 5px; border: 1px solid var(--matrix-dim); margin-top: 0.5rem; }
+    .vf-result-desc { font-size: 0.8rem; color: var(--matrix-text); margin-top: 0.5rem; white-space: pre-wrap; }
+    .vf-history { margin-top: 1rem; }
+    .vf-history h4 { font-size: 0.8rem; color: var(--matrix-text); opacity: 0.6; margin-bottom: 0.5rem; }
+    .vf-history-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .vf-history-item { font-size: 0.72rem; color: var(--matrix-cyan); cursor: pointer; border-bottom: 1px dotted currentColor; }
+
+    /* ── Status bar ───────────────────────────────────────────── */
+    #status-bar { font-size: 0.75rem; color: var(--matrix-text); opacity: 0.55; margin-top: 1.5rem; text-align: center; }
+
+    /* ── Responsive tweaks ────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .page-wrap { padding: 1rem 0.75rem 3rem; }
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/matrix-CrBL9k43.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-Dezn_h7o.js">
+</head>
+<body>
+
+<!-- ═══════════════════════ NAV ═══════════════════════════════ -->
+<nav class="matrix-nav">
+  <a href="./" class="nav-brand">⬡ AMAZING GRACE</a>
+  <ul class="nav-links">
+    <li><a href="./">Home</a></li>
+    <li><a href="./arcade/">Arcade</a></li>
+    <li><a href="./ministry/">Ministry</a></li>
+    <li><a href="./admin/">Admin</a></li>
+  </ul>
+  <span class="nav-user" id="nav-user"></span>
+  <button class="btn" id="login-btn" style="font-size:0.72rem;padding:0.3rem 0.75rem;">Login</button>
+</nav>
+
+<!-- ═══════════════════ LOGIN MODAL ═══════════════════════════ -->
+<div class="modal-backdrop" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <h2 id="modal-title">⬡ Sovereign Matrix Login</h2>
+    <div>
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" autocomplete="username" placeholder="user@matrix.dev">
+    </div>
+    <div>
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <div id="login-error" role="alert" aria-live="polite"></div>
+    <div class="modal-actions">
+      <button class="btn" id="modal-cancel" style="border-color:var(--matrix-text);color:var(--matrix-text)">Cancel</button>
+      <button class="btn" id="modal-submit">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN ══════════════════════════════ -->
+<div class="page-wrap">
+
+  <div class="hero">
+    <h1 class="glitch">MATRIX OF CONSCIENCE</h1>
+    <p>Enter the Matrix of Conscience and continue your journey through the Nexus Arcade.</p>
+  </div>
+
+  <!-- ── Tool cards ───────────────────────────────────────────── -->
+  <div class="tools-grid">
+
+    <!-- Vision Forge -->
+    <div class="tool-card" id="card-visionforge">
+      <h2>🎨 Vision Forge</h2>
+      <p>Generate images with Gemini AI. Describe a scene and watch it materialize.</p>
+      <div>
+        <span class="tool-badge" id="badge-visionforge">Checking…</span>
+        <span class="tool-hint" id="hint-visionforge"></span>
+      </div>
+      <a href="#visionforge-panel" class="btn" id="btn-visionforge">Open Vision Forge</a>
+    </div>
+
+    <!-- Sovereign Nations -->
+    <div class="tool-card" id="card-nations">
+      <h2>🌍 Sovereign Nations</h2>
+      <p>Build and govern your nation. Manage resources, enact policies, and trade.</p>
+      <div>
+        <span class="tool-badge" id="badge-nations">Checking…</span>
+        <span class="tool-hint" id="hint-nations"></span>
+      </div>
+      <a href="#nations-panel" class="btn" id="btn-nations">Open Nations</a>
+    </div>
+
+    <!-- Diagnostics Console -->
+    <div class="tool-card" id="card-diagnostics">
+      <h2>🛠 Diagnostics Console</h2>
+      <p>Inspect browser capabilities and check DNS / network reachability.</p>
+      <div>
+        <span class="tool-badge" id="badge-diagnostics">Checking…</span>
+        <span class="tool-hint" id="hint-diagnostics"></span>
+      </div>
+      <a href="#diagnostics-panel" class="btn" id="btn-diagnostics">Open Diagnostics</a>
+    </div>
+
+  </div><!-- /.tools-grid -->
+
+  <!-- ══════════════ VISION FORGE PANEL ════════════════════════ -->
+  <section class="matrix-card matrix-border" id="visionforge-panel" aria-label="Vision Forge tool" style="margin-top:2.5rem;display:none">
+    <h2 class="matrix-heading">🎨 Vision Forge</h2>
+    <div class="vf-panel">
+      <div class="vf-prompt">
+        <input type="text" id="vf-prompt-input" placeholder="Describe the image…" maxlength="300">
+        <button class="btn" id="vf-generate-btn">Generate</button>
+      </div>
+      <div class="vf-output" id="vf-output" aria-live="polite"></div>
+      <div class="vf-history" id="vf-history" style="display:none">
+        <h4>Recent Prompts</h4>
+        <div class="vf-history-list" id="vf-history-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ NATIONS PANEL ════════════════════════════ -->
+  <section class="matrix-card matrix-border" id="nations-panel" aria-label="Sovereign Nations tool" style="margin-top:2.5rem;display:none">
+    <h2 class="matrix-heading">🌍 Sovereign Nations</h2>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem">
+      <button class="btn" id="nations-new-btn">Found New Nation</button>
+      <button class="btn" id="nations-turn-btn" style="border-color:var(--matrix-cyan);color:var(--matrix-cyan)">Process Turn (All)</button>
+    </div>
+    <div class="nations-panel" id="nations-list" aria-live="polite">
+      <p style="font-size:0.82rem;color:var(--matrix-text);opacity:0.5">No nations founded yet. Click "Found New Nation" to begin.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ DIAGNOSTICS PANEL ════════════════════════ -->
+  <section class="matrix-card matrix-border" id="diagnostics-panel" aria-label="Diagnostics Console" style="margin-top:2.5rem;display:none">
+    <h2 class="matrix-heading">🛠 Diagnostics Console</h2>
+    <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
+      <button class="btn" id="diag-run-btn">Run Browser Diagnostics</button>
+      <button class="btn" id="diag-dns-btn" style="border-color:var(--matrix-cyan);color:var(--matrix-cyan)">Run DNS Tests</button>
+    </div>
+    <div class="diag-section">
+      <h3>Browser Environment</h3>
+      <div class="diag-grid" id="diag-browser-grid" aria-live="polite">
+        <p style="font-size:0.8rem;color:var(--matrix-text);opacity:0.5">Click "Run Browser Diagnostics" to begin.</p>
+      </div>
+    </div>
+    <div class="diag-section" style="margin-top:1.5rem">
+      <h3>DNS / Network Reachability</h3>
+      <div id="diag-dns-list" aria-live="polite" style="display:flex;flex-direction:column;gap:0.4rem">
+        <p style="font-size:0.8rem;color:var(--matrix-text);opacity:0.5">Click "Run DNS Tests" to probe network targets.</p>
+      </div>
+    </div>
+  </section>
+
+  <p id="status-bar"></p>
+
+</div><!-- /.page-wrap -->
+
+
+</body>
+</html>

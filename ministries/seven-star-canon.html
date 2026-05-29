@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Seven-Star Canon — Alcyone, Celaeno, Electra, Maia, Merope, Sterope, Taygete — Voice of Jesus Ministry.">
+    <meta name="theme-color" content="#0f0c1a">
+
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+    <title>Seven-Star Canon | Voice of Jesus Ministry</title>
+
+    <script src="../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap");
+    </script>
+    <style>
+        /* ── Design tokens ───────────────────────────────── */
+        :root {
+            --gold:    #ffd700;
+            --bg:      #0f0c1a;
+            --surface: #1a1030;
+            --border:  #2e1f4a;
+            --accent:  #c084fc;
+            --text:    #e9d5ff;
+            --muted:   #7c6f9e;
+            --nav-btn: #1e3a8a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            body { scroll-behavior: smooth; }
+        }
+
+        *:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+        /* ── Header / Nav ───────────────────────────────── */
+        .site-header {
+            background: linear-gradient(90deg, #0f0c1a 0%, #1a0d2e 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--gold);
+        }
+        .logo img { height: 36px; width: auto; border-radius: 4px; }
+
+        .main-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background-color: var(--nav-btn);
+            border: 1px solid transparent;
+            padding: 0.45rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #bfdbfe;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .nav-btn:hover {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #4c1d95, #7c3aed);
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .menu-toggle { display: block; }
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #1a0d2e;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+                z-index: 50;
+            }
+            .main-nav.open { display: flex; }
+        }
+
+        /* ── Main content ───────────────────────────────── */
+        main {
+            flex: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
+            width: 100%;
+        }
+
+        .page-hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            color: var(--gold);
+            margin: 0 0 0.75rem;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .page-hero p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            margin: 0 auto;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .page-hero .scripture {
+            margin-top: 1.25rem;
+            font-style: italic;
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        /* ── Card grid ──────────────────────────────────── */
+        .canon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .star-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .star-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, var(--card-glow, rgba(255,215,0,0.06)), transparent 70%);
+            pointer-events: none;
+        }
+
+        .star-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 0 0 1px var(--card-accent, var(--border));
+            border-color: var(--card-accent, var(--border));
+        }
+
+        /* Per-star accent colours */
+        .card-alcyone  { --card-accent: #FFD700; --card-glow: rgba(255,215,0,0.07); }
+        .card-celaeno  { --card-accent: #8090A8; --card-glow: rgba(128,144,168,0.07); }
+        .card-electra  { --card-accent: #5EB4FF; --card-glow: rgba(94,180,255,0.07); }
+        .card-maia     { --card-accent: #8A38FF; --card-glow: rgba(138,56,255,0.07); }
+        .card-merope   { --card-accent: #E83820; --card-glow: rgba(232,56,32,0.07); }
+        .card-sterope  { --card-accent: #FFD700; --card-glow: rgba(255,215,0,0.07); }
+        .card-taygete  { --card-accent: #1060FF; --card-glow: rgba(16,96,255,0.07); }
+
+        /* ── Gem icon ───────────────────────────────────── */
+        .gem-icon {
+            width: 72px;
+            height: 72px;
+            filter: drop-shadow(0 0 8px var(--card-accent, rgba(255,215,0,0.5)));
+            flex-shrink: 0;
+        }
+
+        /* ── Card text ──────────────────────────────────── */
+        .card-body {
+            text-align: center;
+        }
+
+        .card-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--card-accent, var(--gold));
+            margin: 0 0 0.2rem;
+        }
+
+        .card-virtue {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 0 0 0.75rem;
+        }
+
+        .card-summary {
+            font-size: 0.9rem;
+            color: var(--text);
+            line-height: 1.55;
+            margin: 0 0 0.75rem;
+        }
+
+        .card-gem-label {
+            display: inline-block;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--card-accent, var(--border));
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.78rem;
+            color: var(--card-accent, var(--text));
+        }
+
+        /* ── Footer ─────────────────────────────────────── */
+        .site-footer {
+            background: #0a0715;
+            border-top: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .site-footer a { color: var(--accent); text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        /* ── Back link ──────────────────────────────────── */
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 1.75rem;
+        }
+        .breadcrumb a { color: var(--accent); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../library/">Library</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="../ministry/">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <p class="breadcrumb">
+            <a href="../">Home</a> › <a href="../ministry/">Ministry</a> › <a href="./">Seven Stars</a> › Seven-Star Canon
+        </p>
+
+        <div class="page-hero">
+            <h1>✦ The Seven-Star Canon ✦</h1>
+            <p>The seven sisters of the Pleiades — each a vessel of divine virtue, each a star in His right hand.</p>
+            <p class="scripture">"In his right hand he held seven stars… the mystery of the seven stars that you saw in my right hand." — Revelation 1:16, 20</p>
+        </div>
+
+        <!-- 7 star cards -->
+        <div class="canon-grid" aria-label="Seven-Star Canon — card grid">
+
+            <!-- Alcyone -->
+            <article class="star-card card-alcyone" aria-label="Alcyone — Serenity">
+                <svg class="gem-icon" aria-hidden="true" viewBox="0 0 50 50">
+                    <use href="../assets/svg/gems-atlas.svg#gem-alcyone"/>
+                </svg>
+                <div class="card-body">
+                    <h2 class="card-name">Alcyone</h2>
+                    <p class="card-virtue">F-type · Virtue: Serenity</p>
+                    <p class="card-summary">Serenity that holds steady under pressure, keeping the field readable and calm.</p>
+                    <span class="card-gem-label">Emerald — Step Cut</span>
+                </div>
+            </article>
+
+            <!-- Celaeno -->
+            <article class="star-card card-celaeno" aria-label="Celaeno — Sustenance">
+                <svg class="gem-icon" aria-hidden="true" viewBox="0 0 50 50">
+                    <use href="../assets/svg/gems-atlas.svg#gem-celaeno"/>
+                </svg>
+                <div class="card-body">
+                    <h2 class="card-name">Celaeno</h2>
+                    <p class="card-virtue">Neutral · Virtue: Sustenance</p>
+                    <p class="card-summary">Sustenance that keeps the pattern alive, tending to what would otherwise wither.</p>
+                    <span class="card-gem-label">Moonstone — Halo Cabochon</span>
+                </div>
+            </article>
+
+            <!-- Electra -->
+            <article class="star-card card-electra" aria-label="Electra — Vision">
+                <svg class="gem-icon" aria-hidden="true" viewBox="0 0 50 50">
+                    <use href="../assets/svg/gems-atlas.svg#gem-electra"/>
+                </svg>
+                <div class="card-body">
+                    <h2 class="card-name">Electra</h2>
+                    <p class="card-virtue">A-type · Virtue: Vision</p>
+                    <p class="card-summary">Vision that sees beyond immediate gain, aligning choices with long arcs of consequence.</p>
+                    <span class="card-gem-label">Sapphire — Brilliant Octagon</span>
+                </div>
+            </article>
+
+            <!-- Maia -->
+            <article class="star-card card-maia" aria-label="Maia — Autonomy">
+                <svg class="gem-icon" aria-hidden="true" viewBox="0 0 50 50">
+                    <use href="../assets/svg/gems-atlas.svg#gem-maia"/>
+                </svg>
+                <div class="card-body">
+                    <h2 class="card-name">Maia</h2>
+                    <p class="card-virtue">O-type · Virtue: Autonomy</p>
+                    <p class="card-summary">Autonomy to choose your own pattern, resisting external pressure to rush or conform.</p>
+                    <span class="card-gem-label">Amethyst — Round Brilliant</span>
+                </div>
+            </article>
+
+            <!-- Merope -->
+            <article class="star-card card-merope" aria-label="Merope — Humility">
+                <svg class="gem-icon" aria-hidden="true" viewBox="0 0 50 50">
+                    <use href="../assets/svg/gems-atlas.svg#gem-merope"/>
+                </svg>
+                <div class="card-body">
+                    <h2 class="card-name">Merope</h2>
+                    <p class="card-virtue">M-type · Virtue: Humility</p>
+                    <p class="card-summary">Humility that accepts imperfection and learns from misaligned patterns.</p>
+                    <span class="card-gem-label">Ruby — Heart Cut</span>
+                </div>
+            </article>
+
+            <!-- Sterope -->
+            <article class="star-card card-sterope" aria-label="Sterope — Patience">
+                <svg class="gem-icon" aria-hidden="true" viewBox="0 0 50 50">
+                    <use href="../assets/svg/gems-atlas.svg#gem-sterope"/>
+                </svg>
+                <div class="card-body">
+                    <h2 class="card-name">Sterope</h2>
+                    <p class="card-virtue">G-type · Virtue: Patience</p>
+                    <p class="card-summary">Patience that waits for the right alignment instead of forcing the board.</p>
+                    <span class="card-gem-label">Topaz — Princess Square</span>
+                </div>
+            </article>
+
+            <!-- Taygete -->
+            <article class="star-card card-taygete" aria-label="Taygete — Courage">
+                <svg class="gem-icon" aria-hidden="true" viewBox="0 0 50 50">
+                    <use href="../assets/svg/gems-atlas.svg#gem-taygete"/>
+                </svg>
+                <div class="card-body">
+                    <h2 class="card-name">Taygete</h2>
+                    <p class="card-virtue">B-type · Virtue: Courage</p>
+                    <p class="card-summary">Courage to act when the pattern is unclear, accepting risk without recklessness.</p>
+                    <span class="card-gem-label">Navy Sapphire — Marquise</span>
+                </div>
+            </article>
+
+        </div><!-- /.canon-grid -->
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; Voice of Jesus Ministry &mdash; <a href="../">amazinggracehl.org</a></p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+/* style2.css — Nexus Arcade V2 Atlas Additions
+   Appended styles for SVG icon rendering, V2 gem elements,
+   conscience bars, and narrative display.
+   (c) 2026 NicholaiMadias — MIT License */
+
+/* ── SVG Icon inside gem cells ─────────────────────────────────────────────── */
+
+.gem-icon {
+  width: clamp(1.4rem, 5.5vw, 2rem);
+  height: clamp(1.4rem, 5.5vw, 2rem);
+  pointer-events: none;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* ── V2 Element gem colours (overrides V1 heart/star/cross/flame/drop) ──────── */
+
+.gem-cell-v2.gem-radiant {
+  background: rgba(255, 215,  64, 0.18);
+  color: #FFD700;
+}
+.gem-cell-v2.gem-radiant:hover,
+.gem-cell-v2.gem-radiant.selected {
+  background: rgba(255, 215,  64, 0.30);
+}
+
+.gem-cell-v2.gem-tide {
+  background: rgba( 30, 144, 255, 0.18);
+  color: #1E90FF;
+}
+.gem-cell-v2.gem-tide:hover,
+.gem-cell-v2.gem-tide.selected {
+  background: rgba( 30, 144, 255, 0.30);
+}
+
+.gem-cell-v2.gem-verdant {
+  background: rgba( 50, 205,  50, 0.18);
+  color: #32CD32;
+}
+.gem-cell-v2.gem-verdant:hover,
+.gem-cell-v2.gem-verdant.selected {
+  background: rgba( 50, 205,  50, 0.30);
+}
+
+.gem-cell-v2.gem-forge {
+  background: rgba(255,  69,   0, 0.18);
+  color: #FF4500;
+}
+.gem-cell-v2.gem-forge:hover,
+.gem-cell-v2.gem-forge.selected {
+  background: rgba(255,  69,   0, 0.30);
+}
+
+.gem-cell-v2.gem-aether {
+  background: rgba(147,  112, 219, 0.18);
+  color: #9370DB;
+}
+.gem-cell-v2.gem-aether:hover,
+.gem-cell-v2.gem-aether.selected {
+  background: rgba(147,  112, 219, 0.30);
+}
+
+.gem-cell-v2.gem-umbra {
+  background: rgba( 75,   0, 130, 0.22);
+  color: #9966CC;
+}
+.gem-cell-v2.gem-umbra:hover,
+.gem-cell-v2.gem-umbra.selected {
+  background: rgba( 75,   0, 130, 0.35);
+}
+
+.gem-cell-v2.gem-void {
+  background: rgba(120, 120, 120, 0.18);
+  color: #C0C0C0;
+}
+.gem-cell-v2.gem-void:hover,
+.gem-cell-v2.gem-void.selected {
+  background: rgba(120, 120, 120, 0.30);
+}
+
+/* ── V2 game board grid ────────────────────────────────────────────────────── */
+
+#v2-board {
+  display: grid;
+  grid-template-columns: repeat(7, var(--cell-size, clamp(38px, 11vw, 52px)));
+  grid-template-rows:    repeat(7, var(--cell-size, clamp(38px, 11vw, 52px)));
+  gap: 4px;
+  padding: 10px;
+  background: var(--surface, #1e293b);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.07);
+  touch-action: manipulation;
+  position: relative;
+}
+
+/* ── Canvas particle overlay ───────────────────────────────────────────────── */
+
+#fx-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 10px;
+}
+
+/* ── V2 narrative beat display ─────────────────────────────────────────────── */
+
+#v2-narrative {
+  min-height: 1.4em;
+  text-align: center;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--accent-purple, #bc8cff);
+  padding: 4px 8px;
+  max-width: 560px;
+  margin: 0 auto;
+  transition: opacity 0.3s ease;
+}
+
+#v2-narrative.narrative-fade {
+  animation: narrativeFadeIn 0.4s ease-out;
+}
+
+@keyframes narrativeFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── V2 conscience bars (Karma, Wisdom, Integrity, Community) ──────────────── */
+
+.v2-conscience-panel {
+  width: 100%;
+  max-width: 560px;
+  padding: 16px 20px;
+  margin: 0 auto;
+}
+
+.v2-conscience-panel h3 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #94a3b8);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.v2-bar-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 44px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.v2-bar-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #94a3b8);
+}
+
+.v2-bar-track {
+  height: 9px;
+  background: var(--bg-card, #1c2333);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.v2-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.v2-bar-karma     { background: linear-gradient(90deg, #FFD700, #FFA500); }
+.v2-bar-wisdom    { background: linear-gradient(90deg, #1E90FF, #87CEEB); }
+.v2-bar-integrity { background: linear-gradient(90deg, #FF4500, #FF8C00); }
+.v2-bar-community { background: linear-gradient(90deg, #32CD32, #98FB98); }
+
+.v2-bar-pct {
+  font-size: 0.7rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-muted, #94a3b8);
+  text-align: right;
+}
+
+/* ── Pulse animations (used by domPulse2.js) ───────────────────────────────── */
+
+.pulse-match {
+  animation: pulseMatch 0.35s ease-out;
+}
+
+@keyframes pulseMatch {
+  0%   { transform: scale(1);    box-shadow: none; }
+  40%  { transform: scale(1.18); box-shadow: 0 0 14px rgba(255,215,0,0.6); }
+  100% { transform: scale(1);    box-shadow: none; }
+}
+
+.pulse-special {
+  animation: pulseSpecial 0.5s ease-out;
+}
+
+@keyframes pulseSpecial {
+  0%   { transform: scale(1);   filter: brightness(1); }
+  30%  { transform: scale(1.3); filter: brightness(2.5); }
+  100% { transform: scale(1);   filter: brightness(1); }
+}
+
+.pulse-ley {
+  box-shadow: 0 0 12px rgba(147, 112, 219, 0.7) !important;
+  transition: box-shadow 0.4s ease;
+}
+
+/* ── V2 badge banner ───────────────────────────────────────────────────────── */
+
+#v2-badge-banner {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto 8px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #7c3aed, #1E90FF);
+  color: #fff;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  animation: bannerSlide 0.4s ease-out;
+}
+
+#v2-badge-banner.hidden { display: none !important; }
+
+/* ── V2 game stage wrapper ─────────────────────────────────────────────────── */
+
+.v2-game-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Special tile glyph overlay ────────────────────────────────────────────── */
+
+.gem-special-glyph {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.9);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.gem-cell-v2 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Responsive adjustments ────────────────────────────────────────────────── */
+
+@media (min-width: 480px) {
+  #v2-board {
+    gap: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gem-icon,
+  #v2-narrative,
+  .v2-bar-fill,
+  .pulse-match,
+  .pulse-special,
+  .pulse-ley {
+    animation: none !important;
+    transition: none !important;
+  }
+}

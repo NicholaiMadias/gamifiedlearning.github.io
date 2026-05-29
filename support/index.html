@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Support the Voice of Jesus Ministry mission — partner with Amazing Grace Home Living to provide stable housing and community outreach.">
+    <meta name="theme-color" content="#1e3a8a">
+
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+    <title>Mission Support | Amazing Grace Home Living</title>
+
+    <script src="../assets/vendor/tailwindcss.js"></script>
+    <script src="../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap");
+    </script>
+    <style>
+        :root { --navy: #1e3a8a; --green: #059669; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; color: #333;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        *:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+
+        .site-header {
+            background-color: var(--navy); color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
+            text-decoration: none; color: white;
+        }
+        .logo img { height: 40px; width: auto; border-radius: 4px; }
+        .nav-links { display: flex; gap: 0.75rem; }
+        .nav-btn {
+            background: rgba(255,255,255,0.1); color: white; text-decoration: none;
+            padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.25); }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--navy);
+                padding: 1rem;
+                z-index: 100;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                gap: 0.5rem;
+            }
+            .nav-links.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; padding: 0.75rem 1rem; }
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+            color: white; text-align: center; padding: 3.5rem 1.5rem 2.5rem;
+        }
+        .hero-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: 0.75rem;
+        }
+        .hero p { font-size: 1rem; opacity: 0.9; max-width: 560px; margin: 0 auto; line-height: 1.6; }
+
+        .container { max-width: 900px; margin: 2.5rem auto; padding: 0 1.5rem; }
+
+        .breadcrumb { font-size: 0.825rem; color: #6b7280; margin-bottom: 1.5rem; }
+        .breadcrumb a { color: #2563eb; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem; margin-bottom: 2.5rem;
+        }
+
+        .mission-card {
+            background: white; border-radius: 16px; padding: 1.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--green);
+        }
+
+        .mission-card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .mission-card h3 {
+            font-family: 'Playfair Display', serif; font-size: 1.2rem;
+            color: var(--navy); margin-bottom: 0.5rem;
+        }
+        .mission-card p { color: #6b7280; font-size: 0.9rem; line-height: 1.6; }
+
+        .support-section {
+            background: white; border-radius: 16px; padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 2rem;
+        }
+
+        .support-section h2 {
+            font-family: 'Playfair Display', serif; font-size: 1.5rem;
+            color: var(--navy); margin-bottom: 1rem; border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.75rem;
+        }
+
+        .support-ways { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; }
+
+        .support-way {
+            display: flex; align-items: flex-start; gap: 1rem;
+            padding: 1rem; background: #f9fafb; border-radius: 10px;
+            border-left: 4px solid var(--green);
+        }
+
+        .support-way-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .support-way-content h4 { color: var(--navy); font-weight: 700; margin-bottom: 0.25rem; }
+        .support-way-content p { color: #6b7280; font-size: 0.875rem; line-height: 1.5; margin: 0; }
+
+        .contact-cta {
+            background: linear-gradient(135deg, var(--navy) 0%, #1e40af 100%);
+            color: white; border-radius: 16px; padding: 2.5rem;
+            text-align: center; margin-top: 2rem;
+        }
+        .contact-cta h2 {
+            font-family: 'Playfair Display', serif; font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .contact-cta p { opacity: 0.85; margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+        .btn-primary {
+            display: inline-block; background: #10b981; color: white;
+            font-weight: 700; padding: 0.875rem 2rem; border-radius: 10px;
+            text-decoration: none; font-size: 1rem; transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #059669; }
+
+        .btn-secondary {
+            display: inline-block; background: rgba(255,255,255,0.15); color: white;
+            font-weight: 600; padding: 0.875rem 2rem; border-radius: 10px;
+            text-decoration: none; font-size: 1rem; transition: background 0.2s;
+            margin-left: 0.75rem;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.25); }
+
+        @media (max-width: 480px) {
+            .btn-secondary { margin-left: 0; margin-top: 0.75rem; display: block; }
+        }
+
+        main { flex: 1; }
+
+        .site-footer {
+            background: #1f2937; color: #9ca3af;
+            text-align: center; padding: 1.5rem; font-size: 0.875rem; margin-top: 3rem;
+        }
+        .site-footer a { color: #60a5fa; text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../#properties">Listings</a>
+                <a href="../stories/">Stories</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="../ministry/">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <div class="hero-icon">🤝</div>
+            <h1>Mission Support</h1>
+            <p>Partner with us to bring stable housing, community, and faith-based support to those who need it most.</p>
+        </div>
+
+        <div class="container">
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="../">Home</a> › <a href="../ministry/">Ministry</a> › Mission Support
+            </nav>
+
+            <!-- Mission impact cards -->
+            <div class="mission-grid">
+                <div class="mission-card">
+                    <div class="mission-card-icon">🏠</div>
+                    <h3>Stable Housing</h3>
+                    <p>All-inclusive rooms provide a safe foundation — utilities, Wi-Fi, laundry, and community included.</p>
+                </div>
+                <div class="mission-card" style="border-top-color:#7c3aed">
+                    <div class="mission-card-icon">📖</div>
+                    <h3>Faith Education</h3>
+                    <p>Interactive biblical games and community events teach virtues and strengthen spiritual lives.</p>
+                </div>
+                <div class="mission-card" style="border-top-color:#d97706">
+                    <div class="mission-card-icon">🌍</div>
+                    <h3>Community Outreach</h3>
+                    <p>Serving Tampa Bay and growing — connecting people with resources, hope, and each other.</p>
+                </div>
+            </div>
+
+            <!-- Ways to support -->
+            <div class="support-section">
+                <h2>Ways to Support the Mission</h2>
+                <ul class="support-ways">
+
+                    <li class="support-way">
+                        <span class="support-way-icon">✉️</span>
+                        <div class="support-way-content">
+                            <h4>Contact Us Directly</h4>
+                            <p>
+                                Reach out by email to discuss partnership opportunities, donations, or volunteer involvement.
+                                We respond to every message personally.<br>
+                                <a href="mailto:admin@amazinggracehl.org" style="color:#059669;font-weight:600">admin@amazinggracehl.org</a>
+                            </p>
+                        </div>
+                    </li>
+
+                    <li class="support-way" style="border-left-color:#7c3aed">
+                        <span class="support-way-icon">🙏</span>
+                        <div class="support-way-content">
+                            <h4>Prayer Partnership</h4>
+                            <p>
+                                Your prayers are the foundation of our work. We welcome prayer partners who will stand with us
+                                as we expand our housing and ministry reach across Tampa Bay.
+                            </p>
+                        </div>
+                    </li>
+
+                    <li class="support-way" style="border-left-color:#d97706">
+                        <span class="support-way-icon">🔗</span>
+                        <div class="support-way-content">
+                            <h4>Spread the Word</h4>
+                            <p>
+                                Share our mission with friends, family, and your faith community. Every referral helps
+                                connect someone in need with stable housing and support.
+                            </p>
+                        </div>
+                    </li>
+
+                    <li class="support-way" style="border-left-color:#2563eb">
+                        <span class="support-way-icon">🏠</span>
+                        <div class="support-way-content">
+                            <h4>Property Partnership</h4>
+                            <p>
+                                If you own or manage property in the Tampa Bay area and share our mission values,
+                                reach out to explore partnership opportunities that serve our community.
+                            </p>
+                        </div>
+                    </li>
+
+                    <li class="support-way" style="border-left-color:#f59e0b">
+                        <span class="support-way-icon">💛</span>
+                        <div class="support-way-content">
+                            <h4>Financial Giving</h4>
+                            <p>
+                                Your donation directly funds stable housing, faith education, and community outreach.
+                                Every gift — large or small — makes a tangible difference.
+                            </p>
+                            <button
+                                id="open-donation-modal"
+                                style="margin-top:.6rem;background:#f59e0b;color:#000;font-weight:700;border:none;padding:.5rem 1.25rem;border-radius:8px;cursor:pointer;font-size:.875rem;transition:background .2s"
+                                aria-haspopup="dialog"
+                                onmouseover="this.style.background='#d97706'"
+                                onmouseout="this.style.background='#f59e0b'">
+                                💛 Give Now
+                            </button>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+
+            <!-- CTA -->
+            <div class="contact-cta">
+                <h2>Ready to Make a Difference?</h2>
+                <p>
+                    Every act of support — whether through prayer, partnership, or connection — helps someone
+                    find stability and experience the grace of God.
+                </p>
+                <a href="mailto:admin@amazinggracehl.org?subject=Mission%20Support%20Inquiry%20—%20Amazing%20Grace" class="btn-primary">
+                    ✉️ Get in Touch
+                </a>
+                <a href="../ministry/" class="btn-secondary">← Back to Ministry</a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../">amazinggracehl.org</a></p>
+    </footer>
+
+    <!-- ── Voice of Jesus Ministries Donation Modal ──────────────────── -->
+    <div id="donation-modal" role="dialog" aria-modal="true" aria-labelledby="donation-modal-title"
+         style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:1rem">
+
+        <!-- Glassmorphism backdrop -->
+        <div id="donation-backdrop"
+             style="position:absolute;inset:0;background:rgba(10,20,40,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)"></div>
+
+        <!-- Modal card -->
+        <div style="position:relative;width:100%;max-width:520px;background:rgba(15,23,42,0.92);border:1px solid rgba(245,158,11,0.4);border-radius:20px;padding:2rem 1.75rem;box-shadow:0 8px 48px rgba(0,0,0,0.6),0 0 0 1px rgba(245,158,11,0.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">
+
+            <!-- Close button -->
+            <button id="close-donation-modal" aria-label="Close donation dialog"
+                    style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;line-height:1;padding:.25rem">&times;</button>
+
+            <!-- Header -->
+            <div style="text-align:center;margin-bottom:1.5rem">
+                <div style="font-size:2.5rem;margin-bottom:.5rem">✝️</div>
+                <h2 id="donation-modal-title" style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#f59e0b;margin:0 0 .4rem">
+                    Voice of Jesus Ministries
+                </h2>
+                <p style="color:#94a3b8;font-size:.875rem;line-height:1.5;margin:0">
+                    Your gift provides stable housing, faith education, and community support.<br>
+                    <strong style="color:#7effd8">Supporters unlock the Bonus Game Vault 🎮</strong>
+                </p>
+            </div>
+
+            <!-- Donation tiers -->
+            <div id="donation-tiers" role="group" aria-label="Select donation amount" style="display:grid;gap:.75rem;margin-bottom:1.5rem">
+
+                <button class="donation-tier" aria-pressed="false" data-amount="10" data-label="Prayer Partner" data-desc="Prayer Partner">
+                    <span class="tier-amount">$10</span>
+                    <span class="tier-info">
+                        <strong>Prayer Partner</strong>
+                        <span>Monthly basic support — stand with us in faith</span>
+                    </span>
+                </button>
+
+                <button class="donation-tier" aria-pressed="false" data-amount="25" data-label="Monthly Partner" data-desc="Monthly Partner">
+                    <span class="tier-amount">$25</span>
+                    <span class="tier-info">
+                        <strong>Monthly Partner</strong>
+                        <span>Building community one person at a time</span>
+                    </span>
+                </button>
+
+                <button class="donation-tier tier-featured" aria-pressed="false" data-amount="40" data-label="Chromebook Sponsorship" data-desc="Chromebook Sponsorship">
+                    <span class="tier-amount">$40</span>
+                    <span class="tier-info">
+                        <strong>Chromebook Sponsorship ⭐</strong>
+                        <span>Equip a student with a device for faith-based learning</span>
+                    </span>
+                    <span class="tier-popular-badge">Most Impactful</span>
+                </button>
+
+                <button class="donation-tier" aria-pressed="false" data-amount="100" data-label="Housing Angel" data-desc="Housing Angel">
+                    <span class="tier-amount">$100</span>
+                    <span class="tier-info">
+                        <strong>Housing Angel</strong>
+                        <span>Emergency housing fund — shelter someone in need</span>
+                    </span>
+                </button>
+
+            </div>
+
+            <!-- PayPal button -->
+            <div style="text-align:center">
+                <a id="paypal-donate-btn" href="#" target="_blank" rel="noopener noreferrer"
+                   style="display:inline-flex;align-items:center;gap:.5rem;background:#f59e0b;color:#000;font-weight:700;padding:.75rem 2rem;border-radius:10px;text-decoration:none;font-size:1rem;transition:background .2s;border:none">
+                    <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-34px.png" alt="PayPal" style="height:20px;vertical-align:middle"> Donate via PayPal
+                </a>
+                <p style="color:#64748b;font-size:.75rem;margin-top:.75rem;line-height:1.4">
+                    After your donation, PayPal will redirect you back to unlock the Bonus Game Vault.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+        .donation-tier {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .9rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 12px;
+            cursor: pointer;
+            color: #e2e8f0;
+            text-align: left;
+            width: 100%;
+            transition: background .15s, border-color .15s, transform .12s;
+            position: relative;
+        }
+        .donation-tier:hover { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.5); transform: translateY(-1px); }
+        .donation-tier:active { transform: translateY(0); }
+        .donation-tier.selected { background: rgba(245,158,11,0.18); border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,0.3); }
+        .donation-tier.tier-featured { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+        .tier-amount { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #f59e0b; min-width: 52px; flex-shrink: 0; }
+        .tier-info { display: flex; flex-direction: column; gap: .15rem; }
+        .tier-info strong { font-size: .9rem; color: #e2e8f0; }
+        .tier-info span { font-size: .78rem; color: #94a3b8; }
+        .tier-popular-badge { position: absolute; top: -.55rem; right: .75rem; background: #f59e0b; color: #000; font-size: .65rem; font-weight: 700; padding: .15rem .5rem; border-radius: 999px; text-transform: uppercase; letter-spacing: .05em; }
+    </style>
+
+    <script>
+    (function () {
+        var PAYPAL_BUSINESS = 'admin@amazinggracehl.org';
+        var RETURN_URL = 'https://amazinggracehl.org/arcade/?unlock=bonus_games';
+        var CANCEL_URL = 'https://amazinggracehl.org/support/';
+
+        var modal = document.getElementById('donation-modal');
+        var openBtn = document.getElementById('open-donation-modal');
+        var closeBtn = document.getElementById('close-donation-modal');
+        var backdrop = document.getElementById('donation-backdrop');
+        var paypalBtn = document.getElementById('paypal-donate-btn');
+        var selectedAmount = 40;
+        var selectedLabel = 'Chromebook Sponsorship';
+
+        function buildPayPalUrl(amount, itemName) {
+            return 'https://www.paypal.com/donate/?business=' +
+                encodeURIComponent(PAYPAL_BUSINESS) +
+                '&amount=' + encodeURIComponent(amount) +
+                '&currency_code=USD' +
+                '&item_name=' + encodeURIComponent(itemName) +
+                '&return=' + encodeURIComponent(RETURN_URL) +
+                '&cancel_return=' + encodeURIComponent(CANCEL_URL);
+        }
+
+        function selectTier(btn) {
+            document.querySelectorAll('.donation-tier').forEach(function (b) {
+                b.classList.remove('selected');
+                b.setAttribute('aria-pressed', 'false');
+            });
+            btn.classList.add('selected');
+            btn.setAttribute('aria-pressed', 'true');
+            selectedAmount = btn.dataset.amount;
+            selectedLabel  = btn.dataset.label;
+            paypalBtn.href = buildPayPalUrl(selectedAmount, selectedLabel);
+        }
+
+        // Pre-select the $40 Chromebook tier
+        var defaultTier = document.querySelector('.donation-tier[data-amount="40"]');
+        if (defaultTier) selectTier(defaultTier);
+
+        document.querySelectorAll('.donation-tier').forEach(function (btn) {
+            btn.addEventListener('click', function () { selectTier(btn); });
+            btn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTier(btn); } });
+        });
+
+        function getPageEls() {
+            // Apply inert to header, main, and footer (filter handles any absent elements gracefully)
+            return ['header', 'main', 'footer'].map(function (s) { return document.querySelector(s); }).filter(Boolean);
+        }
+        function openModal() {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            getPageEls().forEach(function (el) { el.inert = true; });
+            closeBtn.focus();
+        }
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            getPageEls().forEach(function (el) { el.inert = false; });
+            if (openBtn) openBtn.focus();
+        }
+
+        if (openBtn)   openBtn.addEventListener('click', openModal);
+        if (closeBtn)  closeBtn.addEventListener('click', closeModal);
+        if (backdrop)  backdrop.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+        });
+    })();
+    </script>
+</body>
+</html>

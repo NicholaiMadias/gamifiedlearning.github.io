@@ -1,0 +1,38 @@
+<section id="notice" class="matrix-card matrix-border" style="margin-top:1.5rem">
+  <p style="font-size:0.85rem;color:#b0c8b0">
+    Potential login issues detected. To ensure uninterrupted troubleshooting, all tools below are available
+    <strong>without requiring login</strong>. These links are safe for all users.
+  </p>
+</section>
+
+<section id="public-diagnostics" class="matrix-card matrix-border" style="margin-top:1rem">
+  <h2 class="matrix-heading">Diagnostic Tools (No Login Required)</h2>
+  <ul style="line-height:2.2;font-size:0.85rem;color:#b0c8b0;padding-left:1.25rem">
+    <li><a href="https://toolbox.googleapps.com/apps/browserinfo" target="_blank" rel="noopener noreferrer"><strong>Browserinfo</strong></a> — Captures browser details.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/useragent" target="_blank" rel="noopener noreferrer"><strong>Useragent</strong></a> — Analyzes user-agent strings.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/checkmx" target="_blank" rel="noopener noreferrer"><strong>Check MX</strong></a> — Validates MX records.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/dig" target="_blank" rel="noopener noreferrer"><strong>Dig</strong></a> — Web-based DNS lookup tool.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/har_analyzer" target="_blank" rel="noopener noreferrer"><strong>HAR Analyzer</strong></a> — Reviews HAR files.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/loganalyzer" target="_blank" rel="noopener noreferrer"><strong>Log Analyzer</strong></a> — Processes Chrome/Workspace logs.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/loganalyzer2" target="_blank" rel="noopener noreferrer"><strong>Log Analyzer 2</strong></a> — Handles large log files.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/messageheader" target="_blank" rel="noopener noreferrer"><strong>Messageheader</strong></a> — Analyzes email headers.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/encode_decode" target="_blank" rel="noopener noreferrer"><strong>Encode/Decode</strong></a> — Converts data formats.</li>
+    <li><a href="https://toolbox.googleapps.com/apps/screen_recorder" target="_blank" rel="noopener noreferrer"><strong>Screen Recorder</strong></a> — Captures screen and audio.</li>
+  </ul>
+</section>
+
+</div> <script type="module">
+  import { getCurrentUser, injectMasterKeyModal } from '/admin/js/admin-router.js';
+
+  injectMasterKeyModal();
+
+  const user = getCurrentUser();
+  const displayEmail = user.email || 'guest@local';
+  const roleText = `${displayEmail} (${user.role})`;
+
+  const navUser = document.getElementById('nav-user');
+  const roleDisplay = document.getElementById('user-role-display');
+
+  if (navUser) navUser.textContent = roleText;
+  if (roleDisplay) roleDisplay.textContent = `${displayEmail} — ${user.role}`;
+</script>

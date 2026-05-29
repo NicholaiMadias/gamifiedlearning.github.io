@@ -1,531 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gamified Learning</title>
-  <style>
-    /* ── Base ─────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Amazing Grace Home Living — secure, all-inclusive housing in Tampa and Largo, plus ministry and arcade resources.">
+    <title>Amazing Grace Home Living</title>
+    <link rel="icon" type="image/png" href="./assets/logo-S7NXL_ug.png">
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: #0f172a;
+            --surface-2: #111827;
+            --border: #1e293b;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-2: #facc15;
+        }
 
-    body {
-      background: #0a0a0f;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      padding: 1.5rem 1rem 3rem;
-    }
+        * { box-sizing: border-box; }
 
-    h1.app-title {
-      font-size: 1.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #00ff41;
-      text-shadow: 0 0 10px #00ff4180;
-    }
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
 
-    /* ── Match Maker ──────────────────────────────── */
-    .match-card {
-      background: #0d0d1a;
-      border: 1px solid #1a1a2e;
-      border-radius: 12px;
-      padding: 1rem;
-      width: 100%;
-      max-width: 460px;
-    }
+        a { color: var(--accent); }
+        a:hover { color: #7dd3fc; }
 
-    .match-card h2 {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #00ff41;
-      margin-bottom: 0.6rem;
-    }
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(2, 6, 23, 0.96);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
 
-    .match-stats {
-      display: flex;
-      justify-content: space-around;
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 0.8rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
+        .nav-container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
 
-    .match-stats span { color: #00ff41; font-weight: 700; }
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
 
-    .match-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      padding: 0.8rem;
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-      position: relative;
-    }
+        .logo img {
+            height: 40px;
+            width: auto;
+            border-radius: 6px;
+        }
 
-    .match-grid.power-up-mode {
-      cursor: crosshair;
-    }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: nowrap;      /* keep nav on a single row */
+            white-space: nowrap;    /* prevent link text from wrapping */
+            gap: 0.75rem;
+        }
 
-    .match-grid.power-up-mode .match-cell {
-      cursor: crosshair;
-    }
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 0.8rem;
+            border-radius: 999px;
+        }
 
-    .match-cell {
-      aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      user-select: none;
-      overflow: hidden;
-    }
+        .nav-links a:hover,
+        .nav-links a.nav-active-page {
+            background: rgba(56, 189, 248, 0.14);
+            color: #fff;
+        }
 
-    .gem-icon {
-      width: 100%;
-      height: 100%;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      transition: transform 0.2s ease;
-      filter: drop-shadow(0 0 3px rgba(0, 255, 65, 0.3));
-    }
+        main {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 2rem 1.25rem 4rem;
+        }
 
-    .match-cell:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 15px rgba(0,255,65,0.4);
-    }
+        .hero {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+            align-items: center;
+            padding: 2rem 0 3rem;
+        }
 
-    .match-cell:hover .gem-icon {
-      transform: scale(1.1) rotate(5deg);
-    }
+        .hero-copy h1 {
+            font-size: clamp(2.3rem, 5vw, 3.75rem);
+            line-height: 1.05;
+            margin: 0 0 1rem;
+        }
 
-    .match-cell:active { transform: scale(0.94); }
+        .hero-copy p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            margin: 0 0 1.5rem;
+        }
 
-    /* Explosion animation */
-    @keyframes explode {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.3); opacity: 0.8; }
-      100% { transform: scale(0.5); opacity: 0; }
-    }
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
 
-    .match-explode .gem-icon {
-      animation: explode 0.3s ease-out forwards;
-    }
+        .hero-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.1rem;
+            border-radius: 0.9rem;
+            text-decoration: none;
+            font-weight: 700;
+        }
 
-    /* Particle effects */
-    .particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: radial-gradient(circle, #00ff41 0%, #00ff4100 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      animation: particle-fly 0.6s ease-out forwards;
-    }
+        .btn-primary {
+            background: var(--accent);
+            color: #082f49;
+        }
 
-    @keyframes particle-fly {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--dx), var(--dy)) scale(0);
-        opacity: 0;
-      }
-    }
+        .btn-secondary {
+            border: 1px solid var(--border);
+            color: var(--text);
+            background: rgba(15, 23, 42, 0.92);
+        }
 
-    .match-badge-banner {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #00ff41;
-      background: #001a00;
-      border: 1px solid #00ff4160;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      margin-top: 0.6rem;
-    }
+        .hero-panel {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.32);
+        }
 
-    .match-badge-banner.hidden { display: none; }
+        .hero-panel h2 {
+            margin-top: 0;
+            color: var(--accent-2);
+        }
 
-    /* Combo banner */
-    .match-combo-banner {
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #ffaa00;
-      background: linear-gradient(135deg, #1a0f00 0%, #0d0600 100%);
-      border: 2px solid #ffaa00;
-      border-radius: 8px;
-      padding: 0.6rem 1rem;
-      margin-top: 0.6rem;
-      text-shadow: 0 0 10px #ffaa00;
-    }
+        .hero-panel ul {
+            margin: 0;
+            padding-left: 1rem;
+            color: var(--muted);
+        }
 
-    .match-combo-banner.hidden { display: none; }
+        .section-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: end;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
 
-    @keyframes combo-pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
+        .section-header h2 {
+            margin: 0;
+            font-size: 2rem;
+        }
 
-    .combo-pulse {
-      animation: combo-pulse 0.3s ease-in-out 2;
-    }
+        .section-header p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 700px;
+        }
 
-    /* Store panel */
-    .match-store-panel {
-      background: #0d0d1a;
-      border: 1px solid #1a1a2e;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-top: 0.8rem;
-    }
+        .property-grid {
+            display: grid;
+            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
 
-    .match-store-panel.hidden { display: none; }
+        .property-card {
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+        }
 
-    .store-header {
-      text-align: center;
-      font-size: 1rem;
-      color: #00ff41;
-      margin-bottom: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
+        .property-card>img,
+        .property-card>a>img {
+            display: block;
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: #020617;
+        }
 
-    .store-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.6rem;
-    }
+        .property-card>a {
+            display: block;
+        }
 
-    .store-item {
-      background: #111;
-      border: 1px solid #1a1a2e;
-      border-radius: 6px;
-      padding: 0.6rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+        .property-card-gallery {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(104px, 1fr);
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.75rem 0.75rem 0.9rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
 
-    .store-item:hover {
-      border-color: #00ff41;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,255,65,0.2);
-    }
+        .property-card-gallery a {
+            display: block;
+            flex-shrink: 0;
+        }
 
-    .store-item-icon {
-      font-size: 2rem;
-      margin-bottom: 0.3rem;
-    }
+        .property-card-gallery img {
+            display: block;
+            width: 100%;
+            height: 92px;
+            object-fit: cover;
+            border-radius: 0.55rem;
+            border: 1px solid var(--border);
+            background: #020617;
+            transition: opacity 0.15s;
+        }
 
-    .store-item-name {
-      font-size: 0.7rem;
-      color: #aaa;
-      margin-bottom: 0.2rem;
-      text-transform: uppercase;
-    }
+        .property-card-gallery a:hover img,
+        .property-card-gallery a:focus img {
+            opacity: 0.82;
+        }
 
-    .store-item-cost {
-      font-size: 0.8rem;
-      color: #ffaa00;
-      font-weight: bold;
-    }
+        .property-card-content {
+            padding: 1.25rem;
+        }
 
-    .store-item-owned {
-      font-size: 0.7rem;
-      color: #00ff41;
-      margin-top: 0.2rem;
-    }
+        .property-card h3 {
+            margin: 0 0 0.35rem;
+            font-size: 1.25rem;
+        }
 
-    @keyframes purchase-flash {
-      0%, 100% { background: #111; }
-      50% { background: #00ff4120; }
-    }
+        .property-meta,
+        .property-copy {
+            color: var(--muted);
+            margin: 0 0 0.85rem;
+        }
 
-    .purchase-flash {
-      animation: purchase-flash 0.3s ease-in-out;
-    }
+        .property-amenities {
+            margin: 0 0 1rem;
+            padding-left: 1.1rem;
+            color: var(--muted);
+        }
 
-    .store-toggle-btn {
-      display: block;
-      margin: 0.8rem auto 0;
-      background: transparent;
-      border: 1px solid #ffaa00;
-      color: #ffaa00;
-      padding: 0.4rem 1.4rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      transition: background 0.15s;
-    }
+        .property-cta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
 
-    .store-toggle-btn:hover { background: #ffaa0020; }
+        .property-cta a {
+            text-decoration: none;
+            font-weight: 700;
+        }
 
-    /* Power-up use buttons */
-    .power-up-panel {
-      display: flex;
-      justify-content: center;
-      gap: 0.6rem;
-      margin-top: 0.8rem;
-      flex-wrap: wrap;
-    }
+        .shared-living-card {
+            margin-top: 1.25rem;
+        }
 
-    .power-up-btn {
-      background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
-      border: 1px solid #00ff41;
-      color: #00ff41;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      transition: all 0.2s ease;
-      position: relative;
-    }
+        .footer {
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            text-align: center;
+            padding: 1.5rem 1rem 2rem;
+        }
 
-    .power-up-btn:hover:not(:disabled) {
-      background: #00ff4110;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,255,65,0.3);
-    }
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
 
-    .power-up-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      border-color: #555;
-      color: #555;
-    }
-
-    .power-up-btn.power-up-active {
-      background: #00ff4130;
-      border-color: #ffaa00;
-      color: #ffaa00;
-      box-shadow: 0 0 15px rgba(255,170,0,0.5);
-      animation: pulse-glow 1s ease-in-out infinite;
-    }
-
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 10px rgba(255,170,0,0.5); }
-      50% { box-shadow: 0 0 20px rgba(255,170,0,0.8); }
-    }
-
-    .power-up-count {
-      background: #00ff4120;
-      padding: 0.1rem 0.4rem;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 0.7rem;
-    }
-
-    .power-up-active .power-up-count {
-      background: #ffaa0030;
-      color: #ffaa00;
-    }
-
-    .match-restart-btn {
-      display: block;
-      margin: 0.8rem auto 0;
-      background: transparent;
-      border: 1px solid #00ff41;
-      color: #00ff41;
-      padding: 0.4rem 1.4rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      transition: background 0.15s;
-    }
-
-    .match-restart-btn:hover { background: #00ff4120; }
-
-    /* ── Matrix of Conscience ─────────────────────── */
-    .matrix-card {
-      background: #0d0d1a;
-      border-radius: 12px;
-      padding: 1.2rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .matrix-border { border: 1px solid #1a2a3a; }
-
-    .matrix-heading {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #4fc3f7;
-      margin-bottom: 1rem;
-    }
-
-    .matrix-economy-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
-    .matrix-cell {
-      background: #111827;
-      border: 1px solid #1e3a5f;
-      border-radius: 8px;
-      padding: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .matrix-cell .icon { font-size: 1.6rem; }
-
-    .matrix-cell .label {
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #64b5f6;
-    }
-
-    .matrix-cell .value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #e0e0e0;
-    }
-
-    .matrix-cell .bar-track {
-      width: 100%;
-      height: 4px;
-      background: #1e3a5f;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .matrix-cell .bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: linear-gradient(90deg, #1565c0, #4fc3f7);
-      transition: width 0.4s ease;
-    }
-  </style>
+            .nav-container {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+  <link rel="stylesheet" crossorigin href="./assets/unified-nav-D383fX84.css">
 </head>
 <body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="./" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="./assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
 
-  <h1 class="app-title">Gamified Learning</h1>
-
-  <!-- ══ Match Maker ══════════════════════════════════ -->
-  <section class="match-card" id="match-maker-screen">
-    <h2>Match Maker</h2>
-
-    <div class="match-stats">
-      <div>Score: <span id="match-score">0</span></div>
-      <div>Moves: <span id="match-moves">20</span></div>
-      <div>Level: <span id="match-level">1</span></div>
-      <div>Combo: <span id="match-combo">-</span></div>
-      <div>Coins: <span id="match-coins">100</span></div>
-    </div>
-
-    <div class="match-grid" id="match-grid"></div>
-
-    <div id="match-combo-banner" class="match-combo-banner hidden"></div>
-    <div id="match-badge-banner" class="match-badge-banner hidden"></div>
-
-    <!-- Power-up Use Buttons -->
-    <div class="power-up-panel">
-      <button class="power-up-btn" id="use-bomb" onclick="activatePowerUp('bomb')">
-        <span>💣</span>
-        <span>Bomb</span>
-        <span class="power-up-count" id="use-bomb-count">0</span>
-      </button>
-      <button class="power-up-btn" id="use-lightning" onclick="activatePowerUp('lightning')">
-        <span>⚡</span>
-        <span>Lightning</span>
-        <span class="power-up-count" id="use-lightning-count">0</span>
-      </button>
-      <button class="power-up-btn" id="use-rainbow" onclick="activatePowerUp('rainbow')">
-        <span>🌈</span>
-        <span>Rainbow</span>
-        <span class="power-up-count" id="use-rainbow-count">0</span>
-      </button>
-    </div>
-
-    <button class="store-toggle-btn" onclick="toggleStore()">🛒 Store</button>
-
-    <div id="match-store-panel" class="match-store-panel hidden">
-      <div class="store-header">Power-Up Store</div>
-      <div class="store-grid">
-        <div class="store-item" id="store-bomb" onclick="purchasePowerUp('bomb', 30)">
-          <div class="store-item-icon">💣</div>
-          <div class="store-item-name">Bomb</div>
-          <div class="store-item-cost">30 coins</div>
-          <div class="store-item-owned">Owned: <span id="store-bomb-count">0</span></div>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="#properties" class="nav-active-page" aria-current="page">Listings</a>
+                <a href="./library/">Library</a>
+                <a href="./arcade/">Arcade</a>
+                <a href="./ministry/">Ministry</a>
+                <a href="./contact/">Contact</a>
+            </nav>
         </div>
-        <div class="store-item" id="store-lightning" onclick="purchasePowerUp('lightning', 50)">
-          <div class="store-item-icon">⚡</div>
-          <div class="store-item-name">Lightning</div>
-          <div class="store-item-cost">50 coins</div>
-          <div class="store-item-owned">Owned: <span id="store-lightning-count">0</span></div>
-        </div>
-        <div class="store-item" id="store-rainbow" onclick="purchasePowerUp('rainbow', 80)">
-          <div class="store-item-icon">🌈</div>
-          <div class="store-item-name">Rainbow</div>
-          <div class="store-item-cost">80 coins</div>
-          <div class="store-item-owned">Owned: <span id="store-rainbow-count">0</span></div>
-        </div>
-      </div>
-    </div>
+    </header>
 
-    <button class="match-restart-btn" id="match-restart-btn">↺ Restart</button>
-  </section>
+    <main>
+        <section class="hero">
+            <div class="hero-copy">
+                <h1>Secure housing and community support in Tampa and Largo.</h1>
+                <p>
+                    Amazing Grace Home Living provides all-inclusive rooms in Tampa and Largo while keeping
+                    ministry and arcade resources easy to reach from one dependable GitHub Pages site.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn-primary" href="#properties">View available listings</a>
+                    <a class="btn-secondary" href="./contact/">Schedule a tour</a>
+                </div>
+            </div>
 
-  <!-- ══ Matrix of Conscience ════════════════════════ -->
-  <section class="matrix-card matrix-border" id="matrix-economy-screen">
-    <h2 class="matrix-heading">Matrix of Conscience</h2>
+            <aside class="hero-panel" aria-label="Quick contact">
+                <h2>Now showing</h2>
+                <ul>
+                    <li>926 E Poinsettia Ave — Tampa, FL</li>
+                    <li>1142 7th Street NW — Largo, FL</li>
+                    <li>1144 7th Street NW — Largo, FL</li>
+                </ul>
+                <p><strong>Call:</strong> <a href="tel:+17274202873">727-420-2873</a><br><strong>Email:</strong> <a href="mailto:admin@amazinggracehl.org">admin@amazinggracehl.org</a></p>
+            </aside>
+        </section>
 
-    <div class="matrix-economy-grid">
-      <div class="matrix-cell">
-        <span class="icon">💖</span>
-        <span class="label">Empathy</span>
-        <span class="value" id="mc-empathy">72</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-empathy-bar" style="width:72%"></div></div>
-      </div>
+        <section id="properties" aria-labelledby="properties-heading">
+            <div class="section-header">
+                <div>
+                    <h2 id="properties-heading">Available Housing</h2>
+                    <p>Comfortable all-inclusive housing in Tampa and Largo with stable, supportive shared living and repository-hosted photo galleries.</p>
+                </div>
+            </div>
 
-      <div class="matrix-cell">
-        <span class="icon">⚖️</span>
-        <span class="label">Justice</span>
-        <span class="value" id="mc-justice">58</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-justice-bar" style="width:58%"></div></div>
-      </div>
+            <div class="property-grid">
+                <article class="property-card">
+                    <img src="./assets/1000002510-BLOzbFYj.jpg" alt="Bedroom at 926 E Poinsettia Ave in Tampa">
+                    <div class="property-card-content">
+                        <h3>926 E Poinsettia Ave — Tampa, FL</h3>
+                        <p class="property-meta">Tampa, FL · $850/mo</p>
+                        <p class="property-copy">Comfortable all-inclusive housing in central Tampa designed to provide a stable and supportive living environment.</p>
+                        <ul class="property-amenities">
+                            <li>Washer &amp; dryer access, high-speed Wi-Fi, utilities included, and parking available</li>
+                            <li>Shared kitchen and common areas in a clean, maintained home</li>
+                            <li>Repo-hosted gallery under <code>assets/images/926-poinsettia/</code></li>
+                        </ul>
+                        <div class="property-cta">
+                            <a href="./contact/">Ask about this room</a>
+                        </div>
+                    </div>
+                </article>
 
-      <div class="matrix-cell">
-        <span class="icon">🧠</span>
-        <span class="label">Wisdom</span>
-        <span class="value" id="mc-wisdom">45</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-wisdom-bar" style="width:45%"></div></div>
-      </div>
+                <article class="property-card">
+                    <a href="./assets/images/1142-7th-street/889bbd8f-3c61-431a-9da7-d21e0738ec8c.jpg" target="_blank" rel="noopener">
+                        <img src="./assets/889bbd8f-3c61-431a-9da7-d21e0738ec8c-D62-fblJ.jpg" alt="Exterior entry at 1142 7th Street NW in Largo">
+                    </a>
+                    <div class="property-card-gallery" aria-label="1142 7th Street NW photo gallery">
+                        <a href="./assets/images/1142-7th-street/db43caca-6cf5-44db-9977-ea590b416bca.jpg" target="_blank" rel="noopener"><img src="./assets/db43caca-6cf5-44db-9977-ea590b416bca-qmhyvR9K.jpg" alt="1142 7th Street NW photo 2" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/9b5c9a4e-78cf-4b3d-bc58-2e63de8971a7.jpg" target="_blank" rel="noopener"><img src="./assets/9b5c9a4e-78cf-4b3d-bc58-2e63de8971a7-ub8WJq7P.jpg" alt="1142 7th Street NW photo 3" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/01b83773-5e20-4b83-8da4-13719a8e1a5a.jpg" target="_blank" rel="noopener"><img src="./assets/01b83773-5e20-4b83-8da4-13719a8e1a5a-D-7LQ3YO.jpg" alt="1142 7th Street NW photo 4" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/3c2f9c29-7787-42df-a5ef-57727fd00951.jpg" target="_blank" rel="noopener"><img src="./assets/3c2f9c29-7787-42df-a5ef-57727fd00951-DNPt7pEN.jpg" alt="1142 7th Street NW photo 5" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/b4ad39de-6b72-45c7-adf3-862acac5e5b5.jpg" target="_blank" rel="noopener"><img src="./assets/b4ad39de-6b72-45c7-adf3-862acac5e5b5-C5K7h7Bl.jpg" alt="1142 7th Street NW photo 6" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/8dce806b-e552-47b7-bd41-07017c8792ca.jpg" target="_blank" rel="noopener"><img src="./assets/8dce806b-e552-47b7-bd41-07017c8792ca-DoO39YRe.jpg" alt="1142 7th Street NW photo 7" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/1d5c47cd-7d54-446f-82eb-ea1d7a089b30.jpg" target="_blank" rel="noopener"><img src="./assets/1d5c47cd-7d54-446f-82eb-ea1d7a089b30-C3SI3V92.jpg" alt="1142 7th Street NW photo 8" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/1940a088-9629-4609-b018-523611119aa0.jpg" target="_blank" rel="noopener"><img src="./assets/1940a088-9629-4609-b018-523611119aa0-CeWOa2xl.jpg" alt="1142 7th Street NW photo 9" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/7a984ab5-2ec7-4211-bc99-ad8eadec9936.jpg" target="_blank" rel="noopener"><img src="./assets/7a984ab5-2ec7-4211-bc99-ad8eadec9936-D6x_XnWe.jpg" alt="1142 7th Street NW photo 10" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/ff665772-3e1e-45e2-9937-2ba09c754d7b.jpg" target="_blank" rel="noopener"><img src="./assets/ff665772-3e1e-45e2-9937-2ba09c754d7b-BbZY7ipQ.jpg" alt="1142 7th Street NW photo 11" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/eb85c854-4d64-4e6f-a981-632d7af77ca1.jpg" target="_blank" rel="noopener"><img src="./assets/eb85c854-4d64-4e6f-a981-632d7af77ca1-DBWcwH1o.jpg" alt="1142 7th Street NW photo 12" loading="lazy"></a>
+                        <a href="./assets/images/1142-7th-street/57d23a1f-270e-4583-b04b-753286f8dd80.jpg" target="_blank" rel="noopener"><img src="./assets/57d23a1f-270e-4583-b04b-753286f8dd80-CGJPd9FI.jpg" alt="1142 7th Street NW photo 13" loading="lazy"></a>
+                    </div>
+                    <div class="property-card-content">
+                        <h3>1142 7th Street NW — Largo, FL</h3>
+                        <p class="property-meta">Largo, FL · $1,000/mo</p>
+                        <p class="property-copy">Quiet and comfortable housing in Largo offering a stable home base near the Gulf Coast.</p>
+                        <ul class="property-amenities">
+                            <li>Utilities included, washer &amp; dryer access, high-speed Wi-Fi, and parking available</li>
+                            <li>Shared kitchen access in a structured and respectful home setting</li>
+                            <li>Repo-hosted gallery under <code>assets/images/1142-7th-street/</code></li>
+                        </ul>
+                        <div class="property-cta">
+                            <a href="./contact/">Ask about this room</a>
+                        </div>
+                    </div>
+                </article>
 
-      <div class="matrix-cell">
-        <span class="icon">🌱</span>
-        <span class="label">Growth</span>
-        <span class="value" id="mc-growth">83</span>
-        <div class="bar-track"><div class="bar-fill" id="mc-growth-bar" style="width:83%"></div></div>
-      </div>
-    </div>
-  </section>
+                <article class="property-card">
+                    <a href="./assets/images/1144-7th-street/1144-7th-street-largo.jpg" target="_blank" rel="noopener">
+                        <img src="./assets/1144-7th-street-largo-CUyRCrES.jpg" alt="Exterior of 1144 7th Street NW in Largo">
+                    </a>
+                    <div class="property-card-gallery" aria-label="1144 7th Street NW photo gallery">
+                        <a href="./assets/images/1144-7th-street/image.jpg" target="_blank" rel="noopener"><img src="./assets/889bbd8f-3c61-431a-9da7-d21e0738ec8c-D62-fblJ.jpg" alt="1144 7th Street NW photo 2" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67125505.JPG" target="_blank" rel="noopener"><img src="./assets/8dce806b-e552-47b7-bd41-07017c8792ca-DoO39YRe.jpg" alt="1144 7th Street NW photo 3" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67145217.JPG" target="_blank" rel="noopener"><img src="./assets/1940a088-9629-4609-b018-523611119aa0-CeWOa2xl.jpg" alt="1144 7th Street NW photo 4" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67164161.JPG" target="_blank" rel="noopener"><img src="./assets/ff665772-3e1e-45e2-9937-2ba09c754d7b-BbZY7ipQ.jpg" alt="1144 7th Street NW photo 5" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67166209.JPG" target="_blank" rel="noopener"><img src="./assets/b4ad39de-6b72-45c7-adf3-862acac5e5b5-C5K7h7Bl.jpg" alt="1144 7th Street NW photo 6" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67169793.JPG" target="_blank" rel="noopener"><img src="./assets/57d23a1f-270e-4583-b04b-753286f8dd80-CGJPd9FI.jpg" alt="1144 7th Street NW photo 7" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67172609.JPG" target="_blank" rel="noopener"><img src="./assets/1d5c47cd-7d54-446f-82eb-ea1d7a089b30-C3SI3V92.jpg" alt="1144 7th Street NW photo 8" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67178497.JPG" target="_blank" rel="noopener"><img src="./assets/3c2f9c29-7787-42df-a5ef-57727fd00951-DNPt7pEN.jpg" alt="1144 7th Street NW photo 9" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/image_67217665.JPG" target="_blank" rel="noopener"><img src="./assets/01b83773-5e20-4b83-8da4-13719a8e1a5a-D-7LQ3YO.jpg" alt="1144 7th Street NW photo 10" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/IMG_2467.jpg" target="_blank" rel="noopener"><img src="./assets/9b5c9a4e-78cf-4b3d-bc58-2e63de8971a7-ub8WJq7P.jpg" alt="1144 7th Street NW photo 11" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/IMG_2469.jpg" target="_blank" rel="noopener"><img src="./assets/eb85c854-4d64-4e6f-a981-632d7af77ca1-DBWcwH1o.jpg" alt="1144 7th Street NW photo 12" loading="lazy"></a>
+                        <a href="./assets/images/1144-7th-street/IMG_2474.jpg" target="_blank" rel="noopener"><img src="./assets/7a984ab5-2ec7-4211-bc99-ad8eadec9936-D6x_XnWe.jpg" alt="1144 7th Street NW photo 13" loading="lazy"></a>
+                    </div>
+                    <div class="property-card-content">
+                        <h3>1144 7th Street NW — Largo, FL</h3>
+                        <p class="property-meta">Largo, FL · $850/mo</p>
+                        <p class="property-copy">Spacious shared housing adjacent to the primary Largo property with access to the same supportive and all-inclusive amenities.</p>
+                        <ul class="property-amenities">
+                            <li>Full kitchen access, washer &amp; dryer, high-speed Wi-Fi, utilities included, and parking available</li>
+                            <li>Spacious shared layout with stable and supportive community living</li>
+                            <li>Repo-hosted gallery under <code>assets/images/1144-7th-street/</code></li>
+                        </ul>
+                        <div class="property-cta">
+                            <a href="./contact/">Ask about this room</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
 
-  <script type="module" src="./main.js"></script>
+            <article class="property-card shared-living-card">
+                <div class="property-card-content">
+                    <h3>Shared Living Expectations</h3>
+                    <p class="property-copy">Amazing Grace Home Living promotes a respectful and structured environment for all residents.</p>
+                    <ul class="property-amenities">
+                        <li>Maintain cleanliness in shared spaces</li>
+                        <li>Respect quiet hours</li>
+                        <li>Treat others with dignity and consideration</li>
+                        <li>Follow property guidelines and safety expectations</li>
+                    </ul>
+                    <p class="property-copy">Our goal is to provide stable housing in a peaceful and supportive atmosphere.</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; Tampa and Largo, Florida</p>
+    </footer>
 </body>
 </html>

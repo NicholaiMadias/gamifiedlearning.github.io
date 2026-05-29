@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Voice of Jesus Ministry — Seven-Star Ministry outreach, stories, mission support, and faith-based community.">
+    <meta name="theme-color" content="#0d0115">
+
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+    <title>Ministry | Amazing Grace Home Living</title>
+
+    <script src="../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap");
+    </script>
+    <style>
+        :root {
+            --deep-purple: #4a235a;
+            --gold:        #ffd700;
+            --gold-dim:    rgba(255,215,0,0.75);
+            --bg:          #0d0115;
+            --surface:     rgba(74,35,90,0.55);
+            --border:      rgba(255,215,0,0.22);
+            --text:        #f0e6ff;
+            --text-muted:  #b89dc8;
+            --accent:      #c084fc;
+            --radius:      14px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @media (prefers-reduced-motion: no-preference) {
+            html { scroll-behavior: smooth; }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Ministry Starfield Background (CSS-only) ── */
+        .ministry-stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, #ffffffaa, transparent),
+                radial-gradient(1.5px 1.5px at 70% 80%, #ffffff88, transparent),
+                radial-gradient(1px 1px at 40% 60%, #ffffff55, transparent),
+                radial-gradient(2px 2px at 80% 20%, #ffffffaa, transparent),
+                radial-gradient(1px 1px at 10% 90%, #ffffff55, transparent);
+            background-repeat: no-repeat;
+            animation: twinkle 6s infinite alternate ease-in-out;
+        }
+
+        @keyframes twinkle {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 25%, rgba(107,55,128,0.35) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 70%, rgba(74,35,90,0.45) 0%, transparent 55%),
+                var(--bg);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        *:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+        /* ── Header ── */
+        .site-header {
+            background: rgba(20,5,32,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.85rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--gold);
+        }
+
+        .logo img { height: 36px; width: auto; border-radius: 4px; }
+
+        .nav-links { display: flex; gap: 0.5rem; flex-wrap: nowrap; white-space: nowrap; }
+
+        .nav-btn {
+            background: rgba(255,215,0,0.07);
+            border: 1px solid var(--border);
+            padding: 0.45rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        .nav-btn:hover { background: rgba(255,215,0,0.18); border-color: var(--gold); color: var(--gold); }
+        .nav-btn.active { background: rgba(192,132,252,0.2); border-color: var(--accent); color: var(--accent); }
+
+        @media (max-width: 640px) {
+            .site-header { padding-inline: 1rem; }
+            .nav-links { width: 100%; }
+            .nav-btn { flex: 1 1 140px; text-align: center; }
+        }
+
+        /* ── Hero ── */
+        .hero {
+            text-align: center;
+            padding: 5rem 1.5rem 4rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 60%, rgba(192,132,252,0.12) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 18px rgba(255,215,0,0.5));
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.6rem, 4.5vw, 2.75rem);
+            font-weight: 900;
+            color: var(--gold);
+            text-shadow: 0 0 30px rgba(255,215,0,0.35);
+            margin-bottom: 1rem;
+            letter-spacing: 0.04em;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── Ministry grid ── */
+        .ministry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            max-width: 940px;
+            margin: 3rem auto 4rem;
+            padding: 0 1.5rem;
+        }
+
+        .ministry-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            background: rgba(74,35,90,0.4);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
+            cursor: pointer;
+            min-height: 160px;
+            backdrop-filter: blur(8px);
+        }
+
+        .ministry-btn:hover, .ministry-btn:focus-visible {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 32px rgba(255,215,0,0.18);
+            border-color: var(--gold);
+            background: rgba(74,35,90,0.65);
+            text-decoration: none;
+        }
+
+        .ministry-btn-icon { font-size: 2.5rem; filter: drop-shadow(0 0 8px rgba(255,215,0,0.3)); }
+
+        .ministry-btn-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.04em;
+        }
+
+        .ministry-btn-desc { font-size: 0.825rem; font-weight: 400; color: var(--text-muted); text-align: center; line-height: 1.5; }
+
+        .ministry-btn.btn-stories  { border-top: 3px solid #c084fc; }
+        .ministry-btn.btn-support  { border-top: 3px solid #34d399; }
+        .ministry-btn.btn-games    { border-top: 3px solid var(--gold); }
+        .ministry-btn.btn-gallery  { border-top: 3px solid #60a5fa; }
+        .ministry-btn.btn-sevenstars { border-top: 3px solid #c084fc; }
+
+        .media-library {
+            max-width: 1040px;
+            margin: 0 auto 4rem;
+            padding: 0 1.5rem;
+        }
+
+        .media-library h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.7rem);
+            color: var(--gold);
+            margin-bottom: 0.75rem;
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+
+        .media-library-intro {
+            max-width: 720px;
+            margin: 0 auto 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .media-section {
+            background: rgba(74,35,90,0.32);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .media-section h3 {
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        .media-section p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .audio-library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .media-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .media-video-card {
+            background: rgba(13,1,21,0.72);
+            border: 1px solid rgba(255,215,0,0.16);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .media-video-card h4 {
+            color: var(--text);
+            margin-bottom: 0.25rem;
+            font-size: 0.98rem;
+        }
+
+        .media-video-card p {
+            font-size: 0.85rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .media-video-card video {
+            width: 100%;
+            display: block;
+            border-radius: 10px;
+            border: 1px solid rgba(255,215,0,0.14);
+            background: #020617;
+            margin-bottom: 0.75rem;
+        }
+
+        .audio-card {
+            background: rgba(13,1,21,0.72);
+            border: 1px solid rgba(255,215,0,0.16);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .audio-card h4 {
+            color: var(--text);
+            margin-bottom: 0.25rem;
+            font-size: 0.98rem;
+        }
+
+        .audio-card p {
+            font-size: 0.85rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .audio-card audio {
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+
+        .media-download {
+            display: inline-block;
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .media-download:hover { text-decoration: underline; }
+
+        .media-file-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.75rem 1.5rem;
+            margin-top: 1rem;
+            padding: 0;
+        }
+
+        .media-file-list a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .media-file-list a:hover {
+            color: var(--gold);
+            text-decoration: underline;
+        }
+
+        main { flex: 1; }
+
+        /* ── Footer ── */
+        .site-footer {
+            background: rgba(10,2,18,0.9);
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .site-footer a { color: var(--gold-dim); text-decoration: none; }
+        .site-footer a:hover { color: var(--gold); text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+    <div class="ministry-stars" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../#properties">Listings</a>
+                <a href="../library/">Library</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="./" class="active" aria-current="page">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <div class="hero-icon">🕊️</div>
+            <h1>Voice of Jesus Ministry</h1>
+            <p>Faith, hope, and community — bringing the love of Jesus Christ to those who need it most.</p>
+        </div>
+
+        <div class="ministry-grid" role="navigation" aria-label="Ministry sections">
+
+            <a href="../library/" class="ministry-btn btn-stories" aria-label="Read Ministry Stories">
+                <span class="ministry-btn-icon">📖</span>
+                <span class="ministry-btn-label">Library</span>
+                <span class="ministry-btn-desc">Testimonies of faith, hope, and transformation</span>
+            </a>
+
+            <a href="../support/" class="ministry-btn btn-support" aria-label="Mission Support">
+                <span class="ministry-btn-icon">🤝</span>
+                <span class="ministry-btn-label">Mission Support</span>
+                <span class="ministry-btn-desc">Partner with us to expand our reach</span>
+            </a>
+
+            <a href="../arcade/" class="ministry-btn btn-games" aria-label="Play Faith-Based Games">
+                <span class="ministry-btn-icon">🎮</span>
+                <span class="ministry-btn-label">Games</span>
+                <span class="ministry-btn-desc">Interactive faith-based learning through play</span>
+            </a>
+
+            <a href="#ministry-media-library" class="ministry-btn btn-gallery" aria-label="Ministry media library">
+                <span class="ministry-btn-icon">🖼️</span>
+                <span class="ministry-btn-label">Media Library</span>
+                <span class="ministry-btn-desc">Audio and shared media preserved directly on the site</span>
+            </a>
+
+            <a href="../ministries/" class="ministry-btn btn-sevenstars" aria-label="Play the Seven Stars Journey">
+                <span class="ministry-btn-icon">✨</span>
+                <span class="ministry-btn-label">Seven Stars Journey</span>
+                <span class="ministry-btn-desc">A branched narrative &amp; puzzle adventure into Revelation's seven mysteries</span>
+            </a>
+
+            <a href="./bible-journey.html" class="ministry-btn" style="border-top:4px solid #9b59b6;" aria-label="Bible Journey — Story viewer and Bible Quiz">
+                <span class="ministry-btn-icon">✝</span>
+                <span class="ministry-btn-label">Bible Journey</span>
+                <span class="ministry-btn-desc">Seven Stars Lore story viewer and Bible quiz — faith through interactive learning</span>
+            </a>
+
+        </div>
+
+        <section class="media-library" aria-labelledby="ministry-media-library">
+            <h2 id="ministry-media-library">Media Library</h2>
+            <p class="media-library-intro">
+                Shared ministry audio and music now live under the main assets folders so they stay discoverable,
+                reusable, and protected during repository cleanup.
+            </p>
+
+            <div class="media-section">
+                <h3 id="ministry-gallery-heading">Ministry Gallery</h3>
+                <p>Recent ministry recordings now live under <code>assets/images/ministry/</code> so the outreach archive stays local to the repository.</p>
+
+                <div class="media-gallery-grid" role="region" aria-labelledby="ministry-gallery-heading">
+                    <article class="media-video-card">
+                        <h4>Portrait archive recording 1 · 4 sec · 720 × 1280</h4>
+                        <p>First preserved MP4 issue upload, kept as a 720 × 1280 portrait clip in the local ministry archive.</p>
+                        <video controls preload="metadata" playsinline aria-label="Portrait archive recording 1, 4 second video" title="Portrait archive recording 1, 4 second video">
+                            <source src="../assets/f848d75b-7d0a-459d-9f8f-4023ac7b4f46-D7jBxgpz.mp4" type="video/mp4">
+                            Your browser does not support the video element.
+                        </video>
+                        <a class="media-download" href="../assets/images/ministry/f848d75b-7d0a-459d-9f8f-4023ac7b4f46.mp4" target="_blank" rel="noopener">Open full video</a>
+                    </article>
+
+                    <article class="media-video-card">
+                        <h4>Portrait archive recording 2 · 4 sec · 720 × 1280</h4>
+                        <p>Second preserved MP4 issue upload, kept as another 720 × 1280 portrait clip in the local ministry archive.</p>
+                        <video controls preload="metadata" playsinline aria-label="Portrait archive recording 2, 4 second video" title="Portrait archive recording 2, 4 second video">
+                            <source src="../assets/7a65ebf3-4f2b-4fbf-9fd9-174859d47a1f-BqRhsAqo.mp4" type="video/mp4">
+                            Your browser does not support the video element.
+                        </video>
+                        <a class="media-download" href="../assets/images/ministry/7a65ebf3-4f2b-4fbf-9fd9-174859d47a1f.mp4" target="_blank" rel="noopener">Open full video</a>
+                    </article>
+
+                    <article class="media-video-card">
+                        <h4>Portrait archive recording 3 · 10 sec · 720 × 1280</h4>
+                        <p>Original MP4 issue upload preserved as a 720 × 1280 portrait clip with a longer 10 second runtime.</p>
+                        <video controls preload="metadata" playsinline aria-label="Portrait archive recording 3, 10 second video" title="Portrait archive recording 3, 10 second video">
+                            <source src="../assets/82179453-3283-4aae-b0af-6b8caf68eb9b-5aZAu3Xg.mp4" type="video/mp4">
+                            Your browser does not support the video element.
+                        </video>
+                        <a class="media-download" href="../assets/images/ministry/82179453-3283-4aae-b0af-6b8caf68eb9b.mp4" target="_blank" rel="noopener">Open full video</a>
+                    </article>
+
+                    <article class="media-video-card">
+                        <h4>QuickTime archive recording 4 · MOV upload</h4>
+                        <p>Original QuickTime issue upload preserved in the local ministry archive for download and playback.</p>
+                        <video controls preload="metadata" playsinline aria-label="QuickTime archive recording 4 video" title="QuickTime archive recording 4 video">
+                            <source src="../assets/4e5e0fe6-d627-44b3-9e07-b54346aefe5c-C_2a98oQ.MOV" type="video/quicktime">
+                            Your browser does not support the video element.
+                        </video>
+                        <a class="media-download" href="../assets/images/ministry/4e5e0fe6-d627-44b3-9e07-b54346aefe5c.MOV" target="_blank" rel="noopener">Open full video</a>
+                    </article>
+
+                    <article class="media-video-card">
+                        <h4>Portrait archive recording 5 · 5 sec · 1080 × 1920</h4>
+                        <p>Original MP4 issue upload preserved as a 1080 × 1920 portrait clip with just over 5 seconds of runtime.</p>
+                        <video controls preload="metadata" playsinline aria-label="Portrait archive recording 5, 5 second video" title="Portrait archive recording 5, 5 second video">
+                            <source src="../assets/a2715c20-d753-48bb-9ae5-110f60991b75-BH-WgubW.mp4" type="video/mp4">
+                            Your browser does not support the video element.
+                        </video>
+                        <a class="media-download" href="../assets/images/ministry/a2715c20-d753-48bb-9ae5-110f60991b75.mp4" target="_blank" rel="noopener">Open full video</a>
+                    </article>
+
+                    <article class="media-video-card">
+                        <h4>Landscape archive recording 6 · 5 sec · 832 × 480</h4>
+                        <p>Original MP4 issue upload preserved as an 832 × 480 landscape clip with just over 5 seconds of runtime.</p>
+                        <video controls preload="metadata" playsinline aria-label="Landscape archive recording 6, 5 second video" title="Landscape archive recording 6, 5 second video">
+                            <source src="../assets/610a3d0c-68c5-49c7-b124-9727214036c2-D8Vrzndv.mp4" type="video/mp4">
+                            Your browser does not support the video element.
+                        </video>
+                        <a class="media-download" href="../assets/images/ministry/610a3d0c-68c5-49c7-b124-9727214036c2.mp4" target="_blank" rel="noopener">Open full video</a>
+                    </article>
+
+                    <article class="media-video-card">
+                        <h4>Portrait archive recording 7 · 4 sec · 1080 × 1920</h4>
+                        <p>Original MP4 issue upload preserved as a 1080 × 1920 portrait clip in the local ministry archive.</p>
+                        <video controls preload="metadata" playsinline aria-label="Portrait archive recording 7, 4 second video" title="Portrait archive recording 7, 4 second video">
+                            <source src="../assets/57466648-ccca-4c11-ae7f-9f61cf8490ea-WQmbeGHu.mp4" type="video/mp4">
+                            Your browser does not support the video element.
+                        </video>
+                        <a class="media-download" href="../assets/images/ministry/57466648-ccca-4c11-ae7f-9f61cf8490ea.mp4" target="_blank" rel="noopener">Open full video</a>
+                    </article>
+                </div>
+            </div>
+
+            <div class="media-section">
+                <h3>Music &amp; Audio Archive</h3>
+                <p>These tracks are now explicitly linked here so they remain part of the ministry and site media library.</p>
+
+                <div class="audio-library-grid">
+                    <article class="audio-card">
+                        <h4>Storm</h4>
+                        <p>Atmospheric arcade score for dramatic ministry and game moments.</p>
+                        <audio controls preload="none">
+                            <source src="../assets/storm-CpVkJXGp.mp3" type="audio/mpeg">
+                        </audio>
+                        <a class="media-download" href="../assets/audio/storm.mp3" download>Download MP3</a>
+                    </article>
+
+                    <article class="audio-card">
+                        <h4>Victory</h4>
+                        <p>Celebration cue used for success and completion moments.</p>
+                        <audio controls preload="none">
+                            <source src="../assets/victory-tA01jxSg.mp3" type="audio/mpeg">
+                        </audio>
+                        <a class="media-download" href="../assets/audio/victory.mp3" download>Download MP3</a>
+                    </article>
+
+                    <article class="audio-card">
+                        <h4>Ending</h4>
+                        <p>Long-form ambient track preserved for story and ministry playback.</p>
+                        <audio controls preload="none">
+                            <source src="../assets/ending-DgGUomTE.mp3" type="audio/mpeg">
+                        </audio>
+                        <a class="media-download" href="../assets/audio/ending.mp3" download>Download MP3</a>
+                    </article>
+
+                    <article class="audio-card">
+                        <h4>Badge</h4>
+                        <p>Short reward stinger used across the arcade experience.</p>
+                        <audio controls preload="none">
+                            <source src="../assets/badge-DkimBBCL.mp3" type="audio/mpeg">
+                        </audio>
+                        <a class="media-download" href="../assets/audio/badge.mp3" download>Download MP3</a>
+                    </article>
+
+                    <article class="audio-card">
+                        <h4>Course Clear Fanfare</h4>
+                        <p>Arcade completion fanfare preserved under the shared audio library.</p>
+                        <audio controls preload="none">
+                            <source src="../assets/course-clear-fanfare-BqHXpYJ5.mp3" type="audio/mpeg">
+                        </audio>
+                        <a class="media-download" href="../assets/audio/course-clear-fanfare.mp3" download>Download MP3</a>
+                    </article>
+
+                    <article class="audio-card">
+                        <h4>Player Down</h4>
+                        <p>Game-over and warning cue retained as part of the ministry audio archive.</p>
+                        <audio controls preload="none">
+                            <source src="../assets/player-down-DY5VzlSB.mp3" type="audio/mpeg">
+                        </audio>
+                        <a class="media-download" href="../assets/audio/player-down.mp3" download>Download MP3</a>
+                    </article>
+                </div>
+            </div>
+
+            <div class="media-section">
+                <h3>Downloadable MIDI Music</h3>
+                <p>Legacy Super Mario 64 MIDI tracks are now organized under <code>assets/music/</code> and linked here so they remain part of the repository library.</p>
+                <ul class="media-file-list">
+                    <li><a href="../assets/music/m64bomb.mid" download>m64bomb.mid</a></li>
+                    <li><a href="../assets/music/m64bowsr.mid" download>m64bowsr.mid</a></li>
+                    <li><a href="../assets/music/m64crs1.mid" download>m64crs1.mid</a></li>
+                    <li><a href="../assets/music/m64crse1.mid" download>m64crse1.mid</a></li>
+                    <li><a href="../assets/music/m64docks.mid" download>m64docks.mid</a></li>
+                    <li><a href="../assets/music/m64endin.mid" download>m64endin.mid</a></li>
+                    <li><a href="../assets/music/m64file.mid" download>m64file.mid</a></li>
+                    <li><a href="../assets/music/m64metal.mid" download>m64metal.mid</a></li>
+                    <li><a href="../assets/music/m64metlm.mid" download>m64metlm.mid</a></li>
+                    <li><a href="../assets/music/m64slide.mid" download>m64slide.mid</a></li>
+                    <li><a href="../assets/music/m64snow.mid" download>m64snow.mid</a></li>
+                    <li><a href="../assets/music/m64vansh.mid" download>m64vansh.mid</a></li>
+                    <li><a href="../assets/music/m64water.mid" download>m64water.mid</a></li>
+                    <li><a href="../assets/music/m64wings.mid" download>m64wings.mid</a></li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../">amazinggracehl.org</a></p>
+    </footer>
+    <script src="../sw-register.js" defer></script>
+</body>
+</html>

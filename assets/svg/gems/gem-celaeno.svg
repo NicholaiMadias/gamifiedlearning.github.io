@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <!-- Celaeno — Neutral — Moonstone Silver — Virtue: Sustenance — Gem: Halo/cabochon double ring -->
+  <defs>
+    <radialGradient id="gGemCelaeno" cx="38%" cy="28%" r="68%">
+      <stop offset="0%"   stop-color="#F8F8FC"/>
+      <stop offset="45%"  stop-color="#8090A8"/>
+      <stop offset="100%" stop-color="#303444"/>
+    </radialGradient>
+    <radialGradient id="gGemCelaenoInner" cx="38%" cy="28%" r="70%">
+      <stop offset="0%"   stop-color="#FFFFFF"/>
+      <stop offset="55%"  stop-color="#C8CCD8"/>
+      <stop offset="100%" stop-color="#7880A0"/>
+    </radialGradient>
+    <filter id="glowGemCelaeno" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Outer halo disc -->
+  <circle cx="25" cy="25" r="22"
+          fill="url(#gGemCelaeno)" stroke="#282C3C" stroke-width="1.5" filter="url(#glowGemCelaeno)"/>
+  <!-- Ring channel — dark night-blue to match theme --night -->
+  <circle cx="25" cy="25" r="16"
+          fill="#1C2030" opacity="0.70"/>
+  <!-- 8-point star inlay on ring (tick marks) -->
+  <line x1="25" y1="9"  x2="25" y2="12" stroke="#8090A8" stroke-width="1.2" opacity="0.70"/>
+  <line x1="25" y1="38" x2="25" y2="41" stroke="#8090A8" stroke-width="1.2" opacity="0.70"/>
+  <line x1="9"  y1="25" x2="12" y2="25" stroke="#8090A8" stroke-width="1.2" opacity="0.70"/>
+  <line x1="38" y1="25" x2="41" y2="25" stroke="#8090A8" stroke-width="1.2" opacity="0.70"/>
+  <line x1="14.4" y1="14.4" x2="16.5" y2="16.5" stroke="#8090A8" stroke-width="1.0" opacity="0.60"/>
+  <line x1="35.6" y1="14.4" x2="33.5" y2="16.5" stroke="#8090A8" stroke-width="1.0" opacity="0.60"/>
+  <line x1="35.6" y1="35.6" x2="33.5" y2="33.5" stroke="#8090A8" stroke-width="1.0" opacity="0.60"/>
+  <line x1="14.4" y1="35.6" x2="16.5" y2="33.5" stroke="#8090A8" stroke-width="1.0" opacity="0.60"/>
+  <!-- Inner cabochon gem -->
+  <circle cx="25" cy="25" r="10"
+          fill="url(#gGemCelaenoInner)" stroke="#4C5470" stroke-width="1.0"/>
+  <!-- Specular highlight -->
+  <ellipse cx="21" cy="20" rx="3.5" ry="2.2" fill="#FFFFFF" opacity="0.50"/>
+</svg>

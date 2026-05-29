@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Audio Library - Sermons, teachings, and faith-based content from Amazing Grace Home Living.">
+    <meta name="theme-color" content="#020617">
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+    <title>Audio Library | Amazing Grace Home Living</title>
+
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: #0f172a;
+            --border: #1e293b;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(2, 6, 23, 0.96);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .logo img {
+            height: 42px;
+            width: auto;
+            border-radius: 6px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: nowrap;      /* keep nav on a single row */
+            white-space: nowrap;    /* prevent link text from wrapping */
+            gap: 0.75rem;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 0.8rem;
+            border-radius: 999px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.nav-active-page {
+            background: rgba(56, 189, 248, 0.14);
+            color: #fff;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 4rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 2.75rem);
+            margin: 0 0 0.5rem;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0 0 2rem;
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: rgba(15, 23, 42, 1);
+            border-color: var(--accent);
+        }
+
+        .placeholder {
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            text-align: center;
+            padding: 1.5rem 1rem 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../#properties">Listings</a>
+                <a href="../library/">Library</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="../ministry/">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <a href="../library/" class="back-link">
+            <span>←</span>
+            <span>Back to Library</span>
+        </a>
+
+        <h1>🎵 Audio Library</h1>
+        <p class="subtitle">Audio recordings, sermons, and faith-based teachings from Amazing Grace Home Living.</p>
+
+        <div class="placeholder">
+            <p>Audio content coming soon.</p>
+            <p>Check back later for sermons, teachings, and other audio resources.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; Tampa and Largo, Florida</p>
+    </footer>
+</body>
+</html>
