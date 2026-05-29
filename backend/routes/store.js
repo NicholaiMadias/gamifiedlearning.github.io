@@ -23,21 +23,23 @@ function getAdminApiKey(req) {
 }
 
 function isValidAdminApiKey(candidate, expected) {
+  // timingSafeEqual requires equal-length buffers
   if (typeof expected !== 'string' || expected.length === 0) {
     return false;
   }
-  if (typeof candidate !== 'string') {
+  if (!candidate || typeof candidate !== 'string') {
     return false;
   }
-  const candidateHash = crypto.createHash('sha256').update(candidate || '').digest();
-  const expectedHash = crypto.createHash('sha256').update(expected).digest();
-  return crypto.timingSafeEqual(candidateHash, expectedHash);
+  const candidateBuffer = Buffer.from(candidate, 'utf8');
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+  if (candidateBuffer.length !== expectedBuffer.length) return false;
+  return crypto.timingSafeEqual(candidateBuffer, expectedBuffer);
 }
 
 function requireAdmin(req, res, next) {
   const expectedKey = process.env.ADMIN_API_KEY;
   if (!expectedKey) {
-    return res.status(503).json({ error: 'Admin API key is not configured' });
+    return res.status(403).json({ error: 'Admin access denied' });
   }
 
   if (!isValidAdminApiKey(getAdminApiKey(req), expectedKey)) {

@@ -123,4 +123,28 @@ describe('matchMakerState (v1) — match detection and special classification', 
     expect(next[2][3]).toBeNull();
     expect(next[4][3]).toBeNull();
   });
+
+  test('applyMatches creates supernova specials with kind: "wild" for wildcard matching', () => {
+    const grid = make7x7('star');
+    const t = 'heart';
+    // Create a 5-cell horizontal line (avoiding L-shapes by keeping other cells different)
+    grid[3][1] = gem(t);
+    grid[3][2] = gem(t);
+    grid[3][3] = gem(t);
+    grid[3][4] = gem(t);
+    grid[3][5] = gem(t);
+
+    const res = findMatches(grid);
+    const supernovaSpec = res.specials.find(s => s.specialType === 'supernova');
+    expect(supernovaSpec).toBeDefined();
+
+    const next = applyMatches(grid, res, 1);
+    const supernovaCell = next[supernovaSpec.row][supernovaSpec.col];
+
+    // Supernova should be a wildcard gem
+    expect(supernovaCell).not.toBeNull();
+    expect(supernovaCell.special).toBe('supernova');
+    expect(supernovaCell.kind).toBe('wild');
+    expect(supernovaCell.type).toBe('wild');
+  });
 });
