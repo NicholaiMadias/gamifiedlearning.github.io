@@ -264,8 +264,10 @@ export function applyMatches(grid, matchResult, comboLevel = 1) {
     const key = `${s.row},${s.col}`;
     if (!toClear.has(key)) continue;
     toClear.delete(key);
+    // Supernova specials become true wildcards (kind: 'wild')
     const existingType = cellType(next[s.row]?.[s.col]) || 'star';
-    next[s.row][s.col] = makeGem(existingType, s.specialType, 'shape');
+    const gemType = s.specialType === 'supernova' ? 'wild' : existingType;
+    next[s.row][s.col] = makeGem(gemType, s.specialType, 'shape');
   }
 
   for (const key of toClear) {

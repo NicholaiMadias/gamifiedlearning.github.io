@@ -5,12 +5,49 @@
 
 'use strict';
 
+const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 
 const { findOrCreate, getPlayer } = require('../models/Player');
 const { addItem, getAllItems, getItemById } = require('../models/StoreItem');
 const { logTransaction } = require('../models/Transaction');
+
+function getAdminApiKey(req) {
+  const headerToken = req.get('x-admin-api-key');
+  if (headerToken) return headerToken;
+
+  const authHeader = req.get('authorization') || '';
+  const [scheme, token] = authHeader.split(/\s+/, 2);
+  return scheme === 'Bearer' ? token : null;
+}
+
+function isValidAdminApiKey(candidate, expected) {
+  // timingSafeEqual requires equal-length buffers
+  if (typeof expected !== 'string' || expected.length === 0) {
+    return false;
+  }
+  if (!candidate || typeof candidate !== 'string') {
+    return false;
+  }
+  const candidateBuffer = Buffer.from(candidate, 'utf8');
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+  if (candidateBuffer.length !== expectedBuffer.length) return false;
+  return crypto.timingSafeEqual(candidateBuffer, expectedBuffer);
+}
+
+function requireAdmin(req, res, next) {
+  const expectedKey = process.env.ADMIN_API_KEY;
+  if (!expectedKey) {
+    return res.status(403).json({ error: 'Admin access denied' });
+  }
+
+  if (!isValidAdminApiKey(getAdminApiKey(req), expectedKey)) {
+    return res.status(403).json({ error: 'Admin access denied' });
+  }
+
+  return next();
+}
 
 /* ------------------------------------------------------------------ */
 /*  POST /update-credits                                                */
@@ -107,7 +144,7 @@ router.post('/purchase', (req, res) => {
 /*  GET /admin/store-items                                              */
 /*  Returns all store items.                                            */
 /* ------------------------------------------------------------------ */
-router.get('/admin/store-items', (req, res) => {
+router.get('/admin/store-items', requireAdmin, (req, res) => {
   return res.json({ items: getAllItems().map(i => i.toJSON()) });
 });
 
@@ -116,7 +153,7 @@ router.get('/admin/store-items', (req, res) => {
 /*  Body: { name, description, cost }                                   */
 /*  Adds a new item to the store.                                       */
 /* ------------------------------------------------------------------ */
-router.post('/admin/add-item', (req, res) => {
+router.post('/admin/add-item', requireAdmin, (req, res) => {
   const { name, description, cost } = req.body;
 
   if (!name || typeof name !== 'string' || name.trim() === '') {

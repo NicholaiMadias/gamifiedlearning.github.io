@@ -75,6 +75,32 @@ describe('matchMakerState (v1) — match detection and special classification', 
     );
   });
 
+  test('findMatches classifies a 5-cell line as a supernova and applyMatches preserves it', () => {
+    const grid = make7x7('star');
+    const t = 'heart';
+    grid[3][1] = gem(t);
+    grid[3][2] = gem(t);
+    grid[3][3] = gem(t);
+    grid[3][4] = gem(t);
+    grid[3][5] = gem(t);
+
+    const res = findMatches(grid);
+    expect(res.specials).toEqual(
+      expect.arrayContaining([
+        { row: 3, col: 3, specialType: 'supernova' },
+      ])
+    );
+
+    const next = applyMatches(grid, res, 1);
+    expect(next[3][3]).toEqual(
+      expect.objectContaining({ type: 'wild', kind: 'wild', special: 'supernova' })
+    );
+    expect(next[3][1]).toBeNull();
+    expect(next[3][2]).toBeNull();
+    expect(next[3][4]).toBeNull();
+    expect(next[3][5]).toBeNull();
+  });
+
   test('applyMatches clears matched cells but keeps newly-created specials', () => {
     const grid = make7x7('star');
     const t = 'cross';
@@ -97,5 +123,28 @@ describe('matchMakerState (v1) — match detection and special classification', 
     expect(next[2][3]).toBeNull();
     expect(next[4][3]).toBeNull();
   });
-});
 
+  test('applyMatches creates supernova specials with kind: "wild" for wildcard matching', () => {
+    const grid = make7x7('star');
+    const t = 'heart';
+    // Create a 5-cell horizontal line (avoiding L-shapes by keeping other cells different)
+    grid[3][1] = gem(t);
+    grid[3][2] = gem(t);
+    grid[3][3] = gem(t);
+    grid[3][4] = gem(t);
+    grid[3][5] = gem(t);
+
+    const res = findMatches(grid);
+    const supernovaSpec = res.specials.find(s => s.specialType === 'supernova');
+    expect(supernovaSpec).toBeDefined();
+
+    const next = applyMatches(grid, res, 1);
+    const supernovaCell = next[supernovaSpec.row][supernovaSpec.col];
+
+    // Supernova should be a wildcard gem
+    expect(supernovaCell).not.toBeNull();
+    expect(supernovaCell.special).toBe('supernova');
+    expect(supernovaCell.kind).toBe('wild');
+    expect(supernovaCell.type).toBe('wild');
+  });
+});

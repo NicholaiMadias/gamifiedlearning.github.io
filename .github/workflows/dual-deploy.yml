@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -45,8 +46,8 @@ jobs:
             echo "CNAME file not found at repo root"
             exit 1
           fi
-          ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="matrix.amazinggracehl.org"
+          ACTUAL=$(tr -d '[:space:]' < CNAME | tr '[:upper:]' '[:lower:]')
+          EXPECTED="app.amazinggracehl.org"
           if [ "$ACTUAL" != "$EXPECTED" ]; then
             echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
             exit 1

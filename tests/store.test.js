@@ -7,11 +7,13 @@
  */
 
 const request = require('supertest');
+const ADMIN_API_KEY = 'test-admin-key';
 
 // Isolate module state between tests
 let app;
 beforeEach(() => {
   jest.resetModules();
+  process.env.ADMIN_API_KEY = ADMIN_API_KEY;
   app = require('../backend/server');
 });
 
@@ -117,9 +119,18 @@ describe('POST /donate', () => {
 });
 
 describe('POST /admin/add-item and GET /admin/store-items', () => {
+  it('rejects admin requests without the configured API key', async () => {
+    const res = await request(app)
+      .post('/admin/add-item')
+      .send({ name: 'Blocked Item', cost: 1 });
+
+    expect(res.status).toBe(403);
+  });
+
   it('adds an item and retrieves it', async () => {
     const addRes = await request(app)
       .post('/admin/add-item')
+      .set('x-admin-api-key', ADMIN_API_KEY)
       .send({ name: 'Gold Badge', description: 'A shiny badge', cost: 150 });
 
     expect(addRes.status).toBe(201);
@@ -127,7 +138,9 @@ describe('POST /admin/add-item and GET /admin/store-items', () => {
     expect(addRes.body.item.cost).toBe(150);
     expect(addRes.body.item.id).toBeDefined();
 
-    const listRes = await request(app).get('/admin/store-items');
+    const listRes = await request(app)
+      .get('/admin/store-items')
+      .set('x-admin-api-key', ADMIN_API_KEY);
     expect(listRes.status).toBe(200);
     expect(listRes.body.items.length).toBeGreaterThanOrEqual(1);
     const found = listRes.body.items.find(i => i.name === 'Gold Badge');
@@ -137,6 +150,7 @@ describe('POST /admin/add-item and GET /admin/store-items', () => {
   it('returns 400 when name is missing', async () => {
     const res = await request(app)
       .post('/admin/add-item')
+      .set('x-admin-api-key', ADMIN_API_KEY)
       .send({ cost: 50 });
 
     expect(res.status).toBe(400);
@@ -146,6 +160,7 @@ describe('POST /admin/add-item and GET /admin/store-items', () => {
   it('returns 400 when cost is negative', async () => {
     const res = await request(app)
       .post('/admin/add-item')
+      .set('x-admin-api-key', ADMIN_API_KEY)
       .send({ name: 'Invalid', cost: -10 });
 
     expect(res.status).toBe(400);
@@ -162,6 +177,7 @@ describe('POST /purchase', () => {
     // Add an item
     const itemRes = await request(app)
       .post('/admin/add-item')
+      .set('x-admin-api-key', ADMIN_API_KEY)
       .send({ name: 'Star Sticker', cost: 100 });
     const itemId = itemRes.body.item.id;
 
@@ -186,6 +202,7 @@ describe('POST /purchase', () => {
 
     const itemRes = await request(app)
       .post('/admin/add-item')
+      .set('x-admin-api-key', ADMIN_API_KEY)
       .send({ name: 'Expensive Trophy', cost: 9999 });
     const itemId = itemRes.body.item.id;
 
@@ -200,6 +217,7 @@ describe('POST /purchase', () => {
   it('returns 404 when player does not exist', async () => {
     const itemRes = await request(app)
       .post('/admin/add-item')
+      .set('x-admin-api-key', ADMIN_API_KEY)
       .send({ name: 'Test Item', cost: 1 });
     const itemId = itemRes.body.item.id;
 

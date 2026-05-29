@@ -5,11 +5,11 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       cache.addAll([
-        '/',
-        '/index.html',
-        '/style.css',
-        '/main.js',
-        '/manifest.json'
+        './',
+        './index.html',
+        './style.css',
+        './main.js',
+        './manifest.json'
       ])
     )
   );

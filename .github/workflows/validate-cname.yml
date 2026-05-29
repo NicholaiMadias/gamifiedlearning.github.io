@@ -19,7 +19,7 @@ jobs:
           EXPECTED=""
           case "${{ github.repository }}" in
             "NicholaiMadias/gamifiedlearning.github.io")
-              EXPECTED="app.AmazingGraceHL.org"
+              EXPECTED="app.amazinggracehl.org"
               ;;
             "NicholaiMadias/Amazing-Grace")
               EXPECTED="amazinggracehl.org"
@@ -36,7 +36,7 @@ jobs:
               ;;
           esac
 
-          ACTUAL=$(tr -d '\r\n' < CNAME)
+          ACTUAL=$(tr -d '\r\n' < CNAME | tr '[:upper:]' '[:lower:]')
           ACTUAL="${ACTUAL#"${ACTUAL%%[![:space:]]*}"}"
           ACTUAL="${ACTUAL%"${ACTUAL##*[![:space:]]}"}"
 
