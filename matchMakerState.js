@@ -76,12 +76,16 @@ export function applySwap(grid, r1, c1, r2, c2) {
  */
 export function findMatches(grid) {
   const groups = [];
+  const rowCount = grid.length;
+  const colCount = grid[0]?.length ?? 0;
+
+  if (rowCount === 0 || colCount === 0) return groups;
 
   // Horizontal runs — only regular gem types can form matches
-  for (let r = 0; r < GRID_SIZE; r++) {
+  for (let r = 0; r < rowCount; r++) {
     let runStart = 0;
-    for (let c = 1; c <= GRID_SIZE; c++) {
-      const cont = c < GRID_SIZE && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r][c - 1];
+    for (let c = 1; c <= colCount; c++) {
+      const cont = c < colCount && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r][c - 1];
       if (!cont) {
         if (c - runStart >= 3) {
           const group = [];
@@ -94,10 +98,10 @@ export function findMatches(grid) {
   }
 
   // Vertical runs — only regular gem types can form matches
-  for (let c = 0; c < GRID_SIZE; c++) {
+  for (let c = 0; c < colCount; c++) {
     let runStart = 0;
-    for (let r = 1; r <= GRID_SIZE; r++) {
-      const cont = r < GRID_SIZE && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r - 1][c];
+    for (let r = 1; r <= rowCount; r++) {
+      const cont = r < rowCount && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r - 1][c];
       if (!cont) {
         if (r - runStart >= 3) {
           const group = [];
@@ -128,10 +132,12 @@ export function clearMatches(grid, matches) {
  */
 export function applyBombExplosion(grid, r, c) {
   const next = grid.map(row => [...row]);
+  const rowCount = next.length;
+  const colCount = next[0]?.length ?? 0;
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
       const nr = r + dr, nc = c + dc;
-      if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+      if (nr >= 0 && nr < rowCount && nc >= 0 && nc < colCount) {
         next[nr][nc] = null;
       }
     }
@@ -144,8 +150,10 @@ export function applyBombExplosion(grid, r, c) {
  */
 export function applyRainbowClear(grid, targetType) {
   const next = grid.map(row => [...row]);
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
+  const rowCount = next.length;
+  const colCount = next[0]?.length ?? 0;
+  for (let r = 0; r < rowCount; r++) {
+    for (let c = 0; c < colCount; c++) {
       if (next[r][c] === targetType) next[r][c] = null;
     }
   }
@@ -159,8 +167,10 @@ export function applyRainbowClear(grid, targetType) {
 export function findMostCommonType(grid) {
   const counts = {};
   GEM_TYPES.forEach(t => { counts[t] = 0; });
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
+  const rowCount = grid.length;
+  const colCount = grid[0]?.length ?? 0;
+  for (let r = 0; r < rowCount; r++) {
+    for (let c = 0; c < colCount; c++) {
       if (GEM_TYPES.includes(grid[r][c])) counts[grid[r][c]]++;
     }
   }
@@ -173,12 +183,14 @@ export function findMostCommonType(grid) {
  */
 export function applyGravity(grid) {
   const next = grid.map(row => [...row]);
-  for (let c = 0; c < GRID_SIZE; c++) {
+  const rowCount = next.length;
+  const colCount = next[0]?.length ?? 0;
+  for (let c = 0; c < colCount; c++) {
     const gems = [];
-    for (let r = GRID_SIZE - 1; r >= 0; r--) {
+    for (let r = rowCount - 1; r >= 0; r--) {
       if (next[r][c] !== null) gems.push(next[r][c]);
     }
-    for (let r = GRID_SIZE - 1; r >= 0; r--) {
+    for (let r = rowCount - 1; r >= 0; r--) {
       next[r][c] = gems.length > 0 ? gems.shift() : randomGem();
     }
   }

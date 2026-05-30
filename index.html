@@ -90,6 +90,11 @@
 
     .match-cell:hover  { box-shadow: 0 0 10px rgba(0,255,65,0.25); }
     .match-cell:active { transform: scale(0.92); }
+    .match-cell:focus-visible {
+      outline: 2px solid #00ff41;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 2px #00ff4150;
+    }
 
     .match-cell.selected {
       box-shadow: 0 0 0 2px #00ff41, 0 0 12px #00ff4160;

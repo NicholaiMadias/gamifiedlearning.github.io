@@ -17,7 +17,6 @@ import {
   findMostCommonType,
   GEM_TYPES,
   GEM_SCORE,
-  GRID_SIZE,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
@@ -66,7 +65,7 @@ export function initMatchMaker(dbRef, userRef) {
   chainDepth = 0;
   selected = null;
   lastSwap = null;
-  grid = createInitialGrid(7, 7);
+  grid = createInitialGrid();
 
   document.getElementById('match-score').textContent = score;
   document.getElementById('match-moves').textContent = moves;
@@ -84,14 +83,24 @@ export function initMatchMaker(dbRef, userRef) {
 function renderGrid() {
   const container = document.getElementById('match-grid');
   container.innerHTML = '';
+  container.style.gridTemplateColumns = `repeat(${grid[0]?.length || 0}, 1fr)`;
 
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
+  for (let r = 0; r < grid.length; r++) {
+    for (let c = 0; c < grid[r].length; c++) {
       const cell = document.createElement('div');
       cell.className = 'match-cell';
       cell.dataset.row = r;
       cell.dataset.col = c;
+      cell.setAttribute('role', 'button');
+      cell.tabIndex = 0;
       const type = grid[r][c];
+      const isSelected = selected?.r === r && selected?.c === c;
+      cell.classList.toggle('selected', isSelected);
+      cell.setAttribute('aria-pressed', String(isSelected));
+      cell.setAttribute(
+        'aria-label',
+        `${GEM_LABELS[type] || type || 'Empty'} tile at row ${r + 1}, column ${c + 1}${isSelected ? ', selected' : ''}`
+      );
       if (type) {
         const gem = document.createElement('div');
         gem.className = `gem gem-${type}`;
@@ -99,7 +108,16 @@ function renderGrid() {
         gem.setAttribute('aria-label', GEM_LABELS[type] || type);
         cell.appendChild(gem);
       }
-      cell.onclick = () => onCellClick(r, c);
+      cell.addEventListener('click', () => onCellClick(r, c));
+      cell.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onCellClick(r, c);
+        } else if (event.key === 'Escape' && selected?.r === r && selected?.c === c) {
+          event.preventDefault();
+          clearSelection();
+        }
+      });
       container.appendChild(cell);
     }
   }
@@ -120,8 +138,7 @@ function onCellClick(r, c) {
 
   const { r: r1, c: c1 } = selected;
   if (r === r1 && c === c1) {
-    highlightCell(r, c, false);
-    selected = null;
+    clearSelection();
     return;
   }
 
@@ -137,8 +154,7 @@ function onCellClick(r, c) {
 
   if (matches.length === 0) {
     // No valid match — cancel selection without consuming a move
-    highlightCell(r1, c1, false);
-    selected = null;
+    clearSelection();
     return;
   }
 
@@ -157,6 +173,20 @@ function highlightCell(r, c, on) {
   const cell = document.querySelector(`.match-cell[data-row="${r}"][data-col="${c}"]`);
   if (!cell) return;
   cell.classList.toggle('selected', on);
+  cell.setAttribute('aria-pressed', String(on));
+  const type = grid[r]?.[c];
+  if (type) {
+    cell.setAttribute(
+      'aria-label',
+      `${GEM_LABELS[type] || type} tile at row ${r + 1}, column ${c + 1}${on ? ', selected' : ''}`
+    );
+  }
+}
+
+function clearSelection() {
+  if (!selected) return;
+  highlightCell(selected.r, selected.c, false);
+  selected = null;
 }
 
 // ── Special gem activation ───────────────────────────────
@@ -407,7 +437,7 @@ function checkGameOver() {
 function resetCascadeState() {
   runId++;
   if (pendingTimeout) { clearTimeout(pendingTimeout); pendingTimeout = null; }
-  if (selected) { highlightCell(selected.r, selected.c, false); selected = null; }
+  clearSelection();
   chainDepth = 0;
   lastSwap = null;
 }
@@ -429,7 +459,7 @@ export function purchaseItem(itemId) {
 
     case 'shuffle':
       resetCascadeState();
-      grid = createInitialGrid(7, 7);
+      grid = createInitialGrid();
       renderGrid();
       showBanner('🔀 Board shuffled!', 'banner--badge');
       break;
@@ -437,8 +467,8 @@ export function purchaseItem(itemId) {
     case 'place-bomb': {
       resetCascadeState();
       const candidates = [];
-      for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c < GRID_SIZE; c++) {
+      for (let r = 0; r < grid.length; r++) {
+        for (let c = 0; c < grid[r].length; c++) {
           if (GEM_TYPES.includes(grid[r][c])) candidates.push({ r, c });
         }
       }
@@ -461,17 +491,6 @@ export function updateStoreButtons() {
 }
 
 // ── Local helpers ─────────────────────────────────────────
-function countBombArea(g, r, c) {
-  let n = 0;
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      const nr = r + dr, nc = c + dc;
-      if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE && g[nr][nc] !== null) n++;
-    }
-  }
-  return n;
-}
-
 /**
  * Detonates one or more bombs and chain-detonates any bombs caught in each blast radius.
  * Any bomb destroyed by another bomb's explosion also detonates its own 3×3 area.
@@ -484,6 +503,8 @@ function detonateAllBombs(g, startPositions) {
   const scheduled = new Set(startPositions.map(({ r, c }) => `${r},${c}`));
   const queue = [...startPositions];
   const clearedKeys = new Set();
+  const rowCount = g.length;
+  const colCount = g[0]?.length ?? 0;
 
   while (queue.length > 0) {
     const { r, c } = queue.shift();
@@ -494,7 +515,7 @@ function detonateAllBombs(g, startPositions) {
       for (let dc = -1; dc <= 1; dc++) {
         if (dr === 0 && dc === 0) continue; // center is the detonating bomb, already queued
         const nr = r + dr, nc = c + dc;
-        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+        if (nr >= 0 && nr < rowCount && nc >= 0 && nc < colCount) {
           const nKey = `${nr},${nc}`;
           if (g[nr][nc] === 'bomb' && !scheduled.has(nKey)) {
             scheduled.add(nKey);
@@ -508,7 +529,7 @@ function detonateAllBombs(g, startPositions) {
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
         const nr = r + dr, nc = c + dc;
-        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE && g[nr][nc] !== null) {
+        if (nr >= 0 && nr < rowCount && nc >= 0 && nc < colCount && g[nr][nc] !== null) {
           clearedKeys.add(`${nr},${nc}`);
         }
       }
@@ -522,8 +543,8 @@ function detonateAllBombs(g, startPositions) {
 
 function countType(g, type) {
   let n = 0;
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
+  for (let r = 0; r < g.length; r++) {
+    for (let c = 0; c < g[r].length; c++) {
       if (g[r][c] === type) n++;
     }
   }
