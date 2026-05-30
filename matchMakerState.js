@@ -26,15 +26,15 @@ function randomGem() {
 }
 
 /**
- * Creates an initial grid with no pre-existing matches.
- * @param {number} [rows=GRID_SIZE] - Number of rows (defaults to GRID_SIZE)
- * @param {number} [cols=GRID_SIZE] - Number of columns (defaults to GRID_SIZE)
+ * Creates an initial GRID_SIZE×GRID_SIZE grid with no pre-existing matches.
+ * All other functions in this module are hard-coded to GRID_SIZE, so variable
+ * dimensions are intentionally not supported here.
  */
-export function createInitialGrid(rows = GRID_SIZE, cols = GRID_SIZE) {
+export function createInitialGrid() {
   const grid = [];
-  for (let r = 0; r < rows; r++) {
+  for (let r = 0; r < GRID_SIZE; r++) {
     grid[r] = [];
-    for (let c = 0; c < cols; c++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
       let gem;
       do {
         gem = randomGem();
