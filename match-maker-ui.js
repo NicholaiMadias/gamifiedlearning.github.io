@@ -83,7 +83,10 @@ export function initMatchMaker(dbRef, userRef) {
 function renderGrid() {
   const container = document.getElementById('match-grid');
   container.innerHTML = '';
-  container.style.gridTemplateColumns = `repeat(${grid[0]?.length || 0}, 1fr)`;
+  const columnCount = Number.isInteger(grid[0]?.length) && grid[0].length > 0
+    ? grid[0].length
+    : 1;
+  container.style.setProperty('grid-template-columns', `repeat(${columnCount}, 1fr)`);
 
   for (let r = 0; r < grid.length; r++) {
     for (let c = 0; c < grid[r].length; c++) {
@@ -99,13 +102,13 @@ function renderGrid() {
       cell.setAttribute('aria-pressed', String(isSelected));
       cell.setAttribute(
         'aria-label',
-        `${GEM_LABELS[type] || type || 'Empty'} tile at row ${r + 1}, column ${c + 1}${isSelected ? ', selected' : ''}`
+        `${getCellLabel(type)} tile at row ${r + 1}, column ${c + 1}${isSelected ? ', selected' : ''}`
       );
       if (type) {
         const gem = document.createElement('div');
         gem.className = `gem gem-${type}`;
         gem.setAttribute('role', 'img');
-        gem.setAttribute('aria-label', GEM_LABELS[type] || type);
+        gem.setAttribute('aria-label', getCellLabel(type));
         cell.appendChild(gem);
       }
       cell.addEventListener('click', () => onCellClick(r, c));
@@ -175,18 +178,20 @@ function highlightCell(r, c, on) {
   cell.classList.toggle('selected', on);
   cell.setAttribute('aria-pressed', String(on));
   const type = grid[r]?.[c];
-  if (type) {
-    cell.setAttribute(
-      'aria-label',
-      `${GEM_LABELS[type] || type} tile at row ${r + 1}, column ${c + 1}${on ? ', selected' : ''}`
-    );
-  }
+  cell.setAttribute(
+    'aria-label',
+    `${getCellLabel(type)} tile at row ${r + 1}, column ${c + 1}${on ? ', selected' : ''}`
+  );
 }
 
 function clearSelection() {
   if (!selected) return;
   highlightCell(selected.r, selected.c, false);
   selected = null;
+}
+
+function getCellLabel(type) {
+  return GEM_LABELS[type] || 'Empty';
 }
 
 // ── Special gem activation ───────────────────────────────
