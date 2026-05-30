@@ -472,6 +472,7 @@ function countBombArea(g, r, c) {
 /**
  * Detonates one or more bombs and chain-detonates any bombs caught in each blast radius.
  * Any bomb destroyed by another bomb's explosion also detonates its own 3×3 area.
+ * Duplicate positions in startPositions are silently deduplicated via the scheduled Set.
  * @param {string[][]} g - current grid
  * @param {{ r: number, c: number }[]} startPositions - initial bomb positions to detonate
  * @returns {{ grid: string[][], cleared: number }} updated grid and count of unique cells cleared
@@ -484,10 +485,11 @@ function detonateAllBombs(g, startPositions) {
   while (queue.length > 0) {
     const { r, c } = queue.shift();
 
-    // Scan blast radius BEFORE clearing: queue any chained bombs not yet scheduled
+    // Scan the 8 surrounding cells (not the center — the bomb itself is already scheduled)
+    // for any additional bombs to chain-detonate, before the current explosion clears them.
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
-        if (dr === 0 && dc === 0) continue;
+        if (dr === 0 && dc === 0) continue; // center is the detonating bomb, already queued
         const nr = r + dr, nc = c + dc;
         if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
           const nKey = `${nr},${nc}`;
