@@ -167,12 +167,7 @@ function onCellClick(r, c) {
     return;
   }
 
-<<<<<<< HEAD
   if (!isAdjacent(r1, c1, r, c)) {
-    highlightCell(r1, c1, false);
-=======
-  if (!canSwap(grid, r1, c1, r, c)) {
->>>>>>> origin/main
     selected = { r, c };
     renderGrid();
     return;
