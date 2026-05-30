@@ -1,8 +1,6 @@
 // match-maker-ui.js
 import {
   createInitialGrid,
-  canSwap,
-  applySwap,
   findMatches,
   clearMatches,
   applyGravity,
@@ -29,6 +27,18 @@ let resolving = false;
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 320;
 const MAX_COMBO_MULTIPLIER = 5;
+
+function isAdjacent(r1, c1, r2, c2) {
+  const rowDiff = Math.abs(r1 - r2);
+  const colDiff = Math.abs(c1 - c2);
+  return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+}
+
+function swapGridCells(currentGrid, r1, c1, r2, c2) {
+  const swapped = currentGrid.map((row) => row.slice());
+  [swapped[r1][c1], swapped[r2][c2]] = [swapped[r2][c2], swapped[r1][c1]];
+  return swapped;
+}
 
 const STORE_ITEMS = [
   { id: 'moves', label: '+5 Moves Flask', cost: 4, detail: 'Refill your focus and gain +5 moves.', action: () => addMoves(5) },
@@ -157,13 +167,13 @@ function onCellClick(r, c) {
     return;
   }
 
-  if (!canSwap(grid, r1, c1, r, c)) {
+  if (!isAdjacent(r1, c1, r, c)) {
     selected = { r, c };
     renderGrid();
     return;
   }
 
-  const swapped = applySwap(grid, r1, c1, r, c);
+  const swapped = swapGridCells(grid, r1, c1, r, c);
   const matches = findMatches(swapped);
 
   if (matches.length === 0) {
