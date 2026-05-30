@@ -1,265 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<<<<<<< HEAD
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gamified Learning</title>
-  <style>
-    /* ── Base ─────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0a0a0f;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      padding: 1.5rem 1rem 3rem;
-    }
-
-    h1.app-title {
-      font-size: 1.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #00ff41;
-      text-shadow: 0 0 10px #00ff4180;
-    }
-
-    /* ── Match Maker ──────────────────────────────── */
-    .match-card {
-      background: #0d0d1a;
-      border: 1px solid #1a1a2e;
-      border-radius: 12px;
-      padding: 1rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .match-card h2 {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #00ff41;
-      margin-bottom: 0.6rem;
-    }
-
-    .match-stats {
-      display: flex;
-      justify-content: space-around;
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 0.8rem;
-    }
-
-    .match-stats span { color: #00ff41; font-weight: 700; }
-
-    .match-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      padding: 0.8rem;
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-    }
-
-    .match-cell {
-      aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      cursor: pointer;
-      background: #111;
-      box-shadow: 0 0 6px rgba(0,0,0,0.6);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-      user-select: none;
-    }
-
-    .match-cell:hover { transform: scale(1.08); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
-    .match-cell:active { transform: scale(0.94); }
-
-    .match-badge-banner {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #00ff41;
-      background: #001a00;
-      border: 1px solid #00ff4160;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      margin-top: 0.6rem;
-    }
-
-    .match-badge-banner.hidden { display: none; }
-
-    .match-restart-btn {
-      display: block;
-      margin: 0.8rem auto 0;
-      background: transparent;
-      border: 1px solid #00ff41;
-      color: #00ff41;
-      padding: 0.4rem 1.4rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      transition: background 0.15s;
-    }
-
-    .match-restart-btn:hover { background: #00ff4120; }
-
-    /* ── Matrix of Conscience ─────────────────────── */
-    .matrix-card {
-      background: #0d0d1a;
-      border-radius: 12px;
-      padding: 1.2rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .matrix-border { border: 1px solid #1a2a3a; }
-
-    .matrix-heading {
-      text-align: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #4fc3f7;
-      margin-bottom: 1rem;
-    }
-
-    .matrix-economy-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
-    .matrix-cell {
-      background: #111827;
-      border: 1px solid #1e3a5f;
-      border-radius: 8px;
-      padding: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .matrix-cell .icon { font-size: 1.6rem; }
-
-    .matrix-cell .label {
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #64b5f6;
-    }
-
-    .matrix-cell .value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #e0e0e0;
-    }
-
-    .matrix-cell .bar-track {
-      width: 100%;
-      height: 4px;
-      background: #1e3a5f;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .matrix-cell .bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: linear-gradient(90deg, #1565c0, #4fc3f7);
-      transition: width 0.4s ease;
-    }
-
-    /* ── Assumed Remembrance ───────────────────────── */
-    .veil-card {
-      background: #0d0d1a;
-      border: 1px solid #1a1a2e;
-      border-radius: 12px;
-      padding: 1rem;
-      width: 100%;
-      max-width: 720px;
-    }
-
-    .veil-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 0.5rem;
-    }
-
-    .veil-heading {
-      font-size: 1.05rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #8be9fd;
-    }
-
-    .veil-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.9rem;
-      color: #b0b0b0;
-      cursor: pointer;
-    }
-
-    .veil-toggle input {
-      width: 18px;
-      height: 18px;
-      accent-color: #8be9fd;
-    }
-
-    .veil-note {
-      font-size: 0.9rem;
-      color: #a5b4c3;
-      margin-bottom: 0.8rem;
-      line-height: 1.5;
-    }
-
-    .veil-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 0.8rem;
-    }
-
-    .veil-cell {
-      background: #111827;
-      border: 1px solid #1e3a5f;
-      border-radius: 8px;
-      padding: 0.8rem;
-      min-height: 90px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .veil-label {
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #64b5f6;
-    }
-
-    .veil-text {
-      font-size: 0.95rem;
-      color: #e0e0e0;
-      line-height: 1.45;
-    }
-  </style>
-=======
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nexus Arcade | Amazing Grace</title>
@@ -309,8 +50,58 @@
         .loader { width: 40px; height: 40px; border: 4px solid var(--star-sapphire); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .hidden { display: none !important; }
+
+    /* ── Assumed Remembrance ───────────────────────── */
+    .veil-card {
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 100%;
+      max-width: 720px;
+    }
+    .veil-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+    .veil-heading {
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8be9fd;
+    }
+    .veil-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      color: #b0b0b0;
+      cursor: pointer;
+    }
+    .veil-toggle input { width: 18px; height: 18px; accent-color: #8be9fd; }
+    .veil-note { font-size: 0.9rem; color: #a5b4c3; margin-bottom: 0.8rem; line-height: 1.5; }
+    .veil-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.8rem;
+    }
+    .veil-cell {
+      background: #111827;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 0.8rem;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .veil-label { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: #64b5f6; }
+    .veil-text { font-size: 0.95rem; color: #e0e0e0; line-height: 1.45; }
     </style>
->>>>>>> origin/main
 </head>
 <body class="flex flex-col items-center justify-center">
     <!-- SITE NAVIGATION -->
@@ -364,41 +155,6 @@
                 style="background:none;border:none;cursor:pointer;padding:0.25rem 0.5rem;">✕</button>
     </div>
 
-<<<<<<< HEAD
-  <!-- ══ Assumed Remembrance (Veil) ═════════════════ -->
-  <section class="veil-card" id="assumed-remembrance">
-    <div class="veil-header">
-      <h2 class="veil-heading">Assumed Remembrance</h2>
-      <label class="veil-toggle">
-        <input type="checkbox" id="veil-toggle" />
-        <span>Player has seen the Veil</span>
-      </label>
-    </div>
-    <p class="veil-note">
-      Language shifts silently when the Veil has been seen—elliptical, assumptive, never announced.
-    </p>
-    <div class="veil-grid">
-      <div class="veil-cell">
-        <span class="veil-label">Codex Entry</span>
-        <p class="veil-text" id="veil-codex-text"></p>
-      </div>
-      <div class="veil-cell">
-        <span class="veil-label">Sage Reflection</span>
-        <p class="veil-text" id="veil-sage-text"></p>
-      </div>
-      <div class="veil-cell">
-        <span class="veil-label">Archivist Diagnostic</span>
-        <p class="veil-text" id="veil-archivist-text"></p>
-      </div>
-      <div class="veil-cell">
-        <span class="veil-label">Environmental Prompt</span>
-        <p class="veil-text" id="veil-prompt-text"></p>
-      </div>
-    </div>
-  </section>
-
-  <script type="module" src="./main.js"></script>
-=======
     <div id="view-hub" class="h-full overflow-y-auto flex flex-col items-center p-6 text-center w-full max-w-4xl" style="padding-bottom:3rem;">
         <div class="mb-8 mt-4">
             <h1 class="orbitron text-5xl md:text-7xl font-black text-white tracking-tighter mb-2 italic">NEXUS ARCADE</h1>
@@ -481,6 +237,17 @@
         <div class="mt-8 flex flex-wrap gap-4 justify-center">
             <a href="/arcade/certificates/" class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] hover:text-cyan-400 transition-colors" style="text-decoration:none;">📜 My Certificates</a>
             <a href="/frontend/public/store.html" class="text-[9px] text-yellow-400 font-bold uppercase tracking-[0.2em] hover:text-yellow-300 transition-colors" style="text-decoration:none;">🛒 Credit Store</a>
+        </div>
+
+        <!-- ── Narrative Systems ─────────────────────────── -->
+        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.25em] mt-6 mb-4 w-full text-left">▸ Narrative Systems</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <button onclick="switchView('view-veil')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-cyan-400">
+                <div class="w-12 h-12 bg-cyan-500/20 rounded-xl mb-4 flex items-center justify-center text-cyan-400">🌫️</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Assumed Remembrance</h2>
+                <p class="text-slate-400 text-[10px]">Narrative language shifts when the Veil has been seen—elliptical, assumptive, never announced.</p>
+                <span class="mt-3 inline-block text-[8px] font-bold uppercase tracking-[0.15em] text-cyan-500 border border-cyan-500/30 rounded-full px-2 py-0.5">Narrative</span>
+            </button>
         </div>
     </div>
 
@@ -577,6 +344,41 @@
             </div>
         </div>
     </div>
+
+    <!-- ══ ASSUMED REMEMBRANCE (VEIL) ══════════════════ -->
+    <div id="view-veil" class="hidden w-full flex flex-col items-center px-4 py-6">
+      <section class="veil-card">
+        <div class="veil-header">
+          <h2 class="veil-heading">Assumed Remembrance</h2>
+          <label class="veil-toggle">
+            <input type="checkbox" id="veil-toggle" />
+            <span>Player has seen the Veil</span>
+          </label>
+        </div>
+        <p class="veil-note">
+          Language shifts silently when the Veil has been seen—elliptical, assumptive, never announced.
+        </p>
+        <div class="veil-grid">
+          <div class="veil-cell">
+            <span class="veil-label">Codex Entry</span>
+            <p class="veil-text" id="veil-codex-text"></p>
+          </div>
+          <div class="veil-cell">
+            <span class="veil-label">Sage Reflection</span>
+            <p class="veil-text" id="veil-sage-text"></p>
+          </div>
+          <div class="veil-cell">
+            <span class="veil-label">Archivist Diagnostic</span>
+            <p class="veil-text" id="veil-archivist-text"></p>
+          </div>
+          <div class="veil-cell">
+            <span class="veil-label">Environmental Prompt</span>
+            <p class="veil-text" id="veil-prompt-text"></p>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <!-- NUMBER LOCK GAME -->
     <div id="view-lock" class="hidden w-full flex flex-col items-center px-4 max-w-md">
         <div class="bg-slate-900/80 border border-white/10 p-8 rounded-[2.5rem] shadow-2xl w-full">
@@ -721,6 +523,7 @@
             if (viewId === 'view-lock') initLock();
             if (viewId === 'view-bible-journey') bjInit();
             if (viewId === 'view-act-one') aoInit();
+            if (viewId === 'view-veil') veilInit();
             ncNotify();
         }
 
@@ -1454,11 +1257,84 @@
         function aoRestart() { aoInit(); }
         /* ─────────────────────────────────────────────────────────────────── */
 
+
+        /* ── Assumed Remembrance (Veil Language) ──────── */
+        (function () {
+            const reassuranceWords = ['again', 'still', 'now', 'please', 'may', 'just'];
+
+            function veilSeen(playerOrFlag) {
+                return typeof playerOrFlag === 'boolean'
+                    ? playerOrFlag
+                    : !!(playerOrFlag && playerOrFlag.hasSeenTheVeil);
+            }
+
+            function renderAssumedLine(base, veilFragment, player) {
+                const seen = veilSeen(player);
+                if (seen && veilFragment) return (base + ' ' + veilFragment).trim();
+                return base;
+            }
+
+            function renderVeilVariant(lineSpec, player) {
+                const seen = veilSeen(player);
+                if (seen && lineSpec.veilVariant) return lineSpec.veilVariant;
+                return renderAssumedLine(lineSpec.base, lineSpec.veilFragment, seen);
+            }
+
+            function renderArchivistDiagnostic(base, veilFragment, player) {
+                const seen = veilSeen(player);
+                const match = base.match(/[^.!?]*[.!?]/);
+                const clipped = seen ? (match ? match[0].trim() : base.trim()) : base;
+                return renderAssumedLine(clipped, veilFragment, seen);
+            }
+
+            function renderEnvironmentPrompt(base, player) {
+                const seen = veilSeen(player);
+                if (!seen) return base.trim();
+                let s = base.trim();
+                reassuranceWords.forEach(w => { s = s.replace(new RegExp('\\b' + w + '\\b', 'gi'), ''); });
+                s = s.replace(/\bYou\s+/i, '').replace(/\s+/g, ' ').trim();
+                if (!/[.!?]$/.test(s) && s.length) s += '.';
+                return s.charAt(0).toUpperCase() + s.slice(1);
+            }
+
+            const veilText = {
+                codex: { base: 'The Archive preserves disagreement without judgment.', veilFragment: 'As you already know, preservation is not the same as stability.' },
+                sage: { base: 'Some truths are difficult to witness.', veilVariant: 'Some truths do not need to be shown twice.' },
+                archivist: { base: '[DIAGNOSTIC] Divergence detected. Monitoring advised.' },
+                prompt: { base: 'You may proceed.' }
+            };
+            const veilState = { hasSeenTheVeil: false };
+
+            function renderVeilPreview() {
+                const hasSeen = veilState.hasSeenTheVeil;
+                const codexNode = document.getElementById('veil-codex-text');
+                const sageNode = document.getElementById('veil-sage-text');
+                const archivistNode = document.getElementById('veil-archivist-text');
+                const promptNode = document.getElementById('veil-prompt-text');
+                if (codexNode) codexNode.textContent = renderAssumedLine(veilText.codex.base, veilText.codex.veilFragment, hasSeen);
+                if (sageNode) sageNode.textContent = renderVeilVariant(veilText.sage, hasSeen);
+                if (archivistNode) archivistNode.textContent = renderArchivistDiagnostic(veilText.archivist.base, veilText.archivist.veilFragment, hasSeen);
+                if (promptNode) promptNode.textContent = renderEnvironmentPrompt(veilText.prompt.base, hasSeen);
+            }
+
+            window.veilInit = function () {
+                const toggle = document.getElementById('veil-toggle');
+                if (toggle) {
+                    toggle.checked = veilState.hasSeenTheVeil;
+                    toggle.addEventListener('change', function (e) {
+                        veilState.hasSeenTheVeil = e.target.checked;
+                        renderVeilPreview();
+                    });
+                }
+                renderVeilPreview();
+            };
+        }());
+        /* ─────────────────────────────────────────────────────────────────── */
+
         window.onload = () => { ncNotify(); switchView('view-hub'); };
 
     </script>
     <!-- Dynamic nav-height: keeps --site-nav-height in sync with the actual rendered nav -->
     <script src="nav-height.js"></script>
->>>>>>> origin/main
 </body>
 </html>
