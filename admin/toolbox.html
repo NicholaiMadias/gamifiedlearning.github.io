@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tools — Amazing Grace</title>
+  <link rel="stylesheet" href="../../admin/css/matrix.css">
+  <style>
+    /* ── Toolbox grid ── */
+    .toolbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .tool-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid #1a3a1a;
+      border-radius: 6px;
+      background: rgba(0, 20, 0, 0.45);
+      text-decoration: none;
+      color: #b0c8b0;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .tool-card:hover {
+      border-color: #00ff41;
+      background: rgba(0, 40, 0, 0.55);
+      box-shadow: 0 0 12px rgba(0, 255, 65, 0.08);
+    }
+    .tool-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 0.1rem;
+    }
+    .tool-info { flex: 1; min-width: 0; }
+    .tool-name {
+      display: block;
+      font-weight: 700;
+      color: #00ff41;
+      font-size: 0.85rem;
+      margin-bottom: 0.2rem;
+    }
+    .tool-desc {
+      font-size: 0.75rem;
+      color: #6a8a6a;
+      line-height: 1.4;
+    }
+    /* ── Section spacing ── */
+    .toolbox-section { margin-top: 1.75rem; }
+    .toolbox-section:first-child { margin-top: 0; }
+    .section-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #3a6a3a;
+      margin-bottom: 0.5rem;
+      padding-left: 0.25rem;
+    }
+    /* ── Page header ── */
+    .page-header {
+      text-align: center;
+      padding: 1.5rem 0 0.5rem;
+    }
+    .page-header h1 {
+      font-size: 1.25rem;
+      color: #00ff41;
+      margin: 0 0 0.35rem;
+      letter-spacing: 0.04em;
+    }
+    .page-header p {
+      font-size: 0.75rem;
+      color: #3a5a3a;
+      margin: 0;
+    }
+    /* ── Back link ── */
+    .back-link {
+      display: inline-block;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #3a6a3a;
+      text-decoration: none;
+    }
+    .back-link:hover { color: #00ff41; }
+    /* ── Container ── */
+    .admin-container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 1rem 1.25rem 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="matrix-nav">
+  <a href="../../admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
+  <ul class="nav-links">
+    <li><a href="../../admin/index.html">Dashboard</a></li>
+    <li><a href="../../admin/users.html">Users</a></li>
+    <li><a href="../../admin/keys.html">Keys</a></li>
+    <li><a href="../../admin/diagnostics.html">Diagnostics</a></li>
+    <li><a href="../../admin/network-defense.html">Network Defense</a></li>
+    <li><a href="../../admin/logs.html">Logs</a></li>
+    <li><a href="../../admin/toolbox.html" class="active">Toolbox</a></li>
+  </ul>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="admin-container">
+
+  <div class="page-header">
+    <h1>⬡ Tools</h1>
+    <p>Mobile-first shortcuts for diagnostics, search, and site operations.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Lease Agreement (Print / Download)
+       ═══════════════════════════════════════════ -->
+  <div class="toolbox-section">
+    <div class="section-label">Lease Agreement</div>
+    <div class="toolbox-grid">
+      <a class="tool-card" href="../../admin/lease.html">
+        <span class="tool-icon">📄</span>
+        <div class="tool-info">
+          <span class="tool-name">Lease Agreement</span>
+          <span class="tool-desc">Fill, print to PDF, or download a PDF copy.</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PowerShell Toolkit
+       ═══════════════════════════════════════════ -->
+  <div class="toolbox-section">
+    <div class="section-label">PowerShell Toolkit</div>
+    <div class="toolbox-grid">
+      <a class="tool-card" href="https://github.com/NicholaiMadias/Amazing-Grace/tree/copilot%2Fadd-powershell-toolkit" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🛠️</span>
+        <div class="tool-info">
+          <span class="tool-name">PowerShell Toolkit Branch</span>
+          <span class="tool-desc">Open the Copilot toolkit branch to review and manage the PowerShell automation work.</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Google Search & Analytics
+       ═══════════════════════════════════════════ -->
+  <div class="toolbox-section">
+    <div class="section-label">Google Search &amp; Analytics</div>
+    <div class="toolbox-grid">
+
+      <a class="tool-card" href="https://search.google.com/search-console?resource_id=sc-domain:amazinggracehl.org" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🔍</span>
+        <div class="tool-info">
+          <span class="tool-name">Search Console</span>
+          <span class="tool-desc">Monitor search performance, indexing, and crawl health.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">📊</span>
+        <div class="tool-info">
+          <span class="tool-name">Google Analytics</span>
+          <span class="tool-desc">Traffic, audience insights, and conversion tracking.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://tagmanager.google.com/" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🏷️</span>
+        <div class="tool-info">
+          <span class="tool-name">Tag Manager</span>
+          <span class="tool-desc">Manage analytics tags, pixels, and tracking scripts.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2Famazinggracehl.org" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">⚡</span>
+        <div class="tool-info">
+          <span class="tool-name">PageSpeed Insights</span>
+          <span class="tool-desc">Core Web Vitals, performance scores, and optimization tips.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://search.google.com/test/rich-results?url=https%3A%2F%2Famazinggracehl.org" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">✨</span>
+        <div class="tool-info">
+          <span class="tool-name">Rich Results Test</span>
+          <span class="tool-desc">Validate structured data and rich snippet eligibility.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://search.google.com/test/mobile-friendly?url=https%3A%2F%2Famazinggracehl.org" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">📱</span>
+        <div class="tool-info">
+          <span class="tool-name">Mobile-Friendly Test</span>
+          <span class="tool-desc">Check mobile usability and responsive rendering.</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Google Admin Toolbox (Diagnostic)
+       ═══════════════════════════════════════════ -->
+  <div class="toolbox-section">
+    <div class="section-label">Google Admin Toolbox — Diagnostics</div>
+    <div class="toolbox-grid">
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/browserinfo" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🌐</span>
+        <div class="tool-info">
+          <span class="tool-name">Browserinfo</span>
+          <span class="tool-desc">Captures browser details for troubleshooting.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/useragent" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🕵️</span>
+        <div class="tool-info">
+          <span class="tool-name">Useragent</span>
+          <span class="tool-desc">Analyzes user-agent strings.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/checkmx" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">📧</span>
+        <div class="tool-info">
+          <span class="tool-name">Check MX</span>
+          <span class="tool-desc">Validates MX records and mail routing.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/dig" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🔎</span>
+        <div class="tool-info">
+          <span class="tool-name">Dig (DNS Lookup)</span>
+          <span class="tool-desc">Web-based DNS lookup and record inspection.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/har_analyzer" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">📋</span>
+        <div class="tool-info">
+          <span class="tool-name">HAR Analyzer</span>
+          <span class="tool-desc">Review HTTP Archive files for network issues.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/loganalyzer" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">📜</span>
+        <div class="tool-info">
+          <span class="tool-name">Log Analyzer</span>
+          <span class="tool-desc">Process Chrome and Workspace logs.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/loganalyzer2" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">📜</span>
+        <div class="tool-info">
+          <span class="tool-name">Log Analyzer 2</span>
+          <span class="tool-desc">Handles large log files and advanced analysis.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/messageheader" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">✉️</span>
+        <div class="tool-info">
+          <span class="tool-name">Messageheader</span>
+          <span class="tool-desc">Analyzes email headers for delivery issues.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/encode_decode" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🔄</span>
+        <div class="tool-info">
+          <span class="tool-name">Encode / Decode</span>
+          <span class="tool-desc">Base64, URL, and other format conversions.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://toolbox.googleapps.com/apps/screen_recorder" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🎥</span>
+        <div class="tool-info">
+          <span class="tool-name">Screen Recorder</span>
+          <span class="tool-desc">Captures screen and audio for bug reports.</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════��═══
+       Infrastructure & Hosting
+       ═══════════════════════════════════════════ -->
+  <div class="toolbox-section">
+    <div class="section-label">Infrastructure &amp; Hosting</div>
+    <div class="toolbox-grid">
+
+      <a class="tool-card" href="https://github.com/NicholaiMadias/Amazing-Grace/deployments" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">📄</span>
+        <div class="tool-info">
+          <span class="tool-name">GitHub Pages Deployments</span>
+          <span class="tool-desc">Production and PR preview deployments via GitHub Pages.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://github.com/NicholaiMadias/Amazing-Grace" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🐙</span>
+        <div class="tool-info">
+          <span class="tool-name">GitHub Repository</span>
+          <span class="tool-desc">Source code, pull requests, and issue tracker.</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🔥</span>
+        <div class="tool-info">
+          <span class="tool-name">Firebase Console</span>
+          <span class="tool-desc">Auth, Realtime Database, and hosting (when ready).</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="https://business.google.com/" target="_blank" rel="noopener noreferrer">
+        <span class="tool-icon">🏢</span>
+        <div class="tool-info">
+          <span class="tool-name">Google Business Profile</span>
+          <span class="tool-desc">Manage business listing, reviews, and local SEO.</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <a class="back-link" href="../../admin/index.html">← Back to Dashboard</a>
+
+</div>
+
+<script type="module">
+  import { getCurrentUser, logout } from '/admin/js/admin-router.js';
+
+  const user = getCurrentUser();
+  if (!user) { window.location.href = '/admin/login.html'; return; }
+
+  document.getElementById('nav-user').textContent = `${user.email} (${user.role})`;
+
+  const nav = document.querySelector('.matrix-nav');
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className   = 'btn btn-danger';
+  logoutBtn.style.fontSize = '0.72rem';
+  logoutBtn.style.padding  = '0.3rem 0.75rem';
+  logoutBtn.addEventListener('click', logout);
+  nav.appendChild(logoutBtn);
+</script>
+
+</body>
+</html>

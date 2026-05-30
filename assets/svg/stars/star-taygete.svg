@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <!-- Taygete — B-type — Deep Blue — Virtue: Courage — Shape: 4-point star -->
+  <defs>
+    <radialGradient id="gTaygete" cx="40%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#B0D0FF"/>
+      <stop offset="50%" stop-color="#2060FF"/>
+      <stop offset="100%" stop-color="#0020A0"/>
+    </radialGradient>
+    <filter id="glowTaygete">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <polygon points="25,2 31,19 48,25 31,31 25,48 19,31 2,25 19,19"
+           fill="url(#gTaygete)" stroke="#001880" stroke-width="1" filter="url(#glowTaygete)"/>
+  <polygon points="25,10 29,22 40,25 29,28 25,40 21,28 10,25 21,22"
+           fill="#D0E4FF" opacity="0.35"/>
+</svg>

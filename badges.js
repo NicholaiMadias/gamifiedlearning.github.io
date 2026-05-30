@@ -1,42 +1,62 @@
 /**
- * badges.js — handles level completion and badge awarding.
+ * badges.js — 6-Tier Badge Award System
+ * (c) 2026 NicholaiMadias — MIT License
  */
 
-const LEVEL_BADGES = {
-  1: { icon: '🌱', label: 'Seedling' },
-  2: { icon: '⚡', label: 'Charged' },
-  3: { icon: '🔥', label: 'On Fire' },
-  4: { icon: '💎', label: 'Diamond' },
-  5: { icon: '👑', label: 'Champion' },
-};
+import { recordLevelComplete } from './progression.js';
 
-/**
- * Called when a level is completed.
- * Shows a badge notification and optionally persists to the provided db/user.
- *
- * @param {number} level - The level that was completed
- * @param {number} score - The final score for the level
- * @param {object} [db]  - Optional Firebase / storage reference
- * @param {object} [user] - Optional user object
- */
-export function onLevelComplete(level, score, db, user) {
-  const badge = LEVEL_BADGES[level] || { icon: '🏅', label: `Level ${level}` };
+const BADGE_TIERS = [
+  { level: 1,  name: 'Seedling',  emoji: '🌱', desc: 'Planted the first seed of knowledge' },
+  { level: 3,  name: 'Charged',   emoji: '⚡',  desc: 'Electrified by curiosity' },
+  { level: 5,  name: 'On Fire',   emoji: '🔥', desc: 'Burning through challenges' },
+  { level: 8,  name: 'Diamond',   emoji: '💎', desc: 'Unbreakable focus and clarity' },
+  { level: 12, name: 'Champion',  emoji: '🏆', desc: 'Master of the Matrix' },
+  { level: 15, name: 'Supernova', emoji: '🌟', desc: 'Cosmic energy — the stars align for you' }
+];
 
-  // Show in-game notification
+let earnedBadges = [];
+// Initialise from localStorage immediately so earnedBadges is always in sync
+// before any onLevelComplete() call — prevents badges re-triggering on reload.
+loadBadges();
+
+function showBadgeBanner(badge) {
   const banner = document.getElementById('match-badge-banner');
-  if (banner) {
-    banner.textContent = `${badge.icon} ${badge.label} badge unlocked! Score: ${score}`;
-    banner.classList.remove('hidden');
-    setTimeout(() => banner.classList.add('hidden'), 3000);
-  }
-
-  // Persist if db and user are available
-  if (db && user) {
-    try {
-      const ref = db.ref(`users/${user.uid}/badges/level_${level}`);
-      ref.set({ level, badge: badge.label, score, earnedAt: Date.now() });
-    } catch (e) {
-      console.warn('Badge save failed:', e);
-    }
-  }
+  if (!banner) return;
+  banner.textContent = badge.emoji + ' Badge Unlocked: ' + badge.name + ' — ' + badge.desc;
+  banner.classList.remove('hidden');
+  banner.setAttribute('aria-live', 'polite');
+  setTimeout(() => banner.classList.add('hidden'), 4000);
 }
+
+export function onLevelComplete(completedLevel, currentScore, db, user) {
+  recordLevelComplete(completedLevel);
+  BADGE_TIERS.forEach(badge => {
+    if (completedLevel >= badge.level && !earnedBadges.includes(badge.name)) {
+      earnedBadges.push(badge.name);
+      showBadgeBanner(badge);
+      try { localStorage.setItem('glm-badges', JSON.stringify(earnedBadges)); } catch (e) {}
+    }
+  });
+}
+
+export function loadBadges() {
+  try {
+    const s = localStorage.getItem('glm-badges');
+    if (!s) {
+      earnedBadges = [];
+    } else {
+      const parsed = JSON.parse(s);
+      earnedBadges = Array.isArray(parsed) ? parsed.filter(b => typeof b === 'string') : [];
+    }
+  } catch (e) {
+    earnedBadges = [];
+  }
+  return earnedBadges;
+}
+
+export function resetBadges() {
+  earnedBadges = [];
+  try { localStorage.removeItem('glm-badges'); } catch (e) {}
+}
+
+export { BADGE_TIERS };

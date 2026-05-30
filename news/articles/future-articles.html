@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="More news and articles coming soon from Amazing Grace Home Living and the Voice of Jesus Ministry.">
+    <meta name="theme-color" content="#1e3a8a">
+
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>Future Articles | News | Amazing Grace Home Living</title>
+
+    <script src="../../assets/vendor/tailwindcss.js"></script>
+    <script src="../../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap");
+    </script>
+    <style>
+        :root { --navy: #1e3a8a; --blue: #2563eb; --green: #059669; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        *:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+
+        .site-header {
+            background-color: var(--navy);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
+            text-decoration: none; color: white;
+        }
+        .logo img { height: 40px; width: auto; border-radius: 4px; }
+
+        .nav-links { display: flex; gap: 0.75rem; }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.1); color: white; text-decoration: none;
+            padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.25); }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--navy);
+                padding: 1rem;
+                z-index: 100;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                gap: 0.5rem;
+            }
+            .nav-links.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; padding: 0.75rem 1rem; }
+        }
+
+        .article-hero {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+            color: white; text-align: center; padding: 3.5rem 1.5rem 2.5rem;
+        }
+        .article-hero .tag {
+            display: inline-block; background: rgba(255,255,255,0.2); color: white;
+            font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem;
+            border-radius: 999px; margin-bottom: 1rem; text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .article-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 0.75rem; line-height: 1.2;
+        }
+        .article-hero p { font-size: 1rem; opacity: 0.85; max-width: 520px; margin: 0.5rem auto 0; line-height: 1.6; }
+
+        .article-container {
+            max-width: 720px; margin: 2.5rem auto; padding: 0 1.5rem;
+        }
+
+        .article-body {
+            background: white; border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 2.5rem;
+            line-height: 1.8; font-size: 1rem; color: #374151;
+        }
+
+        .article-body h2 {
+            font-family: 'Playfair Display', serif; font-size: 1.5rem;
+            color: #065f46; margin: 2rem 0 0.75rem;
+        }
+
+        .article-body p { margin-bottom: 1.25rem; }
+
+        .placeholder-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem; margin: 1.5rem 0;
+        }
+
+        .placeholder-card {
+            background: #f9fafb; border: 2px dashed #d1fae5;
+            border-radius: 12px; padding: 1.25rem; text-align: center;
+            color: #6b7280;
+        }
+        .placeholder-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .placeholder-card p { font-size: 0.875rem; margin: 0; }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--blue); text-decoration: none; font-weight: 600;
+            font-size: 0.9rem; margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .breadcrumb {
+            max-width: 720px; margin: 1rem auto 0; padding: 0 1.5rem;
+            font-size: 0.825rem; color: #6b7280;
+        }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        main { flex: 1; }
+
+        .site-footer {
+            background: #1f2937; color: #9ca3af;
+            text-align: center; padding: 1.5rem; font-size: 0.875rem; margin-top: 3rem;
+        }
+        .site-footer a { color: #60a5fa; text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../../#properties">Listings</a>
+                <a href="../../stories/">Stories</a>
+                <a href="../../arcade/">Arcade</a>
+                <a href="../../ministry/">Ministry</a>
+                <a href="../../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="article-hero">
+            <span class="tag">Coming Soon</span>
+            <h1>More Articles Are on the Way</h1>
+            <p>We are growing — new stories, updates, and community highlights will be published here regularly.</p>
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="../../">Home</a> › <a href="..">News</a> › Future Articles
+        </nav>
+
+        <div class="article-container">
+            <a href=".." class="back-link" aria-label="Back to News">← Back to News</a>
+
+            <article class="article-body">
+
+                <p>
+                    Amazing Grace Home Living is an ever-growing ministry. As we expand our housing services, educational arcade, and global outreach, we will share it all here — openly and joyfully.
+                </p>
+
+                <h2>Topics We Will Cover</h2>
+
+                <div class="placeholder-grid">
+                    <div class="placeholder-card">
+                        <div class="icon">🏡</div>
+                        <p>Housing &amp; Community Updates</p>
+                    </div>
+                    <div class="placeholder-card">
+                        <div class="icon">✝️</div>
+                        <p>Ministry &amp; Mission Reports</p>
+                    </div>
+                    <div class="placeholder-card">
+                        <div class="icon">🌟</div>
+                        <p>Seven Stars Arcade News</p>
+                    </div>
+                    <div class="placeholder-card">
+                        <div class="icon">📚</div>
+                        <p>Zyko Learn Releases</p>
+                    </div>
+                    <div class="placeholder-card">
+                        <div class="icon">🌍</div>
+                        <p>Global Outreach Stories</p>
+                    </div>
+                    <div class="placeholder-card">
+                        <div class="icon">🙏</div>
+                        <p>Prayer &amp; Devotional Features</p>
+                    </div>
+                </div>
+
+                <p>
+                    Check back soon, and <a href="../../ministry" style="color:#059669;font-weight:600;">visit our Ministry page</a> to stay connected with our mission.
+                </p>
+
+            </article>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../../">amazinggracehl.org</a></p>
+    </footer>
+</body>
+</html>
