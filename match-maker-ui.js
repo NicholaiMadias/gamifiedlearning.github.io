@@ -163,7 +163,7 @@ function activateBomb(r, c) {
   moves--;
   document.getElementById('match-moves').textContent = moves;
 
-  // Visual flash on 3×3 explosion area
+  // Visual flash on 3×3 explosion area of the primary bomb
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
       const cell = document.querySelector(
@@ -173,9 +173,8 @@ function activateBomb(r, c) {
     }
   }
 
-  const cleared = countBombArea(grid, r, c);
-  grid = applyBombExplosion(grid, r, c);
-  grid = applyGravity(grid);
+  const { grid: explodedGrid, cleared } = detonateAllBombs(grid, [{ r, c }]);
+  grid = applyGravity(explodedGrid);
 
   const pts = cleared * 15;
   score += pts;
@@ -468,6 +467,52 @@ function countBombArea(g, r, c) {
     }
   }
   return n;
+}
+
+/**
+ * Detonates one or more bombs and chain-detonates any bombs caught in each blast radius.
+ * Any bomb destroyed by another bomb's explosion also detonates its own 3×3 area.
+ * @param {string[][]} g - current grid
+ * @param {{ r: number, c: number }[]} startPositions - initial bomb positions to detonate
+ * @returns {{ grid: string[][], cleared: number }} updated grid and count of unique cells cleared
+ */
+function detonateAllBombs(g, startPositions) {
+  const scheduled = new Set(startPositions.map(({ r, c }) => `${r},${c}`));
+  const queue = [...startPositions];
+  const clearedKeys = new Set();
+
+  while (queue.length > 0) {
+    const { r, c } = queue.shift();
+
+    // Scan blast radius BEFORE clearing: queue any chained bombs not yet scheduled
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+          const nKey = `${nr},${nc}`;
+          if (g[nr][nc] === 'bomb' && !scheduled.has(nKey)) {
+            scheduled.add(nKey);
+            queue.push({ r: nr, c: nc });
+          }
+        }
+      }
+    }
+
+    // Record unique non-null cells about to be cleared (for scoring)
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE && g[nr][nc] !== null) {
+          clearedKeys.add(`${nr},${nc}`);
+        }
+      }
+    }
+
+    g = applyBombExplosion(g, r, c);
+  }
+
+  return { grid: g, cleared: clearedKeys.size };
 }
 
 function countType(g, type) {
