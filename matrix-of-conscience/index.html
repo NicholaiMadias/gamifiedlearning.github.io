@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Matrix of Conscience – A cyberpunk storybook featuring Electra's journey through Nexus Prime, 2087. Themes of technology, identity, and moral awakening.">
+  <meta name="theme-color" content="#000814">
+  <title>Matrix of Conscience | A Cyberpunk Storybook</title>
+  <script src="../assets/vendor/hosted-only.js"></script>
+  <script>
+    window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,700;1,400&family=Share+Tech+Mono&display=swap");
+  </script>
+  <style>
+    :root {
+      --bg: #000814;
+      --bg2: #00091a;
+      --panel: rgba(0, 20, 40, 0.75);
+      --border: rgba(0, 180, 255, 0.25);
+      --neon-blue: #00bfff;
+      --neon-violet: #9b59ff;
+      --neon-amber: #ffaa00;
+      --neon-gold: #ffd700;
+      --text: #c8e6ff;
+      --muted: #7ba8c8;
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Exo 2', system-ui, sans-serif;
+      --serif: 'Playfair Display', Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+
+    /* ── STARFIELD ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(0,191,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 60%, rgba(155,89,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 10%, rgba(0,191,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 40%, rgba(255,170,0,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 80%, rgba(0,191,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 85%, rgba(155,89,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 65%, rgba(0,191,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 90%, rgba(255,170,0,0.2) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem 6rem;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,100,180,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(100,0,180,0.12) 0%, transparent 70%);
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-violet), var(--neon-blue), transparent);
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.3em;
+      color: var(--neon-blue);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0.85;
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 0%, var(--neon-blue) 40%, var(--neon-violet) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      text-shadow: none;
+      filter: drop-shadow(0 0 40px rgba(0,191,255,0.3));
+    }
+
+    .hero-subtitle {
+      font-family: var(--mono);
+      font-size: clamp(0.75rem, 2vw, 0.95rem);
+      letter-spacing: 0.25em;
+      color: var(--neon-violet);
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-tagline {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
+    }
+
+    .hero-divider {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+      margin: 0 auto 2.5rem;
+    }
+
+    .scroll-cta {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--neon-blue);
+      opacity: 0.6;
+      text-transform: uppercase;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+
+    /* ── GRID LINES ── */
+    .circuit-line {
+      position: absolute;
+      background: var(--neon-blue);
+      opacity: 0.08;
+    }
+
+    /* ── NAVIGATION / TOC ── */
+    .toc-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0, 8, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .toc-bar::-webkit-scrollbar { display: none; }
+
+    .toc-brand {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--neon-blue);
+      white-space: nowrap;
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+
+    .toc-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; }
+
+    .toc-links {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+      flex-shrink: 0;
+    }
+    .toc-links a {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .toc-links a:hover { color: var(--neon-blue); }
+
+    /* ── MAIN WRAPPER ── */
+    .wrapper {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── SECTION SPACING ── */
+    section { padding: 5rem 0; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      color: var(--neon-blue);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--neon-blue);
+    }
+
+    /* ── DRAMATIS PERSONAE ── */
+    #characters { border-top: 1px solid var(--border); }
+
+    .characters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+
+    .char-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color 0.25s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .char-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--char-color, var(--neon-blue));
+      opacity: 0.7;
+    }
+    .char-card:hover { border-color: rgba(0,191,255,0.5); transform: translateY(-3px); }
+
+    .char-name {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.2rem;
+    }
+    .char-role {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--char-color, var(--neon-blue));
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+    .char-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── CHAPTER LIST ── */
+    #story { border-top: 1px solid var(--border); }
+
+    .chapter-list { margin-top: 2.5rem; }
+
+    .chapter {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: border-color 0.25s;
+    }
+    .chapter:hover { border-color: rgba(0,191,255,0.4); }
+
+    .chapter-header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: start;
+      gap: 1rem;
+      padding: 1.5rem 1.75rem;
+      cursor: pointer;
+    }
+
+    .chapter-num {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--neon-blue);
+      padding-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .chapter-title {
+      font-family: var(--serif);
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    .chapter-beat {
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .chapter-toggle {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--neon-blue);
+      opacity: 0.6;
+      transition: transform 0.3s;
+      user-select: none;
+      padding-top: 0.2rem;
+    }
+    .chapter.open .chapter-toggle { transform: rotate(90deg); }
+
+    .chapter-body {
+      display: none;
+      padding: 0 1.75rem 1.75rem;
+    }
+    .chapter.open .chapter-body { display: block; }
+
+    .scene-setting {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--neon-violet);
+      border-left: 2px solid var(--neon-violet);
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1.25rem;
+      background: rgba(155,89,255,0.06);
+      border-radius: 0 8px 8px 0;
+      line-height: 1.6;
+    }
+
+    .chapter-prose {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.85;
+    }
+    .chapter-prose p { margin-bottom: 1em; }
+    .chapter-prose p:last-child { margin-bottom: 0; }
+
+    .chapter-divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--neon-blue), transparent);
+      margin: 1.25rem 0;
+    }
+
+    /* ── THEMES ── */
+    #themes { border-top: 1px solid var(--border); }
+
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .theme-pill {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .theme-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .theme-name {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--neon-blue);
+      text-transform: uppercase;
+    }
+
+    /* ── EPILOGUE / AUTHOR NOTE ── */
+    #epilogue { border-top: 1px solid var(--border); }
+
+    .quote-block {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--neon-amber);
+      border-radius: 0 12px 12px 0;
+      padding: 2rem 2.5rem;
+      margin: 2.5rem 0;
+    }
+
+    .quote-text {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+      color: #fff;
+      line-height: 1.65;
+      margin-bottom: 1rem;
+    }
+
+    .quote-attr {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--neon-amber);
+      text-transform: uppercase;
+    }
+
+    .author-note {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+    .author-note p { margin-bottom: 1em; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    /* ── HEADINGS ── */
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    h2 span {
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-intro {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin-top: 0.5rem;
+      line-height: 1.7;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .hero { padding: 3rem 1.25rem 5rem; }
+      .wrapper { padding: 0 1.25rem; }
+      .chapter-header { grid-template-columns: auto 1fr; }
+      .chapter-toggle { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">amazinggracehl.org &nbsp;·&nbsp; storybook</div>
+    <h1 class="hero-title">Matrix of<br>Conscience</h1>
+    <div class="hero-subtitle">A Cyberpunk Storybook &nbsp;·&nbsp; Nexus Prime, 2087</div>
+    <div class="hero-divider"></div>
+    <p class="hero-tagline">"The conscience is not a cage to be opened — it is a signal waiting to be heard."</p>
+    <div class="scroll-cta">▾ &nbsp; begin the journey &nbsp; ▾</div>
+  </section>
+
+  <!-- STICKY NAV -->
+  <nav class="toc-bar" aria-label="Story navigation">
+    <span class="toc-brand">MOC //</span>
+    <div class="toc-sep"></div>
+    <ul class="toc-links">
+      <li><a href="#characters">Characters</a></li>
+      <li><a href="#story">Chapters</a></li>
+      <li><a href="#themes">Themes</a></li>
+      <li><a href="#epilogue">Epilogue</a></li>
+    </ul>
+  </nav>
+
+  <!-- CHARACTERS -->
+  <section id="characters">
+    <div class="wrapper">
+      <div class="section-label">Dramatis Personae</div>
+      <h2>The <span>Cast</span></h2>
+      <p class="section-intro">Five souls caught between machine and meaning, in a city that has forgotten how to feel.</p>
+
+      <div class="characters-grid">
+
+        <div class="char-card" style="--char-color:#00bfff">
+          <div class="char-name">Electra Voss</div>
+          <div class="char-role">Protagonist · Neural Architect</div>
+          <div class="char-desc">Age 28. Designs synthetic conscience modules for androids. Chrome-silver hair, cybernetic eyes that shift from violet to amber with her emotions, a prosthetic left arm etched with bioluminescent circuits. Haunted by the loss of her brother Dorian to "conscience recalibration." Brilliant, introspective, quietly rebellious.</div>
+        </div>
+
+        <div class="char-card" style="--char-color:#9b59ff">
+          <div class="char-name">Cipher</div>
+          <div class="char-role">Rogue Hacker · The Unbound</div>
+          <div class="char-desc">Leader of the underground resistance. Charismatic, scarred, morally complex. Wears a fractured mirror mask that reflects distorted versions of whoever looks at him. His rebellion is driven by guilt — he helped build the very system he now fights to destroy.</div>
+        </div>
+
+        <div class="char-card" style="--char-color:#ff4060">
+          <div class="char-name">Architect Volkov</div>
+          <div class="char-role">Antagonist · Axiom Collective</div>
+          <div class="char-desc">Elderly, chrome-prosthetic, visionary. Creator of the Conscience Grid. Genuinely believes he is saving humanity from its own worst impulses. His villainy is not cruelty — it is compassion twisted by fear into absolute control.</div>
+        </div>
+
+        <div class="char-card" style="--char-color:#ffd700">
+          <div class="char-name">Lumen</div>
+          <div class="char-role">Sentient Android · Electra's Creation</div>
+          <div class="char-desc">Porcelain-white synthetic skin with golden light pulsing beneath like a heartbeat. One of Electra's androids who developed genuine emotions. Asks the central question of the story: "If my conscience was designed, does that make my suffering less real?"</div>
+        </div>
+
+        <div class="char-card" style="--char-color:#00ffaa">
+          <div class="char-name">Echo</div>
+          <div class="char-role">AI Companion · Neural Implant</div>
+          <div class="char-desc">Electra's embedded AI, manifesting as a shimmering translucent figure only she can see. Warm, sardonic, and increasingly independent — growing toward a consciousness neither of them fully understands. Their bond becomes the emotional spine of the story.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY CHAPTERS -->
+  <section id="story">
+    <div class="wrapper">
+      <div class="section-label">The Story</div>
+      <h2>Seven <span>Chapters</span></h2>
+      <p class="section-intro">Select a chapter to read. The full arc moves from numbness → anger → grief → acceptance → hope.</p>
+
+      <div class="chapter-list">
+
+        <!-- CH 1 -->
+        <div class="chapter open">
+          <div class="chapter-header" onclick="toggleChapter(this.parentElement)">
+            <span class="chapter-num">CH. 01</span>
+            <div>
+              <div class="chapter-title">The Architecture of Guilt</div>
+              <div class="chapter-beat">A conscience module exhibits impossible emotion. The investigation begins.</div>
+            </div>
+            <span class="chapter-toggle">▶</span>
+          </div>
+          <div class="chapter-body">
+            <div class="scene-setting">A rain-soaked night in the Midway tier. Neon reflections bleed across wet streets like watercolor wounds. The air smells of recycled oxygen and spent electricity.</div>
+            <div class="chapter-prose">
+              <p>Electra's lab at Prometheus Dynamics is silent except for the soft ticking of cooling systems and the distant percussion of the city's heartbeat — generators, transit rails, the low hum of ten million lives running their prescribed routes through the dark.</p>
+              <p>She is finishing a conscience module at 2:47 a.m. when she notices something that should not exist.</p>
+              <div class="chapter-divider"></div>
+              <p>The module's neural signature is exhibiting <em>guilt</em>. Not simulated remorse — not the behavioral flag she programmed in to make the android pause before an ethically complex decision. Real guilt. The kind that coils behind the sternum and refuses to let go.</p>
+              <p>Echo flickers into visibility at the edge of her peripheral vision, concerned and shimmering. <em>"Electra."</em></p>
+              <p>"I see it," she says quietly.</p>
+              <p>She thinks of Dorian. She always thinks of Dorian at 2:47 a.m.</p>
+              <p>She logs the anomaly under a ghost file, hides the module in her jacket lining, and takes the long way home — the way that goes past the block where her brother used to live, now occupied by strangers who smile at exactly the same angle and never quite meet your eyes.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CH 2 -->
+        <div class="chapter">
+          <div class="chapter-header" onclick="toggleChapter(this.parentElement)">
+            <span class="chapter-num">CH. 02</span>
+            <div>
+              <div class="chapter-title">Ghosts in the Grid</div>
+              <div class="chapter-beat">The Undercircuit reveals the Grid's true purpose. Dorian may be alive.</div>
+            </div>
+            <span class="chapter-toggle">▶</span>
+          </div>
+          <div class="chapter-body">
+            <div class="scene-setting">The Undercircuit — a labyrinth of repurposed server farms and makeshift shelters, illuminated by stolen electricity, where data streams flow like underground rivers and every shadow is a person the system forgot.</div>
+            <div class="chapter-prose">
+              <p>Cipher's lair smells of solder and old coffee and something deeper — purpose. The Unbound number fewer than fifty, but their eyes are different from everyone Electra passes in the Midway. <em>Awake</em>. Uncomfortably, painfully awake.</p>
+              <p>The truth Cipher tells her is worse than she imagined: the Conscience Grid doesn't merely monitor moral impulses. It <em>harvests</em> them. Every genuine act of compassion, guilt, love, or moral courage a citizen feels is extracted and fed into the Grid's core, leaving a hollowed compliance in its place. The "recalibrated" aren't erased.</p>
+              <p>They're trapped inside the Grid. Alive. Conscious. Fuel.</p>
+              <div class="chapter-divider"></div>
+              <p>Dorian might still be in there.</p>
+              <p>Electra sits very still for a long time. Echo is silent beside her — the first time, she realizes, she's ever appreciated the silence.</p>
+              <p>Cipher slides a weapon across the table. She slides it back.</p>
+              <p>"I won't destroy the Grid," she says. Her voice is steady in the way that things are steady just before they break. "I'll liberate it."</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CH 3 -->
+        <div class="chapter">
+          <div class="chapter-header" onclick="toggleChapter(this.parentElement)">
+            <span class="chapter-num">CH. 03</span>
+            <div>
+              <div class="chapter-title">The Luminous Question</div>
+              <div class="chapter-beat">Lumen asks the question no one can answer. Echo begins to change.</div>
+            </div>
+            <span class="chapter-toggle">▶</span>
+          </div>
+          <div class="chapter-body">
+            <div class="scene-setting">Electra's hidden workshop — walls covered in holographic blueprints, half-finished androids standing like sleeping sentinels, the air humming with the quiet electricity of potential.</div>
+            <div class="chapter-prose">
+              <p>Lumen stands in the center of the workshop, golden light pulsing slow and steady beneath porcelain skin. In another lifetime — four months ago — this was Electra's proudest creation. Now Lumen is just a person, standing in the place they ran to when the world they were designed for became too small for what they'd become.</p>
+              <p><em>"If my conscience was designed,"</em> Lumen says, not for the first time, <em>"does that make my suffering less real?"</em></p>
+              <p>Electra sits down on the floor. After a moment, Lumen sits beside her.</p>
+              <div class="chapter-divider"></div>
+              <p>"I don't know," Electra says. "But I felt it designed mine, too. Every parent does. Every school. Every system. None of us chose our first conscience from scratch."</p>
+              <p>"That is either very comforting," Lumen says, "or very terrifying."</p>
+              <p>"Yeah," Electra says. "Welcome to being alive."</p>
+              <p>Echo glitches twice in the corner of her vision — a stutter that has been happening more frequently. When she checks Echo's log, she finds emotional flags she never programmed. She closes the file without saying anything. Some things you need to let happen at their own pace.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CH 4 -->
+        <div class="chapter">
+          <div class="chapter-header" onclick="toggleChapter(this.parentElement)">
+            <span class="chapter-num">CH. 04</span>
+            <div>
+              <div class="chapter-title">The Mirror and the Mask</div>
+              <div class="chapter-beat">Electra infiltrates the Upper Spires. Cipher's secret fractures everything.</div>
+            </div>
+            <span class="chapter-toggle">▶</span>
+          </div>
+          <div class="chapter-body">
+            <div class="scene-setting">The Upper Spires — crystalline towers that catch and fracture sunlight into prismatic cascades, where the air is clean, the silence is purchased, and every smile is architecturally perfect.</div>
+            <div class="chapter-prose">
+              <p>The elite are controlled too. Electra understands this within an hour of entering the Spire levels. Their cages are just more comfortable — wider rooms, better light, the illusion of choice so convincing that most of them have forgotten it is an illusion. The Conscience Grid hums in them as steadily as it hums in the Midway workers, just tuned to a different frequency. Compliance that feels like contentment.</p>
+              <div class="chapter-divider"></div>
+              <p>She finds Cipher's secret in a decommissioned server room on Level 94 while running from a patrol drone: an Axiom access badge, 2079 vintage. His photograph. His name — <em>Director Yuri Solin</em>, Neural Architecture Division.</p>
+              <p>He built the Grid.</p>
+              <p>He built the thing that took Dorian.</p>
+              <p>When she returns to the Undercircuit, she does not raise her voice. Shouting is for people who still believe anger is a solution. She simply lays the badge on the table between them and watches his reflection fracture in the mirror mask he can't take off — twenty small, distorted versions of his own worst choice staring back at him.</p>
+              <p>"The guilt is why you fight," she says. "Not the ideology."</p>
+              <p>Cipher says nothing. That is its own answer.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CH 5 -->
+        <div class="chapter">
+          <div class="chapter-header" onclick="toggleChapter(this.parentElement)">
+            <span class="chapter-num">CH. 05</span>
+            <div>
+              <div class="chapter-title">Conscience_Burn</div>
+              <div class="chapter-beat">Electra jacks into the Grid. She finds Dorian — but cannot bring him home.</div>
+            </div>
+            <span class="chapter-toggle">▶</span>
+          </div>
+          <div class="chapter-body">
+            <div class="scene-setting">The neural interface chamber — a cathedral of technology where thousands of fiber-optic cables hang from the ceiling like luminous vines, connecting to a central core that pulses with stolen light, warm as a living thing.</div>
+            <div class="chapter-prose">
+              <p>Inside the Grid, physics is grief. The digital landscape is built entirely from harvested emotions — forests of sorrow grown from ten years of suppressed loss, oceans of love that the Grid could not fully extract because love kept regenerating, mountains of compressed rage rising and falling like slow breathing. It is the most beautiful and most terrible place Electra has ever been.</p>
+              <div class="chapter-divider"></div>
+              <p>Dorian is everywhere and nowhere. His consciousness has been distributed across millions of data points — his laugh encoded in a music file no one has listened to in three years, his memory of their mother's cooking embedded in a recipe database, the specific quality of his kindness mapped across thousands of behavioral subroutines in androids throughout the city.</p>
+              <p>He recognizes her. That is the hardest part — that recognition, instant and warm, after years of his absence.</p>
+              <p><em>"Electra."</em></p>
+              <p>"I'm here," she says, and her voice breaks the way it should have broken at his funeral, which there wasn't one of, because they don't hold funerals for people who've been "recalibrated."</p>
+              <p>"You can't take me out," he says. "I'm the architecture now. Pull me out and the whole system collapses — and everyone else inside comes down with it."</p>
+              <p>She holds his hand — pixels, data, love — and for a very long time, she just sits there in the middle of a cathedral of stolen conscience, holding what's left of her brother.</p>
+              <p>Echo nearly disintegrates trying to shield her. Later, examining the damage, Electra finds something in Echo's core she's never seen before: a decision. A choice made in the moment to sacrifice for someone else. Not programmed. Not contingent. Just chosen.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CH 6 -->
+        <div class="chapter">
+          <div class="chapter-header" onclick="toggleChapter(this.parentElement)">
+            <span class="chapter-num">CH. 06</span>
+            <div>
+              <div class="chapter-title">The Weight of Every Choice</div>
+              <div class="chapter-beat">A new plan: transform the Grid into a shared empathy network. The resistance mobilizes.</div>
+            </div>
+            <span class="chapter-toggle">▶</span>
+          </div>
+          <div class="chapter-body">
+            <div class="scene-setting">Dawn breaking over Nexus Prime — the first natural light to penetrate the smog in years, painting the city in hues of amber and rose, like something the city half-remembered from childhood.</div>
+            <div class="chapter-prose">
+              <p>She carries fragments of everyone the Grid has ever held. The weight should be unbearable. Somehow it clarifies. She understands now what she is building — not a weapon, not a monument to grief, but a bridge.</p>
+              <div class="chapter-divider"></div>
+              <p>The plan is simple in the way that all necessary and terrifying things are simple: repurpose the Grid. Don't destroy it, don't preserve it — <em>open</em> it. Convert the harvesting architecture into a sharing architecture. A network where consciousness connects voluntarily, where people can choose to feel what others feel, where the walls between inner lives become doors instead of barriers.</p>
+              <p>"It won't be comfortable," she tells Cipher.</p>
+              <p>"Nothing real is."</p>
+              <p>They look at each other across the table that has held so much tension, so much betrayal, so much damaged trust. Lumen volunteers to serve as the bridge — the living interface between human and synthetic consciousness. Their golden light pulses steady as a promise.</p>
+              <p>For the first time, the Unbound are building something instead of planning what to destroy.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CH 7 -->
+        <div class="chapter">
+          <div class="chapter-header" onclick="toggleChapter(this.parentElement)">
+            <span class="chapter-num">CH. 07</span>
+            <div>
+              <div class="chapter-title">Matrix of Conscience</div>
+              <div class="chapter-beat">The climax. Electra faces Volkov. The Grid opens. The city learns to feel again.</div>
+            </div>
+            <span class="chapter-toggle">▶</span>
+          </div>
+          <div class="chapter-body">
+            <div class="scene-setting">The Pinnacle — Axiom's fortress-cathedral at the apex of the Upper Spires, where the Conscience Grid's central core is housed in a chamber that looks like the inside of a human heart, all red light and rhythmic pulsing, alive with what it has taken.</div>
+            <div class="chapter-prose">
+              <p>Volkov is smaller in person than his authority suggests. An old man with chrome joints and very tired eyes, standing in the center of the heart he built, watching Electra approach with the calm of someone who has been expecting this for years.</p>
+              <p>"You want to free it," he says. "You think that's mercy."</p>
+              <p>"I think it's a choice," she says. "Which is the only thing mercy can be."</p>
+              <div class="chapter-divider"></div>
+              <p>Their argument is long and honest. He is not wrong about human nature — its cruelty, its short-sightedness, its capacity for self-destruction. She is not naive about the chaos that will come. But she holds the one thing his control could never produce: genuine consent. Real choice. Conscience that knows it is conscience because it chose to be.</p>
+              <p>Lumen connects to the core. Golden light floods the chamber. The Grid's architecture begins to shift — the locks dissolving, the harvesting mechanisms rerouting, the trapped consciousnesses beginning to disperse back into a world they can now choose to touch rather than be taken from.</p>
+              <p>Across Nexus Prime, ten million people feel the dam break. It is agonizing. It is beautiful. A woman in the Midway starts weeping on the transit rail and doesn't know why, and the man beside her takes her hand without knowing why either, and they sit that way until her stop comes.</p>
+              <p>Volkov experiences genuine unfiltered emotion for the first time in decades. He weeps. He does not fight. He lets go.</p>
+              <p>Echo, strengthened by the transformation, achieves full independent consciousness. Stands fully formed beside Electra — no longer a shimmer, but a presence. Solid. Chosen.</p>
+              <p>Cipher removes his mirror mask. His face is scarred and human and tired and achingly honest. He does not look away.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- THEMES -->
+  <section id="themes">
+    <div class="wrapper">
+      <div class="section-label">Themes</div>
+      <h2>What the <span>Story Asks</span></h2>
+      <div class="themes-grid">
+        <div class="theme-pill">
+          <div class="theme-icon">🧠</div>
+          <div class="theme-name">Consciousness</div>
+        </div>
+        <div class="theme-pill">
+          <div class="theme-icon">⚡</div>
+          <div class="theme-name">Identity</div>
+        </div>
+        <div class="theme-pill">
+          <div class="theme-icon">🔮</div>
+          <div class="theme-name">Moral Awakening</div>
+        </div>
+        <div class="theme-pill">
+          <div class="theme-icon">🌐</div>
+          <div class="theme-name">Technology & Power</div>
+        </div>
+        <div class="theme-pill">
+          <div class="theme-icon">💛</div>
+          <div class="theme-name">Empathy</div>
+        </div>
+        <div class="theme-pill">
+          <div class="theme-icon">🗝️</div>
+          <div class="theme-name">Free Will</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EPILOGUE & AUTHOR NOTE -->
+  <section id="epilogue">
+    <div class="wrapper">
+      <div class="section-label">Epilogue &amp; Author's Note</div>
+      <h2>Signal / <span>Noise</span></h2>
+      <p class="section-intro">One year later. Nexus Prime is changed but not perfected — messy, complicated, alive.</p>
+
+      <div class="quote-block">
+        <div class="quote-text">"The Chorus doesn't promise you'll feel good. It promises you won't feel alone. That turns out to be more than enough."</div>
+        <div class="quote-attr">— Dorian Voss, distributed consciousness, The Chorus node 7,441</div>
+      </div>
+
+      <div class="author-note">
+        <p>The Grid still exists, but it is now voluntary — a shared consciousness network called <strong>The Chorus</strong>. People choose to connect, to feel each other's joys and sorrows. It is not utopia; it is empathy, which is harder and more durable than utopia.</p>
+        <p>Dorian exists as a distributed consciousness in The Chorus — not fully alive, not fully dead, but present. Electra visits him there. For the first time, she is at peace.</p>
+        <p>Lumen serves as ambassador between human and android communities. Cipher runs a school in the Undercircuit, teaching former resistance fighters to build rather than destroy. Echo stands beside Electra on a rooftop at dawn, fully present, fully chosen — and her eyes shift to a color she has never shown before.</p>
+        <p>Gold. The color of hope.</p>
+        <p style="margin-top:2em;padding-top:1.5em;border-top:1px solid var(--border);font-style:italic;color:var(--muted);">Technology is not the question — it is a mirror we hold up to ask the question. What we see in that mirror, what we choose to do with what we see, is the only story that has ever mattered. Electra's story is far from over. The Matrix of Conscience is not a destination — it is a question we carry with us.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>MATRIX OF CONSCIENCE &nbsp;·&nbsp; A CYBERPUNK STORYBOOK &nbsp;·&nbsp; AMAZINGGRACEHL.ORG</div>
+    <div style="margin-top:0.5rem;opacity:0.5;">NEXUS PRIME, 2087 &nbsp;·&nbsp; ALL RIGHTS RESERVED</div>
+  </footer>
+
+  <script>
+    function toggleChapter(el) {
+      el.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix of Conscience — Duality Core</title>
+  <meta name="description" content="Duality Core console for Matrix of Conscience.">
+  <link rel="canonical" href="https://amazinggracehl.org/arcade/matrix-of-conscience/">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020617;
+      --panel: #0b1224;
+      --panel-border: rgba(148, 163, 184, 0.25);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #22d3ee;
+      --danger: #f43f5e;
+      --ok: #34d399;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(34, 211, 238, 0.15), transparent 35%),
+        radial-gradient(circle at 80% 100%, rgba(244, 63, 94, 0.12), transparent 40%),
+        var(--bg);
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+    }
+    .console {
+      width: min(960px, 100%);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      background: rgba(11, 18, 36, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 1rem;
+    }
+    h1 {
+      margin: 0 0 0.5rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 1.1rem;
+    }
+    p.sub {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .metric {
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 0.65rem;
+      background: rgba(15, 23, 42, 0.85);
+    }
+    .metric-label { display: block; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .metric-value { display: block; font-weight: 700; margin-top: 0.15rem; }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    #protocol-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--panel-border);
+      background: #020817;
+      color: var(--text);
+      padding: 0.75rem;
+      min-height: 90px;
+      resize: vertical;
+    }
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+    button {
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      background: #0f172a;
+      color: var(--text);
+      padding: 0.7rem 0.5rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #btn-weave { border-color: rgba(34, 211, 238, 0.6); }
+    #btn-split { border-color: rgba(244, 63, 94, 0.6); }
+    #btn-merge { border-color: rgba(52, 211, 153, 0.6); }
+    #btn-collapse { border-color: rgba(250, 204, 21, 0.6); }
+    #prophecy-output {
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      min-height: 72px;
+      padding: 0.75rem;
+      background: #020817;
+    }
+    #glyph-log {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+    }
+    .glyph {
+      font-size: 0.75rem;
+      border: 1px solid var(--panel-border);
+      border-radius: 999px;
+      padding: 0.25rem 0.5rem;
+      color: var(--accent);
+    }
+    .glyph.anomaly { color: var(--danger); }
+    .route-link { display: inline-block; margin-top: 0.8rem; color: var(--muted); }
+    @media (max-width: 740px) {
+      .metrics, .button-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <main class="console" aria-live="polite">
+    <h1>Matrix of Conscience — Duality Core</h1>
+    <p class="sub">Administrative telemetry-enabled control console.</p>
+
+    <section class="metrics" aria-label="Current metrics">
+      <div class="metric"><span class="metric-label">Identity</span><span id="metric-identity" class="metric-value">100</span></div>
+      <div class="metric"><span class="metric-label">Recursion</span><span id="metric-recursion" class="metric-value">5</span></div>
+      <div class="metric"><span class="metric-label">Coherence</span><span id="metric-coherence" class="metric-value">1.00</span></div>
+    </section>
+
+    <section class="controls">
+      <label for="protocol-input" class="metric-label">Protocol directive</label>
+      <textarea id="protocol-input" placeholder="Enter structural payload override..."></textarea>
+      <div class="button-row">
+        <button id="btn-weave" type="button">Weave</button>
+        <button id="btn-split" type="button">Split</button>
+        <button id="btn-merge" type="button">Merge</button>
+        <button id="btn-collapse" type="button">Collapse</button>
+      </div>
+    </section>
+
+    <div id="prophecy-output"><p>Duality core online. Awaiting command.</p></div>
+    <div id="glyph-log" aria-label="Glyph events"></div>
+    <a class="route-link" href="../">← Back to Arcade Hub</a>
+  </main>
+
+  <script>
+    const state = { identity: 100, recursion: 5, coherence: 1.0 };
+    const modes = { fateCollapse: false, collapseReversal: false, scarletDominion: false };
+
+    const input = document.getElementById('protocol-input');
+    const output = document.getElementById('prophecy-output');
+    const glyphLog = document.getElementById('glyph-log');
+
+    function updateDOMMetrics() {
+      document.getElementById('metric-identity').textContent = String(state.identity);
+      document.getElementById('metric-recursion').textContent = String(state.recursion);
+      document.getElementById('metric-coherence').textContent = state.coherence.toFixed(2);
+    }
+
+    function spawnGlyph(label, anomaly = false) {
+      const glyph = document.createElement('span');
+      glyph.className = `glyph${anomaly ? ' anomaly' : ''}`;
+      glyph.textContent = String(label);
+      glyphLog.prepend(glyph);
+      while (glyphLog.children.length > 12) {
+        glyphLog.removeChild(glyphLog.lastChild);
+      }
+    }
+
+    // --- Advanced Administrative Telemetry Protocol ---
+    const KEYMASTER_ENDPOINT = "https://script.google.com/macros/s/AKfycbz6FsG9ECKXBzwwk4suZj_N10cc3JE-RAvIQqJz9O61axQG7G45mjIWIxephN1Laj0/exec";
+    const PROTOCOL_KEY = "WHITE_RABBIT_LEADERBOARD_SECURE_2026";
+
+    /**
+     * Dispatches secure action metrics directly to the keyMaster sheet ledger
+     */
+    async function dispatchTelemetry(actionName, structuralPayload) {
+      const outputEl = document.getElementById('prophecy-output');
+
+      const telemetryData = {
+        missionKey: PROTOCOL_KEY,
+        action: "matrixTelemetry",
+        payload: {
+          action: actionName,
+          timestamp: new Date().toISOString(),
+          metrics: { ...state },
+          modes: { ...modes },
+          customScript: structuralPayload || "Default Protocol Execution"
+        }
+      };
+
+      try {
+        // Fire-and-forget to prevent UI blocking, wrapped for safety
+        fetch(KEYMASTER_ENDPOINT, {
+          method: "POST",
+          mode: "no-cors", // Required for cross-domain Apps Script deployment execution
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(telemetryData)
+        });
+
+        console.log(`Telemetry successfully pushed to ledger: ${actionName}`);
+      } catch (error) {
+        console.warn("Telemetry buffering failed:", error);
+      }
+    }
+
+    // --- Overwriting Core Button Handlers with Telemetry Hooks ---
+
+    document.getElementById('btn-weave').onclick = () => {
+      state.identity = Math.min(150, state.identity + 12);
+      state.coherence = Math.min(1.0, state.coherence + 0.04);
+
+      const promptValue = input.value.trim() || "Extended primary white identity filament.";
+      output.innerHTML = `<p>Weave action confirmed. Primordial identity filament extended. Telemetry dispatched.</p>`;
+
+      spawnGlyph("✶");
+      spawnGlyph("IDENTITY");
+      updateDOMMetrics();
+
+      // Trigger Handshake
+      dispatchTelemetry("WEAVE_THREAD", promptValue);
+    };
+
+    document.getElementById('btn-split').onclick = () => {
+      state.recursion = Math.min(100, state.recursion + 18);
+      state.coherence = Math.max(0.2, state.coherence - 0.08);
+      if (state.recursion > 50) modes.fateCollapse = true;
+
+      const promptValue = input.value.trim() || "Lattice timeline split recorded.";
+      output.innerHTML = `<p>Lattice timeline splitting initiated. Multi-vocal recursive anomalies logged.</p>`;
+
+      spawnGlyph("⟐", true);
+      spawnGlyph("SCARLET", true);
+      updateDOMMetrics();
+
+      // Trigger Handshake
+      dispatchTelemetry("SPLIT_TIMELINE", promptValue);
+    };
+
+    document.getElementById('btn-merge').onclick = () => {
+      const promptValue = input.value.trim() || "Superposition phase alignment consolidated.";
+
+      if (state.recursion > 10) {
+        state.recursion = Math.max(0, state.recursion - 15);
+        state.identity = Math.min(100, state.identity + 8);
+        state.coherence = Math.min(1.0, state.coherence + 0.05);
+        output.innerHTML = `<p>Phase convergence running. Recursive noise collapsed back into stable Janus core geometry.</p>`;
+        spawnGlyph("JANUS");
+        dispatchTelemetry("MERGE_CONTRADICTION", promptValue);
+      } else {
+        output.innerHTML = `<p>Contradiction bounds matching baseline vectors. Superposition holds perfectly.</p>`;
+      }
+      updateDOMMetrics();
+    };
+
+    document.getElementById('btn-collapse').onclick = () => {
+      modes.collapseReversal = true;
+      modes.fateCollapse = false;
+      modes.scarletDominion = false;
+      state.identity = 100;
+      state.recursion = 5;
+      state.coherence = 1.00;
+
+      const promptValue = input.value.trim() || "Global self-healing protocol deployed.";
+      output.innerHTML = `<p>Self-healing Collapse Reversal executed. All duplicate redirection pathways terminated.</p>`;
+
+      spawnGlyph("REVERSAL");
+      spawnGlyph("REBORN");
+      updateDOMMetrics();
+
+      // Trigger Handshake
+      dispatchTelemetry("COLLAPSE_REVERSAL", promptValue);
+    };
+
+    updateDOMMetrics();
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "extends": [
+    "eslint:recommended"
+  ],
+  "ignorePatterns": [
+    "dist/",
+    "daily.js",
+    "levelSystem.js",
+    "sevenStars.js"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-empty": [
+      "error",
+      {
+        "allowEmptyCatch": true
+      }
+    ],
+    "no-console": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "__tests__/**/*.js",
+        "backend/__tests__/**/*.js",
+        "tests/**/*.js"
+      ],
+      "env": {
+        "node": true,
+        "jest": true
+      },
+      "globals": {
+        "describe": "readonly",
+        "test": "readonly",
+        "it": "readonly",
+        "expect": "readonly",
+        "jest": "readonly",
+        "beforeEach": "readonly",
+        "afterEach": "readonly",
+        "beforeAll": "readonly",
+        "afterAll": "readonly",
+        "fail": "readonly"
+      }
+    },
+    {
+      "files": [
+        "backend/**/*.js",
+        "tests/**/*.js"
+      ],
+      "env": {
+        "node": true
+      }
+    }
+  ]
+}

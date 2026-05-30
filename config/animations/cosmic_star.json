@@ -1,0 +1,8 @@
+{
+  "name": "cosmic_star",
+  "frames": 7,
+  "frameRate": 10,
+  "loop": true,
+  "glow": 1.2,
+  "spritePath": "/assets/icons/cosmic_frame_"
+}

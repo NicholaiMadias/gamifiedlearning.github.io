@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fix the GitHub Copilot ruleset bypass startup error with a practical branch ruleset checklist.">
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>Fixing Copilot Ruleset Bypass Errors | Amazing Grace Story Library</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            background: #04060f;
+            color: #e5e7eb;
+            line-height: 1.7;
+        }
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #1f2937;
+            position: sticky;
+            top: 0;
+            background: rgba(4, 6, 15, 0.95);
+        }
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #facc15;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .logo img { height: 32px; border-radius: 4px; }
+        nav { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+        nav a { color: #93c5fd; text-decoration: none; }
+        nav a:hover { text-decoration: underline; }
+        main {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.2rem 3rem;
+        }
+        h1 { margin-top: 0; }
+        .card {
+            background: #0b1220;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-top: 1.25rem;
+        }
+        code { color: #fde68a; }
+        a { color: #93c5fd; }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <a href="../../" class="logo" aria-label="Amazing Grace Home Living — Home">
+        <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living Logo">
+        Amazing Grace
+    </a>
+    <nav aria-label="Story navigation">
+        <a href="../">Library</a>
+        <a href="../../ministry/">Ministry</a>
+        <a href="../../arcade/">Arcade</a>
+    </nav>
+</header>
+<main>
+    <h1 class="hero-title">Fixing Copilot Ruleset Bypass Errors</h1>
+    <p>If your coding agent fails with a repository ruleset violation, the fix is usually in GitHub settings—not code. Keep <code>main</code> strict, and grant bypass only to trusted automation on narrow branch scopes.</p>
+
+    <section class="card" aria-label="Bypass checklist">
+        <h2>Fast Checklist</h2>
+        <ol>
+            <li>Open your repository rulesets in GitHub settings.</li>
+            <li>Add bypass for <strong>GitHub Actions</strong> and your approved coding-agent app.</li>
+            <li>Scope bypass to automation branches and/or <code>gh-pages</code> when possible.</li>
+            <li>Re-run the blocked automation run after saving the ruleset.</li>
+        </ol>
+        <p>Need the exact project guidance? See <a href="../../docs/rulesets-and-agents.md">docs/rulesets-and-agents.md</a>.</p>
+    </section>
+</main>
+</body>
+</html>
