@@ -6,6 +6,21 @@ export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop', 'gem'];
 /** Special power-up gem types (never fill in randomly). */
 export const SPECIAL_GEM_TYPES = ['bomb', 'rainbow'];
 
+/**
+ * Base score for one matched cell of each regular gem type
+ * (multiplied by the current combo before adding to the total).
+ * Diamonds are rarest and highest-value; flames score lower
+ * but chain more easily.
+ */
+export const GEM_SCORE = {
+  heart: 12,  // life tile — slight bonus
+  star:  10,  // standard
+  cross: 15,  // crystal — high value
+  flame:  8,  // fire — lower base, relies on chains
+  drop:  10,  // water — standard
+  gem:   20,  // diamond — rarest, highest value
+};
+
 function randomGem() {
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
 }

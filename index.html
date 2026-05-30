@@ -95,7 +95,7 @@
       box-shadow: 0 0 0 2px #00ff41, 0 0 12px #00ff4160;
     }
 
-    /* ── Gem shapes (CSS star, clip-path polygon) ── */
+    /* ── Gem base — shared sizing; each sub-type defines its own clip-path ── */
     .gem {
       width: 82%;
       height: 82%;
@@ -103,7 +103,7 @@
         50% 0%,  61% 35%, 98% 35%, 68% 57%,
         79% 91%, 50% 70%, 21% 91%, 32% 57%,
          2% 35%, 39% 35%
-      );
+      ); /* fallback 5-pt star used by bomb / rainbow */
       filter: drop-shadow(0 2px 3px rgba(0,0,0,0.55));
     }
 
@@ -118,13 +118,38 @@
       transition: transform 0.12s;
     }
 
-    /* Regular gem colours */
-    .gem-heart  { background: radial-gradient(circle at 38% 32%, #ff8ab4, #e91e63 55%, #880e4f); }
-    .gem-star   { background: radial-gradient(circle at 38% 32%, #fff9c4, #ffd700 55%, #e65100); }
-    .gem-cross  { background: radial-gradient(circle at 38% 32%, #e040fb, #9c27b0 55%, #4a148c); }
-    .gem-flame  { background: radial-gradient(circle at 38% 32%, #ffcc80, #ff6b35 55%, #bf360c); }
-    .gem-drop   { background: radial-gradient(circle at 38% 32%, #80d8ff, #2196f3 55%, #0d47a1); }
-    .gem-gem    { background: radial-gradient(circle at 38% 32%, #b9f6ca, #4caf50 55%, #1b5e20); }
+    /* ── Gem shapes — each type has its own distinct clip-path ──────────── */
+
+    /* Heart — organic two-lobed top, pointed base (+12 pts) */
+    .gem-heart {
+      clip-path: polygon(50% 28%, 73% 5%, 100% 18%, 100% 44%, 82% 68%, 50% 100%, 18% 68%, 0% 44%, 0% 18%, 27% 5%);
+      background: radial-gradient(circle at 38% 32%, #ff8ab4, #e91e63 55%, #880e4f);
+    }
+    /* Star — classic 5-pointed (10 pts) */
+    .gem-star {
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      background: radial-gradient(circle at 38% 32%, #fff9c4, #ffd700 55%, #e65100);
+    }
+    /* Cross — bold 12-point plus sign (+15 pts, crystal) */
+    .gem-cross {
+      clip-path: polygon(35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%, 0% 35%, 35% 35%);
+      background: radial-gradient(circle at 38% 32%, #ce93d8, #7c4dff 55%, #311b92);
+    }
+    /* Flame — elongated teardrop, pointed apex (+8 pts) */
+    .gem-flame {
+      clip-path: polygon(50% 0%, 65% 22%, 84% 48%, 72% 76%, 50% 100%, 28% 76%, 16% 48%, 35% 22%);
+      background: radial-gradient(circle at 38% 32%, #ffcc80, #ff6b35 55%, #bf360c);
+    }
+    /* Drop — regular hexagon, maximally distinct from star (+10 pts) */
+    .gem-drop {
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      background: radial-gradient(circle at 38% 32%, #80d8ff, #2196f3 55%, #0d47a1);
+    }
+    /* Gem/Diamond — 4-pointed elongated diamond, highest value (+20 pts) */
+    .gem-gem {
+      clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
+      background: radial-gradient(circle at 38% 32%, #b2ebf2, #00bcd4 55%, #006064);
+    }
 
     /* Special gem: bomb */
     .gem-bomb {

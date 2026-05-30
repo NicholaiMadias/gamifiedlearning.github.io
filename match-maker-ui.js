@@ -16,6 +16,7 @@ import {
   applyRainbowClear,
   findMostCommonType,
   GEM_TYPES,
+  GEM_SCORE,
   GRID_SIZE,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
@@ -245,7 +246,9 @@ function resolveMatches(myRunId) {
 
   // Score: sum all group sizes × combo multiplier (overlapping cells in L/T shapes score twice as a bonus)
   let roundScore = 0;
-  groups.forEach(g => { roundScore += g.length * 10; });
+  groups.forEach(g => {
+    g.forEach(({ r, c }) => { roundScore += GEM_SCORE[grid[r][c]] ?? 10; });
+  });
   roundScore *= combo;
   score += roundScore;
 
