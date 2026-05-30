@@ -1,8 +1,6 @@
 // match-maker-ui.js
 import {
   createInitialGrid,
-  canSwap,
-  applySwap,
   findMatches,
   clearMatches,
   applyGravity,
@@ -26,6 +24,18 @@ let activePowerUp = null; // Currently selected power-up to use
 
 const SCORE_PER_LEVEL = 500;
 const CHAIN_REACTION_DELAY_MS = 300;
+
+function isAdjacent(r1, c1, r2, c2) {
+  const rowDiff = Math.abs(r1 - r2);
+  const colDiff = Math.abs(c1 - c2);
+  return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+}
+
+function swapGridCells(currentGrid, r1, c1, r2, c2) {
+  const swapped = currentGrid.map((row) => row.slice());
+  [swapped[r1][c1], swapped[r2][c2]] = [swapped[r2][c2], swapped[r1][c1]];
+  return swapped;
+}
 
 export function initMatchMaker(dbRef, userRef) {
   db = dbRef;
@@ -137,14 +147,14 @@ function onCellClick(r, c) {
     return;
   }
 
-  if (!canSwap(grid, r1, c1, r, c)) {
+  if (!isAdjacent(r1, c1, r, c)) {
     highlightCell(r1, c1, false);
     selected = { r, c };
     highlightCell(r, c, true);
     return;
   }
 
-  const swapped = applySwap(grid, r1, c1, r, c);
+  const swapped = swapGridCells(grid, r1, c1, r, c);
   const matches = findMatches(swapped);
 
   if (matches.length === 0) {
