@@ -74,26 +74,6 @@
 
     <div class="nexus-bg"></div>
 
-<<<<<<< HEAD
-  <!-- ══ Games Navigation ═══════════════════════════ -->
-  <section style="width:100%;max-width:460px;">
-    <a href="games/seven-stars/"
-       style="display:block;background:#0d0d1a;border:1px solid #ffd700;border-radius:12px;padding:1rem 1.4rem;color:#ffd700;text-decoration:none;font-size:1rem;letter-spacing:0.08em;text-transform:uppercase;transition:background 0.15s;"
-       onmouseover="this.style.background='rgba(255,215,0,0.1)'"
-       onmouseout="this.style.background='#0d0d1a'">
-      ⭐ The Mystery of the Seven Stars
-    </a>
-  </section>
-
-  <!-- ══ Match Maker ══════════════════════════════════ -->
-  <section class="match-card" id="match-maker-screen">
-    <h2>Match Maker</h2>
-
-    <div class="match-stats">
-      <div>Score: <span id="match-score">0</span></div>
-      <div>Moves: <span id="match-moves">20</span></div>
-      <div>Level: <span id="match-level">1</span></div>
-=======
     <!-- HUD -->
     <div id="hud" class="site-nav-top-offset fixed left-0 w-full p-4 flex justify-between items-center glass-panel z-50 hidden">
         <button onclick="switchView('view-hub')" class="text-[10px] text-slate-400 uppercase font-bold tracking-widest hover:text-cyan-400 transition-colors">← Back to Hub</button>
@@ -111,7 +91,6 @@
                 <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
             </div>
         </div>
->>>>>>> origin/main
     </div>
 
     <!-- HUB VIEW -->
@@ -181,6 +160,12 @@
                 <h2 class="orbitron text-xl font-bold text-white mb-2">Matrix of Conscience</h2>
                 <p class="text-slate-400 text-[10px]">Match CERT gems on an 8×8 cosmic board — Creativity, Empathy, Relief, Trust.</p>
                 <span class="mt-3 inline-block text-[8px] font-bold uppercase tracking-[0.15em] text-purple-500 border border-purple-500/30 rounded-full px-2 py-0.5">▶ Play</span>
+            </a>
+            <a href="/games/seven-stars/" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-yellow-400" style="text-decoration:none;">
+                <div class="w-12 h-12 bg-yellow-500/20 rounded-xl mb-4 flex items-center justify-center text-yellow-400">⭐</div>
+                <h2 class="orbitron text-xl font-bold text-white mb-2">Mystery of the Seven Stars</h2>
+                <p class="text-slate-400 text-[10px]">Click stars to match them and decrypt the biometrics.</p>
+                <span class="mt-3 inline-block text-[8px] font-bold uppercase tracking-[0.15em] text-yellow-500 border border-yellow-500/30 rounded-full px-2 py-0.5">New</span>
             </a>
             <button onclick="switchView('view-admin')" class="glass-panel p-8 rounded-[2.5rem] transition-all text-left group hover:border-slate-400">
                 <div class="w-12 h-12 bg-slate-500/20 rounded-xl mb-4 flex items-center justify-center text-slate-400">🛠️</div>

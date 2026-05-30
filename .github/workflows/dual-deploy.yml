@@ -46,13 +46,8 @@ jobs:
             echo "CNAME file not found at repo root"
             exit 1
           fi
-<<<<<<< HEAD
-          ACTUAL=$(tr -d '[:space:]' < CNAME)
-          EXPECTED="www.voiceofJesusministry.org"
-=======
           ACTUAL=$(tr -d '[:space:]' < CNAME | tr '[:upper:]' '[:lower:]')
           EXPECTED="app.amazinggracehl.org"
->>>>>>> origin/main
           if [ "$ACTUAL" != "$EXPECTED" ]; then
             echo "CNAME mismatch: expected '$EXPECTED' but found '$ACTUAL'"
             exit 1
@@ -123,11 +118,6 @@ Be concise and actionable. If there are no issues, say so."
           FALLBACK_MSG="Review unavailable — check Gemini API key."
           RESPONSE=$(curl -sS \
             -H "Content-Type: application/json" \
-<<<<<<< HEAD
-            -H "Authorization: Bearer ${WP_API_KEY}" \
-            -d "{\"content\": ${CONTENT}}" \
-            https://www.voiceofJesusministry.org/wp-json/nexus-sync/v1/update
-=======
             -d "$PAYLOAD" \
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}" \
             | jq -r '.candidates[0].content.parts[0].text // empty') || RESPONSE="$FALLBACK_MSG"
@@ -142,4 +132,3 @@ ${RESPONSE}
 
 ---
 *This review was generated automatically and is informational only.*"
->>>>>>> origin/main
