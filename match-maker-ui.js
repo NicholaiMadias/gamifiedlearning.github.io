@@ -83,8 +83,9 @@ export function initMatchMaker(dbRef, userRef) {
 function renderGrid() {
   const container = document.getElementById('match-grid');
   container.innerHTML = '';
-  const columnCount = Number.isInteger(grid[0]?.length) && grid[0].length > 0
-    ? grid[0].length
+  const rawColumnCount = grid[0]?.length;
+  const columnCount = Number.isInteger(rawColumnCount) && rawColumnCount > 0
+    ? Math.min(rawColumnCount, 50)
     : 1;
   container.style.setProperty('grid-template-columns', `repeat(${columnCount}, 1fr)`);
 
@@ -191,7 +192,17 @@ function clearSelection() {
 }
 
 function getCellLabel(type) {
-  return GEM_LABELS[type] || 'Empty';
+  switch (type) {
+    case 'heart': return 'Heart';
+    case 'star': return 'Star';
+    case 'cross': return 'Cross';
+    case 'flame': return 'Flame';
+    case 'drop': return 'Drop';
+    case 'gem': return 'Gem';
+    case 'bomb': return 'Bomb';
+    case 'rainbow': return 'Crystal';
+    default: return 'Empty';
+  }
 }
 
 // ── Special gem activation ───────────────────────────────
