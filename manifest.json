@@ -1,33 +1,23 @@
 {
-  "name": "Amazing Grace Home Living",
-  "short_name": "Amazing Grace",
-  "description": "Amazing Grace Home Living: Secure housing in Tampa & Largo, Voice of Jesus Ministry, and The Seven Stars Educational Arcade.",
+  "name": "Nexus Arcade | Amazing Grace",
+  "short_name": "Nexus Arcade",
+  "description": "The Gamified Learning Matrix portal for Amazing Grace Home Living.",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
-  "orientation": "any",
-  "background_color": "#FFF9F2",
-  "theme_color": "#1A5276",
+  "orientation": "portrait",
+  "theme_color": "#020617",
+  "background_color": "#020617",
   "icons": [
     {
-      "src": "assets/icon-192.png",
+      "src": "Assets/favicon.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "assets/icon-512.png",
+      "src": "Assets/favicon.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "type": "image/png"
     }
   ],
-  "categories": ["housing", "lifestyle", "education"],
-  "lang": "en-US"
+  "categories": ["education", "games"]
 }

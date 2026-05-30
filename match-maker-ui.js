@@ -4,9 +4,7 @@ import {
   findMatches,
   clearMatches,
   applyGravity,
-  applySpecialGem,
   GRID_SIZE,
-  SPECIAL_GEM_TYPES,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
@@ -15,15 +13,41 @@ let selected = null;
 let score = 0;
 let moves = 20;
 let level = 1;
+let shards = 0;
+let comboChain = 0;
+let comboMultiplier = 1;
 let db = null;
 let user = null;
-let combo = 0;
-let coins = 100; // Starting coins for the store
-let powerUps = { bomb: 0, lightning: 0, rainbow: 0 };
-let activePowerUp = null; // Currently selected power-up to use
+let storeBound = false;
+let resolveTimeoutId = null;
+let statusTimeoutId = null;
+let runId = 0;
+let resolving = false;
 
 const SCORE_PER_LEVEL = 500;
-const CHAIN_REACTION_DELAY_MS = 300;
+const CHAIN_REACTION_DELAY_MS = 320;
+const MAX_COMBO_MULTIPLIER = 5;
+
+const STORE_ITEMS = [
+  { id: 'moves', label: '+5 Moves Flask', cost: 4, detail: 'Refill your focus and gain +5 moves.', action: () => addMoves(5) },
+  { id: 'line', label: 'Line Clear Rune', cost: 3, detail: 'Drop a rune that clears a whole line when matched.', action: () => injectSpecial('row') },
+  { id: 'bomb', label: 'Crystal Bomb', cost: 5, detail: 'Place a radiant bomb for a 3×3 blast.', action: () => injectSpecial('bomb') },
+  { id: 'wild', label: 'Rainbow Wild', cost: 4, detail: 'Adds a wild gem that links any combo.', action: () => injectSpecial('wild') },
+];
+
+const STAR_SHEET_URL = 'https://github.com/user-attachments/assets/ffa6a239-a672-4607-974f-ab1fb0475410';
+const SHOOTING_STAR_FX_URL = 'https://github.com/user-attachments/assets/b2877683-8436-49bd-8bc8-69fdfbf9f717';
+const SUPERNOVA_FX_URL = 'https://github.com/user-attachments/assets/7d098ae2-7b30-4cdd-a1f9-45ef3083211c';
+
+// Gem image mapping
+const GEM_IMAGES = {
+  'heart': null,
+  'star': STAR_SHEET_URL,
+  'cross': null,
+  'flame': null,
+  'drop': SHOOTING_STAR_FX_URL,
+  'wild': STAR_SHEET_URL,
+};
 
 function isAdjacent(r1, c1, r2, c2) {
   const rowDiff = Math.abs(r1 - r2);
@@ -40,47 +64,67 @@ function swapGridCells(currentGrid, r1, c1, r2, c2) {
 export function initMatchMaker(dbRef, userRef) {
   db = dbRef;
   user = userRef;
+  runId++;
   score = 0;
   moves = 20;
   level = 1;
-  combo = 0;
-  activePowerUp = null;
+  shards = 0;
+  comboChain = 0;
+  comboMultiplier = 1;
   selected = null;
+  resolving = false;
+  if (resolveTimeoutId) {
+    clearTimeout(resolveTimeoutId);
+    resolveTimeoutId = null;
+  }
+  if (statusTimeoutId) {
+    clearTimeout(statusTimeoutId);
+    statusTimeoutId = null;
+  }
   grid = createInitialGrid();
   renderGrid();
+  renderStore();
   updateStats();
-  updateStoreDisplay();
-  updatePowerUpButtons();
+  const banner = document.getElementById('match-badge-banner');
+  if (banner) banner.classList.add('hidden');
 }
 
-function updateStats() {
-  document.getElementById('match-score').textContent = score;
-  document.getElementById('match-moves').textContent = moves;
-  document.getElementById('match-level').textContent = level;
-  document.getElementById('match-combo').textContent = combo > 0 ? `${combo}x` : '-';
-  document.getElementById('match-coins').textContent = coins;
-}
-
-function renderGrid() {
+function renderGrid(highlightSet = new Set()) {
   const container = document.getElementById('match-grid');
+  if (!container) return;
   container.innerHTML = '';
 
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
+      const cellData = grid[r][c];
       const cell = document.createElement('div');
       cell.className = 'match-cell';
       cell.dataset.row = r;
       cell.dataset.col = c;
+      cell.classList.add(`gem-${cellData.kind}`);
+      if (cellData.special) cell.classList.add(`special-${cellData.special}`);
+      if (highlightSet.has(key(r, c))) cell.classList.add('matching');
+      if (selected && selected.r === r && selected.c === c) cell.classList.add('selected');
 
-      const gemType = grid[r][c];
-      const img = document.createElement('div');
-      img.className = 'gem-icon';
-      const gemStyle = getGemStyle(gemType);
-      img.style.backgroundImage = gemStyle.backgroundImage;
-      img.style.backgroundSize = gemStyle.backgroundSize;
-      img.style.backgroundPosition = gemStyle.backgroundPosition;
-      img.dataset.gemType = gemType;
-      cell.appendChild(img);
+      const glyph = document.createElement('div');
+      glyph.className = 'glyph';
+
+      // Use PNG image for regular gems, emoji for wild
+      if (GEM_IMAGES[cellData.kind]) {
+        glyph.style.backgroundImage = `url('${GEM_IMAGES[cellData.kind]}')`;
+      } else {
+        glyph.classList.add('emoji');
+        glyph.textContent = gemIcon(cellData);
+      }
+
+      cell.appendChild(glyph);
+
+      if (cellData.special) {
+        const badge = document.createElement('span');
+        badge.className = 'special-chip';
+        badge.textContent = specialBadge(cellData.special);
+        cell.appendChild(badge);
+      }
 
       cell.onclick = () => onCellClick(r, c);
       container.appendChild(cell);
@@ -88,69 +132,49 @@ function renderGrid() {
   }
 }
 
-// IMG_2671.png contains 3 stars side-by-side (white, blue, green).
-// IMG_2673.png contains 2 stars side-by-side (red, purple).
-// IMG_2674.png contains 2 explosion graphics; show only the first (left half).
-// IMG_2675.png has one large star in the left half (~pixels 32-770 of 1536) and
-//   three smaller stars in the right half; backgroundSize 200% shows only the large star.
-// All other images contain a single graphic and use normal contain sizing.
-function getGemStyle(type) {
-  const styleMap = {
-    'yellow':    { backgroundImage: 'url(IMG_2669.png)', backgroundSize: 'contain',   backgroundPosition: '50% 50%' },
-    'white':     { backgroundImage: 'url(IMG_2671.png)', backgroundSize: '300% 100%', backgroundPosition: '0% 50%'  },
-    'blue':      { backgroundImage: 'url(IMG_2671.png)', backgroundSize: '300% 100%', backgroundPosition: '50% 50%' },
-    'green':     { backgroundImage: 'url(IMG_2671.png)', backgroundSize: '300% 100%', backgroundPosition: '100% 50%'},
-    'red':       { backgroundImage: 'url(IMG_2673.png)', backgroundSize: '200% 100%', backgroundPosition: '0% 50%'  },
-    'purple':    { backgroundImage: 'url(IMG_2673.png)', backgroundSize: '200% 100%', backgroundPosition: '100% 50%'},
-    'bomb':      { backgroundImage: 'url(IMG_2674.png)', backgroundSize: '200% 100%', backgroundPosition: '0% 50%'  },
-    'lightning': { backgroundImage: 'url(IMG_2675.png)', backgroundSize: '200% 100%', backgroundPosition: '0% 50%'  },
-    'rainbow':   { backgroundImage: 'url(IMG_2676.png)', backgroundSize: 'contain',   backgroundPosition: '50% 50%' },
-  };
-  return styleMap[type] || styleMap['yellow'];
+function gemIcon(cell) {
+  switch (cell.kind) {
+    case 'heart': return '💖';
+    case 'star': return '⭐';
+    case 'cross': return '✝️';
+    case 'flame': return '🔥';
+    case 'drop': return '💧';
+    case 'wild': return '🌈';
+    default: return '⬛';
+  }
 }
 
-function gemIcon(type) {
-  // Keeping as fallback
-  const iconMap = {
-    'yellow': '⭐',
-    'white': '💎',
-    'blue': '💧',
-    'green': '🍀',
-    'red': '❤️',
-    'purple': '💜',
-    'bomb': '💣',
-    'lightning': '⚡',
-    'rainbow': '🌈'
-  };
-  return iconMap[type] || '⭐';
+function specialBadge(special) {
+  if (special === 'row') return '─';
+  if (special === 'col') return '│';
+  if (special === 'bomb') return '✦';
+  return '☆';
 }
 
 function onCellClick(r, c) {
-  if (moves <= 0) return;
-
-  // If a power-up is active, use it on this cell
-  if (activePowerUp) {
-    usePowerUp(r, c);
-    return;
-  }
+  if (moves <= 0 || resolving) return;
 
   if (!selected) {
     selected = { r, c };
-    highlightCell(r, c, true);
+    renderGrid();
     return;
   }
 
   const { r: r1, c: c1 } = selected;
   if (r === r1 && c === c1) {
-    highlightCell(r, c, false);
     selected = null;
+    renderGrid();
     return;
   }
 
+<<<<<<< HEAD
   if (!isAdjacent(r1, c1, r, c)) {
     highlightCell(r1, c1, false);
+=======
+  if (!canSwap(grid, r1, c1, r, c)) {
+>>>>>>> origin/main
     selected = { r, c };
-    highlightCell(r, c, true);
+    renderGrid();
     return;
   }
 
@@ -158,163 +182,232 @@ function onCellClick(r, c) {
   const matches = findMatches(swapped);
 
   if (matches.length === 0) {
-    // Invalid swap — no match produced, revert selection
-    highlightCell(r1, c1, false);
     selected = null;
+    renderGrid();
     return;
   }
 
   grid = swapped;
-  highlightCell(r1, c1, false);
   selected = null;
   moves--;
-  combo = 0; // Reset combo on new move
   updateStats();
 
   resolveMatches();
 }
 
-function usePowerUp(r, c) {
-  if (!activePowerUp || powerUps[activePowerUp] <= 0) {
-    activePowerUp = null;
-    updatePowerUpButtons();
-    return;
-  }
-
-  // Apply the special gem effect
-  const result = applySpecialGem(grid, SPECIAL_GEM_TYPES[activePowerUp.toUpperCase()], r, c);
-  grid = result.grid;
-
-  // Animate the cleared cells
-  if (result.clearedCells.length > 0) {
-    const matches = [result.clearedCells];
-    animateMatches(matches);
-
-    // Award points for special gem usage
-    score += result.clearedCells.length * 15; // Bonus points for power-ups
-    coins += Math.floor(result.clearedCells.length / 3); // Earn some coins back
-  }
-
-  // Consume the power-up
-  powerUps[activePowerUp]--;
-  activePowerUp = null;
-  updateStats();
-  updateStoreDisplay();
-  updatePowerUpButtons();
-
-  // Apply gravity and resolve any new matches
-  setTimeout(() => {
-    grid = applyGravity(grid);
-    renderGrid();
-    combo = 0; // Power-ups start fresh combo
-    setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
-  }, 400);
-}
-
-function highlightCell(r, c, on) {
-  const cell = document.querySelector(`.match-cell[data-row="${r}"][data-col="${c}"]`);
-  if (!cell) return;
-  cell.style.outline = on ? '2px solid #00ff41' : 'none';
-}
-
 function resolveMatches() {
-  const matches = findMatches(grid);
-  if (matches.length === 0) {
+  const currentRun = runId;
+  resolving = true;
+  const groups = findMatches(grid);
+  if (groups.length === 0) {
+    if (resolveTimeoutId) clearTimeout(resolveTimeoutId);
+    resolveTimeoutId = null;
+    comboChain = 0;
+    comboMultiplier = 1;
+    resolving = false;
+    updateStoreAvailability();
     renderGrid();
     checkLevelUp();
     checkGameOver();
     return;
   }
 
-  // Increment combo
-  combo++;
-  const comboMultiplier = Math.min(combo, 10); // Cap at 10x
+  comboChain++;
+  comboMultiplier = Math.min(MAX_COMBO_MULTIPLIER, 1 + (comboChain - 1) * 0.4);
 
-  // Calculate score with combo bonus
-  matches.forEach(m => {
-    const baseScore = m.length * 10;
-    const bonusScore = baseScore * comboMultiplier;
-    score += bonusScore;
+  const matchSet = collectMatchSet(groups);
+  const explodedSet = expandSpecials(matchSet);
+  const matchCells = [...explodedSet].map(fromKey);
 
-    // Earn coins based on combo
-    if (combo >= 3) {
-      coins += Math.floor(combo / 2);
+  const spawns = deriveSpecialSpawns(groups);
+  const shardGain = Math.max(1, Math.floor(matchCells.length / 4)) + (comboChain > 1 ? 1 : 0);
+
+  shards += shardGain;
+  score += Math.round(matchCells.length * 12 * comboMultiplier);
+  flashStatus(`Chain x${comboChain}! +${shardGain} shards`);
+  updateStats();
+  renderGrid(explodedSet);
+
+  // Create particle effects for matched gems
+  createParticles(matchCells);
+
+  grid = clearMatches(grid, matchCells, spawns);
+  grid = applyGravity(grid);
+
+  if (resolveTimeoutId) clearTimeout(resolveTimeoutId);
+  resolveTimeoutId = setTimeout(() => {
+    if (currentRun !== runId) {
+      resolveTimeoutId = null;
+      return;
+    }
+    resolveTimeoutId = null;
+    resolveMatches();
+  }, CHAIN_REACTION_DELAY_MS);
+}
+
+function deriveSpecialSpawns(groups) {
+  const spawns = [];
+  groups.forEach(group => {
+    if (group.length < 4) return;
+    const anchor = group[Math.floor(group.length / 2)];
+    const sameRow = group.every(p => p.r === group[0].r);
+    const sameCol = group.every(p => p.c === group[0].c);
+    if (!sameRow && !sameCol) return;
+    const special = sameRow ? 'row' : 'col';
+    const kind = grid[anchor.r][anchor.c]?.kind || 'star';
+    spawns.push({ r: anchor.r, c: anchor.c, kind, special });
+
+    if (group.length >= 5) {
+      const extra = group[0];
+      spawns.push({ r: extra.r, c: extra.c, kind: 'wild', special: 'wild' });
     }
   });
 
-  updateStats();
-
-  // Show combo visual feedback
-  if (combo >= 2) {
-    showComboEffect(combo);
-  }
-
-  // Animate matched cells
-  animateMatches(matches);
-
-  grid = clearMatches(grid, matches);
-  grid = applyGravity(grid);
-  renderGrid();
-
-  // chain reactions
-  setTimeout(resolveMatches, CHAIN_REACTION_DELAY_MS);
+  const unique = new Map();
+  spawns.forEach(s => unique.set(key(s.r, s.c), s));
+  return [...unique.values()];
 }
 
-function showComboEffect(comboCount) {
-  const banner = document.getElementById('match-combo-banner');
-  if (banner) {
-    let comboText = `${comboCount}x COMBO!`;
-    if (comboCount >= 5) comboText = `🔥 ${comboCount}x MEGA COMBO! 🔥`;
-    if (comboCount >= 8) comboText = `⚡ ${comboCount}x SUPER COMBO! ⚡`;
-
-    banner.textContent = comboText;
-    banner.classList.remove('hidden');
-    banner.classList.add('combo-pulse');
-
-    setTimeout(() => {
-      banner.classList.add('hidden');
-      banner.classList.remove('combo-pulse');
-    }, 800);
-  }
-}
-
-function animateMatches(matches) {
-  matches.forEach(group => {
-    group.forEach(({ r, c }) => {
-      const cell = document.querySelector(`.match-cell[data-row="${r}"][data-col="${c}"]`);
-      if (cell) {
-        cell.classList.add('match-explode');
-
-        // Create particle effect
-        createParticles(cell);
+function expandSpecials(matchSet) {
+  const expanded = new Set(matchSet);
+  matchSet.forEach(k => {
+    const { r, c } = fromKey(k);
+    const cell = grid[r][c];
+    if (!cell || !cell.special) return;
+    if (cell.special === 'wild') return;
+    if (cell.special === 'row') {
+      for (let col = 0; col < GRID_SIZE; col++) expanded.add(key(r, col));
+    } else if (cell.special === 'col') {
+      for (let row = 0; row < GRID_SIZE; row++) expanded.add(key(row, c));
+    } else {
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          const nr = r + dr;
+          const nc = c + dc;
+          if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+            expanded.add(key(nr, nc));
+          }
+        }
       }
-    });
+    }
   });
+  return expanded;
 }
 
-function createParticles(cell) {
-  const rect = cell.getBoundingClientRect();
-  const container = document.getElementById('match-grid');
-  const containerRect = container.getBoundingClientRect();
+function collectMatchSet(groups) {
+  const set = new Set();
+  groups.forEach(g => g.forEach(({ r, c }) => set.add(key(r, c))));
+  return set;
+}
 
-  for (let i = 0; i < 8; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
+function addMoves(amount) {
+  moves += amount;
+  flashStatus(`+${amount} moves restored`);
+}
 
-    const angle = (Math.PI * 2 * i) / 8;
-    const distance = 30 + Math.random() * 20;
-    const dx = Math.cos(angle) * distance;
-    const dy = Math.sin(angle) * distance;
-
-    particle.style.left = (rect.left - containerRect.left + rect.width / 2) + 'px';
-    particle.style.top = (rect.top - containerRect.top + rect.height / 2) + 'px';
-    particle.style.setProperty('--dx', dx + 'px');
-    particle.style.setProperty('--dy', dy + 'px');
-
-    container.appendChild(particle);
-
-    setTimeout(() => particle.remove(), 600);
+function injectSpecial(special) {
+  if (resolving) {
+    flashStatus('Wait for chain reaction to finish');
+    return;
   }
+  const openCells = [];
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      openCells.push({ r, c });
+    }
+  }
+  const target = openCells[Math.floor(Math.random() * openCells.length)];
+  const existingKind = grid[target.r][target.c]?.kind || 'star';
+  grid[target.r][target.c] = { kind: special === 'wild' ? 'wild' : existingKind, special };
+  flashStatus(`${specialLabel(special)} placed`);
+  renderGrid();
+}
+
+function specialLabel(special) {
+  if (special === 'row') return 'Line rune';
+  if (special === 'col') return 'Column rune';
+  if (special === 'bomb') return 'Crystal bomb';
+  return 'Rainbow wild';
+}
+
+function purchase(item) {
+  if (resolving) {
+    flashStatus('Wait for chain reaction to finish');
+    return;
+  }
+  if (shards < item.cost) {
+    flashStatus('Not enough shards');
+    return;
+  }
+  shards -= item.cost;
+  item.action();
+  updateStats();
+}
+
+function renderStore() {
+  if (storeBound) return;
+  const container = document.getElementById('match-store-items');
+  if (!container) return;
+  container.innerHTML = '';
+  STORE_ITEMS.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'store-item';
+    btn.dataset.itemId = item.id;
+    btn.innerHTML = `
+      <div class="store-title">${item.label}</div>
+      <div class="store-meta">Cost: ${item.cost} shards • ${item.detail}</div>
+    `;
+    btn.onclick = () => purchase(item);
+    container.appendChild(btn);
+  });
+  storeBound = true;
+}
+
+function updateStats() {
+  const scoreEl = document.getElementById('match-score');
+  const movesEl = document.getElementById('match-moves');
+  const levelEl = document.getElementById('match-level');
+  const comboEl = document.getElementById('match-combo');
+  const chainEl = document.getElementById('match-chain');
+  const shardEl = document.getElementById('match-shards');
+
+  // Trigger score pop animation on significant score changes
+  const prevScore = parseInt(scoreEl?.textContent || '0');
+  const scoreChange = score - prevScore;
+
+  if (scoreEl) {
+    scoreEl.textContent = score;
+    if (scoreChange > 20) {
+      const scoreDiv = scoreEl.parentElement;
+      scoreDiv?.classList.add('score-pop');
+      setTimeout(() => scoreDiv?.classList.remove('score-pop'), 500);
+    }
+  }
+
+  if (movesEl) movesEl.textContent = moves;
+  if (levelEl) levelEl.textContent = level;
+  if (comboEl) comboEl.textContent = `${comboMultiplier.toFixed(1)}x`;
+  if (chainEl) chainEl.textContent = comboChain > 0 ? `Chain ${comboChain}` : 'Chain 0';
+  if (shardEl) shardEl.textContent = shards;
+  updateStoreAvailability();
+
+  // Add visual feedback for active combos
+  const comboChip = comboEl?.closest('.momentum-chip');
+  const chainChip = chainEl?.closest('.momentum-chip');
+
+  if (comboChip) {
+    comboChip.classList.toggle('active', comboMultiplier > 1);
+  }
+  if (chainChip) {
+    chainChip.classList.toggle('active', comboChain > 0);
+  }
+}
+
+function updateStoreAvailability() {
+  const buttons = document.querySelectorAll('.store-item');
+  buttons.forEach(button => {
+    button.disabled = resolving;
+  });
 }
 
 function checkLevelUp() {
@@ -323,7 +416,6 @@ function checkLevelUp() {
     onLevelComplete(level, score, db, user);
     level++;
     moves += 10;
-    coins += 50; // Bonus coins on level up
     updateStats();
   }
 }
@@ -338,101 +430,79 @@ function checkGameOver() {
   }
 }
 
-// Store functionality
-export function toggleStore() {
-  const storePanel = document.getElementById('match-store-panel');
-  if (storePanel) {
-    storePanel.classList.toggle('hidden');
-  }
-}
-
-export function purchasePowerUp(type, cost) {
-  if (coins < cost) {
-    alert('Not enough coins!');
-    return;
-  }
-
-  coins -= cost;
-  powerUps[type]++;
-  updateStats();
-  updateStoreDisplay();
-  updatePowerUpButtons();
-
-  const storeItem = document.getElementById(`store-${type}`);
-  if (storeItem) {
-    storeItem.classList.add('purchase-flash');
-    setTimeout(() => storeItem.classList.remove('purchase-flash'), 300);
-  }
-}
-
-export function activatePowerUp(type) {
-  if (powerUps[type] <= 0) {
-    alert(`No ${type} power-ups available! Purchase from the store.`);
-    return;
-  }
-
-  activePowerUp = type;
-  updatePowerUpButtons();
-
-  // Show instruction banner
-  const banner = document.getElementById('match-combo-banner');
+function flashStatus(text) {
+  const banner = document.getElementById('match-badge-banner');
   if (banner) {
-    banner.textContent = `Click any gem to use ${type.toUpperCase()} power-up!`;
+    banner.textContent = text;
     banner.classList.remove('hidden');
-    setTimeout(() => banner.classList.add('hidden'), 2000);
+    if (statusTimeoutId) clearTimeout(statusTimeoutId);
+    statusTimeoutId = setTimeout(() => {
+      banner.classList.add('hidden');
+      statusTimeoutId = null;
+    }, 2000);
   }
 }
 
-function updatePowerUpButtons() {
-  const gridContainer = document.getElementById('match-grid');
-
-  // Update visual state of power-up buttons
-  ['bomb', 'lightning', 'rainbow'].forEach(type => {
-    const btn = document.getElementById(`use-${type}`);
-    if (btn) {
-      if (activePowerUp === type) {
-        btn.classList.add('power-up-active');
-      } else {
-        btn.classList.remove('power-up-active');
-      }
-
-      btn.disabled = powerUps[type] <= 0;
-    }
-  });
-
-  // Update grid cursor style
-  if (gridContainer) {
-    if (activePowerUp) {
-      gridContainer.classList.add('power-up-mode');
-    } else {
-      gridContainer.classList.remove('power-up-mode');
-    }
-  }
+function key(r, c) {
+  return `${r}:${c}`;
 }
 
-function updateStoreDisplay() {
-  const elements = {
-    bomb: document.getElementById('store-bomb-count'),
-    lightning: document.getElementById('store-lightning-count'),
-    rainbow: document.getElementById('store-rainbow-count'),
-  };
+function fromKey(k) {
+  const [r, c] = k.split(':').map(Number);
+  return { r, c };
+}
 
-  Object.keys(elements).forEach(type => {
-    if (elements[type]) {
-      elements[type].textContent = powerUps[type];
-    }
-  });
+function createParticles(matchCells) {
+  const container = document.getElementById('match-grid');
+  if (!container) return;
 
-  // Also update use button counts
-  ['bomb', 'lightning', 'rainbow'].forEach(type => {
-    const countElem = document.getElementById(`use-${type}-count`);
-    if (countElem) {
-      countElem.textContent = powerUps[type];
+  matchCells.forEach(({ r, c }) => {
+    const cellEl = container.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+    if (!cellEl) return;
+
+    const rect = cellEl.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // Create 6-8 particles per gem
+    const particleCount = 6 + Math.floor(Math.random() * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+
+      // Random color based on gem type
+      const cell = grid[r][c];
+      const colors = {
+        'heart': '#ff6b9d',
+        'star': '#ffd700',
+        'cross': '#7ea6ff',
+        'flame': '#ff6347',
+        'drop': '#4fc3f7',
+        'wild': '#7effd8'
+      };
+      particle.style.background = colors[cell?.kind] || '#7effd8';
+      if (cell?.kind === 'star') particle.style.backgroundImage = `url('${STAR_SHEET_URL}')`;
+      if (cell?.kind === 'drop') particle.style.backgroundImage = `url('${SHOOTING_STAR_FX_URL}')`;
+      if (cell?.special === 'wild') particle.style.backgroundImage = `url('${SUPERNOVA_FX_URL}')`;
+
+      // Position relative to cell
+      const offsetX = rect.left - containerRect.left + rect.width / 2;
+      const offsetY = rect.top - containerRect.top + rect.height / 2;
+      particle.style.left = offsetX + 'px';
+      particle.style.top = offsetY + 'px';
+
+      // Random trajectory
+      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+      const distance = 30 + Math.random() * 40;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.setProperty('--ty', ty + 'px');
+
+      container.appendChild(particle);
+
+      // Remove after animation
+      setTimeout(() => particle.remove(), 800);
     }
   });
 }
-
-// Make functions globally accessible
-window.toggleStore = toggleStore;
-window.purchasePowerUp = purchasePowerUp;
-window.activatePowerUp = activatePowerUp;
