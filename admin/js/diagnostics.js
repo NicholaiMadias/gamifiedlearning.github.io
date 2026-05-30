@@ -55,10 +55,11 @@ function timeoutSignal(ms) {
 
 /** Well-known hostnames to probe */
 const DNS_TARGETS = [
-  { host: 'amazinggracehl.org',       label: 'Main site' },
-  { host: 'admin.amazinggracehl.org', label: 'Admin panel' },
-  { host: '1.1.1.1',                  label: 'Cloudflare DNS' },
-  { host: '8.8.8.8',                  label: 'Google DNS' },
+  { host: 'amazinggracehl.org',    label: 'Main site' },
+  { host: 'pages.github.com',      label: 'GitHub Pages' },
+  { host: 'dns.google',            label: 'Google DNS' },
+  { host: '8.8.8.8',               label: 'Google DNS (IP)' },
+  { host: 'raw.githubusercontent.com', label: 'GitHub CDN' },
 ];
 
 /**

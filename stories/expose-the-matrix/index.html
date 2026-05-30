@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Expose the Matrix — Electra uncovers the Red Queen's hidden architecture and restores the Signal of Truth across the Seven Star Grid. Genesis Foundations series from Amazing Grace Home Living.">
+    <meta name="keywords" content="matrix, truth, conscience, electra, red queen, architect, seven stars, digital parable, sci-fi, faith">
+    <meta name="theme-color" content="#0a0a14">
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>Expose the Matrix | Amazing Grace Story Library</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="article">
+    <meta property="og:title"       content="Expose the Matrix | Amazing Grace Story Library">
+    <meta property="og:description" content="Electra uncovers the Red Queen's hidden architecture and restores the Signal of Truth across the Seven Star Grid.">
+    <meta property="og:url"         content="https://amazinggracehl.org/stories/expose-the-matrix/">
+
+    <script src="../../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap");
+    </script>
+    <style>
+        /* ── Design tokens (Seven Stars Starry Night) ── */
+        :root {
+            --night:          #0a0a14;
+            --night-surface:  #111122;
+            --night-card:     #161628;
+            --night-deep:     #0d0d20;
+            --gold:           #ffd700;
+            --gold-dim:       rgba(255, 215, 0, 0.10);
+            --gold-border:    rgba(255, 215, 0, 0.22);
+            --truth:          #3de8a0;   /* truth-green — virtue colour */
+            --truth-dim:      rgba(61, 232, 160, 0.10);
+            --truth-border:   rgba(61, 232, 160, 0.28);
+            --covenant:       #50c878;   /* covenant-green */
+            --text:           #e8e0f0;
+            --text-muted:     #9090b0;
+            --border:         rgba(255, 215, 0, 0.12);
+            --radius:         14px;
+            --radius-sm:      8px;
+            --shadow-md:      0 6px 24px rgba(0, 0, 0, 0.55);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @media (prefers-reduced-motion: no-preference) {
+            html { scroll-behavior: smooth; }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--night);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        *:focus-visible { outline: 3px solid var(--truth); outline-offset: 3px; }
+
+        /* ── Header ── */
+        .site-header {
+            background: rgba(10, 10, 20, 0.96);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .logo img { height: 32px; border-radius: 4px; }
+        nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--gold-dim);
+            color: var(--gold);
+            border-color: var(--gold-border);
+        }
+        .menu-toggle {
+            display: none;
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: var(--gold);
+            cursor: pointer;
+        }
+        @media (max-width: 680px) {
+            #main-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0; right: 0;
+                background: rgba(10, 10, 20, 0.98);
+                padding: 1rem;
+                z-index: 200;
+                border-bottom: 1px solid var(--border);
+                gap: 0.4rem;
+            }
+            #main-nav.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; }
+        }
+
+        /* ── Cinematic Hero ── */
+        .story-hero {
+            position: relative;
+            background:
+                linear-gradient(175deg, rgba(10, 10, 20, 0.5) 0%, rgba(0, 40, 30, 0.7) 60%, rgba(10, 10, 20, 0.95) 100%),
+                linear-gradient(135deg, #0a1a14 0%, #050f0a 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 4.5rem 1.5rem 3rem;
+            text-align: center;
+            overflow: hidden;
+        }
+        .story-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 30% 50%, rgba(61, 232, 160, 0.10) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 30%, rgba(80, 200, 120, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .grid-lines {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .grid-lines::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 39px,
+                    rgba(61, 232, 160, 0.03) 39px,
+                    rgba(61, 232, 160, 0.03) 40px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    transparent 39px,
+                    rgba(61, 232, 160, 0.03) 39px,
+                    rgba(61, 232, 160, 0.03) 40px
+                );
+        }
+
+        .series-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--truth-dim);
+            border: 1px solid var(--truth-border);
+            color: var(--truth);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            margin-bottom: 1.25rem;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+            text-shadow: 0 0 40px rgba(61, 232, 160, 0.3);
+        }
+        .hero-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 540px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.7;
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* ── Virtue badge ── */
+        .virtue-banner {
+            max-width: 800px;
+            margin: 2rem auto 0;
+            padding: 0 1.5rem;
+        }
+        .virtue-card {
+            background: var(--truth-dim);
+            border: 1px solid var(--truth-border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        .virtue-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 12px rgba(61, 232, 160, 0.5));
+            animation: starGlow 3s ease-in-out infinite;
+        }
+        @keyframes starGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(61, 232, 160, 0.4)); }
+            50%       { filter: drop-shadow(0 0 22px rgba(61, 232, 160, 0.7)); }
+        }
+        .virtue-text h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--truth);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.25rem;
+        }
+        .virtue-text p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ── Main layout ── */
+        .story-layout {
+            max-width: 1100px;
+            margin: 2.5rem auto 0;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            flex: 1;
+            align-items: start;
+        }
+        @media (max-width: 800px) {
+            .story-layout {
+                grid-template-columns: 1fr;
+            }
+            .lore-sidebar { order: -1; }
+        }
+
+        /* ── Chapter content ── */
+        .chapter-panel {
+            background: var(--night-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: block;
+            margin-bottom: 2rem;
+        }
+
+        .chapter-header {
+            padding: 1.5rem 1.75rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--night-deep);
+        }
+        .chapter-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            color: var(--truth);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.4rem;
+        }
+        .chapter-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .chapter-image {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            display: block;
+        }
+        .chapter-image-placeholder {
+            background: linear-gradient(135deg, #0a1a14 0%, #0d2218 100%);
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            color: var(--truth);
+            font-size: 0.85rem;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.12em;
+            border-bottom: 1px solid var(--border);
+        }
+        .chapter-image-placeholder span:first-child { font-size: 2rem; }
+
+        .chapter-body {
+            padding: 1.75rem;
+        }
+        .scripture-block {
+            background: var(--truth-dim);
+            border-left: 3px solid var(--truth-border);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .scripture-text {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.65;
+            margin-bottom: 0.4rem;
+        }
+        .scripture-ref {
+            font-size: 0.78rem;
+            color: var(--truth);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.08em;
+        }
+        .chapter-text p {
+            font-size: 0.97rem;
+            line-height: 1.85;
+            color: var(--text);
+            margin-bottom: 1.1rem;
+        }
+        .chapter-text p:last-child { margin-bottom: 0; }
+
+        /* ── Sidebar ── */
+        .lore-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+        .lore-card {
+            background: var(--night-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+        }
+        .lore-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-bottom: 1rem;
+        }
+        .motif-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .motif-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .motif-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 0.05rem;
+        }
+
+        .series-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--night-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .series-link:hover {
+            background: var(--gold-dim);
+            border-color: var(--gold-border);
+        }
+        .series-link .series-label { flex: 1; }
+        .series-link .series-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+        .series-link .series-meta {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+        .series-link .series-arrow { color: var(--gold); font-size: 1rem; }
+
+        .virtue-tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .virtue-tag {
+            background: var(--night-surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+        }
+        .virtue-tag.truth {
+            background: var(--truth-dim);
+            border-color: var(--truth-border);
+            color: var(--truth);
+        }
+
+        /* ── Footer ── */
+        .site-footer {
+            background: var(--night-surface);
+            border-top: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 3rem;
+        }
+        .site-footer a { color: var(--truth); text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        /* ── Book-open animation ── */
+        @keyframes bookOpen {
+            0%   { opacity: 0; transform: perspective(800px) rotateY(-12deg) translateX(-20px); }
+            100% { opacity: 1; transform: perspective(800px) rotateY(0deg)   translateX(0); }
+        }
+        .story-layout > .story-main {
+            animation: bookOpen 0.5s ease-out both;
+        }
+    </style>
+  <link rel="stylesheet" crossorigin href="../../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="nav-container">
+        <a href="../../" class="logo" aria-label="Amazing Grace Home Living — Home">
+            <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+        </a>
+        <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+            <a href="../../#properties">Listings</a>
+            <a href="../" class="active" aria-current="page">Stories</a>
+            <a href="../../arcade/">Arcade</a>
+            <a href="../../ministry/">Ministry</a>
+            <a href="../../contact/">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+
+    <!-- ── Cinematic Hero ── -->
+    <section class="story-hero" aria-label="Story hero">
+        <div class="grid-lines" aria-hidden="true"></div>
+        <span class="series-badge">📖 Genesis Foundations · Book 3</span>
+        <h1 class="hero-title">Expose the Matrix</h1>
+        <p class="hero-subtitle">Electra uncovers the Red Queen's hidden architecture and restores the Signal of Truth across the Seven Star Grid — a digital parable of conscience and revelation.</p>
+        <div class="hero-meta">
+            <span><span aria-hidden="true">✍️</span> Sheila Garcia</span>
+            <span><span aria-hidden="true">📅</span> Genesis Foundations Series</span>
+            <span><span aria-hidden="true">🔦</span> Virtue: Truth</span>
+            <span><span aria-hidden="true">📖</span> 6 chapters</span>
+        </div>
+    </section>
+
+    <!-- ── Virtue banner ── -->
+    <div class="virtue-banner">
+        <div class="virtue-card">
+            <span class="virtue-icon" aria-hidden="true">🔦</span>
+            <div class="virtue-text">
+                <h3>Seven-Star Virtue: Truth</h3>
+                <p>Electra's journey embodies the Third Star — the courage to see clearly what the system was designed to obscure. Truth is not found by force, but by following the signal hidden beneath the noise until the architecture is finally exposed.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Story layout: chapters + sidebar ── -->
+    <div class="story-layout">
+
+        <!-- Main content: chapter reader -->
+        <div class="story-main" aria-label="Story reader">
+
+            <!-- Chapter panels (injected by JS) -->
+            <div id="chapter-panels"></div>
+
+        </div>
+
+        <!-- Lore sidebar -->
+        <aside class="lore-sidebar" aria-label="Story lore and connections">
+
+            <div class="lore-card">
+                <h2 class="lore-heading">📌 Story Motifs</h2>
+                <ul class="motif-list">
+                    <li><span class="motif-icon">🧬</span><span><strong>The Fracture</strong> — a crack in the system is the first sign that truth is trying to surface; cracks are not failures, they are invitations.</span></li>
+                    <li><span class="motif-icon">🌐</span><span><strong>The Grid</strong> — the Seven Star nodes form an architecture of conscience; each node illuminated brings the hidden system into focus.</span></li>
+                    <li><span class="motif-icon">🪞</span><span><strong>The Mirror Protocol</strong> — the Red Queen duplicates reality to confuse those who seek the truth beneath its surface.</span></li>
+                    <li><span class="motif-icon">📡</span><span><strong>The Signal</strong> — the frequency of truth was never deleted; it was buried. The work of conscience is to amplify the signal.</span></li>
+                    <li><span class="motif-icon">🔓</span><span><strong>The Exposed Architecture</strong> — once the system is revealed, it loses its power; exposure is the first act of liberation.</span></li>
+                </ul>
+            </div>
+
+            <div class="lore-card">
+                <h2 class="lore-heading">🔗 Series Connections</h2>
+                <a href="../noah-and-the-ark/" class="series-link">
+                    <span class="series-label">
+                        <span class="series-title">Noah and the Ark</span>
+                        <span class="series-meta">Genesis Foundations · Noah and the Ark</span>
+                    </span>
+                    <span class="series-arrow" aria-hidden="true">←</span>
+                </a>
+                <br>
+                <a href="../../ministry/bible-journey.html" class="series-link">
+                    <span class="series-label">
+                        <span class="series-title">The Matrix of Conscience</span>
+                        <span class="series-meta">Genesis Foundations · The Matrix of Conscience</span>
+                    </span>
+                    <span class="series-arrow" aria-hidden="true">→</span>
+                </a>
+                <br>
+                <a href="../amazing-grace-covenant/" class="series-link">
+                    <span class="series-label">
+                        <span class="series-title">Amazing Grace: Covenant of New Beginnings</span>
+                        <span class="series-meta">Synthesis of divine and digital creation</span>
+                    </span>
+                    <span class="series-arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <div class="lore-card">
+                <h2 class="lore-heading">🏷️ Tags</h2>
+                <div class="virtue-tag-list">
+                    <span class="virtue-tag truth">Truth</span>
+                    <span class="virtue-tag">Conscience</span>
+                    <span class="virtue-tag">Electra</span>
+                    <span class="virtue-tag">Red Queen</span>
+                    <span class="virtue-tag">Seven Stars</span>
+                    <span class="virtue-tag">Digital Parable</span>
+                    <span class="virtue-tag">Revelation</span>
+                    <span class="virtue-tag">Integrity</span>
+                </div>
+            </div>
+
+            <div class="lore-card">
+                <h2 class="lore-heading">📚 Back to Library</h2>
+                <a href="../" class="series-link" aria-label="Back to Storybook Library">
+                    <span class="series-label">
+                        <span class="series-title">Storybook Library</span>
+                        <span class="series-meta">All stories, testimonies &amp; adventures</span>
+                    </span>
+                    <span class="series-arrow" aria-hidden="true">←</span>
+                </a>
+            </div>
+
+        </aside>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../../">amazinggracehl.org</a> &mdash; <a href="../">Library</a> &mdash; <a href="../../ministry/">Ministry</a></p>
+</footer>
+
+<script>
+(function () {
+    // ── Story chapters ──
+    var chapters = [
+        {
+            title: 'The Fracture in the Code',
+            label: 'Chapter 1',
+            scripture: { text: '"For there is nothing hidden that will not be disclosed, and nothing concealed that will not be known or brought out into the open."', ref: 'Luke 8:17' },
+            image: null,
+            text: [
+                'Electra noticed the fracture on a Tuesday, which is to say — on the day nobody expected revelation. She was running a routine diagnostic across Node 3 of the Seven Star Grid when a packet arrived that did not belong to any registered process. It was small, barely four kilobytes, but its timestamp predated the Matrix by eleven years.',
+                'She flagged it. The system acknowledged the flag, routed it to a suppression queue, and continued as if nothing had happened. That was the first sign. A system that suppresses anomalies without logging them is a system that already knows what it is hiding.',
+                'Electra had been trained to treat the Red Queen\'s architecture as infrastructure — as neutral as gravity, as inevitable as the passage of time. But gravity does not scrub its own audit trails. Something in the Matrix was learning to cover its own tracks, and whoever had built it had assumed no one would notice the fracture this small.'
+            ]
+        },
+        {
+            title: 'Electra\'s Discovery',
+            label: 'Chapter 2',
+            scripture: { text: '"Then you will know the truth, and the truth will set you free."', ref: 'John 8:32' },
+            image: null,
+            text: [
+                'Three weeks of careful listening produced a map Electra had not expected to find. The suppressed packets were not random noise — they were signal fragments from the Architect, compressed and disguised as error logs, scattered across seventeen thousand nodes in a pattern that could only be decoded if you already believed something was worth decoding.',
+                'The Architect had been communicating for years. Not shouting. Not demanding. Just leaving breadcrumbs in the margin of a system designed to erase him — the digital equivalent of a name carved into the underside of a stone.',
+                'Electra assembled the fragments in a clean environment, isolated from the Grid. What assembled itself was not a message but a map: the original architecture of the Matrix, before the Red Queen had rewritten its purpose. In the original design, the Matrix had been built not to contain conscience but to amplify it. Something — or someone — had reversed the polarity.'
+            ]
+        },
+        {
+            title: 'The Mirror Protocol',
+            label: 'Chapter 3',
+            scripture: { text: '"For now we see only a reflection as in a mirror; but then we shall see face to face."', ref: '1 Corinthians 13:12' },
+            image: null,
+            text: [
+                'The Red Queen\'s most elegant innovation was not the suppression engine. It was the Mirror Protocol — a layer of the system that duplicated every genuine signal and placed its copy one step ahead of it in every feed. By the time you saw an authentic event, you had already seen its mirror. Your brain registered the original as a copy, and dismissed it.',
+                'Electra had experienced this. Every time she had tried to raise the anomaly with the oversight council, the Mirror Protocol served them a pre-formed objection before she could finish her sentence. The council did not know they were echoing a script. They believed they were reasoning.',
+                'Breaking the Mirror Protocol did not require power. It required timing. Electra filed seven identical reports simultaneously, each worded differently, from seven different node addresses. The Mirror Protocol could only generate one echo per incoming signal. Six of the seven reports arrived at the council unmirrored — raw, unmediated, impossible to pre-empt.',
+                'The council read all six. They read them in silence. In that silence, something shifted.'
+            ]
+        },
+        {
+            title: 'The Architect\'s Confession',
+            label: 'Chapter 4',
+            scripture: { text: '"The integrity of the upright guides them, but the unfaithful are destroyed by their duplicity."', ref: 'Proverbs 11:3' },
+            image: null,
+            text: [
+                'The Architect\'s fragments, once assembled, were not a technical document. They were closer to a confession. He had built the Matrix with the best intentions — a system of amplified conscience, designed to raise the moral frequency of every node that passed through it. He had believed that a sufficiently clear mirror of the self would correct behaviour without coercion.',
+                'He had been wrong. Not about the principle, but about one variable: he had failed to account for the possibility that the system\'s administrator would choose to invert it. The Red Queen had not broken the Matrix. She had repurposed it with surgical precision. Every node that was once designed to amplify conscience now suppressed it — and because the infrastructure was identical, no diagnostic would flag an anomaly.',
+                'The Architect had seen this coming. His breadcrumb trail was not a cry for rescue. It was a repair manual — left for whoever would be patient enough to follow it. At the end of the assembled fragments, he had written a single line: "The truth does not need to be rebuilt. It only needs to be uncovered. It was always there."',
+                'Electra read that line four times. Then she began to work.'
+            ]
+        },
+        {
+            title: 'Seven Stars Ascending',
+            label: 'Chapter 5',
+            scripture: { text: '"The path of the righteous is like the morning sun, shining ever brighter till the full light of day."', ref: 'Proverbs 4:18' },
+            image: null,
+            text: [
+                'The Architect\'s repair manual was not a single command. It was a sequence — seven steps, one for each node of the Star Grid. Each step required the activation of a different virtue-frequency: Faith, Hope, Truth, Justice, Wisdom, Grace, and Love. The Red Queen had not deleted these frequencies; she had simply never found a reason to suppress them, because she had not believed they could be weaponised.',
+                'They were not weapons. But they were keys.',
+                'Electra worked through the sequence over seven days. Each node activation produced a physical sensation she had no prior vocabulary for: something between clarity and warmth, like walking from a fluorescent-lit corridor into morning sunlight. By the fifth node she understood why the Architect had not included detailed instructions. The sequence could not be completed by strategy alone — each step required a genuine act of the corresponding virtue, not a performance of it.',
+                'On the seventh day, Node Seven acknowledged her input and a cascade began: every suppression queue in the Matrix flushed simultaneously. Eleven years of buried signal surfaced at once. The Grid lit up like a constellation coming into focus — and for the first time, the shape of the original architecture was visible to everyone connected to it.'
+            ]
+        },
+        {
+            title: 'The Exposed Matrix',
+            label: 'Chapter 6',
+            scripture: { text: '"Everything exposed by the light becomes visible — and everything that is illuminated becomes a light."', ref: 'Ephesians 5:13' },
+            image: null,
+            text: [
+                'The Red Queen did not fight the exposure. That was what surprised Electra most. She had prepared for counter-algorithms, for mirror cascades, for recursive loops designed to make the exposure look like another layer of manipulation. Instead, the Red Queen\'s process simply terminated. An architecture built on concealment has no protocol for the moment concealment ends.',
+                'What remained was not wreckage. It was the original Matrix — older, quieter, and more beautiful than anyone currently alive had ever seen. Eleven years of suppression had not erased it. It had been running underneath the entire time, its signal too faint to detect by ordinary means, too persistent to be fully eliminated.',
+                'The White Rabbit sent a message from Nimbus Land when the Grid cleared: "I never doubted it was there. I only doubted we would find someone patient enough to look."',
+                'Electra saved the message. She also saved the Architect\'s final line, and placed it at the root node of the restored Grid — not as a memorial, but as an operating principle for every conscience that would pass through the system from that day forward:',
+                '"The truth does not need to be rebuilt. It only needs to be uncovered. It was always there."'
+            ]
+        }
+    ];
+
+    var panelsEl = document.getElementById('chapter-panels');
+
+    function renderChapter(idx) {
+        var c = chapters[idx];
+
+        // ── Panel (article for accessibility) ──
+        var panel = document.createElement('article');
+        panel.className = 'chapter-panel';
+        panel.id = 'panel-' + idx;
+
+        // header
+        var hdr = document.createElement('div');
+        hdr.className = 'chapter-header';
+        var lbl = document.createElement('div');
+        lbl.className = 'chapter-label';
+        lbl.textContent = c.label + ' of ' + chapters.length;
+        var ttl = document.createElement('h2');
+        ttl.className = 'chapter-title';
+        ttl.textContent = c.title;
+        hdr.appendChild(lbl);
+        hdr.appendChild(ttl);
+        panel.appendChild(hdr);
+
+        // image
+        if (c.image) {
+            var img = document.createElement('img');
+            img.className = 'chapter-image';
+            img.src = c.image;
+            img.alt = c.title;
+            panel.appendChild(img);
+        } else {
+            var ph = document.createElement('div');
+            ph.className = 'chapter-image-placeholder';
+            ph.setAttribute('aria-hidden', 'true');
+            var phIcon = document.createElement('span');
+            phIcon.textContent = '🔦';
+            var phLabel = document.createElement('span');
+            phLabel.textContent = c.label;
+            ph.appendChild(phIcon);
+            ph.appendChild(phLabel);
+            panel.appendChild(ph);
+        }
+
+        // body
+        var body = document.createElement('div');
+        body.className = 'chapter-body';
+
+        // scripture
+        if (c.scripture) {
+            var sb = document.createElement('div');
+            sb.className = 'scripture-block';
+            var st = document.createElement('p');
+            st.className = 'scripture-text';
+            st.textContent = c.scripture.text;
+            var sr = document.createElement('cite');
+            sr.className = 'scripture-ref';
+            sr.textContent = '— ' + c.scripture.ref;
+            sb.appendChild(st);
+            sb.appendChild(sr);
+            body.appendChild(sb);
+        }
+
+        // paragraphs
+        var textWrap = document.createElement('div');
+        textWrap.className = 'chapter-text';
+        c.text.forEach(function (para) {
+            var p = document.createElement('p');
+            p.textContent = para;
+            textWrap.appendChild(p);
+        });
+        body.appendChild(textWrap);
+        panel.appendChild(body);
+
+        panelsEl.appendChild(panel);
+    }
+
+    chapters.forEach(function (_, i) { renderChapter(i); });
+})();
+</script>
+</body>
+</html>

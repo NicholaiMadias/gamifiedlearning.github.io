@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ella — The Relic Runner, High-Speed Historian. Character dossier from the Nexus Arcade at Amazing Grace Home Living.">
+    <meta name="theme-color" content="#0a0a14">
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>Ella — The Relic Runner | Nexus Archive | Amazing Grace</title>
+
+    <script src="../../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap");
+    </script>
+    <style>
+        :root {
+            --night:         #0a0a14;
+            --night-surface: #111122;
+            --night-card:    #161628;
+            --gold:          #ffd700;
+            --gold-dim:      rgba(255,215,0,0.10);
+            --gold-border:   rgba(255,215,0,0.22);
+            --teal:          #2dd4bf;
+            --teal-dim:      rgba(45,212,191,0.10);
+            --teal-border:   rgba(45,212,191,0.28);
+            --red:           #f87171;
+            --text:          #e8e0f0;
+            --text-muted:    #9090b0;
+            --border:        rgba(255,215,0,0.12);
+            --radius:        14px;
+            --radius-sm:     8px;
+            --shadow-md:     0 6px 24px rgba(0,0,0,0.55);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @media (prefers-reduced-motion: no-preference) {
+            html { scroll-behavior: smooth; }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--night);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        *:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+
+        /* ── Header ── */
+        .site-header {
+            background: rgba(10,10,20,0.96);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .logo img { height: 32px; border-radius: 4px; }
+        nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--gold-dim);
+            color: var(--gold);
+            border-color: var(--gold-border);
+        }
+        .menu-toggle {
+            display: none;
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: var(--gold);
+            cursor: pointer;
+        }
+        @media (max-width: 680px) {
+            #main-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0; right: 0;
+                background: rgba(10,10,20,0.98);
+                padding: 1rem;
+                z-index: 200;
+                border-bottom: 1px solid var(--border);
+                gap: 0.4rem;
+            }
+            #main-nav.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; }
+        }
+
+        /* ── Breadcrumb ── */
+        .breadcrumb {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 0.6rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--night-surface);
+        }
+        .breadcrumb a {
+            color: var(--teal);
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* ── Hero ── */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0a0a14 0%, #0d1a2e 60%, #0a0a14 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1000px;
+            margin: 0 auto;
+            align-items: center;
+            gap: 2rem;
+            padding: 3rem 1.5rem;
+        }
+        @media (max-width: 680px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+                padding: 2rem 1.5rem;
+            }
+            .hero-img-wrap { order: -1; }
+        }
+        .hero-img-wrap {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(45,212,191,0.25), var(--shadow-md);
+            border: 1px solid var(--teal-border);
+        }
+        .hero-img-wrap img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .dossier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--teal-dim);
+            border: 1px solid var(--teal-border);
+            color: var(--teal);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .hero-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: 0.06em;
+            line-height: 1;
+            margin-bottom: 0.4rem;
+            text-shadow: 0 0 40px rgba(45,212,191,0.4);
+        }
+        .hero-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--teal);
+            letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+        }
+        .hero-quote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+            border-left: 3px solid var(--teal);
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .trait-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .trait {
+            background: var(--night-card);
+            border: 1px solid var(--teal-border);
+            color: var(--teal);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── Stats bar ── */
+        .stats-section {
+            background: var(--night-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+        }
+        .stats-inner {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        .section-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1.25rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.25rem;
+        }
+        .stat-item { display: flex; flex-direction: column; gap: 0.3rem; }
+        .stat-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; display: flex; justify-content: space-between; }
+        .stat-value { font-family: 'Orbitron', sans-serif; font-size: 0.82rem; color: var(--teal); }
+        .stat-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--teal), #5eead4);
+            transition: width 0.5s ease;
+        }
+        .stat-fill.danger { background: linear-gradient(90deg, var(--red), #fca5a5); }
+
+        /* ── Content sections ── */
+        .content-section {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .content-section:last-of-type { border-bottom: none; }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1.5rem;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .card {
+            background: var(--night-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+        }
+        .card-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .card h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.4rem;
+        }
+        .card p {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .mechanic-card {
+            background: var(--night-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .mechanic-card:last-child { margin-bottom: 0; }
+        .mechanic-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+        .mechanic-icon { font-size: 1.25rem; }
+        .mechanic-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+        .mechanic-subtitle { font-size: 0.78rem; color: var(--text-muted); }
+        .mechanic-card p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 0.6rem; }
+        .mechanic-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .tag-positive {
+            background: var(--teal-dim);
+            border: 1px solid var(--teal-border);
+            color: var(--teal);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+        .tag-warning {
+            background: rgba(251,191,36,0.10);
+            border: 1px solid rgba(251,191,36,0.25);
+            color: #fbbf24;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        /* ── Growth Arc ── */
+        .arc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            counter-reset: arc;
+        }
+        .arc-card {
+            background: var(--night-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            border-top: 3px solid var(--teal);
+        }
+        .arc-card:nth-child(2) { border-top-color: #fbbf24; }
+        .arc-card:nth-child(3) { border-top-color: #a78bfa; }
+        .arc-phase {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 0.4rem;
+        }
+        .arc-card:nth-child(2) .arc-phase { color: #fbbf24; }
+        .arc-card:nth-child(3) .arc-phase { color: #a78bfa; }
+        .arc-card h3 { font-size: 0.9rem; color: var(--text); font-weight: 700; margin-bottom: 0.5rem; }
+        .arc-card p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* ── Footer ── */
+        .site-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .site-footer a { color: var(--teal); text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../../#properties">Listings</a>
+                <a href="../" class="active" aria-current="page">Stories</a>
+                <a href="../../arcade/">Arcade</a>
+                <a href="../../ministry/">Ministry</a>
+                <a href="../../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../../">Home</a> › <a href="../">Stories</a> › <a href="../#characters">Characters</a> › Ella
+    </nav>
+
+    <!-- ── Hero ── -->
+    <section class="hero" aria-labelledby="ella-name">
+        <div class="hero-inner">
+            <div class="hero-content">
+                <div class="dossier-badge">⭐ Character Dossier — Nexus Archive</div>
+                <h1 id="ella-name" class="hero-name">ELLA</h1>
+                <p class="hero-title">The Relic Runner — High-Speed Historian</p>
+                <blockquote class="hero-quote">
+                    "History is moving at the speed of light — if we blink, we lose it.
+                    Now, can we PLEASE hurry up and save that toaster? It's pre-Collapse!"
+                </blockquote>
+                <div class="trait-list" aria-label="Character traits">
+                    <span class="trait">⚡ High-Speed Historian</span>
+                    <span class="trait">💛 Relic Romantic</span>
+                    <span class="trait">🌀 Unfiltered Kinetic</span>
+                    <span class="trait">🔔 Jingle Rig Carrier</span>
+                    <span class="trait">🔍 Flash-Scanner</span>
+                </div>
+            </div>
+            <div class="hero-img-wrap">
+                <img src="../../assets/Ella-DcI0GxOJ.jpg" alt="Ella — The Relic Runner, standing before a glowing circuit tree over a night cityscape">
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Stats ── -->
+    <section class="stats-section" aria-labelledby="stats-heading">
+        <div class="stats-inner">
+            <p id="stats-heading" class="section-label">🪪 Core Stats</p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label"><span>Speed</span><span class="stat-value">95</span></div>
+                    <div class="stat-bar"><div class="stat-fill" style="width:95%" role="img" aria-label="Speed 95 out of 100"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label"><span>Knowledge</span><span class="stat-value">88</span></div>
+                    <div class="stat-bar"><div class="stat-fill" style="width:88%" role="img" aria-label="Knowledge 88 out of 100"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label"><span>Empathy</span><span class="stat-value">72</span></div>
+                    <div class="stat-bar"><div class="stat-fill" style="width:72%" role="img" aria-label="Empathy 72 out of 100"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label"><span>Reckless</span><span class="stat-value">82</span></div>
+                    <div class="stat-bar"><div class="stat-fill danger" style="width:82%" role="img" aria-label="Reckless 82 out of 100"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label"><span>Stealth</span><span class="stat-value">25</span></div>
+                    <div class="stat-bar"><div class="stat-fill danger" style="width:25%" role="img" aria-label="Stealth 25 out of 100"></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+
+        <!-- ── Core Identity ── -->
+        <section class="content-section" aria-labelledby="identity-heading">
+            <h2 id="identity-heading">🪪 Core Identity</h2>
+            <p style="font-size:0.95rem; line-height:1.75; color:var(--text-muted);">
+                Ella is a "High-Speed Historian" — the friction between reverence for the past and impatience with the present.
+                She doesn't just want to study history; she wants to rescue it before the world's chaos swallows it whole.
+                Every relic she carries is a story she refuses to let die.
+            </p>
+        </section>
+
+        <!-- ── Visual Design ── -->
+        <section class="content-section" aria-labelledby="visual-heading">
+            <h2 id="visual-heading">👓 Visual Design &amp; Silhouette</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🎒</div>
+                    <h3>The "Jingle" Rig</h3>
+                    <p>A custom tactical harness covered in small pouches and carabiners. Every mission, she attaches new "treasures." The player hears a rhythmic metallic clinking whenever she moves — the sonic signature of her obsession.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🥽</div>
+                    <h3>Goggles of Preservation</h3>
+                    <p>Large, multi-lens goggles for scanning artifacts and protecting her eyes during high-speed sprints. The lenses shift color based on the era of the relic she's examining.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧣</div>
+                    <h3>The Contrast</h3>
+                    <p>Streamlined, high-performance athletic fabrics for mobility — juxtaposed with ancient, tattered scarves or patches from the eras she admires. The past literally woven into her future-forward kit.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Gameplay Mechanics ── -->
+        <section class="content-section" aria-labelledby="mechanics-heading">
+            <h2 id="mechanics-heading">🎮 Gameplay Mechanics</h2>
+
+            <div class="mechanic-card">
+                <div class="mechanic-header">
+                    <span class="mechanic-icon">🔔</span>
+                    <div>
+                        <div class="mechanic-title">The Jingle Radius</div>
+                        <div class="mechanic-subtitle">Stealth / Audio</div>
+                    </div>
+                </div>
+                <p>Ella's movement speed is 20% higher than other companions. But her "Jingle" generates a sound radius. The more Relics she carries, the larger it grows — alerting enemies.</p>
+                <div class="mechanic-tags">
+                    <span class="tag-positive">✦ +20% Move Speed</span>
+                    <span class="tag-warning">⚠ Sound Radius Scales with Inventory</span>
+                </div>
+            </div>
+
+            <div class="mechanic-card">
+                <div class="mechanic-header">
+                    <span class="mechanic-icon">📡</span>
+                    <div>
+                        <div class="mechanic-title">The Flash-Scan</div>
+                        <div class="mechanic-subtitle">Exploration</div>
+                    </div>
+                </div>
+                <p>When entering a new room, Ella performs a high-speed sweep. She automatically highlights "Historical Points of Interest" that other NPCs would ignore — unlocking secret lore and unique crafting materials.</p>
+                <div class="mechanic-tags">
+                    <span class="tag-positive">✦ Auto-Detect Hidden Items</span>
+                    <span class="tag-positive">✦ Unique Lore Unlocks</span>
+                </div>
+            </div>
+
+            <div class="mechanic-card">
+                <div class="mechanic-header">
+                    <span class="mechanic-icon">💎</span>
+                    <div>
+                        <div class="mechanic-title">Sentiment-Based Inventory</div>
+                        <div class="mechanic-subtitle">Choice / Morale</div>
+                    </div>
+                </div>
+                <p>Ella has her own "Personal Stash." She will occasionally refuse to carry heavy mission items if her stash is full of "Sentimental Junk." The player must decide whether to ask her to let go.</p>
+                <div class="mechanic-tags">
+                    <span class="tag-warning">⚠ "Let Go" lowers Morale &amp; Trust</span>
+                    <span class="tag-positive">✦ Full Stash = Higher Relic Bonuses</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Community Roles ── -->
+        <section class="content-section" aria-labelledby="roles-heading">
+            <h2 id="roles-heading">🏘️ Community Roles</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">⛏️</div>
+                    <h3>Scavenger-General</h3>
+                    <p>In "Reclamation" missions, retrieves 3× more materials — if you can keep up. Her speed makes her the most efficient resource runner in the community.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎶</div>
+                    <h3>Morale Anchor</h3>
+                    <p>Her Jingle and energy buffer community members during tasks, turning chores into expeditions. Her enthusiasm is contagious even when her noise is a liability.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Character Growth Arc ── -->
+        <section class="content-section" aria-labelledby="arc-heading">
+            <h2 id="arc-heading">📈 Character Growth Arc</h2>
+            <div class="arc-grid">
+                <div class="arc-card">
+                    <div class="arc-phase">Early Game</div>
+                    <h3>The Collector</h3>
+                    <p>Obsessive, reckless, and noisy. She values objects as much as — or more than — people. Every room is a museum exhibit she's rescuing from oblivion.</p>
+                </div>
+                <div class="arc-card">
+                    <div class="arc-phase">Mid Game</div>
+                    <h3>The Reckoning</h3>
+                    <p>She begins to realize that her "Jingle" puts the player in danger. A mission goes wrong because of her noise. She must learn the value of silence — and sacrifice some treasures.</p>
+                </div>
+                <div class="arc-card">
+                    <div class="arc-phase">End Game</div>
+                    <h3>The Living Archive</h3>
+                    <p>She understands that the community IS the living history she's been trying to save. She stops looking for artifacts and starts making new ones — crafting tools, writing records, teaching.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Back link ── -->
+        <div class="content-section" style="border-bottom:none; padding-top:1rem; padding-bottom:2rem;">
+            <a href="../#characters" class="back-link">← Back to Characters</a>
+        </div>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../../">amazinggracehl.org</a> &mdash; Nexus Arcade</p>
+    </footer>
+</body>
+</html>

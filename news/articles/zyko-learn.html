@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zyko Learn — Faith-based interactive learning through the Seven Stars Arcade, Amazing Grace Home Living.">
+    <meta name="theme-color" content="#1e3a8a">
+
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>Zyko Learn | News | Amazing Grace Home Living</title>
+
+    <script src="../../assets/vendor/tailwindcss.js"></script>
+    <script src="../../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap");
+    </script>
+    <style>
+        :root { --navy: #1e3a8a; --blue: #2563eb; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        *:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+
+        .site-header {
+            background-color: var(--navy);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
+            text-decoration: none; color: white;
+        }
+        .logo img { height: 40px; width: auto; border-radius: 4px; }
+
+        .nav-links { display: flex; gap: 0.75rem; }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.1); color: white; text-decoration: none;
+            padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.25); }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--navy);
+                padding: 1rem;
+                z-index: 100;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                gap: 0.5rem;
+            }
+            .nav-links.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; padding: 0.75rem 1rem; }
+        }
+
+        .article-hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white; text-align: center; padding: 3.5rem 1.5rem 2.5rem;
+        }
+        .article-hero .tag {
+            display: inline-block; background: rgba(255,255,255,0.2); color: white;
+            font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem;
+            border-radius: 999px; margin-bottom: 1rem; text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .article-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 0.75rem; line-height: 1.2;
+        }
+        .article-hero .meta { font-size: 0.9rem; opacity: 0.75; }
+
+        .article-container {
+            max-width: 720px; margin: 2.5rem auto; padding: 0 1.5rem;
+        }
+
+        .article-body {
+            background: white; border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 2.5rem;
+            line-height: 1.8; font-size: 1rem; color: #374151;
+        }
+
+        .article-body h2 {
+            font-family: 'Playfair Display', serif; font-size: 1.5rem;
+            color: #1e3a8a; margin: 2rem 0 0.75rem;
+        }
+
+        .article-body p { margin-bottom: 1.25rem; }
+
+        .article-body blockquote {
+            background: #eff6ff; border-left: 4px solid var(--blue);
+            padding: 1rem 1.25rem; margin: 1.5rem 0;
+            font-style: italic; color: #1e40af; font-size: 1rem; line-height: 1.6;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--blue); text-decoration: none; font-weight: 600;
+            font-size: 0.9rem; margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .breadcrumb {
+            max-width: 720px; margin: 1rem auto 0; padding: 0 1.5rem;
+            font-size: 0.825rem; color: #6b7280;
+        }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        main { flex: 1; }
+
+        .site-footer {
+            background: #1f2937; color: #9ca3af;
+            text-align: center; padding: 1.5rem; font-size: 0.875rem; margin-top: 3rem;
+        }
+        .site-footer a { color: #60a5fa; text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../../#properties">Listings</a>
+                <a href="../../stories/">Stories</a>
+                <a href="../../arcade/">Arcade</a>
+                <a href="../../ministry/">Ministry</a>
+                <a href="../../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="article-hero">
+            <span class="tag">Education</span>
+            <h1>Zyko Learn: Faith-Based Learning for the Next Generation</h1>
+            <p class="meta">Amazing Grace Home Living &mdash; May 2026</p>
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="../../">Home</a> › <a href="..">News</a> › Zyko Learn
+        </nav>
+
+        <div class="article-container">
+            <a href=".." class="back-link" aria-label="Back to News">← Back to News</a>
+
+            <article class="article-body">
+
+                <p>
+                    At Amazing Grace Home Living, we believe education and faith are not separate journeys — they are one. <strong>Zyko Learn</strong> is our vision for bringing interactive, biblically grounded learning to every resident, every neighbor, and every curious mind who walks through our doors.
+                </p>
+
+                <h2>What Is Zyko Learn?</h2>
+                <p>
+                    Zyko Learn is an educational initiative embedded within the <a href="../../arcade" style="color:#2563eb;">Seven Stars Arcade</a> platform. Drawing from the wisdom of the Pleiades — the Seven Sisters — each module is tied to one of the Seven Star virtues: Vision (Electra), Courage (Taygete), Serenity (Alcyone), Autonomy (Maia), Sustenance (Celaeno), Patience (Sterope), and Humility (Merope).
+                </p>
+                <p>
+                    Students and residents engage with interactive challenges, quizzes, and story-driven puzzles that make ancient truths feel alive and relevant in today's world.
+                </p>
+
+                <blockquote>
+                    "The fear of the Lord is the beginning of wisdom." — Proverbs 9:10
+                </blockquote>
+
+                <h2>Who Is Zyko Learn For?</h2>
+                <p>
+                    Zyko Learn is designed for learners of all ages. Whether you are a child discovering the Bible for the first time, a teen wrestling with big questions, or an adult seeking to deepen your understanding of scripture and character, Zyko Learn meets you where you are.
+                </p>
+                <p>
+                    Our housing residents have access to all modules at no cost. Community members and supporters can also engage via the Seven Stars Arcade at <a href="../../arcade" style="color:#2563eb;">amazinggracehl.org/arcade</a>.
+                </p>
+
+                <h2>Looking Ahead</h2>
+                <p>
+                    We are actively developing new modules, certificates, and community challenges. Future updates will bring collaborative learning, progress badges, and faith-based skill trees — all built to encourage growth, connection, and the pursuit of a life rooted in Christ.
+                </p>
+                <p>
+                    Stay connected by visiting the <a href=".." style="color:#2563eb;">News</a> page regularly for the latest Zyko Learn updates.
+                </p>
+
+            </article>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../../">amazinggracehl.org</a></p>
+    </footer>
+</body>
+</html>

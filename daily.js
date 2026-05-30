@@ -1,19 +1,24 @@
-import list from './dailyChallenges.json' assert { type: 'json' };
+/**
+ * daily.js — daily challenge tracking.
+ * Challenge data is inlined to avoid JSON import-assertion browser compatibility issues.
+ */
+
+const list = [
+  { "id": "score500", "desc": "Score 500 points today",  "check": (s, l, c) => s >= 500 },
+  { "id": "clear20",  "desc": "Clear 20 gems today",     "check": (s, l, c) => c >= 20  },
+  { "id": "reach3",   "desc": "Reach level 3 today",     "check": (s, l, c) => l >= 3   }
+];
 
 export function getTodayChallenge() {
   const today = new Date().toDateString();
-  let saved = {};
-  try {
-    saved = JSON.parse(localStorage.getItem('daily') || '{}');
-  } catch (e) {
-    saved = {};
-  }
+  const saved = JSON.parse(localStorage.getItem('daily') || '{}');
 
   if (saved.date === today) return saved;
 
-  const challenge = list[Math.floor(Math.random() * list.length)];
-
-  const newData = { date: today, challenge, progress: {} };
+  // Pick by index only — strip the non-serialisable check function before storing
+  const idx = Math.floor(Math.random() * list.length);
+  const { id, desc } = list[idx];
+  const newData = { date: today, challenge: { id, desc }, progress: {} };
   localStorage.setItem('daily', JSON.stringify(newData));
   return newData;
 }
@@ -24,41 +29,25 @@ export function updateDailyProgress(key, value) {
   localStorage.setItem('daily', JSON.stringify(data));
 }
 
-/**
- * Safe evaluator for challenge `check` expressions.
- * Supports simple `field op value` comparisons where field is a known state key.
- * Uses no eval/Function — avoids arbitrary code execution.
- */
-function safeCheck(expr, state) {
-  const OPS = [
-    ['>=', (a, b) => a >= b],
-    ['<=', (a, b) => a <= b],
-    ['===', (a, b) => a === b],
-    ['!==', (a, b) => a !== b],
-    ['>', (a, b) => a > b],
-    ['<', (a, b) => a < b],
-    ['==', (a, b) => a == b],
-  ];
-  for (const [op, fn] of OPS) {
-    const idx = expr.indexOf(op);
-    if (idx !== -1) {
-      const field = expr.slice(0, idx).trim();
-      const valueStr = expr.slice(idx + op.length).trim();
-      const value = Number(valueStr);
-      if (!Object.prototype.hasOwnProperty.call(state, field) || !Number.isFinite(value)) return false;
-      return fn(state[field], value);
-    }
-  }
-  return false;
-}
-
 export function checkDailyCompletion(state) {
   const data = getTodayChallenge();
-  const expr = data.challenge.check;
+  const id = data.challenge?.id;
+  if (!id) return false;
 
-  if (safeCheck(expr, state)) {
+  const { score, level, clears } = state;
+
+  // Safe predefined checks — no eval/new Function needed
+  const checks = {
+    score500: (s, l, c) => s >= 500,
+    clear20:  (s, l, c) => c >= 20,
+    reach3:   (s, l, c) => l >= 3,
+  };
+
+  const fn = checks[id];
+  if (fn && fn(score, level, clears)) {
     localStorage.setItem('dailyComplete', 'true');
     return true;
   }
   return false;
 }
+

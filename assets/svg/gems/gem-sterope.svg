@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <!-- Sterope — G-type — Warm Gold — Virtue: Patience — Gem: Princess/square cut -->
+  <defs>
+    <radialGradient id="gGemSterope" cx="38%" cy="28%" r="68%">
+      <stop offset="0%"   stop-color="#FFFDF0"/>
+      <stop offset="40%"  stop-color="#FFD700"/>
+      <stop offset="100%" stop-color="#8C5800"/>
+    </radialGradient>
+    <filter id="glowGemSterope" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Outer princess cut (square with angled corners) -->
+  <polygon points="14,3 36,3 47,14 47,36 36,47 14,47 3,36 3,14"
+           fill="url(#gGemSterope)" stroke="#6A4000" stroke-width="1.5" filter="url(#glowGemSterope)"/>
+  <!-- Middle step ring -->
+  <polygon points="18,10 32,10 40,18 40,32 32,40 18,40 10,32 10,18"
+           fill="none" stroke="#FFFFFF" stroke-width="0.9" opacity="0.60"/>
+  <!-- Centre table highlight -->
+  <polygon points="20,17 30,17 33,25 30,33 20,33 17,25"
+           fill="#FFFBE0" opacity="0.55"/>
+  <!-- Corner facet lines -->
+  <line x1="14" y1="3"  x2="18" y2="10" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="36" y1="3"  x2="32" y2="10" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="47" y1="14" x2="40" y2="18" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="47" y1="36" x2="40" y2="32" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="36" y1="47" x2="32" y2="40" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="14" y1="47" x2="18" y2="40" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="3"  y1="36" x2="10" y2="32" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <line x1="3"  y1="14" x2="10" y2="18" stroke="#FFFFFF" stroke-width="0.8" opacity="0.65"/>
+  <!-- Cross facets from step ring to centre -->
+  <line x1="25" y1="10" x2="25" y2="17" stroke="#FFFFFF" stroke-width="0.7" opacity="0.55"/>
+  <line x1="40" y1="25" x2="33" y2="25" stroke="#FFFFFF" stroke-width="0.7" opacity="0.55"/>
+  <line x1="25" y1="40" x2="25" y2="33" stroke="#FFFFFF" stroke-width="0.7" opacity="0.55"/>
+  <line x1="10" y1="25" x2="17" y2="25" stroke="#FFFFFF" stroke-width="0.7" opacity="0.55"/>
+  <!-- Specular highlight -->
+  <ellipse cx="17" cy="13" rx="4.5" ry="2.8" fill="#FFFFFF" opacity="0.45"/>
+</svg>

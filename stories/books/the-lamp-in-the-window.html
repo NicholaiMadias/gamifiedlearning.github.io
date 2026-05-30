@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Lamp in the Window — A story of hope, community, and the light that never goes out, from Amazing Grace Home Living.">
+    <meta name="theme-color" content="#1e3a8a">
+
+    <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+    <title>The Lamp in the Window | Stories | Amazing Grace Home Living</title>
+
+    <script src="../../assets/vendor/tailwindcss.js"></script>
+    <script src="../../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap");
+    </script>
+    <style>
+        :root { --navy: #1e3a8a; --blue: #2563eb; --purple: #7c3aed; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        *:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+
+        .site-header {
+            background-color: var(--navy);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
+            text-decoration: none; color: white;
+        }
+        .logo img { height: 40px; width: auto; border-radius: 4px; }
+
+        .nav-links { display: flex; gap: 0.75rem; }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.1); color: white; text-decoration: none;
+            padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.25); }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--navy);
+                padding: 1rem;
+                z-index: 100;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                gap: 0.5rem;
+            }
+            .nav-links.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; padding: 0.75rem 1rem; }
+        }
+
+        .book-hero {
+            background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+            color: white; text-align: center; padding: 3.5rem 1.5rem 2.5rem;
+        }
+        .book-hero .tag {
+            display: inline-block; background: rgba(255,255,255,0.2); color: white;
+            font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem;
+            border-radius: 999px; margin-bottom: 1rem; text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .book-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 0.75rem; line-height: 1.2;
+        }
+        .book-hero p { font-size: 1rem; opacity: 0.85; max-width: 520px; margin: 0.5rem auto 0; line-height: 1.6; }
+
+        .book-container {
+            max-width: 720px; margin: 2.5rem auto; padding: 0 1.5rem;
+        }
+
+        .book-body {
+            background: white; border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 2.5rem;
+            line-height: 1.9; font-size: 1.05rem; color: #374151;
+            border-left: 5px solid var(--purple);
+        }
+
+        .book-body h2 {
+            font-family: 'Playfair Display', serif; font-size: 1.5rem;
+            color: var(--navy); margin: 2rem 0 0.75rem;
+        }
+
+        .book-body p { margin-bottom: 1.25rem; }
+
+        .book-body blockquote {
+            background: #faf5ff; border-left: 4px solid var(--purple);
+            padding: 1rem 1.25rem; margin: 1.5rem 0;
+            font-style: italic; color: #4c1d95; font-size: 1rem; line-height: 1.6;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .chapter-divider {
+            text-align: center; margin: 2.5rem 0 1.5rem;
+            font-family: 'Playfair Display', serif; font-size: 0.85rem;
+            color: #9ca3af; letter-spacing: 0.15em; text-transform: uppercase;
+        }
+        .chapter-divider::before, .chapter-divider::after {
+            content: '— ';
+        }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--blue); text-decoration: none; font-weight: 600;
+            font-size: 0.9rem; margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .breadcrumb {
+            max-width: 720px; margin: 1rem auto 0; padding: 0 1.5rem;
+            font-size: 0.825rem; color: #6b7280;
+        }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        main { flex: 1; }
+
+        .site-footer {
+            background: #1f2937; color: #9ca3af;
+            text-align: center; padding: 1.5rem; font-size: 0.875rem; margin-top: 3rem;
+        }
+        .site-footer a { color: #60a5fa; text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../../#properties">Listings</a>
+                <a href=".." class="active" aria-current="page">Stories</a>
+                <a href="../../arcade/">Arcade</a>
+                <a href="../../ministry/">Ministry</a>
+                <a href="../../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="book-hero">
+            <span class="tag">📖 Hope &amp; Home Story</span>
+            <h1>The Lamp in the Window</h1>
+            <p>A story of hope, community, and the light that never goes out.</p>
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="../../">Home</a> › <a href="..">Stories</a> › The Lamp in the Window
+        </nav>
+
+        <div class="book-container">
+            <a href=".." class="back-link" aria-label="Back to Stories">← Back to Stories</a>
+
+            <article class="book-body">
+
+                <p>
+                    On a cold November evening in Tampa, a woman named Ruth sat on the steps of a shelter with everything she owned in a single bag. She had lost her apartment two weeks before, and the nights had grown longer since.
+                </p>
+
+                <p>
+                    A van pulled up slowly, and a young man rolled down the window. He said only four words: <em>"There is a place."</em>
+                </p>
+
+                <div class="chapter-divider">Chapter One</div>
+
+                <h2>The Open Door</h2>
+
+                <p>
+                    The house at 1142 7th Street had a lamp burning in the front window every night. It was a small thing — a simple LED bulb in a white shade — but to Ruth it was the most beautiful light she had ever seen.
+                </p>
+
+                <blockquote>
+                    "Your word is a lamp to my feet and a light to my path." — Psalm 119:105
+                </blockquote>
+
+                <p>
+                    She was welcomed without judgment. She was given a key to a room that was clean and quiet. For the first time in weeks, she slept through the night.
+                </p>
+
+                <div class="chapter-divider">Chapter Two</div>
+
+                <h2>A Table Prepared</h2>
+
+                <p>
+                    Mornings at Amazing Grace were communal. Residents gathered around a table, sharing coffee and conversation. There were rules — respect, responsibility, faith — but they were the kind of rules that felt less like walls and more like roots.
+                </p>
+
+                <p>
+                    Ruth discovered the Seven Stars Arcade in the common room. She had never expected a game to make her think about who she wanted to become. But there she was, night after night, working through challenges that whispered of patience and grace.
+                </p>
+
+                <blockquote>
+                    "He makes me lie down in green pastures. He leads me beside still waters. He restores my soul." — Psalm 23:2–3
+                </blockquote>
+
+                <div class="chapter-divider">Epilogue</div>
+
+                <p>
+                    Six months later, Ruth had steady work, a savings account with a small but growing balance, and a photograph on her phone of herself and three other residents laughing at a table. She sent it to her daughter with the caption: <em>Found my people.</em>
+                </p>
+
+                <p>
+                    The lamp in the window still burns every night. It always will.
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../../">amazinggracehl.org</a></p>
+    </footer>
+</body>
+</html>

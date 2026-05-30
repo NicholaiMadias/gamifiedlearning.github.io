@@ -1,0 +1,9 @@
+{
+  "name": "supernova",
+  "frames": 9,
+  "frameRate": 12,
+  "loop": false,
+  "glow": 1.4,
+  "burstParticles": 32,
+  "spritePath": "/assets/icons/supernova_frame_"
+}
