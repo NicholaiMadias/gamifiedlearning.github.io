@@ -1,24 +1,3 @@
-This implementation perfectly nails the core structural rules of the Single-File HTML Architecture. By unifying the asset-less CSS styles, processing the logic entirely within a single script enclosure, and leveraging a responsive canvas background, it ensures zero dependencies.
-To fully polish this engine and elevate it from a base configuration into a production-ready operational release, we need to address a silent flaw in the code provided: **canvas responsive scaling.**
-### The Bug in the Provided Code
-In the original script, when the browser triggers a window resize event, the resizeCanvas() function recalibrates the dimensions:
-```javascript
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-
-```
-However, the columns variable (which dictates the density and size of the array tracking the drops) is calculated only **once** during the initial execution context:
-```javascript
-let columns = canvas.width / fontSize;
-let rainDrops = Array.from({ length: columns }).fill(1);
-
-```
-If a user expands their screen or flips their layout horizontally, the rainDrops array remains static. The right side of the screen will experience a permanent digital drought because new drop coordinates are never generated for the expanded real estate.
-### The Productionized Code
-Here is the finalized code block. The canvas resize listener has been upgraded to dynamically recalculate the array matrix on the fly, and the rendering logic has been augmented with an automated initial sequence evaluation to verify that no dead locks exist out of the box.
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -406,9 +385,3 @@ Here is the finalized code block. The canvas resize listener has been upgraded t
     </script>
 </body>
 </html>
-
-```
-### Implementation Validation Checklist
- 1. **Directory Isolation:** Confirm that this complete code block is dropped directly into the /arcade/matrix-of-conscience/index.html structure.
- 2. **Card Forwarding:** Verify that your main layout route card targets the relative directory root path (/arcade/matrix-of-conscience/) or explicit file rather than the tool landing page (matrix.html).
- 3. **Local Testing:** Test out keyboard traversal via Tab sequences to confirm that the focused state halo glows amber (#ffb000) correctly on pure interactive selection loops.
