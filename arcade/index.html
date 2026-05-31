@@ -1,259 +1,51 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Arcade | Matrix of Conscience</title>
-  <meta name="description" content="Unified Nexus Arcade Hub — Matrix of Conscience Portal.">
-  <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+  <title>Nexus Arcade | Amazing Grace</title>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #020617;
-      --panel: #0b1224;
-      --panel-border: rgba(148, 163, 184, 0.25);
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #22d3ee;
-      --danger: #f43f5e;
-      --ok: #34d399;
-      --gold: #fbbf24;
-      --purple: #bc13fe;
-    }
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 20% 0%, rgba(34, 211, 238, 0.1), transparent 35%),
-        radial-gradient(circle at 80% 100%, rgba(244, 63, 94, 0.08), transparent 40%),
-        var(--bg);
+      background: #020617;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 1rem;
-    }
-    .container {
-      width: min(1000px, 100%);
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-    .header {
-      text-align: center;
-      padding: 1.5rem 1rem;
-      border: 1px solid var(--panel-border);
-      border-radius: 16px;
-      background: rgba(11, 18, 36, 0.8);
-      backdrop-filter: blur(8px);
-    }
-    h1 {
-      margin: 0 0 0.5rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-size: 1.5rem;
-      color: var(--accent);
-      text-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
-    }
-    .nav-links {
-      display: flex;
       justify-content: center;
-      gap: 1rem;
-      list-style: none;
-      padding: 0;
-      margin: 1rem 0 0;
     }
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: white; }
-
-    /* Tool Grid */
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1rem;
-    }
-    .tool-card {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-    .tool-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-    }
-    .tool-card h2 {
-      font-size: 1rem;
-      margin: 0;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .tool-card p {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin: 0;
-      flex-grow: 1;
-    }
-    .btn {
-      background: #0f172a;
-      border: 1px solid var(--panel-border);
-      border-radius: 8px;
-      color: white;
-      padding: 0.6rem;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn:hover { background: #1e293b; }
-    .btn-accent { border-color: var(--accent); color: var(--accent); }
-    .btn-accent:hover { background: rgba(34, 211, 238, 0.1); }
-
-    /* Game Stage */
-    .game-stage {
-      display: none;
-      background: rgba(11, 18, 36, 0.95);
-      border: 1px solid var(--panel-border);
+    .redirect-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      padding: 3rem;
       border-radius: 16px;
-      padding: 2rem;
-      margin-top: 1rem;
-      animation: fadeIn 0.3s ease;
-    }
-    .game-stage.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    /* Seven Stars Specific */
-    .map-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
-    .map-item {
-      padding: 1rem;
-      background: rgba(255,255,255,0.05);
-      border: 2px solid var(--panel-border);
-      border-radius: 12px;
       text-align: center;
-      cursor: pointer;
+      box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+    }
+    h1 { margin: 0 0 1rem; color: #00f2ff; }
+    p { color: #94a3b8; font-family: 'Inter', sans-serif; margin-bottom: 2rem; }
+    .btn {
+      background: rgba(188, 19, 254, 0.15);
+      border: 1px solid #bc13fe;
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       transition: all 0.2s;
     }
-    .map-item:hover { border-color: var(--gold); background: rgba(251, 191, 36, 0.1); }
-    .map-item.completed { border-color: var(--gold); background: rgba(251, 191, 36, 0.2); }
-    .star-svg { width: 32px; height: 32px; fill: none; stroke: var(--gold); stroke-width: 2; margin-bottom: 0.5rem; }
-    .completed .star-svg { fill: var(--gold); }
-
-    /* Wallet HUD */
-    .wallet-hud {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.75rem 1.25rem;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      font-family: monospace;
-      font-size: 0.9rem;
-    }
-    .wallet-value { color: var(--ok); font-weight: bold; }
-
-    /* Store */
-    .store-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem;
-      border-bottom: 1px solid var(--panel-border);
-    }
-    .store-item:last-child { border-bottom: none; }
-
-    #status-bar { text-align: center; font-size: 0.75rem; color: var(--muted); margin-top: 2rem; }
+    .btn:hover { background: #bc13fe; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
   </style>
-  <script type="module" crossorigin src="../assets/arcade-BOgm-NP_.js"></script>
-  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <h1>MATRIX OF CONSCIENCE</h1>
-      <p class="sub">Nexus Arcade Unification Node v2.1</p>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="../">Home</a></li>
-          <li><a href="./certificates/">Certificates</a></li>
-          <li><a href="../ministry/">Ministry</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <div class="wallet-hud">
-      <span>BALANCE: <span id="wallet-balance" class="wallet-value">0</span> LUMEN</span>
-      <span>LEVEL: <span id="player-level" class="wallet-value">1</span></span>
-    </div>
-
-    <div class="tools-grid" id="tools-grid">
-      <!-- Seven Stars Card -->
-      <div class="tool-card" id="card-sevenstars">
-        <h2>🌟 Seven Stars</h2>
-        <p>Journey through the seven churches of Asia Minor. Collect stars and verify your alignment.</p>
-        <button class="btn btn-accent" onclick="launchGame('sevenstars')">Launch Quest</button>
-      </div>
-
-      <!-- Janus Continuum Card -->
-      <div class="tool-card" id="card-janus">
-        <h2>🌀 Janus Continuum</h2>
-        <p>The dual-phase Metaphysical Engine. Weave timelines and stabilize contradictions.</p>
-        <a href="./janus/" class="btn btn-accent">Enter Continuum</a>
-      </div>
-
-      <!-- Exchange Card -->
-      <div class="tool-card" id="card-exchange">
-        <h2>💎 Lumen Exchange</h2>
-        <p>Spend your hard-earned points on upgrades and skips.</p>
-        <button class="btn" onclick="showStore()">Open Exchange</button>
-      </div>
-    </div>
-
-    <!-- Seven Stars Game Stage -->
-    <div id="stage-sevenstars" class="game-stage">
-      <button class="btn" style="margin-bottom: 1rem;" onclick="closeGame()">← Back to Matrix</button>
-      <div id="sevenstars-content"></div>
-    </div>
-
-    <!-- Exchange Stage -->
-    <div id="stage-exchange" class="game-stage">
-      <button class="btn" style="margin-bottom: 1rem;" onclick="closeGame()">← Back to Matrix</button>
-      <h2>LUMEN EXCHANGE</h2>
-      <div id="store-content">
-        <div class="store-item">
-          <span>Alignment Skip (菲律宾 Skip)</span>
-          <button class="btn btn-accent" onclick="buyItem('skip', 500)">500 LUMEN</button>
-        </div>
-        <div class="store-item">
-          <span>Wisdom Boost</span>
-          <button class="btn btn-accent" onclick="buyItem('wisdom', 200)">200 LUMEN</button>
-        </div>
-      </div>
-    </div>
-
-    <p id="status-bar">Portal Status: NOMINAL</p>
+  <div class="redirect-card">
+    <h1>ARCADE UNIFIED</h1>
+    <p>All subsystems have been merged into the Central Matrix.</p>
+    <a href="./matrix-of-conscience/" class="btn">Enter the Matrix</a>
   </div>
-
 </body>
 </html>
