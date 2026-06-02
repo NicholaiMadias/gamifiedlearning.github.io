@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Library of stories, resources, and biblical content from Amazing Grace Home Living.">
+    <meta name="theme-color" content="#020617">
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+    <title>Library | Amazing Grace Home Living</title>
+
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: #0f172a;
+            --border: #1e293b;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --neon-blue: #0ea5e9;
+            --gold: #facc15;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(2, 6, 23, 0.96);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .logo img {
+            height: 42px;
+            width: auto;
+            border-radius: 6px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: nowrap;      /* keep nav on a single row */
+            white-space: nowrap;    /* prevent link text from wrapping */
+            gap: 0.75rem;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 0.8rem;
+            border-radius: 999px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.nav-active-page {
+            background: rgba(56, 189, 248, 0.14);
+            color: #fff;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 4rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 2.75rem);
+            margin: 0 0 0.5rem;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0 0 3rem;
+            font-size: 1.1rem;
+        }
+
+        .section-heading {
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1rem;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .story-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .story-list li {
+            margin: 0;
+        }
+
+        .story-card {
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .story-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .story-card-thumb {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            display: block;
+            background: #0f172a;
+        }
+
+        .story-card-thumb-placeholder {
+            width: 100%;
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: rgba(56, 189, 248, 0.06);
+        }
+
+        .story-card-body {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .story-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            margin: 0 0 0.4rem;
+        }
+
+        .story-card-meta {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin: 0 0 0.5rem;
+        }
+
+        .story-card-summary {
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin: 0;
+            flex: 1;
+        }
+
+        .resource-link {
+            display: block;
+            padding: 1.25rem;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            margin: 1rem 0;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .resource-link:hover {
+            background: rgba(15, 23, 42, 1);
+            border-color: var(--accent);
+        }
+
+        .resource-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 0 0 0.5rem;
+        }
+
+        .resource-desc {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            text-align: center;
+            padding: 1.5rem 1rem 2rem;
+        }
+
+        .audio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin: 1rem 0 2rem;
+        }
+
+        .audio-card {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.1rem;
+        }
+
+        .audio-card h4 {
+            margin: 0 0 0.35rem;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .audio-card p {
+            margin: 0 0 0.75rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .audio-card audio {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 1rem 0 2rem;
+        }
+
+        .video-card {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .video-card iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            display: block;
+            border: none;
+        }
+
+        .video-card-content {
+            padding: 1.1rem;
+        }
+
+        .video-card h4 {
+            margin: 0 0 0.35rem;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .video-card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .blog-feature {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(56, 189, 248, 0.28);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 0 0 2rem;
+        }
+
+        .blog-feature h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .blog-feature p {
+            color: var(--muted);
+            margin: 0 0 1rem;
+        }
+
+        .blog-feature a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .blog-feature a:hover { color: #7dd3fc; }
+
+        .media-download {
+            display: inline-block;
+            font-size: 0.82rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .media-download:hover { color: #7dd3fc; }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../#properties">Listings</a>
+                <a href="./" class="nav-active-page" aria-current="page">Library</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="../ministry/">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1>📚 Library</h1>
+        <p class="subtitle">Stories, biblical resources, and faith-based content from Amazing Grace Home Living.</p>
+
+        <h2 class="section-heading">Stories</h2>
+        <ul id="story-list" class="story-list" aria-label="Story list">
+            <!-- Stories will be loaded dynamically -->
+        </ul>
+
+        <h2 class="section-heading">🎵 Audio Collection</h2>
+
+        <div class="audio-grid">
+            <article class="audio-card">
+                <h4>Storm</h4>
+                <p>Atmospheric score for dramatic ministry and story moments.</p>
+                <audio controls preload="none">
+                    <source src="../assets/storm-CpVkJXGp.mp3" type="audio/mpeg">
+                </audio>
+                <a class="media-download" href="../assets/audio/storm.mp3" download>Download MP3</a>
+            </article>
+
+            <article class="audio-card">
+                <h4>Victory</h4>
+                <p>Celebration cue used for success and completion moments.</p>
+                <audio controls preload="none">
+                    <source src="../assets/victory-tA01jxSg.mp3" type="audio/mpeg">
+                </audio>
+                <a class="media-download" href="../assets/audio/victory.mp3" download>Download MP3</a>
+            </article>
+
+            <article class="audio-card">
+                <h4>Ending</h4>
+                <p>Long-form ambient track preserved for story and ministry playback.</p>
+                <audio controls preload="none">
+                    <source src="../assets/ending-DgGUomTE.mp3" type="audio/mpeg">
+                </audio>
+                <a class="media-download" href="../assets/audio/ending.mp3" download>Download MP3</a>
+            </article>
+
+            <article class="audio-card">
+                <h4>Badge</h4>
+                <p>Short reward stinger used across the arcade experience.</p>
+                <audio controls preload="none">
+                    <source src="../assets/badge-DkimBBCL.mp3" type="audio/mpeg">
+                </audio>
+                <a class="media-download" href="../assets/audio/badge.mp3" download>Download MP3</a>
+            </article>
+
+            <article class="audio-card">
+                <h4>Course Clear Fanfare</h4>
+                <p>Arcade completion fanfare from the shared audio library.</p>
+                <audio controls preload="none">
+                    <source src="../assets/course-clear-fanfare-BqHXpYJ5.mp3" type="audio/mpeg">
+                </audio>
+                <a class="media-download" href="../assets/audio/course-clear-fanfare.mp3" download>Download MP3</a>
+            </article>
+
+            <article class="audio-card">
+                <h4>Player Down</h4>
+                <p>Game-over and warning cue from the ministry audio archive.</p>
+                <audio controls preload="none">
+                    <source src="../assets/player-down-DY5VzlSB.mp3" type="audio/mpeg">
+                </audio>
+                <a class="media-download" href="../assets/audio/player-down.mp3" download>Download MP3</a>
+            </article>
+        </div>
+        <h2 class="section-heading">🎬 Video Collection</h2>
+
+        <div class="video-grid">
+            <article class="video-card">
+                <iframe
+                    src="https://www.youtube.com/embed/GKrXY0zH7lQ"
+                    title="Matrix of Conscience"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+                <div class="video-card-content">
+                    <h4>Matrix of Conscience</h4>
+                    <p>The official video tied to the Matrix of Conscience system and its themes.</p>
+                </div>
+            </article>
+
+            <article class="video-card">
+                <iframe
+                    src="https://www.youtube.com/embed/ZgRolaeK1fg"
+                    title="AMV Feature"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+                <div class="video-card-content">
+                    <h4>AMV Feature</h4>
+                    <p>A creative AMV piece included for artistic variety and visual engagement.</p>
+                </div>
+            </article>
+
+            <article class="video-card">
+                <iframe
+                    src="https://www.youtube.com/embed/EOOcReGQVuo"
+                    title="Electra Comedy Intro"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+                <div class="video-card-content">
+                    <h4>Electra Comedy Intro</h4>
+                    <p>A short intro featuring Electra — lighthearted and full of personality.</p>
+                </div>
+            </article>
+
+            <article class="video-card">
+                <iframe
+                    src="https://www.youtube.com/embed/9SxnzBAQ46U"
+                    title="Bible Study"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+                <div class="video-card-content">
+                    <h4>Bible Study</h4>
+                    <p>A teaching-focused Bible study session offering depth, clarity, and insight.</p>
+                </div>
+            </article>
+        </div>
+        <h2 class="section-heading">Resources</h2>
+
+        <a href="https://solomonsgatepressbible.com/pages/ethiopian-bible-bonuses" class="resource-link" target="_blank" rel="noopener noreferrer">
+            <div class="resource-title">📖 Ethiopian Bible</div>
+            <p class="resource-desc">Access the complete Ethiopian Bible translation with PDF format and bonus audio content.</p>
+        </a>
+
+        <a href="../stories/" class="resource-link">
+            <div class="resource-title">📑 Stories Archive</div>
+            <p class="resource-desc">Browse the complete archive of all stories and articles.</p>
+        </a>
+
+        <h2 class="section-heading">📝 Featured Blog</h2>
+
+        <div class="blog-feature">
+            <span style="font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);font-weight:700;">First article</span>
+            <h3>Architectural JS Synthesis of the Matrix of Conscience</h3>
+            <p>An architectural deep-dive into unifying the Sequence Stabilizer, Binary Rain, and a point-based economy in high-fidelity simulation environments.</p>
+            <a href="../stories/blog/architectural-js-synthesis.html">Read full article →</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; Tampa and Largo, Florida</p>
+    </footer>
+
+    <script>
+        var THUMBNAILS = {
+            'matrix-of-conscience': 'https://github.com/user-attachments/assets/9743f88b-2425-4a99-8eec-509bed3e24b3',
+            'expose-the-matrix':    'https://github.com/user-attachments/assets/08bda5db-0092-4a12-a378-94184861db7b',
+            'noah-and-the-ark':     'https://github.com/user-attachments/assets/ca12975d-2699-4bfd-b9ef-d06b4452cef6',
+            'the-lamp-in-the-window': 'https://github.com/user-attachments/assets/5e315c2c-6185-474e-a3f8-1ebf56224e45'
+        };
+
+        function esc(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function resolvePath(entry) {
+            var p = entry.path || '';
+            // paths like ./slug/ are relative to stories/ — rewrite to ../stories/slug/
+            if (p.startsWith('./')) return '../stories/' + p.slice(2);
+            // paths like ../news/... are already correct relative to /library/
+            if (p.startsWith('../')) return p;
+            // fallback: build from slug
+            return entry.slug ? '../stories/' + entry.slug + '/' : '#';
+        }
+
+        function pickIcon(entry) {
+            var tags = Array.isArray(entry.tags) ? entry.tags.map(function(t){ return String(t).toLowerCase(); }) : [];
+            var genre = String(entry.genre || '').toLowerCase();
+            if (tags.indexOf('faith') !== -1 || genre.indexOf('faith') !== -1) return '✝';
+            if (tags.indexOf('matrix') !== -1 || tags.indexOf('sci-fi') !== -1 || genre.indexOf('sci') !== -1) return '⌬';
+            if (tags.indexOf('covenant') !== -1) return '✧';
+            return '📖';
+        }
+
+        async function loadStories() {
+            var list = document.getElementById('story-list');
+            var errorDiv = document.createElement('p');
+            errorDiv.style.color = '#fecaca';
+
+            try {
+                var res = await fetch('../stories/library.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status + ' loading library.json');
+
+                var data = await res.json();
+                var entries = Array.isArray(data.entries) ? data.entries : [];
+
+                if (!entries.length) {
+                    errorDiv.textContent = 'No stories found in the library.';
+                    list.appendChild(errorDiv);
+                    return;
+                }
+
+                entries.forEach(function (entry) {
+                    var href = resolvePath(entry);
+                    var thumb = THUMBNAILS[entry.slug] || null;
+                    var li = document.createElement('li');
+
+                    var thumbHtml = thumb
+                        ? '<img class="story-card-thumb" src="' + esc(thumb) + '" alt="' + esc(entry.title) + '" loading="lazy">'
+                        : '<div class="story-card-thumb-placeholder">' + esc(pickIcon(entry)) + '</div>';
+
+                    var metaParts = [entry.author, entry.series, entry.genre].filter(Boolean);
+                    li.innerHTML =
+                        '<a class="story-card" href="' + esc(href) + '">' +
+                            thumbHtml +
+                            '<div class="story-card-body">' +
+                                '<div class="story-card-title">' + esc(entry.title || 'Untitled') + '</div>' +
+                                (metaParts.length ? '<div class="story-card-meta">' + esc(metaParts.join(' — ')) + '</div>' : '') +
+                                '<p class="story-card-summary">' + esc(entry.summary || '') + '</p>' +
+                            '</div>' +
+                        '</a>';
+                    list.appendChild(li);
+                });
+            } catch (err) {
+                console.error('Failed to load stories', err);
+                errorDiv.textContent = 'Failed to load stories: ' + String(err);
+                list.appendChild(errorDiv);
+            }
+        }
+
+        loadStories();
+    </script>
+</body>
+</html>

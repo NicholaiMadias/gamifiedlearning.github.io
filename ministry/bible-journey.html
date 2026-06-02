@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Bible Journey — Seven Stars Lore story viewer and Bible Quiz from Voice of Jesus Ministry." />
+    <meta name="theme-color" content="#0f0c1a" />
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png" />
+    <title>Bible Journey | Voice of Jesus Ministry</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #0a0a0f;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        *:focus-visible { outline: 3px solid #9b59b6; outline-offset: 2px; }
+
+        /* ── Header / Nav ── */
+        .site-header {
+            background: linear-gradient(90deg, #0f0c1a 0%, #1a0d2e 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            border-bottom: 1px solid #2e1f4a;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+            letter-spacing: 0.04em;
+        }
+
+        .logo img { height: 36px; width: auto; border-radius: 4px; }
+
+        .nav-links { display: flex; gap: 0.75rem; }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active { background: rgba(155,89,182,0.4); }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #0f0c1a;
+                padding: 1rem;
+                z-index: 100;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+                gap: 0.5rem;
+                border-bottom: 1px solid #2e1f4a;
+            }
+            .nav-links.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; padding: 0.75rem 1rem; }
+        }
+
+        /* ── Page body layout ── */
+        .page-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 1rem 3rem;
+            gap: 1.5rem;
+        }
+
+        .breadcrumb {
+            align-self: flex-start;
+            font-size: 0.8rem;
+            color: #555;
+            letter-spacing: 0.04em;
+        }
+
+        .breadcrumb a { color: #9b59b6; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        h1.app-title {
+            font-size: 1.4rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #9b59b6;
+            text-shadow: 0 0 10px #9b59b680;
+        }
+
+        /* ── Tabs ── */
+        .tab-bar {
+            display: flex;
+            gap: 0.5rem;
+            background: #0d0d1a;
+            border: 1px solid #2e1f4a;
+            border-radius: 10px;
+            padding: 0.4rem;
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.55rem 1rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 7px;
+            color: #777;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+
+        .tab-btn.active {
+            background: #9b59b610;
+            border-color: #9b59b6;
+            color: #9b59b6;
+            text-shadow: 0 0 6px #9b59b660;
+        }
+
+        /* ── Shared card ── */
+        .card {
+            background: #0d0d1a;
+            border: 1px solid #2e1f4a;
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            max-width: 560px;
+        }
+
+        /* ── Story section ── */
+        #story-section { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        .story-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        .story-meta .chapter-counter { color: #9b59b6; }
+
+        .story-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: #9b59b6;
+            text-shadow: 0 0 10px #9b59b660;
+            line-height: 1.4;
+        }
+
+        .story-image-wrap {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #13132a;
+            border: 1px solid #2a1a3a;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .story-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .story-image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            color: #444;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .story-image-placeholder .icon { font-size: 2rem; }
+
+        .story-content {
+            font-size: 0.95rem;
+            line-height: 1.75;
+            color: #bbb;
+        }
+
+        .story-error {
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            color: #ffd700;
+            background: #1a0d2e;
+            border: 1px solid #9b59b640;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .story-error .error-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .story-error .error-hint {
+            font-size: 0.78rem;
+            color: #9b59b6;
+            margin-top: 0.4rem;
+            display: block;
+        }
+
+        .story-error .error-code {
+            font-family: monospace;
+            font-size: 0.72rem;
+            color: #ff6b6b;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .story-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-btn-chapter {
+            padding: 0.6rem 1.2rem;
+            background: transparent;
+            border: 1px solid #9b59b6;
+            color: #9b59b6;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+
+        .nav-btn-chapter:hover:not(:disabled) {
+            background: #9b59b615;
+            box-shadow: 0 0 8px #9b59b640;
+        }
+
+        .nav-btn-chapter:disabled { opacity: 0.3; cursor: default; }
+        .nav-btn-chapter:active:not(:disabled) { transform: scale(0.97); }
+
+        .dot-track {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #333;
+            transition: background 0.2s;
+        }
+
+        .dot.active { background: #9b59b6; box-shadow: 0 0 6px #9b59b6; }
+
+        /* ── Quiz section ── */
+        #quiz-section { display: none; }
+
+        .quiz-card-inner h2 {
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #00ff41;
+            text-shadow: 0 0 8px #00ff4160;
+            margin-bottom: 1.4rem;
+            text-align: center;
+        }
+
+        #q-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 1.4rem;
+            min-height: 2.5rem;
+            text-align: center;
+        }
+
+        #q-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            letter-spacing: 0.06em;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+
+        .btn:hover {
+            background: #00ff4115;
+            box-shadow: 0 0 8px #00ff4140;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-restart {
+            margin-top: 1.2rem;
+            border-color: #4fc3f7;
+            color: #4fc3f7;
+        }
+
+        .btn-restart:hover {
+            background: #4fc3f715;
+            box-shadow: 0 0 8px #4fc3f740;
+        }
+
+        #feedback {
+            min-height: 1.4rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            color: #ff4c4c;
+            margin-bottom: 0.8rem;
+            text-align: center;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 4px;
+            background: #1a2a1a;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1.2rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00a82d, #00ff41);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .complete-heading {
+            font-size: 1.3rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #00ff41;
+            text-shadow: 0 0 14px #00ff4190;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* ── Footer ── */
+        .site-footer {
+            background: #1f2937;
+            color: #9ca3af;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .site-footer a { color: #60a5fa; text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living" />
+            </a>
+            <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../#properties">Listings</a>
+                <a href="../stories/">Stories</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="./" class="active" aria-current="page">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-body">
+
+        <p class="breadcrumb" aria-label="Breadcrumb">
+            <a href="../">Home</a> › <a href="./">Ministry</a> › Bible Journey
+        </p>
+
+        <h1 class="app-title">✝ Bible Journey</h1>
+
+        <!-- Tab bar — Fix 3: roving tabindex + keyboard navigation via setupTabs() -->
+        <div class="tab-bar" role="tablist" aria-label="Bible Journey sections">
+            <button class="tab-btn active" id="tab-story" role="tab"
+                    aria-selected="true" aria-controls="story-section" tabindex="0">
+                📖 Story Journey
+            </button>
+            <button class="tab-btn" id="tab-quiz" role="tab"
+                    aria-selected="false" aria-controls="quiz-section" tabindex="-1">
+                ✝ Bible Quiz
+            </button>
+        </div>
+
+        <!-- ── Story section — Fix 2: role="tabpanel" + hidden attribute ── -->
+        <section id="story-section" role="tabpanel" aria-labelledby="tab-story" tabindex="0">
+            <div class="card">
+                <div class="story-meta">
+                    <span>Seven Stars Lore</span>
+                    <span class="chapter-counter" id="chapter-counter">Chapter 1 / 7</span>
+                </div>
+                <h2 class="story-title" id="story-title"></h2>
+            </div>
+
+            <div class="card" style="padding: 0;">
+                <div class="story-image-wrap" id="image-wrap">
+                    <div class="story-image-placeholder" id="image-placeholder">
+                        <span class="icon">✨</span>
+                        <span>No image for this chapter</span>
+                    </div>
+                    <img id="chapter-img" src="" alt="" style="display:none;" />
+                </div>
+            </div>
+
+            <div class="card">
+                <!-- Fix 4: gamified error display -->
+                <div id="story-error" style="display:none;" role="alert" class="story-error">
+                    <span class="error-title" id="story-error-title"></span>
+                    <span id="story-error-body"></span>
+                    <span class="error-hint" id="story-error-hint"></span>
+                    <span class="error-code" id="story-error-code"></span>
+                </div>
+                <p class="story-content" id="story-content"></p>
+            </div>
+
+            <div class="card" style="padding: 1rem 1.5rem;">
+                <div class="story-nav">
+                    <button class="nav-btn-chapter" id="btn-prev">‹ Prev</button>
+                    <div class="dot-track" id="dot-track"></div>
+                    <button class="nav-btn-chapter" id="btn-next">Next ›</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Quiz section — Fix 2: role="tabpanel" + hidden attribute ── -->
+        <section id="quiz-section" role="tabpanel" aria-labelledby="tab-quiz" tabindex="0" hidden>
+            <div class="card quiz-card-inner" id="quiz-box">
+                <h2>✝ Bible Journey</h2>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progress-bar" style="width:0%"
+                         role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+                <p id="q-text"></p>
+                <p id="feedback" aria-live="polite"></p>
+                <div id="q-options"></div>
+            </div>
+        </section>
+
+    </div><!-- /.page-body -->
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; <a href="../">amazinggracehl.org</a></p>
+    </footer>
+
+    <script src="bible-journey-data.js"></script>
+    <script>
+        // ── Tab switching — Fix 3: getTabConfig / handleTabKeydown / setupTabs ──
+        function getTabConfig() {
+            return {
+                story: {
+                    tab: document.getElementById('tab-story'),
+                    panel: document.getElementById('story-section'),
+                    display: 'flex'
+                },
+                quiz: {
+                    tab: document.getElementById('tab-quiz'),
+                    panel: document.getElementById('quiz-section'),
+                    display: 'block'
+                }
+            };
+        }
+
+        function switchTab(name, options) {
+            options = options || {};
+            var focusTab   = options.focusTab   || false;
+            var focusPanel = options.focusPanel || false;
+            var tabs       = getTabConfig();
+            var isStory    = name === 'story';
+            var activeName   = isStory ? 'story' : 'quiz';
+            var inactiveName = isStory ? 'quiz'  : 'story';
+            var active   = tabs[activeName];
+            var inactive = tabs[inactiveName];
+
+            // Fix 2: toggle hidden alongside aria-selected
+            active.panel.style.display = active.display;
+            active.panel.hidden = false;
+            inactive.panel.style.display = 'none';
+            inactive.panel.hidden = true;
+
+            active.tab.classList.add('active');
+            inactive.tab.classList.remove('active');
+
+            active.tab.setAttribute('aria-selected', 'true');
+            inactive.tab.setAttribute('aria-selected', 'false');
+            // Fix 3: roving tabindex
+            active.tab.setAttribute('tabindex', '0');
+            inactive.tab.setAttribute('tabindex', '-1');
+
+            if (focusTab) {
+                active.tab.focus();
+            } else if (focusPanel) {
+                active.panel.focus();
+            }
+        }
+
+        function handleTabKeydown(event) {
+            var tabNames = ['story', 'quiz'];
+            var currentIndex = tabNames.indexOf(event.currentTarget.id === 'tab-story' ? 'story' : 'quiz');
+            var nextIndex = currentIndex;
+
+            switch (event.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                    nextIndex = (currentIndex + 1) % tabNames.length;
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    nextIndex = (currentIndex - 1 + tabNames.length) % tabNames.length;
+                    break;
+                case 'Home':
+                    nextIndex = 0;
+                    break;
+                case 'End':
+                    nextIndex = tabNames.length - 1;
+                    break;
+                case 'Enter':
+                case ' ':
+                case 'Spacebar':
+                    event.preventDefault();
+                    switchTab(tabNames[currentIndex], { focusTab: true });
+                    return;
+                default:
+                    return;
+            }
+
+            event.preventDefault();
+            switchTab(tabNames[nextIndex], { focusTab: true });
+        }
+
+        function setupTabs() {
+            var tabs = getTabConfig();
+            var storyTab = tabs.story.tab;
+            var quizTab  = tabs.quiz.tab;
+
+            [storyTab, quizTab].forEach(function (tab) {
+                if (!tab) return;
+                tab.addEventListener('keydown', handleTabKeydown);
+                tab.addEventListener('click', function () {
+                    switchTab(tab.id === 'tab-story' ? 'story' : 'quiz', { focusTab: true });
+                });
+            });
+
+            // Determine which tab starts active
+            var initialTab = (quizTab &&
+                (quizTab.getAttribute('aria-selected') === 'true' || quizTab.classList.contains('active')))
+                ? 'quiz'
+                : 'story';
+
+            switchTab(initialTab);
+        }
+
+        // ── Story chapter and quiz data (loaded from external module) ──
+        // See: bible-journey-data.js
+
+        var currentPage = 0;
+        var imageCache = {};
+        // Pre-populate imageCache from the static chapter images
+        chapters.forEach(function (ch, i) { imageCache[i] = ch.image || null; });
+
+        function showImage(src, alt) {
+            var img = document.getElementById('chapter-img');
+            img.src = src;
+            img.alt = alt;
+            img.style.display = 'block';
+            document.getElementById('image-placeholder').style.display = 'none';
+        }
+
+        function showImagePlaceholder(icon, label) {
+            var placeholder = document.getElementById('image-placeholder');
+            placeholder.innerHTML = '<span class="icon">' + icon + '</span><span>' + label + '</span>';
+            placeholder.style.display = 'flex';
+            document.getElementById('chapter-img').style.display = 'none';
+        }
+
+        // Fix 4: gamified error with title, body, hint, and technical code
+        function showError(title, body, hint, code) {
+            var el = document.getElementById('story-error');
+            document.getElementById('story-error-title').textContent = title || '';
+            document.getElementById('story-error-body').textContent = body || '';
+            document.getElementById('story-error-hint').textContent = hint || '';
+            document.getElementById('story-error-code').textContent = code ? '⚙ ' + code : '';
+            el.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('story-error').style.display = 'none';
+        }
+
+        // ── Chapter rendering ──────────────────────────────────────────
+        function renderChapter(index) {
+            var ch = chapters[index];
+            document.getElementById('chapter-counter').textContent =
+                'Chapter ' + (index + 1) + ' / ' + chapters.length;
+            document.getElementById('story-title').textContent = ch.title;
+            document.getElementById('story-content').textContent = ch.content;
+            document.getElementById('btn-prev').disabled = index === 0;
+            document.getElementById('btn-next').disabled = index === chapters.length - 1;
+
+            // Dots
+            var track = document.getElementById('dot-track');
+            track.innerHTML = '';
+            chapters.forEach(function (_, i) {
+                var dot = document.createElement('span');
+                dot.className = 'dot' + (i === index ? ' active' : '');
+                dot.setAttribute('aria-label', 'Chapter ' + (i + 1));
+                track.appendChild(dot);
+            });
+
+            // Image
+            hideError();
+            if (imageCache[index]) {
+                showImage(imageCache[index], ch.title);
+            } else {
+                showImagePlaceholder('⭐', 'No image for this chapter');
+            }
+        }
+
+        function nextChapter() {
+            if (currentPage < chapters.length - 1) {
+                currentPage++;
+                renderChapter(currentPage);
+            }
+        }
+
+        function prevChapter() {
+            if (currentPage > 0) {
+                currentPage--;
+                renderChapter(currentPage);
+            }
+        }
+
+        // ── Quiz data & logic ──────────────────────────────────────────
+
+        var qIdx = 0;
+
+        function renderComplete() {
+            var quizBox = document.getElementById('quiz-box');
+            var heading = document.createElement('h2');
+            heading.className = 'complete-heading';
+            heading.textContent = 'Journey Complete!';
+
+            var restartBtn = document.createElement('button');
+            restartBtn.className = 'btn btn-restart';
+            restartBtn.textContent = '↺ Restart';
+            restartBtn.addEventListener('click', function () { qIdx = 0; buildQuizShell(); loadQ(); });
+
+            quizBox.replaceChildren(heading, restartBtn);
+        }
+
+        function buildQuizShell() {
+            var quizBox = document.getElementById('quiz-box');
+            quizBox.innerHTML = [
+                '<h2>✝ Bible Journey</h2>',
+                '<div class="progress-bar-track">',
+                '<div class="progress-bar-fill" id="progress-bar" style="width:0%"',
+                '     role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>',
+                '</div>',
+                '<p id="q-text"></p>',
+                '<p id="feedback" aria-live="polite"></p>',
+                '<div id="q-options"></div>'
+            ].join('');
+        }
+
+        function setProgress(value) {
+            var bar = document.getElementById('progress-bar');
+            if (!bar) return;
+            bar.style.width = value + '%';
+            bar.setAttribute('aria-valuenow', value);
+        }
+
+        function loadQ() {
+            if (qIdx >= qData.length) {
+                setProgress(100);
+                renderComplete();
+                return;
+            }
+
+            setProgress(Math.round((qIdx / qData.length) * 100));
+            document.getElementById('q-text').textContent = qData[qIdx].question;
+            document.getElementById('feedback').textContent = '';
+
+            var opt = document.getElementById('q-options');
+            opt.innerHTML = '';
+            qData[qIdx].answers.forEach(function (answer, i) {
+                var btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = answer;
+                btn.addEventListener('click', (function (capturedIdx) {
+                    return function () {
+                        if (i === qData[capturedIdx].correctIndex) {
+                            qIdx++;
+                            loadQ();
+                        } else {
+                            document.getElementById('feedback').textContent = '✗ Try again!';
+                        }
+                    };
+                })(qIdx));
+                opt.appendChild(btn);
+            });
+        }
+
+        // ── Chapter nav button handlers ────────────────────────────────
+        document.getElementById('btn-prev').addEventListener('click', prevChapter);
+        document.getElementById('btn-next').addEventListener('click', nextChapter);
+
+        // ── Init ───────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            setupTabs();
+            renderChapter(0);
+            loadQ();
+        });
+    </script>
+</body>
+</html>

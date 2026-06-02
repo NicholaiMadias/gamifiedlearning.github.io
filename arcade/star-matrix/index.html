@@ -1,0 +1,449 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Star Matrix — match star constellations in this faith-based puzzle game from Amazing Grace.">
+  <link rel="icon" type="image/png" href="../../assets/logo-S7NXL_ug.png">
+  <title>Star Matrix | Nexus Arcade — Amazing Grace</title>
+  <script src="../../assets/vendor/hosted-only.js"></script>
+  <script>
+    window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap");
+  </script>
+  <style>
+    :root {
+      --neon-blue: #00f2ff;
+      --neon-purple: #bc13fe;
+      --neon-gold: #fbbf24;
+      --deep-space: #020617;
+      --mc-tint-rgb: 188 19 254;
+      --mc-tint-opacity: 0.06;
+      --sm-shell-max: min(96vw, 920px);
+      --sm-grid-max: min(94vw, 740px);
+      --sm-grid-gap: clamp(3px, 0.55vw, 8px);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #1a0533 0%, #020617 70%);
+      color: #e2e8f0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      touch-action: pan-x pan-y;
+    }
+    .orbitron { font-family: 'Orbitron', sans-serif; }
+
+    #sm-page-bg {
+      position: relative;
+      width: 100%;
+    }
+
+    #sm-page-bg::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 18%,
+          rgba(var(--mc-tint-rgb) / var(--mc-tint-opacity)) 0%,
+          rgba(var(--mc-tint-rgb) / 0) 65%);
+      pointer-events: none;
+      z-index: 0;
+      transition: background 320ms ease-out;
+      mix-blend-mode: screen;
+    }
+
+    .game-header {
+      width: 100%;
+      max-width: var(--sm-shell-max);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(188,19,254,0.2);
+    }
+    .game-header a {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      color: #94a3b8;
+      transition: color 0.2s;
+    }
+    .game-header a:hover { color: var(--neon-purple); }
+    .game-header a.cert-link { color: var(--neon-gold); }
+    .game-header a.cert-link:hover { color: #fcd34d; }
+    .game-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+
+    .game-header-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sm-music-btn {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(15,23,42,0.55);
+      color: #94a3b8;
+      font-size: 0.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border-radius: 999px;
+      padding: 0.45rem 0.7rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .sm-music-btn:hover { color: #e2e8f0; border-color: rgba(255,255,255,0.28); }
+    .sm-music-btn[aria-pressed="true"] {
+      color: var(--neon-blue);
+      border-color: rgba(0, 242, 255, 0.45);
+      background: rgba(0, 242, 255, 0.08);
+    }
+
+    .hud {
+      width: 100%;
+      max-width: var(--sm-shell-max);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(15,23,42,0.6);
+      border-bottom: 1px solid rgba(188,19,254,0.1);
+    }
+    .hud-stat { text-align: center; }
+    .hud-label {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #64748b;
+    }
+    .hud-value {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      font-weight: 700;
+      color: var(--neon-purple);
+    }
+    .hud-value.gold { color: var(--neon-gold); }
+    .hud-value.cyan { color: var(--neon-blue); }
+
+    .board-wrapper {
+      width: 100%;
+      max-width: var(--sm-shell-max);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 12px 32px;
+    }
+    .star-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: var(--sm-grid-gap);
+      width: 100%;
+      max-width: var(--sm-grid-max);
+      aspect-ratio: 1;
+      touch-action: none;
+      overscroll-behavior: contain;
+    }
+    .star-cell {
+      border-radius: clamp(10px, 1.2vw, 16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(1.4rem, 3.6vw, 2.4rem);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0;
+      font-family: inherit;
+      line-height: 1;
+      appearance: none;
+      -webkit-appearance: none;
+      background: rgba(15, 23, 42, 0.72);
+      touch-action: none;
+    }
+    .star-cell:focus-visible {
+      outline: 2px solid var(--neon-blue);
+      outline-offset: 2px;
+    }
+    .star-cell.selected {
+      border-color: var(--neon-blue);
+      transform: scale(1.08);
+      box-shadow: 0 0 18px var(--neon-blue);
+      z-index: 10;
+    }
+    .star-cell.drag-target {
+      border-color: rgba(0, 242, 255, 0.85);
+      box-shadow: 0 0 18px rgba(0, 242, 255, 0.35);
+      transform: scale(1.04);
+      z-index: 9;
+    }
+    .star-cell.matched {
+      animation: matchPop 0.35s ease forwards;
+    }
+    @keyframes matchPop {
+      0% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+    .star-cell[data-type="supernova"] { background: rgba(251,191,36,0.15); }
+    .star-cell[data-type="shooting"] { background: rgba(0,242,255,0.12); }
+    .star-cell[data-type="gem"] { background: rgba(52,211,153,0.12); }
+    .star-cell[data-type="rank"] { background: rgba(188,19,254,0.15); }
+    .star-cell[data-type="cosmic"] { background: rgba(248,113,113,0.12); }
+
+    .progress-wrap {
+      width: 100%;
+      max-width: var(--sm-grid-max);
+      margin-top: 12px;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .progress-bar-outer {
+      height: 6px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+      transition: width 0.4s ease;
+    }
+
+    .hint-text {
+      font-size: 0.6rem;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 12px;
+      max-width: var(--sm-grid-max);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.6rem;
+      color: #64748b;
+    }
+
+    .cert-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2,6,23,0.97);
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+    .cert-overlay.hidden { display: none !important; }
+    .cert-overlay h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 20px var(--neon-purple);
+      text-align: center;
+    }
+    .cert-canvas {
+      max-width: min(90vw, 760px);
+      border: 1px solid rgba(188,19,254,0.3);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .cert-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .cert-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(15,23,42,0.8);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .cert-btn.purple { color: var(--neon-purple); }
+    .cert-btn.purple:hover { border-color: var(--neon-purple); background: rgba(188,19,254,0.08); }
+    .cert-btn.cyan { color: var(--neon-blue); }
+    .cert-btn.cyan:hover { border-color: var(--neon-blue); background: rgba(0,242,255,0.08); }
+    .cert-btn.green { color: #4ade80; }
+    .cert-btn.green:hover { border-color: #4ade80; background: rgba(74,222,128,0.08); }
+
+    .name-input {
+      width: 100%;
+      max-width: 320px;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      margin-bottom: 0.75rem;
+    }
+    .name-input:focus { border-color: var(--neon-purple); }
+    .play-again-btn {
+      background: none;
+      border: none;
+      color: #475569;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: color 0.2s;
+    }
+    .play-again-btn:hover { color: #94a3b8; }
+    .cert-overlay-close {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #94a3b8;
+      font-size: 1rem;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .cert-overlay-close:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+  </style>
+  <script type="module" crossorigin src="../../assets/arcadeStarMatrix-hd3LDgeo.js"></script>
+  <link rel="modulepreload" crossorigin href="../../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../../assets/matchmaker-BIZ3nePJ.js">
+  <link rel="modulepreload" crossorigin href="../../assets/firebase-BjiTomjT.js">
+  <link rel="modulepreload" crossorigin href="../../assets/nexus-firestore-BfeRvaK7.js">
+</head>
+<body>
+  <div id="sm-page-bg">
+    <div class="game-header">
+      <a href="..">← Back</a>
+      <div class="game-title">STAR MATRIX</div>
+      <div class="game-header-right">
+        <button class="sm-music-btn" id="sm-sound-toggle" aria-pressed="true">Sound: On</button>
+        <a class="cert-link" href="../certificates/">My Certificates</a>
+      </div>
+    </div>
+
+    <div class="hud">
+      <div class="hud-stat">
+        <div class="hud-label">Score</div>
+        <div class="hud-value" id="sm-score">0</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Target</div>
+        <div class="hud-value gold" id="sm-target">1000</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Combo</div>
+        <div class="hud-value cyan" id="sm-combo">×1</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Moves</div>
+        <div class="hud-value" id="sm-moves">30</div>
+      </div>
+    </div>
+
+    <div class="board-wrapper">
+      <div class="star-grid" id="sm-grid" role="grid" aria-label="Star Matrix game board"></div>
+
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Mission Progress</span>
+          <span id="sm-pct">0%</span>
+        </div>
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner" id="sm-progress" style="width:0%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+        </div>
+      </div>
+
+      <div class="legend" aria-label="Star types">
+        <div class="legend-item">🌟 Supernova</div>
+        <div class="legend-item">💫 Shooting</div>
+        <div class="legend-item">💎 Gem</div>
+        <div class="legend-item">⭐ Rank</div>
+        <div class="legend-item">🔴 Cosmic</div>
+      </div>
+
+      <div class="hint-text">Match 3 stars of the same type to align the constellation</div>
+    </div>
+  </div>
+
+  <div id="sm-cert-overlay" class="cert-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cert-title">
+    <button id="sm-cert-close" class="cert-overlay-close" aria-label="Close certificate overlay">×</button>
+    
+    <div id="sm-name-phase" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+      <h2 id="cert-title">Constellation Aligned</h2>
+      <p style="color:#94a3b8; margin-bottom:1.5rem; text-align:center;">Enter your name for the Star Matrix Alignment Certificate.</p>
+      <input type="text" id="sm-player-name" class="name-input" placeholder="Your Name" maxlength="30">
+      <button id="sm-gen-btn" class="cert-btn purple" style="width:100%; max-width:320px; justify-content:center;">Generate Certificate</button>
+    </div>
+
+    <div id="sm-cert-phase" style="display:none; flex-direction:column; align-items:center; width:100%;">
+      <h2>Alignment Verified</h2>
+      <canvas id="sm-cert-canvas" class="cert-canvas"></canvas>
+      <div class="cert-actions">
+        <button class="cert-btn cyan" onclick="smCertPNG()">⬇ Download PNG</button>
+        <a class="cert-btn green" href="../certificates/">📜 My Certificates</a>
+      </div>
+    </div>
+
+    <button class="play-again-btn" onclick="smReset()">↺ Play Again</button>
+  </div>
+
+  <script src="../../sw-register.js" defer></script>
+</body>
+</html>
+

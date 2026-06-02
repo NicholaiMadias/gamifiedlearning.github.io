@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix of Conscience - Arcade Edition</title>
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --matrix-dark: #0d0d0d;
+            --matrix-glow: rgba(0, 255, 65, 0.5);
+            --amber-glow: #ffb000;
+        }
+
+        body {
+            background-color: var(--matrix-dark);
+            color: var(--matrix-green);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Focus Visible Styles for Keyboard Navigation */
+        *:focus-visible {
+            outline: 3px solid var(--amber-glow);
+            outline-offset: 2px;
+        }
+
+        #game-container {
+            text-align: center;
+            border: 2px solid var(--matrix-green);
+            padding: 20px;
+            box-shadow: 0 0 20px var(--matrix-glow);
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10;
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 5px 0;
+            text-shadow: 0 0 10px var(--matrix-green);
+        }
+
+        .subtitle {
+            color: #ffffff;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        #scoreboard {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 1px dashed var(--matrix-green);
+            padding-bottom: 10px;
+        }
+
+        /* Responsive CSS-Grid Artifact/Game Gallery */
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-template-rows: repeat(5, 60px);
+            gap: 8px;
+            background-color: #1a1a1a;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 0 auto;
+            width: max-content;
+        }
+
+        .tile {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #181818, #050505);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s;
+        }
+
+        .tile:hover {
+            box-shadow: 0 0 10px var(--matrix-green);
+            border-color: var(--matrix-green);
+        }
+
+        .tile.selected {
+            border: 2px solid var(--amber-glow);
+            transform: scale(0.95);
+            box-shadow: 0 0 15px var(--amber-glow);
+        }
+
+        #controls {
+            margin-top: 20px;
+        }
+
+        .btn {
+            background-color: transparent;
+            color: var(--matrix-green);
+            border: 1px solid var(--matrix-green);
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--matrix-green);
+            color: var(--matrix-dark);
+            box-shadow: 0 0 15px var(--matrix-green);
+        }
+
+        /* Background Binary Rain Canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="game-container" role="application" aria-label="Matrix of Conscience Engine">
+        <h1>Matrix of Conscience</h1>
+        <div class="subtitle">Sequence Stabilizer Active (Match 3 Nodes)</div>
+        
+        <div id="scoreboard">
+            <div>Points: <span id="score-display">0</span></div>
+            <div>High Score: <span id="high-score-display">0</span></div>
+        </div>
+
+        <div id="grid" role="grid" aria-label="Sequence Alignment Grid"></div>
+
+        <div id="controls">
+            <button class="btn" id="reset-btn" onclick="initGrid()">Reset Stabilizer</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Robust Binary Rain Engine Loop ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ⬢♦★☀️⭐🔷🔴";
+        const alphabet = letters.split("");
+        const fontSize = 14;
+        let rainDrops = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Dynamic recalibration of tracking matrix arrays upon size manipulation
+            const columns = Math.floor(canvas.width / fontSize);
+            const currentLength = rainDrops.length;
+            
+            if (columns > currentLength) {
+                for (let i = currentLength; i < columns; i++) {
+                    rainDrops.push(Math.floor(Math.random() * -20)); // Stagger start heights
+                }
+            } else if (columns < currentLength) {
+                rainDrops = rainDrops.slice(0, columns);
+            }
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Target initialization
+
+        function drawBinaryRain() {
+            ctx.fillStyle = 'rgba(13, 13, 13, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        }
+        setInterval(drawBinaryRain, 30);
+
+        // --- 2. Interactive Resource Economy Logic ---
+        const symbols = ['⬢', '♦', '★', '☀️', '🔷']; 
+        const gridSize = 5;
+        let score = 0;
+        let highScore = localStorage.getItem('matrix_high_score') || 0;
+        let gridData = [];
+        let selectedTile = null;
+
+        document.getElementById('high-score-display').innerText = highScore;
+
+        function initGrid() {
+            score = 0;
+            updateScore(0);
+            selectedTile = null;
+            renderFreshGridData();
+        }
+
+        function renderFreshGridData() {
+            const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = '';
+            gridData = [];
+
+            for (let r = 0; r < gridSize; r++) {
+                gridData[r] = [];
+                for (let c = 0; c < gridSize; c++) {
+                    let randomSymbol;
+                    do {
+                        randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    } while (
+                        (c >= 2 && gridData[r][c-1] === randomSymbol && gridData[r][c-2] === randomSymbol) ||
+                        (r >= 2 && gridData[r-1][c] === randomSymbol && gridData[r-2][c] === randomSymbol)
+                    );
+
+                    gridData[r][c] = randomSymbol;
+                    createTileElement(r, c, randomSymbol);
+                }
+            }
+        }
+
+        function createTileElement(r, c, symbol) {
+            const gridElement = document.getElementById('grid');
+            const tile = document.createElement('div');
+            tile.classList.add('tile');
+            tile.innerText = symbol;
+            tile.dataset.row = r;
+            tile.dataset.col = c;
+            
+            tile.setAttribute('role', 'gridcell');
+            tile.setAttribute('tabindex', '0');
+            tile.setAttribute('aria-label', `Row ${r + 1}, Column ${c + 1}: ${symbol}`);
+
+            tile.addEventListener('click', () => handleSelection(r, c, tile));
+            tile.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelection(r, c, tile);
+                }
+            });
+
+            gridElement.appendChild(tile);
+        }
+
+        function handleSelection(r, c, tileElement) {
+            if (!selectedTile) {
+                selectedTile = { r, c, element: tileElement };
+                tileElement.classList.add('selected');
+            } else {
+                const prevTile = selectedTile;
+                const isAdjacent = (Math.abs(prevTile.r - r) === 1 && prevTile.c === c) || 
+                                   (Math.abs(prevTile.c - c) === 1 && prevTile.r === r);
+
+                prevTile.element.classList.remove('selected');
+                selectedTile = null;
+
+                if (isAdjacent) {
+                    let temp = gridData[prevTile.r][prevTile.c];
+                    gridData[prevTile.r][prevTile.c] = gridData[r][c];
+                    gridData[r][c] = temp;
+
+                    if (!checkAndClearMatches()) {
+                        // Revert operational execution on invalid matches
+                        temp = gridData[prevTile.r][prevTile.c];
+                        gridData[prevTile.r][prevTile.c] = gridData[r][c];
+                        gridData[r][c] = temp;
+                    } else {
+                        renderGridFromData();
+                    }
+                }
+            }
+        }
+
+        function checkAndClearMatches() {
+            let matched = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
+            let hasMatch = false;
+
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize - 2; c++) {
+                    if (gridData[r][c] && gridData[r][c] === gridData[r][c+1] && gridData[r][c] === gridData[r][c+2]) {
+                        matched[r][c] = matched[r][c+1] = matched[r][c+2] = true;
+                        hasMatch = true;
+                    }
+                }
+            }
+
+            for (let r = 0; r < gridSize - 2; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (gridData[r][c] && gridData[r][c] === gridData[r+1][c] && gridData[r][c] === gridData[r+2][c]) {
+                        matched[r][c] = matched[r+1][c] = matched[r+2][c] = true;
+                        hasMatch = true;
+                    }
+                }
+            }
+
+            if (hasMatch) {
+                let matchCount = 0;
+                for (let r = 0; r < gridSize; r++) {
+                    for (let c = 0; c < gridSize; c++) {
+                        if (matched[r][c]) {
+                            gridData[r][c] = null;
+                            matchCount++;
+                        }
+                    }
+                }
+                updateScore(matchCount * 10);
+                cascadeTiles();
+                return true;
+            }
+            return false;
+        }
+
+        function cascadeTiles() {
+            for (let c = 0; c < gridSize; c++) {
+                let emptyRow = gridSize - 1;
+                for (let r = gridSize - 1; r >= 0; r--) {
+                    if (gridData[r][c] !== null) {
+                        gridData[emptyRow][c] = gridData[r][c];
+                        if (emptyRow !== r) gridData[r][c] = null;
+                        emptyRow--;
+                    }
+                }
+                for (let r = emptyRow; r >= 0; r--) {
+                    gridData[r][c] = symbols[Math.floor(Math.random() * symbols.length)];
+                }
+            }
+            
+            setTimeout(() => {
+                renderGridFromData();
+                if (checkAndClearMatches()) {
+                    renderGridFromData();
+                }
+            }, 250);
+        }
+
+        function renderGridFromData() {
+            const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = '';
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    createTileElement(r, c, gridData[r][c]);
+                }
+            }
+        }
+
+        function updateScore(points) {
+            score += points;
+            document.getElementById('score-display').innerText = score;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('matrix_high_score', highScore);
+                document.getElementById('high-score-display').innerText = highScore;
+            }
+        }
+
+        // Initialize grid on run-time
+        initGrid();
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnostics Console — Sovereign Matrix</title>
+  <link rel="stylesheet" href="../../admin/css/matrix.css">
+</head>
+<body>
+
+<nav class="matrix-nav">
+  <a href="../../admin/index.html" class="nav-brand">⬡ SOVEREIGN MATRIX</a>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="page-wrap">
+
+  <section class="matrix-card matrix-border">
+    <h2 class="matrix-heading">Sovereign Diagnostics Console</h2>
+    <p style="font-size:0.75rem;color:#3a5a3a;margin-bottom:1.25rem">
+      Run browser environment checks and probe DNS / host reachability.
+      Access requires an admin role or a diagnostics tool assignment from a superAdmin.
+    </p>
+
+    <div id="diag-locked" class="matrix-alert error" style="display:none">
+      🔒 Access locked. Admin role or diagnostics tool assignment from a superAdmin required.
+    </div>
+
+    <div id="diag-content">
+      <!-- Browser diagnostics -->
+      <h3 class="matrix-heading" style="font-size:0.9rem;margin-bottom:0.5rem">Browser Diagnostics</h3>
+      <button id="run-browser-test" class="btn btn-neon">Run Browser Diagnostics</button>
+      <pre id="browser-results" class="matrix-terminal">// Results will appear here…</pre>
+
+      <!-- DNS / Reachability tests -->
+      <h3 class="matrix-heading" style="font-size:0.9rem;margin-bottom:0.5rem">DNS &amp; Host Reachability</h3>
+      <button id="run-dns-test" class="btn btn-neon">Run DNS Tests</button>
+      <pre id="dns-results" class="matrix-terminal">// Results will appear here…</pre>
+    </div>
+
+  </section>
+
+</div>
+
+<script type="module">
+  import { getCurrentUser, initFirebaseAuth, injectMasterKeyModal, injectAdminSidebar, logout, ROLES } from '/admin/js/admin-router.js';
+  import { db }                            from '/admin/js/auth.js';
+  import { runBrowserDiagnostics, runDnsTests } from '/admin/js/diagnostics.js';
+
+  await initFirebaseAuth();
+  injectMasterKeyModal();
+  injectAdminSidebar();
+
+  const user = getCurrentUser();
+
+  document.getElementById('nav-user').textContent = `${user.email || 'guest@local'} (${user.role})`;
+
+  const nav = document.querySelector('.matrix-nav');
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className   = 'btn btn-danger';
+  logoutBtn.style.fontSize = '0.72rem';
+  logoutBtn.style.padding  = '0.3rem 0.75rem';
+  logoutBtn.addEventListener('click', logout);
+  nav.appendChild(logoutBtn);
+
+  // All users have diagnostics access while auth is disabled.
+  document.getElementById('run-browser-test').addEventListener('click', () => {
+    const results = runBrowserDiagnostics();
+    document.getElementById('browser-results').textContent =
+      JSON.stringify(results, null, 2);
+  });
+
+  document.getElementById('run-dns-test').addEventListener('click', async () => {
+    const btn = document.getElementById('run-dns-test');
+    btn.disabled    = true;
+    btn.textContent = 'Running…';
+    document.getElementById('dns-results').textContent = '// Probing hosts…';
+    const results = await runDnsTests();
+    document.getElementById('dns-results').textContent =
+      JSON.stringify(results, null, 2);
+    btn.disabled    = false;
+    btn.textContent = 'Run DNS Tests';
+  });
+</script>
+
+</body>
+</html>

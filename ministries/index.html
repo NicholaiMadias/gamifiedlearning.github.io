@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  (function () {
+    const allowedHosts = new Set([
+      "amazinggracehl.org",
+      "www.amazinggracehl.org",
+      "nicholaimadias.github.io",
+    ]);
+    const isHosted =
+      window.location.protocol === "https:" && allowedHosts.has(window.location.hostname);
+    if (!isHosted) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-HKZ2G2VN78";
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-HKZ2G2VN78");
+  })();
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Mystery of the Seven Stars: A Scriptural Journey — a branched narrative and Match-3 Refraction puzzle from Voice of Jesus Ministry.">
+    <meta name="theme-color" content="#0f0c1a">
+
+    <link rel="icon" type="image/png" href="../assets/logo-S7NXL_ug.png">
+    <title>The Mystery of the Seven Stars | Voice of Jesus Ministry</title>
+
+    <script src="../assets/vendor/tailwindcss.js"></script>
+    <script src="../assets/vendor/hosted-only.js"></script>
+    <script>
+        window.AmazingGraceHostedOnly?.loadStylesheet("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap");
+    </script>
+    <style>
+        /* ── Design tokens ───────────────────────────────── */
+        :root {
+            --gold:    #ffd700;
+            --nebula:  rgba(74, 35, 90, 0.8);
+            --bg:      #0f0c1a;
+            --surface: #1a1030;
+            --border:  #2e1f4a;
+            --accent:  #c084fc;
+            --ag-text: #e9d5ff;
+            --muted:   #7c6f9e;
+            --nav-btn: #1e3a8a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--ag-text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            body { scroll-behavior: smooth; }
+        }
+
+        *:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+        /* ── Header / Nav ───────────────────────────────── */
+        .site-header {
+            background: linear-gradient(90deg, #0f0c1a 0%, #1a0d2e 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--gold);
+        }
+        .logo img { height: 36px; width: auto; border-radius: 4px; }
+
+        .main-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn {
+            background-color: var(--nav-btn);
+            border: 1px solid transparent;
+            padding: 0.45rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #bfdbfe;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .nav-btn:hover { background-color: #2563eb; color: white; }
+        .nav-btn.active { background-color: var(--accent); color: #0f0c1a; }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0; right: 0;
+                background: #0f0c1a;
+                padding: 1rem;
+                z-index: 100;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+                gap: 0.5rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .main-nav.show { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { width: 100%; }
+        }
+
+        /* ── Main stage ─────────────────────────────────── */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 4rem;
+        }
+
+        .stage-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--gold);
+            text-align: center;
+            text-shadow: 0 0 30px rgba(255,215,0,0.4);
+            margin-bottom: 0.5rem;
+        }
+
+        .stage-subtitle {
+            color: var(--muted);
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* ── Story card ─────────────────────────────────── */
+        .story-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 680px;
+            width: 100%;
+            box-shadow: 0 0 40px var(--nebula), 0 8px 32px rgba(0,0,0,0.5);
+            animation: fadeSlide 0.4s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .chapter-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            background: rgba(192, 132, 252, 0.15);
+            border: 1px solid rgba(192, 132, 252, 0.4);
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .story-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .story-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--ag-text);
+            margin-bottom: 1.5rem;
+        }
+
+        .story-scripture {
+            background: rgba(255,215,0,0.06);
+            border-left: 3px solid var(--gold);
+            border-radius: 0 8px 8px 0;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+            color: #d4b483;
+            font-size: 0.9rem;
+        }
+        .story-scripture strong {
+            font-style: normal;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        /* ── Choices ─────────────────────────────────────── */
+        #choices-container { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .choice-btn {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            text-align: left;
+            border: 2px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: var(--ag-text);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+        }
+        .choice-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: rgba(192,132,252,0.1);
+            transform: translateX(4px);
+        }
+
+        /* ── Puzzle area ─────────────────────────────────── */
+        #puzzle-container { display: none; flex-direction: column; align-items: center; gap: 1rem; }
+        #puzzle-container.visible { display: flex; }
+
+        .puzzle-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .score-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        .score-bar .score-val { color: var(--gold); font-weight: 700; font-size: 1.1rem; }
+
+        .score-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+            border-radius: 999px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        /* Match board — exactly as spec */
+        #match-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            width: 360px;
+            height: 360px;
+            margin: 4px auto;
+            padding: 15px;
+            background: radial-gradient(ellipse at 50% 30%, rgba(74,35,90,0.6), transparent 70%), var(--bg);
+            background-size: cover;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 20px var(--nebula);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        @media (max-width: 420px) {
+            #match-board { width: 100%; height: auto; }
+        }
+
+        .square {
+            width: 100%;
+            aspect-ratio: 1;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s;
+            border: 2px solid transparent;
+            position: relative;
+            /* Reset button defaults */
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 0;
+            background-color: transparent;
+            font: inherit;
+            /* Keep native focus ring visible in browsers that don't support :focus-visible
+               (the :focus-visible rule below overrides with a custom ring when supported) */
+        }
+
+        .square:hover {
+            transform: scale(1.15);
+            filter: brightness(1.2);
+        }
+
+        .square.sq-selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 14px rgba(255,215,0,0.6);
+            transform: scale(1.1);
+        }
+
+        .square:focus-visible, .square.sq-focus {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(192,132,252,0.4);
+        }
+
+        /* When our custom .sq-focus ring is applied, suppress the redundant native ring */
+        .square.sq-focus:focus { outline: none; }
+
+        .square.sq-selected.sq-focus {
+            outline-color: var(--gold);
+            box-shadow: 0 0 14px rgba(255,215,0,0.6), 0 0 0 3px rgba(255,215,0,0.4);
+        }
+
+        /* Star crystal background images — SVG assets */
+        .star-gold   { background-image: url('../assets/icons/star_crystal_gold.svg'); }
+        .star-blue   { background-image: url('../assets/icons/star_crystal_blue.svg'); }
+        .star-purple { background-image: url('../assets/icons/star_crystal_purple.svg'); }
+        .star-red    { background-image: url('../assets/icons/star_crystal_red.svg'); }
+
+        /* Supernova explosion animation */
+        .match-explode {
+            animation: supernova 0.5s forwards;
+            background-image: url('../assets/images/supernova_explosion.svg') !important;
+            pointer-events: none;
+        }
+
+        @keyframes supernova {
+            0%   { transform: scale(1);   opacity: 1; }
+            50%  { transform: scale(1.8); opacity: 0.8; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        .square.shake {
+            animation: shake 0.35s ease;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25%     { transform: translateX(-5px); }
+            75%     { transform: translateX(5px); }
+        }
+
+        /* Puzzle message */
+        #puzzle-msg {
+            font-size: 0.9rem;
+            color: var(--muted);
+            text-align: center;
+            min-height: 1.4em;
+            transition: color 0.3s;
+        }
+        #puzzle-msg.solved { color: var(--gold); font-weight: 700; font-size: 1rem; }
+
+        /* Continue / action buttons */
+        .story-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 2rem;
+            background: linear-gradient(135deg, #6d28d9, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.15s;
+            margin-top: 0.5rem;
+        }
+        .story-btn:hover { filter: brightness(1.15); transform: translateY(-2px); }
+        .story-btn:active { transform: translateY(0); }
+        .story-btn.gold-btn {
+            background: linear-gradient(135deg, #b45309, var(--gold));
+            color: #1a1a2e;
+        }
+
+        #solve-btn { display: none; }
+
+        /* ── Ending / Certificate ───────────────────────── */
+        #ending-container { display: none; flex-direction: column; align-items: center; gap: 1.5rem; }
+        #ending-container.visible { display: flex; }
+
+        .cert-box {
+            background: linear-gradient(135deg, #1e0d3b, #2e1058);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255,215,0,0.25);
+            max-width: 560px;
+            width: 100%;
+        }
+
+        .cert-stars {
+            font-size: 2.5rem;
+            letter-spacing: 0.5rem;
+            margin-bottom: 1rem;
+            animation: starPulse 2s ease-in-out infinite;
+        }
+        @keyframes starPulse {
+            0%,100% { text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+            50%     { text-shadow: 0 0 30px rgba(255,215,0,0.9); }
+        }
+
+        .cert-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .cert-sub {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cert-verse {
+            background: rgba(255,215,0,0.06);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            font-style: italic;
+            color: #d4b483;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .cert-path-badge {
+            display: inline-block;
+            background: rgba(192,132,252,0.15);
+            border: 1px solid rgba(192,132,252,0.4);
+            color: var(--accent);
+            border-radius: 999px;
+            padding: 0.35rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Progress dots ───────────────────────────────── */
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: background 0.3s, transform 0.2s;
+        }
+        .dot.done  { background: var(--gold); transform: scale(1.2); }
+        .dot.active { background: var(--accent); transform: scale(1.3); box-shadow: 0 0 8px var(--accent); }
+
+        /* ── Footer ─────────────────────────────────────── */
+        .site-footer {
+            background: #0a0818;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.8rem;
+        }
+        .site-footer a { color: var(--accent); text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/unified-nav-D383fX84.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="../" class="logo" aria-label="Amazing Grace Home Living — Home">
+                <img src="../assets/logo-S7NXL_ug.png" alt="Amazing Grace Home Living">
+            </a>
+        <nav id="main-nav" class="nav-links" aria-label="Main navigation">
+                <a href="../#properties">Listings</a>
+                <a href="../library/">Library</a>
+                <a href="../arcade/">Arcade</a>
+                <a href="../ministry/">Ministry</a>
+                <a href="../contact/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main>
+        <h1 class="stage-title">The Mystery of the Seven Stars</h1>
+        <p class="stage-subtitle">A Scriptural Journey &mdash; Voice of Jesus Ministry</p>
+
+        <!-- Progress indicator -->
+        <div class="progress-dots" id="progress-dots" aria-label="Chapter progress" role="img"></div>
+
+        <!-- Story card -->
+        <div class="story-card" id="story-card">
+
+            <!-- Chapter badge -->
+            <div class="chapter-badge" id="chapter-badge">Prologue</div>
+
+            <!-- Story title -->
+            <h2 class="story-title" id="story-title"></h2>
+
+            <!-- Narrative text -->
+            <p class="story-text" id="story-text"></p>
+
+            <!-- Scripture quote -->
+            <blockquote class="story-scripture" id="story-scripture" style="display:none"></blockquote>
+
+            <!-- Choice buttons -->
+            <div id="choices-container"></div>
+
+            <!-- Puzzle (only for refraction_trial node) -->
+            <div id="puzzle-container">
+                <h3 class="puzzle-header">⚡ Refraction Trial</h3>
+                <p style="font-size:0.85rem;color:var(--muted);text-align:center;margin:0">
+                    Select two adjacent star crystals to swap them. Match 3 or more of the same crystal to refract the starlight.
+                    <br>Reach <strong style="color:var(--gold)">1,000 alignment</strong> to decode the message.
+                </p>
+                <div class="score-bar">
+                    <span>Alignment:</span>
+                    <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+                    <span class="score-val"><span id="score">0</span> / 1000</span>
+                </div>
+                <div id="match-board" role="grid" aria-label="Refraction Match-3 board"></div>
+                <p id="puzzle-msg"></p>
+                <button id="solve-btn" class="story-btn gold-btn" onclick="onPuzzleSolved()">
+                    ✨ The Stars Are Aligned — Continue
+                </button>
+            </div>
+
+            <!-- Ending certificate -->
+            <div id="ending-container">
+                <div class="cert-box" id="cert-box">
+                    <div class="cert-stars">⭐⭐⭐⭐⭐⭐⭐</div>
+                    <div class="cert-title">Journey Complete</div>
+                    <div class="cert-sub">You have walked through the Mystery of the Seven Stars.</div>
+                    <div class="cert-path-badge" id="cert-path-badge"></div>
+                    <blockquote class="cert-verse">
+                        "In his right hand he held seven stars… This is the mystery of the seven stars that you saw in my right hand."
+                        <br><strong style="color:var(--gold);font-style:normal">— Revelation 1:16, 20</strong>
+                    </blockquote>
+                    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem">
+                        Each star is a church. Each church is a lesson. Each lesson is a step closer to the One who holds them.
+                    </p>
+                    <a href="../ministry/" class="story-btn" style="text-decoration:none">🕊️ Return to Ministry</a>
+                </div>
+            </div>
+
+        </div><!-- /.story-card -->
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Amazing Grace Home Living &mdash; Voice of Jesus Ministry &mdash; <a href="../">amazinggracehl.org</a></p>
+    </footer>
+
+    <script src="story-nodes.js"></script>
+    <script>
+    // Act → total steps (for progress dots)
+    const TOTAL_ACTS = 5;
+
+    // ═══════════════════════════════════════════════════════════════
+    //  MATCH-3 REFRACTION PUZZLE ENGINE
+    // ═══════════════════════════════════════════════════════════════
+    const COLS = 6, ROWS = 6;
+    const TYPES = ['gold', 'blue', 'purple', 'red'];
+    const SCORE_THRESHOLD = 1000;
+
+    let board = [];
+    let selected = null;   // { r, c }
+    let focusR = 0;        // keyboard cursor row
+    let focusC = 0;        // keyboard cursor col
+    let puzzleScore = 0;
+    let puzzleSolved = false;
+    let boardLocked = false;
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function randType() { return TYPES[Math.floor(Math.random() * TYPES.length)]; }
+
+    function createBoard() {
+        board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const validTypes = TYPES.filter(type => {
+                    const createsHorizontalMatch =
+                        c >= 2 &&
+                        board[r][c - 1] === type &&
+                        board[r][c - 2] === type;
+                    const createsVerticalMatch =
+                        r >= 2 &&
+                        board[r - 1][c] === type &&
+                        board[r - 2][c] === type;
+
+                    return !createsHorizontalMatch && !createsVerticalMatch;
+                });
+
+                board[r][c] = validTypes[Math.floor(Math.random() * validTypes.length)];
+            }
+        }
+    }
+
+    function findMatches() {
+        const hits = new Set();
+        // Horizontal
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c <= COLS - 3; c++) {
+                const t = board[r][c];
+                if (t && t === board[r][c+1] && t === board[r][c+2]) {
+                    let len = 3;
+                    while (c + len < COLS && board[r][c + len] === t) len++;
+                    for (let i = 0; i < len; i++) hits.add(`${r},${c+i}`);
+                }
+            }
+        }
+        // Vertical
+        for (let c = 0; c < COLS; c++) {
+            for (let r = 0; r <= ROWS - 3; r++) {
+                const t = board[r][c];
+                if (t && t === board[r+1][c] && t === board[r+2][c]) {
+                    let len = 3;
+                    while (r + len < ROWS && board[r + len][c] === t) len++;
+                    for (let i = 0; i < len; i++) hits.add(`${r+i},${c}`);
+                }
+            }
+        }
+        return [...hits].map(s => s.split(',').map(Number));
+    }
+
+    function isAdjacent(r1, c1, r2, c2) {
+        return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
+    }
+
+    function getCell(r, c) {
+        return document.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+    }
+
+    function renderBoard(restoreFocus) {
+        const el = document.getElementById('match-board');
+        el.innerHTML = '';
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const sq = document.createElement('button');
+                sq.type = 'button';
+                sq.className = `square star-${board[r][c]}`;
+                sq.setAttribute('data-r', r);
+                sq.setAttribute('data-c', c);
+                sq.setAttribute('role', 'gridcell');
+                sq.setAttribute('aria-label', `${board[r][c]} star crystal, row ${r+1} column ${c+1}`);
+                // Only the keyboard-focused cell is in the tab order
+                sq.setAttribute('tabindex', (r === focusR && c === focusC) ? '0' : '-1');
+
+                if (selected && selected.r === r && selected.c === c) {
+                    sq.classList.add('sq-selected');
+                }
+                if (r === focusR && c === focusC) {
+                    sq.classList.add('sq-focus');
+                }
+
+                sq.addEventListener('click', () => handleCellClick(r, c));
+                sq.addEventListener('keydown', (e) => handleCellKey(e, r, c));
+                el.appendChild(sq);
+            }
+        }
+        if (restoreFocus) {
+            const focusedCell = getCell(focusR, focusC);
+            if (focusedCell) focusedCell.focus();
+        }
+    }
+
+    // Move keyboard focus to (r, c) without changing game selection
+    function moveFocus(r, c) {
+        focusR = r;
+        focusC = c;
+        // Update tabindices — only focused cell is tabbable
+        document.querySelectorAll('#match-board .square').forEach(el => {
+            const er = parseInt(el.getAttribute('data-r'), 10);
+            const ec = parseInt(el.getAttribute('data-c'), 10);
+            const isFocused = er === r && ec === c;
+            el.setAttribute('tabindex', isFocused ? '0' : '-1');
+            el.classList.toggle('sq-focus', isFocused);
+        });
+        const target = getCell(r, c);
+        if (target) target.focus();
+    }
+
+    // Keyboard handler for each cell — mirrors match-maker-ui.js pattern
+    function handleCellKey(e, r, c) {
+        let tr = r, tc = c;
+
+        switch (e.key) {
+            case 'ArrowUp':    tr = Math.max(0, r - 1);        break;
+            case 'ArrowDown':  tr = Math.min(ROWS - 1, r + 1); break;
+            case 'ArrowLeft':  tc = Math.max(0, c - 1);        break;
+            case 'ArrowRight': tc = Math.min(COLS - 1, c + 1); break;
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                handleCellClick(r, c);
+                return;
+            case 'Escape':
+                e.preventDefault();
+                if (selected) {
+                    const prev = getCell(selected.r, selected.c);
+                    if (prev) prev.classList.remove('sq-selected');
+                    selected = null;
+                }
+                return;
+            default:
+                return;
+        }
+
+        e.preventDefault();
+        moveFocus(tr, tc);
+    }
+
+    function handleCellClick(r, c) {
+        if (puzzleSolved || boardLocked) return;
+
+        // Sync keyboard focus cursor to the clicked cell
+        focusR = r;
+        focusC = c;
+
+        if (selected === null) {
+            selected = { r, c };
+            const cell = getCell(r, c);
+            if (cell) cell.classList.add('sq-selected');
+        } else {
+            const { r: pr, c: pc } = selected;
+            const prevCell = getCell(pr, pc);
+            if (prevCell) prevCell.classList.remove('sq-selected');
+
+            if (pr === r && pc === c) {
+                selected = null;
+                return;
+            }
+
+            if (isAdjacent(pr, pc, r, c)) {
+                // Swap
+                [board[pr][pc], board[r][c]] = [board[r][c], board[pr][pc]];
+                const matches = findMatches();
+                if (matches.length > 0) {
+                    boardLocked = true;
+                    // sq-selected already removed from prevCell above; clear logic state before cascade
+                    selected = null;
+                    processMatches(matches).then(() => { boardLocked = false; });
+                } else {
+                    // Revert swap — sq-selected already visually cleared from prevCell above
+                    [board[pr][pc], board[r][c]] = [board[r][c], board[pr][pc]];
+                    selected = null;
+                    const cell = getCell(r, c);
+                    if (cell) {
+                        cell.classList.add('shake');
+                        setTimeout(() => cell.classList.remove('shake'), 350);
+                    }
+                }
+            } else {
+                // Re-select new cell
+                selected = { r, c };
+                const newCell = getCell(r, c);
+                if (newCell) newCell.classList.add('sq-selected');
+            }
+        }
+    }
+
+    async function processMatches(matches) {
+        const matched = matches.length;
+        // Animate explosions
+        for (const [r, c] of matches) {
+            const cell = getCell(r, c);
+            if (cell) cell.classList.add('match-explode');
+            board[r][c] = null;
+        }
+
+        // Score
+        puzzleScore += matched * 250;
+        updateScoreDisplay();
+
+        await sleep(520);
+
+        // Gravity — drop tiles down in each column
+        for (let c = 0; c < COLS; c++) {
+            let writeRow = ROWS - 1;
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r][c] !== null) {
+                    board[writeRow][c] = board[r][c];
+                    if (writeRow !== r) board[r][c] = null;
+                    writeRow--;
+                }
+            }
+            while (writeRow >= 0) {
+                board[writeRow][c] = randType();
+                writeRow--;
+            }
+        }
+
+        renderBoard(true /* restoreFocus after cascade */);
+
+        // Cascade check
+        await sleep(120);
+        const cascadeMatches = findMatches();
+        if (cascadeMatches.length > 0) {
+            await processMatches(cascadeMatches);
+        }
+
+        checkPuzzleWin();
+    }
+
+    function updateScoreDisplay() {
+        document.getElementById('score').textContent = puzzleScore;
+        const pct = Math.min(100, (puzzleScore / SCORE_THRESHOLD) * 100);
+        document.getElementById('score-fill').style.width = pct + '%';
+    }
+
+    function checkPuzzleWin() {
+        if (!puzzleSolved && puzzleScore >= SCORE_THRESHOLD) {
+            puzzleSolved = true;
+            document.getElementById('solve-btn').style.display = 'inline-flex';
+            const msg = document.getElementById('puzzle-msg');
+            msg.textContent = '✨ THE STARS ARE ALIGNED — The path forward is revealed!';
+            msg.className = 'solved';
+        }
+    }
+
+    function onPuzzleSolved() {
+        navigateTo('seven_letters');
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  NARRATIVE ENGINE
+    // ═══════════════════════════════════════════════════════════════
+    let visitedActs = new Set();
+    let currentPathLabel = '';
+
+    function buildProgressDots() {
+        const container = document.getElementById('progress-dots');
+        container.innerHTML = '';
+        for (let i = 1; i <= TOTAL_ACTS; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.id = `dot-${i}`;
+            dot.title = `Act ${i}`;
+            container.appendChild(dot);
+        }
+    }
+
+    function updateProgressDots(currentAct) {
+        for (let i = 1; i <= TOTAL_ACTS; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            if (!dot) continue;
+            if (i < currentAct) { dot.className = 'dot done'; }
+            else if (i === currentAct) { dot.className = 'dot active'; }
+            else { dot.className = 'dot'; }
+        }
+    }
+
+    function navigateTo(nodeId) {
+        const node = STORY_NODES[nodeId];
+        if (!node) return;
+
+        // Track path choices for certificate badge
+        if (nodeId === 'letter_ephesus') currentPathLabel = 'Path of First Love';
+        if (nodeId === 'letter_philadelphia') currentPathLabel = 'Path of the Open Door';
+        if (nodeId === 'victory_grace') currentPathLabel = (currentPathLabel || 'Path') + ' · Grace';
+        if (nodeId === 'victory_perseverance') currentPathLabel = (currentPathLabel || 'Path') + ' · Endurance';
+
+        visitedActs.add(node.act);
+        updateProgressDots(node.act);
+
+        // Update badge & title
+        document.getElementById('chapter-badge').textContent = node.chapter;
+        document.getElementById('story-title').textContent = node.title;
+        const storyTextEl = document.getElementById('story-text');
+        storyTextEl.style.whiteSpace = 'pre-line';
+        storyTextEl.textContent = node.text;
+
+        // Scripture
+        const scriptureEl = document.getElementById('story-scripture');
+        if (node.scripture) {
+            scriptureEl.innerHTML = `${node.scripture.text} <strong>— ${node.scripture.ref}</strong>`;
+            scriptureEl.style.display = 'block';
+        } else {
+            scriptureEl.style.display = 'none';
+        }
+
+        // Hide all variable sections
+        document.getElementById('choices-container').innerHTML = '';
+        document.getElementById('puzzle-container').classList.remove('visible');
+        document.getElementById('ending-container').classList.remove('visible');
+
+        if (node.type === 'choice') {
+            const container = document.getElementById('choices-container');
+            node.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.label;
+                btn.addEventListener('click', () => {
+                    btn.disabled = true;
+                    document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+                    setTimeout(() => navigateTo(choice.next), 350);
+                });
+                container.appendChild(btn);
+            });
+
+        } else if (node.type === 'puzzle') {
+            document.getElementById('puzzle-container').classList.add('visible');
+            // Reset puzzle state for a fresh start every time
+            puzzleScore = 0;
+            puzzleSolved = false;
+            boardLocked = false;
+            selected = null;
+            focusR = 0;
+            focusC = 0;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('score-fill').style.width = '0%';
+            document.getElementById('puzzle-msg').textContent = '';
+            document.getElementById('puzzle-msg').className = '';
+            document.getElementById('solve-btn').style.display = 'none';
+            createBoard();
+            renderBoard(false);
+
+        } else if (node.type === 'ending') {
+            const endContainer = document.getElementById('ending-container');
+            endContainer.classList.add('visible');
+            const badge = document.getElementById('cert-path-badge');
+            badge.textContent = currentPathLabel || 'Seeker of the Seven Stars';
+            updateProgressDots(TOTAL_ACTS);
+        }
+
+        // Scroll story card into view smoothly
+        document.getElementById('story-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  INIT
+    // ═══════════════════════════════════════════════════════════════
+    buildProgressDots();
+    navigateTo('intro');
+    </script>
+</body>
+</html>
