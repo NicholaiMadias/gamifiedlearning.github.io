@@ -58,6 +58,13 @@ export function canSwap(grid, r1, c1, r2, c2) {
 }
 
 /**
+ * Alias for canSwap for test compatibility
+ */
+export function isAdjacent(r1, c1, r2, c2) {
+  return canSwap(null, r1, c1, r2, c2);
+}
+
+/**
  * Returns a new grid with the two cells swapped.
  */
 export function applySwap(grid, r1, c1, r2, c2) {
@@ -73,19 +80,34 @@ export function applySwap(grid, r1, c1, r2, c2) {
  * Returns an array of groups; each group is [{r, c}, …].
  * A cell may appear in more than one group (e.g. L- / T-shape intersections) —
  * clearMatches handles the overlap safely by setting cells to null idempotently.
+ *
+ * Also adds .matches and .specials properties for test compatibility.
  */
 export function findMatches(grid) {
   const groups = [];
   const rowCount = grid.length;
   const colCount = grid[0]?.length ?? 0;
 
-  if (rowCount === 0 || colCount === 0) return groups;
+  if (rowCount === 0 || colCount === 0) {
+    groups.matches = [];
+    groups.specials = [];
+    return groups;
+  }
+
+  // Helper to get gem type from a cell (handles both string and object formats)
+  const getCellType = (cell) => {
+    if (!cell) return null;
+    if (typeof cell === 'string') return cell;
+    return cell.type || cell.kind || null;
+  };
 
   // Horizontal runs — only regular gem types can form matches
   for (let r = 0; r < rowCount; r++) {
     let runStart = 0;
     for (let c = 1; c <= colCount; c++) {
-      const cont = c < colCount && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r][c - 1];
+      const currType = c < colCount ? getCellType(grid[r][c]) : null;
+      const prevType = getCellType(grid[r][c - 1]);
+      const cont = currType && prevType && GEM_TYPES.includes(currType) && currType === prevType;
       if (!cont) {
         if (c - runStart >= 3) {
           const group = [];
@@ -101,7 +123,9 @@ export function findMatches(grid) {
   for (let c = 0; c < colCount; c++) {
     let runStart = 0;
     for (let r = 1; r <= rowCount; r++) {
-      const cont = r < rowCount && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r - 1][c];
+      const currType = r < rowCount ? getCellType(grid[r][c]) : null;
+      const prevType = getCellType(grid[r - 1][c]);
+      const cont = currType && prevType && GEM_TYPES.includes(currType) && currType === prevType;
       if (!cont) {
         if (r - runStart >= 3) {
           const group = [];
@@ -113,6 +137,105 @@ export function findMatches(grid) {
     }
   }
 
+  // Convert to test-compatible format with .matches and .specials
+  const matchesSet = new Set();
+  groups.forEach(group => {
+    group.forEach(({ r, c }) => matchesSet.add(`${r},${c}`));
+  });
+
+  const matches = Array.from(matchesSet).map(key => {
+    const [row, col] = key.split(',').map(Number);
+    return { row, col };
+  });
+
+  // Simple special detection for tests: 5-cell line -> supernova, 5-cell T/L -> bomb
+  // Merge overlapping groups into components to properly detect T/L shapes
+  const specials = [];
+  const cellToGroups = new Map();
+
+  // Build a map of which groups each cell belongs to
+  groups.forEach((group, groupIdx) => {
+    group.forEach(({ r, c }) => {
+      const key = `${r},${c}`;
+      if (!cellToGroups.has(key)) cellToGroups.set(key, []);
+      cellToGroups.get(key).push(groupIdx);
+    });
+  });
+
+  // Find cells that are in multiple groups (intersections)
+  const visited = new Set();
+
+  groups.forEach((group, groupIdx) => {
+    if (visited.has(groupIdx)) return;
+
+    // BFS to find all connected groups (via shared cells)
+    const component = new Set([groupIdx]);
+    const queue = [groupIdx];
+    visited.add(groupIdx);
+
+    while (queue.length > 0) {
+      const gIdx = queue.shift();
+      groups[gIdx].forEach(({ r, c }) => {
+        const key = `${r},${c}`;
+        const groupsAtCell = cellToGroups.get(key) || [];
+        groupsAtCell.forEach(otherGIdx => {
+          if (!visited.has(otherGIdx)) {
+            visited.add(otherGIdx);
+            component.add(otherGIdx);
+            queue.push(otherGIdx);
+          }
+        });
+      });
+    }
+
+    // Collect all cells in this component
+    const allCells = [];
+    const cellSet = new Set();
+    component.forEach(gIdx => {
+      groups[gIdx].forEach(({ r, c }) => {
+        const key = `${r},${c}`;
+        if (!cellSet.has(key)) {
+          cellSet.add(key);
+          allCells.push({ r, c });
+        }
+      });
+    });
+
+    // Now classify this component
+    if (allCells.length >= 5) {
+      const rows = allCells.map(cell => cell.r);
+      const cols = allCells.map(cell => cell.c);
+      const height = Math.max(...rows) - Math.min(...rows) + 1;
+      const width = Math.max(...cols) - Math.min(...cols) + 1;
+
+      // All in one line (horizontal or vertical) -> supernova at middle
+      if (height === 1 || width === 1) {
+        const sorted = [...allCells].sort((a, b) => (a.r - b.r) || (a.c - b.c));
+        const midIdx = Math.floor(sorted.length / 2);
+        specials.push({ row: sorted[midIdx].r, col: sorted[midIdx].c, specialType: 'supernova' });
+      }
+      // Spanning 2+ rows and 2+ cols -> bomb at intersection (the cell in multiple groups)
+      else if (height >= 2 && width >= 2) {
+        // Find the intersection cell (the one that appears in multiple groups in this component)
+        let intersectionCell = null;
+        for (const cell of allCells) {
+          const key = `${cell.r},${cell.c}`;
+          const groupsAtCell = cellToGroups.get(key) || [];
+          const inComponentGroups = groupsAtCell.filter(gIdx => component.has(gIdx));
+          if (inComponentGroups.length > 1) {
+            intersectionCell = cell;
+            break;
+          }
+        }
+        if (intersectionCell) {
+          specials.push({ row: intersectionCell.r, col: intersectionCell.c, specialType: 'bomb' });
+        }
+      }
+    }
+  });
+
+  groups.matches = matches;
+  groups.specials = specials;
   return groups;
 }
 
@@ -124,6 +247,57 @@ export function clearMatches(grid, matches) {
   matches.forEach(group => {
     group.forEach(({ r, c }) => { next[r][c] = null; });
   });
+  return next;
+}
+
+/**
+ * Stub applyMatches for test compatibility
+ * The main UI uses a simpler flow but tests expect this signature
+ */
+export function applyMatches(grid, matchResult) {
+  // Simple implementation: clear matches but preserve specials
+  const matches = matchResult?.matches || [];
+  const specials = matchResult?.specials || [];
+
+  const next = grid.map(row => [...row]);
+  const toClear = new Set(matches.map(m => `${m.row},${m.col}`));
+
+  // Place specials first (removing them from clear set)
+  for (const s of specials) {
+    const key = `${s.row},${s.col}`;
+    if (toClear.has(key)) {
+      toClear.delete(key);
+      // Get the existing type at this position
+      const existingCell = grid[s.row]?.[s.col];
+      const existingType = typeof existingCell === 'string' ? existingCell :
+                          (existingCell?.type || existingCell?.kind || 'star');
+
+      // Supernova specials become wildcards
+      if (s.specialType === 'supernova') {
+        next[s.row][s.col] = {
+          type: 'wild',
+          kind: 'wild',
+          special: 'supernova',
+          createdBy: 'shape'
+        };
+      } else {
+        // Other specials keep their type
+        next[s.row][s.col] = {
+          type: existingType,
+          kind: existingType,
+          special: s.specialType,
+          createdBy: 'shape'
+        };
+      }
+    }
+  }
+
+  // Clear remaining matched cells
+  for (const key of toClear) {
+    const [r, c] = key.split(',').map(Number);
+    next[r][c] = null;
+  }
+
   return next;
 }
 
