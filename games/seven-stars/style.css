@@ -1,0 +1,105 @@
+:root {
+    --gold: #ffd700;
+    --nebula: rgba(74, 35, 90, 0.8);
+}
+
+body {
+    background: #0a0010;
+    color: #e0d0ff;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+}
+
+h1 {
+    color: var(--gold);
+    text-shadow: 0 0 12px #ffd70080;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+#match-board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    width: 360px;
+    height: 360px;
+    margin: 20px auto;
+    padding: 15px;
+    background: url('assets/starfield_bg.jpg') no-repeat center; /* Optional BG */
+    background-size: cover;
+    background-color: #0d0020;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px var(--nebula);
+}
+
+.square {
+    width: 50px;
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 4px;
+}
+
+.square:hover {
+    transform: scale(1.15);
+    filter: brightness(1.2);
+}
+
+/* Specific Classes for your Uploaded Star Assets */
+.star-gold {
+    background-image: url('assets/star_crystal_gold.png');
+    background-color: #ffd700;
+}
+.star-blue {
+    background-image: url('assets/star_crystal_blue.png');
+    background-color: #1565c0;
+}
+.star-purple {
+    background-image: url('assets/star_crystal_purple.png');
+    background-color: #6a1b9a;
+}
+.star-red {
+    background-image: url('assets/star_crystal_red.png');
+    background-color: #b71c1c;
+}
+
+/* Animation for a Match */
+.match-explode {
+    animation: supernova 0.5s forwards;
+    background-image: url('assets/supernova_explosion.png') !important;
+    background-color: #ff6600 !important;
+}
+
+@keyframes supernova {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+#solve-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    letter-spacing: 0.08em;
+}
+
+#solve-btn:hover {
+    background: rgba(255, 215, 0, 0.15);
+}
+
+#msg {
+    font-size: 1.1rem;
+    color: #00ff41;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    min-height: 1.5em;
+}
