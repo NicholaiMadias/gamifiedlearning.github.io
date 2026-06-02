@@ -6,8 +6,10 @@ const assetMap = ["star-gold", "star-blue", "star-purple", "star-red"];
 function init() {
     const board = document.getElementById('match-board');
     for(let i=0; i<36; i++) {
-        const sq = document.createElement('div');
+        const sq = document.createElement('button');
+        sq.type = 'button';
         sq.className = 'square ' + assetMap[Math.floor(Math.random() * assetMap.length)];
+        sq.setAttribute('aria-label', `Star cell ${i + 1}`);
 
         sq.onclick = function() {
             // Visual feedback using your Supernova asset

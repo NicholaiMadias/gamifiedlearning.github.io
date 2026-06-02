@@ -23,8 +23,8 @@ h1 {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 8px;
-    width: 360px;
-    height: 360px;
+    max-width: min(360px, calc(100vw - 2rem));
+    aspect-ratio: 1;
     margin: 20px auto;
     padding: 15px;
     background: url('assets/starfield_bg.jpg') no-repeat center; /* Optional BG */
@@ -35,14 +35,22 @@ h1 {
 }
 
 .square {
-    width: 50px;
-    height: 50px;
+    aspect-ratio: 1;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border-radius: 4px;
+    /* Reset button default styles */
+    border: none;
+    padding: 0;
+    font: inherit;
+}
+
+.square:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
 }
 
 .square:hover {
