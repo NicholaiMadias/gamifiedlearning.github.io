@@ -1,40 +1,34 @@
 export const GRID_SIZE = 7;
-export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop'];
 
-function cellType(cell) {
-  return cell?.type ?? cell?.kind ?? null;
-}
+/** The six regular gem types. */
+export const GEM_TYPES = ['heart', 'star', 'cross', 'flame', 'drop', 'gem'];
 
-export function makeGem(type, special = null, createdBy = null) {
-  return { type, kind: type, special, createdBy };
-}
+/** Special power-up gem types (never fill in randomly). */
+export const SPECIAL_GEM_TYPES = ['bomb', 'rainbow'];
 
-function cloneGrid(grid) {
-  return grid.map(row => row.map(cell => {
-    if (!cell) return null;
-    const type = cellType(cell);
-    return { ...cell, type, kind: type };
-  }));
-}
+/**
+ * Base score for one matched cell of each regular gem type
+ * (multiplied by the current combo before adding to the total).
+ * Diamonds are rarest and highest-value; flames score lower
+ * but chain more easily.
+ */
+export const GEM_SCORE = {
+  heart: 12,  // life tile — slight bonus
+  star:  10,  // standard
+  cross: 15,  // crystal — high value
+  flame:  8,  // fire — lower base, relies on chains
+  drop:  10,  // water — standard
+  gem:   20,  // diamond — rarest, highest value
+};
 
-function randomGemType() {
+function randomGem() {
   return GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)];
 }
 
-function randomGem() {
-  return makeGem(randomGemType());
-}
-
-function sameKind(a, b) {
-  const aType = cellType(a);
-  const bType = cellType(b);
-  if (!aType || !bType) return false;
-  if (aType === 'wild' || bType === 'wild') return true;
-  return aType === bType;
-}
-
 /**
- * Creates an initial 7×7 grid with no pre-existing matches.
+ * Creates an initial GRID_SIZE×GRID_SIZE grid with no pre-existing matches.
+ * All other functions in this module are hard-coded to GRID_SIZE, so variable
+ * dimensions are intentionally not supported here.
  */
 export function createInitialGrid() {
   const grid = [];
@@ -45,16 +39,14 @@ export function createInitialGrid() {
       do {
         gem = randomGem();
       } while (
-        (c >= 2 && sameKind(grid[r][c - 1], gem) && sameKind(grid[r][c - 2], gem)) ||
-        (r >= 2 && sameKind(grid[r - 1][c], gem) && sameKind(grid[r - 2][c], gem))
+        (c >= 2 && grid[r][c - 1] === gem && grid[r][c - 2] === gem) ||
+        (r >= 2 && grid[r - 1][c] === gem && grid[r - 2][c] === gem)
       );
       grid[r][c] = gem;
     }
   }
   return grid;
 }
-
-export const createGrid = createInitialGrid;
 
 /**
  * Returns true if the two cells are adjacent (share an edge).
@@ -65,267 +57,140 @@ export function canSwap(grid, r1, c1, r2, c2) {
   return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
 }
 
-export function isAdjacent(r1, c1, r2, c2) {
-  return canSwap(null, r1, c1, r2, c2);
-}
-
 /**
  * Returns a new grid with the two cells swapped.
  */
 export function applySwap(grid, r1, c1, r2, c2) {
-  const next = cloneGrid(grid);
+  const next = grid.map(row => [...row]);
   const tmp = next[r1][c1];
   next[r1][c1] = next[r2][c2];
   next[r2][c2] = tmp;
   return next;
 }
 
-export const swapGems = applySwap;
-
 /**
- * Finds horizontal and vertical groups of 3+.
- * Returns an array of groups for UI compatibility, with `.matches` and `.specials`
- * properties for test/engine compatibility.
+ * Finds all horizontal and vertical runs of 3+ matching gems.
+ * Returns an array of groups; each group is [{r, c}, …].
+ * A cell may appear in more than one group (e.g. L- / T-shape intersections) —
+ * clearMatches handles the overlap safely by setting cells to null idempotently.
  */
 export function findMatches(grid) {
   const groups = [];
+  const rowCount = grid.length;
+  const colCount = grid[0]?.length ?? 0;
 
-  // Horizontal runs
-  for (let r = 0; r < GRID_SIZE; r++) {
-    let run = [{ r, c: 0 }];
-    for (let c = 1; c <= GRID_SIZE; c++) {
-      const prev = c - 1 < GRID_SIZE ? grid[r][c - 1] : null;
-      const curr = c < GRID_SIZE ? grid[r][c] : null;
-      if (curr && prev && sameKind(curr, prev)) {
-        run.push({ r, c });
-      } else {
-        if (run.length >= 3) groups.push(run);
-        run = c < GRID_SIZE ? [{ r, c }] : [];
+  if (rowCount === 0 || colCount === 0) return groups;
+
+  // Horizontal runs — only regular gem types can form matches
+  for (let r = 0; r < rowCount; r++) {
+    let runStart = 0;
+    for (let c = 1; c <= colCount; c++) {
+      const cont = c < colCount && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r][c - 1];
+      if (!cont) {
+        if (c - runStart >= 3) {
+          const group = [];
+          for (let k = runStart; k < c; k++) group.push({ r, c: k });
+          groups.push(group);
+        }
+        runStart = c;
       }
     }
   }
 
-  // Vertical runs
-  for (let c = 0; c < GRID_SIZE; c++) {
-    let run = [{ r: 0, c }];
-    for (let r = 1; r <= GRID_SIZE; r++) {
-      const prev = r - 1 < GRID_SIZE ? grid[r - 1][c] : null;
-      const curr = r < GRID_SIZE ? grid[r][c] : null;
-      if (curr && prev && sameKind(curr, prev)) {
-        run.push({ r, c });
-      } else {
-        if (run.length >= 3) groups.push(run);
-        run = r < GRID_SIZE ? [{ r, c }] : [];
+  // Vertical runs — only regular gem types can form matches
+  for (let c = 0; c < colCount; c++) {
+    let runStart = 0;
+    for (let r = 1; r <= rowCount; r++) {
+      const cont = r < rowCount && grid[r][c] && GEM_TYPES.includes(grid[r][c]) && grid[r][c] === grid[r - 1][c];
+      if (!cont) {
+        if (r - runStart >= 3) {
+          const group = [];
+          for (let k = runStart; k < r; k++) group.push({ r: k, c });
+          groups.push(group);
+        }
+        runStart = r;
       }
     }
   }
 
-  const unique = new Set();
-  groups.forEach(group => {
-    group.forEach(({ r, c }) => unique.add(`${r},${c}`));
-  });
-  const matches = [...unique].map(key => {
-    const [row, col] = key.split(',').map(Number);
-    return { row, col };
-  });
-
-  const specials = classifyShapes(grid, matches);
-  groups.matches = matches;
-  groups.specials = specials;
   return groups;
 }
 
-function classifyShapes(grid, matches) {
-  const byCell = new Map();
-  for (const m of matches) {
-    byCell.set(`${m.row},${m.col}`, { ...m, neighbors: [] });
-  }
-
-  for (const cell of byCell.values()) {
-    const type = cellType(grid[cell.row]?.[cell.col]);
-    for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const nr = cell.row + dr;
-      const nc = cell.col + dc;
-      const key = `${nr},${nc}`;
-      if (byCell.has(key) && cellType(grid[nr]?.[nc]) === type) {
-        cell.neighbors.push(byCell.get(key));
-      }
-    }
-  }
-
-  const specials = [];
-  const visited = new Set();
-
-  for (const start of byCell.values()) {
-    const startKey = `${start.row},${start.col}`;
-    if (visited.has(startKey)) continue;
-
-    const queue = [start];
-    const component = [];
-    visited.add(startKey);
-
-    while (queue.length) {
-      const cur = queue.shift();
-      component.push(cur);
-      for (const n of cur.neighbors) {
-        const nk = `${n.row},${n.col}`;
-        if (!visited.has(nk)) {
-          visited.add(nk);
-          queue.push(n);
-        }
-      }
-    }
-
-    specials.push(...classifyComponent(component));
-  }
-
-  return specials;
-}
-
-function classifyComponent(component) {
-  if (component.length < 4) return [];
-
-  const rows = component.map(c => c.row);
-  const cols = component.map(c => c.col);
-  const height = Math.max(...rows) - Math.min(...rows) + 1;
-  const width = Math.max(...cols) - Math.min(...cols) + 1;
-  const sorted = [...component].sort((a, b) => (a.row - b.row) || (a.col - b.col));
-  const midIdx = Math.floor(sorted.length / 2);
-
-  // 5+ in line -> supernova
-  if (component.length >= 5 && (height === 1 || width === 1)) {
-    const center = sorted[midIdx];
-    return [{ row: center.row, col: center.col, specialType: 'supernova' }];
-  }
-
-  // T/L shape (5+ spanning 2+ rows and cols) -> bomb
-  if (component.length >= 5 && height >= 2 && width >= 2) {
-    const compSet = new Set(component.map(c => `${c.row},${c.col}`));
-    const degrees = new Map(component.map(cell => [
-      `${cell.row},${cell.col}`,
-      [[0, 1], [0, -1], [1, 0], [-1, 0]].reduce(
-        (n, [dr, dc]) => n + (compSet.has(`${cell.row + dr},${cell.col + dc}`) ? 1 : 0),
-        0,
-      ),
-    ]));
-
-    const intersection = component.reduce((best, cell) =>
-      degrees.get(`${cell.row},${cell.col}`) > degrees.get(`${best.row},${best.col}`) ? cell : best,
-    component[0]);
-
-    return [{ row: intersection.row, col: intersection.col, specialType: 'bomb' }];
-  }
-
-  // 4 in line -> directional line clear
-  if (component.length === 4 && (height === 1 || width === 1)) {
-    const center = sorted[midIdx];
-    return [{ row: center.row, col: center.col, specialType: height === 1 ? 'lineH' : 'lineV' }];
-  }
-
-  return [];
-}
-
 /**
- * Returns a new grid with matched cells set to null and optional replacements placed.
+ * Returns a new grid with all cells referenced by the match groups set to null.
  */
-export function clearMatches(grid, matchCells, replacements = []) {
-  const next = cloneGrid(grid);
-  matchCells.forEach(cell => {
-    const r = cell.r ?? cell.row;
-    const c = cell.c ?? cell.col;
-    next[r][c] = null;
-  });
-  replacements.forEach(repl => {
-    const type = repl.type ?? repl.kind ?? randomGemType();
-    next[repl.r][repl.c] = makeGem(type, repl.special || null, repl.createdBy || null);
+export function clearMatches(grid, matches) {
+  const next = grid.map(row => [...row]);
+  matches.forEach(group => {
+    group.forEach(({ r, c }) => { next[r][c] = null; });
   });
   return next;
 }
 
 /**
- * Applies match results from `findMatches` and keeps newly-created specials.
+ * Clears a 3×3 area centred on (r, c) — triggered when a bomb gem detonates.
  */
-export function applyMatches(grid, matchResult) {
-  const matches = matchResult?.matches || [];
-  const specials = matchResult?.specials || [];
-  const next = cloneGrid(grid);
-  const toClear = new Set(matches.map(m => `${m.row},${m.col}`));
-
-  const preExistingSpecials = matches
-    .filter(m => next[m.row]?.[m.col]?.special)
-    .map(m => ({
-      row: m.row,
-      col: m.col,
-      type: next[m.row][m.col].special,
-      gemType: cellType(next[m.row][m.col]),
-    }));
-
-  for (const s of specials) {
-    const key = `${s.row},${s.col}`;
-    if (!toClear.has(key)) continue;
-    toClear.delete(key);
-    // Supernova specials become true wildcards (kind: 'wild')
-    const existingType = cellType(next[s.row]?.[s.col]) || 'star';
-    const gemType = s.specialType === 'supernova' ? 'wild' : existingType;
-    next[s.row][s.col] = makeGem(gemType, s.specialType, 'shape');
+export function applyBombExplosion(grid, r, c) {
+  const next = grid.map(row => [...row]);
+  const rowCount = next.length;
+  const colCount = next[0]?.length ?? 0;
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < rowCount && nc >= 0 && nc < colCount) {
+        next[nr][nc] = null;
+      }
+    }
   }
-
-  for (const key of toClear) {
-    const [r, c] = key.split(',').map(Number);
-    next[r][c] = null;
-  }
-
-  for (const ps of preExistingSpecials) {
-    triggerSpecial(next, ps.row, ps.col, ps.type, ps.gemType);
-  }
-
   return next;
 }
 
 /**
- * Clears cells affected by a special gem in-place.
+ * Sets every cell whose type === targetType to null — triggered by a rainbow gem.
  */
-export function triggerSpecial(grid, row, col, type, gemType = null) {
-  const rows = grid.length;
-  const cols = grid[0].length;
-
-  const mark = (r, c) => {
-    if (r < 0 || r >= rows || c < 0 || c >= cols) return;
-    grid[r][c] = null;
-  };
-
-  if (type === 'lineH' || type === 'row') {
-    for (let c = 0; c < cols; c++) mark(row, c);
-  } else if (type === 'lineV' || type === 'col') {
-    for (let r = 0; r < rows; r++) mark(r, col);
-  } else if (type === 'bomb') {
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        mark(row + dr, col + dc);
-      }
-    }
-  } else if (type === 'supernova') {
-    const targetType = gemType || cellType(grid[row]?.[col]);
-    if (!targetType) return;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (cellType(grid[r][c]) === targetType) mark(r, c);
-      }
+export function applyRainbowClear(grid, targetType) {
+  const next = grid.map(row => [...row]);
+  const rowCount = next.length;
+  const colCount = next[0]?.length ?? 0;
+  for (let r = 0; r < rowCount; r++) {
+    for (let c = 0; c < colCount; c++) {
+      if (next[r][c] === targetType) next[r][c] = null;
     }
   }
+  return next;
 }
 
 /**
- * Applies gravity: shifts non-null cells down, fills top with new random gems.
+ * Returns the regular gem type that appears most often on the board.
+ * Falls back to the first GEM_TYPES entry if no regular gems are present.
+ */
+export function findMostCommonType(grid) {
+  const counts = {};
+  GEM_TYPES.forEach(t => { counts[t] = 0; });
+  const rowCount = grid.length;
+  const colCount = grid[0]?.length ?? 0;
+  for (let r = 0; r < rowCount; r++) {
+    for (let c = 0; c < colCount; c++) {
+      if (GEM_TYPES.includes(grid[r][c])) counts[grid[r][c]]++;
+    }
+  }
+  const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  return best ? best[0] : GEM_TYPES[0];
+}
+
+/**
+ * Applies gravity: shifts non-null cells downward, fills gaps with new random gems.
  */
 export function applyGravity(grid) {
-  const next = cloneGrid(grid);
-  for (let c = 0; c < GRID_SIZE; c++) {
+  const next = grid.map(row => [...row]);
+  const rowCount = next.length;
+  const colCount = next[0]?.length ?? 0;
+  for (let c = 0; c < colCount; c++) {
     const gems = [];
-    for (let r = GRID_SIZE - 1; r >= 0; r--) {
+    for (let r = rowCount - 1; r >= 0; r--) {
       if (next[r][c] !== null) gems.push(next[r][c]);
     }
-    for (let r = GRID_SIZE - 1; r >= 0; r--) {
+    for (let r = rowCount - 1; r >= 0; r--) {
       next[r][c] = gems.length > 0 ? gems.shift() : randomGem();
     }
   }

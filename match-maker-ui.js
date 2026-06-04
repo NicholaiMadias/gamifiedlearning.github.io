@@ -1,417 +1,435 @@
-// match-maker-ui.js
+/**
+ * match-maker-ui.js — Game UI Layer for Match Maker
+ * Renders the 7×7 grid, handles input, animates cascades,
+ * manages combo scoring, special gems, and the Star Store.
+ * (c) 2026 NicholaiMadias — MIT License
+ */
+
+import { createInitialGrid } from './matchMakerState.js';
 import {
-  createInitialGrid,
+  canSwap,
+  applySwap,
   findMatches,
   clearMatches,
   applyGravity,
-  GRID_SIZE,
+  applyBombExplosion,
+  applyRainbowClear,
+  findMostCommonType,
+  GEM_TYPES,
+  GEM_SCORE,
 } from './matchMakerState.js';
 import { onLevelComplete } from './badges.js';
 
+// ── State ────────────────────────────────────────────────
 let grid;
 let selected = null;
 let score = 0;
 let moves = 20;
 let level = 1;
-let shards = 0;
-let comboChain = 0;
-let comboMultiplier = 1;
+let coins = 0;
+let chainDepth = 0;
+let lastSwap = null;
 let db = null;
 let user = null;
-let storeBound = false;
-let resolveTimeoutId = null;
-let statusTimeoutId = null;
 let runId = 0;
-let resolving = false;
+let pendingTimeout = null;
+let bannerHideTimer = null;
 
 const SCORE_PER_LEVEL = 500;
-const CHAIN_REACTION_DELAY_MS = 320;
-const MAX_COMBO_MULTIPLIER = 5;
+// 350 ms matches the gem-pop animation duration (320 ms) plus a small buffer
+const CHAIN_REACTION_DELAY_MS = 380;
 
-function isAdjacent(r1, c1, r2, c2) {
-  const rowDiff = Math.abs(r1 - r2);
-  const colDiff = Math.abs(c1 - c2);
-  return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
-}
-
-function swapGridCells(currentGrid, r1, c1, r2, c2) {
-  const swapped = currentGrid.map((row) => row.slice());
-  [swapped[r1][c1], swapped[r2][c2]] = [swapped[r2][c2], swapped[r1][c1]];
-  return swapped;
-}
-
-const STORE_ITEMS = [
-  { id: 'moves', label: '+5 Moves Flask', cost: 4, detail: 'Refill your focus and gain +5 moves.', action: () => addMoves(5) },
-  { id: 'line', label: 'Line Clear Rune', cost: 3, detail: 'Drop a rune that clears a whole line when matched.', action: () => injectSpecial('row') },
-  { id: 'bomb', label: 'Crystal Bomb', cost: 5, detail: 'Place a radiant bomb for a 3×3 blast.', action: () => injectSpecial('bomb') },
-  { id: 'wild', label: 'Rainbow Wild', cost: 4, detail: 'Adds a wild gem that links any combo.', action: () => injectSpecial('wild') },
-];
-
-const STAR_SHEET_URL = 'https://github.com/user-attachments/assets/ffa6a239-a672-4607-974f-ab1fb0475410';
-const SHOOTING_STAR_FX_URL = 'https://github.com/user-attachments/assets/b2877683-8436-49bd-8bc8-69fdfbf9f717';
-const SUPERNOVA_FX_URL = 'https://github.com/user-attachments/assets/7d098ae2-7b30-4cdd-a1f9-45ef3083211c';
-
-// Gem image mapping
-const GEM_IMAGES = {
-  'heart': null,
-  'star': STAR_SHEET_URL,
-  'cross': null,
-  'flame': null,
-  'drop': SHOOTING_STAR_FX_URL,
-  'wild': STAR_SHEET_URL,
+const GEM_LABELS = {
+  heart: 'Heart', star: 'Star', cross: 'Cross', flame: 'Flame',
+  drop: 'Drop', gem: 'Gem', bomb: 'Bomb', rainbow: 'Crystal',
 };
 
+// ── Store catalogue ──────────────────────────────────────
+const STORE_ITEMS = [
+  { id: 'extra-moves', label: '+5 Moves', cost: 100, icon: '🎯' },
+  { id: 'shuffle',     label: 'Shuffle',  cost: 150, icon: '🔀' },
+  { id: 'place-bomb',  label: 'Bomb',     cost: 200, icon: '💣' },
+];
+
+// ── Init ─────────────────────────────────────────────────
 export function initMatchMaker(dbRef, userRef) {
   db = dbRef;
   user = userRef;
   runId++;
+  if (pendingTimeout) { clearTimeout(pendingTimeout); pendingTimeout = null; }
+
   score = 0;
   moves = 20;
   level = 1;
-  shards = 0;
-  comboChain = 0;
-  comboMultiplier = 1;
+  coins = 0;
+  chainDepth = 0;
   selected = null;
-  resolving = false;
-  if (resolveTimeoutId) {
-    clearTimeout(resolveTimeoutId);
-    resolveTimeoutId = null;
-  }
-  if (statusTimeoutId) {
-    clearTimeout(statusTimeoutId);
-    statusTimeoutId = null;
-  }
+  lastSwap = null;
   grid = createInitialGrid();
-  renderGrid();
-  renderStore();
-  updateStats();
+
+  document.getElementById('match-score').textContent = score;
+  document.getElementById('match-moves').textContent = moves;
+  document.getElementById('match-level').textContent = level;
+  document.getElementById('match-coins').textContent = coins;
+
   const banner = document.getElementById('match-badge-banner');
   if (banner) banner.classList.add('hidden');
+
+  renderGrid();
+  updateStoreButtons();
 }
 
-function renderGrid(highlightSet = new Set()) {
+// ── Rendering ────────────────────────────────────────────
+function renderGrid() {
   const container = document.getElementById('match-grid');
-  if (!container) return;
   container.innerHTML = '';
+  const rawColumnCount = grid[0]?.length;
+  const columnCount = Number.isInteger(rawColumnCount) && rawColumnCount > 0
+    ? Math.min(rawColumnCount, 50)
+    : 1;
+  container.style.setProperty('grid-template-columns', `repeat(${columnCount}, 1fr)`);
 
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
-      const cellData = grid[r][c];
+  for (let r = 0; r < grid.length; r++) {
+    for (let c = 0; c < grid[r].length; c++) {
       const cell = document.createElement('div');
       cell.className = 'match-cell';
       cell.dataset.row = r;
       cell.dataset.col = c;
-      cell.classList.add(`gem-${cellData.kind}`);
-      if (cellData.special) cell.classList.add(`special-${cellData.special}`);
-      if (highlightSet.has(key(r, c))) cell.classList.add('matching');
-      if (selected && selected.r === r && selected.c === c) cell.classList.add('selected');
-
-      const glyph = document.createElement('div');
-      glyph.className = 'glyph';
-
-      // Use PNG image for regular gems, emoji for wild
-      if (GEM_IMAGES[cellData.kind]) {
-        glyph.style.backgroundImage = `url('${GEM_IMAGES[cellData.kind]}')`;
-      } else {
-        glyph.classList.add('emoji');
-        glyph.textContent = gemIcon(cellData);
+      cell.setAttribute('role', 'button');
+      cell.tabIndex = 0;
+      const type = grid[r][c];
+      const isSelected = selected?.r === r && selected?.c === c;
+      cell.classList.toggle('selected', isSelected);
+      cell.setAttribute('aria-pressed', String(isSelected));
+      cell.setAttribute(
+        'aria-label',
+        `${getCellLabel(type)} tile at row ${r + 1}, column ${c + 1}${isSelected ? ', selected' : ''}`
+      );
+      if (type) {
+        const gem = document.createElement('div');
+        gem.className = `gem gem-${type}`;
+        gem.setAttribute('role', 'img');
+        gem.setAttribute('aria-label', getCellLabel(type));
+        cell.appendChild(gem);
       }
-
-      cell.appendChild(glyph);
-
-      if (cellData.special) {
-        const badge = document.createElement('span');
-        badge.className = 'special-chip';
-        badge.textContent = specialBadge(cellData.special);
-        cell.appendChild(badge);
-      }
-
-      cell.onclick = () => onCellClick(r, c);
+      cell.addEventListener('click', () => onCellClick(r, c));
+      cell.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onCellClick(r, c);
+        } else if (event.key === 'Escape' && selected?.r === r && selected?.c === c) {
+          event.preventDefault();
+          clearSelection();
+        }
+      });
       container.appendChild(cell);
     }
   }
 }
 
-function gemIcon(cell) {
-  switch (cell.kind) {
-    case 'heart': return '💖';
-    case 'star': return '⭐';
-    case 'cross': return '✝️';
-    case 'flame': return '🔥';
-    case 'drop': return '💧';
-    case 'wild': return '🌈';
-    default: return '⬛';
-  }
-}
-
-function specialBadge(special) {
-  if (special === 'row') return '─';
-  if (special === 'col') return '│';
-  if (special === 'bomb') return '✦';
-  return '☆';
-}
-
+// ── Input ────────────────────────────────────────────────
 function onCellClick(r, c) {
-  if (moves <= 0 || resolving) return;
+  if (moves <= 0) return;
 
+  // Direct special-gem activation on first tap (no prior selection needed)
   if (!selected) {
+    if (grid[r][c] === 'bomb')    { activateBomb(r, c);    return; }
+    if (grid[r][c] === 'rainbow') { activateRainbow(r, c); return; }
     selected = { r, c };
-    renderGrid();
+    highlightCell(r, c, true);
     return;
   }
 
   const { r: r1, c: c1 } = selected;
   if (r === r1 && c === c1) {
-    selected = null;
-    renderGrid();
+    clearSelection();
     return;
   }
 
-  if (!isAdjacent(r1, c1, r, c)) {
+  if (!canSwap(grid, r1, c1, r, c)) {
+    highlightCell(r1, c1, false);
     selected = { r, c };
-    renderGrid();
+    highlightCell(r, c, true);
     return;
   }
 
-  const swapped = swapGridCells(grid, r1, c1, r, c);
+  const swapped = applySwap(grid, r1, c1, r, c);
   const matches = findMatches(swapped);
 
   if (matches.length === 0) {
-    selected = null;
-    renderGrid();
+    // No valid match — cancel selection without consuming a move
+    clearSelection();
     return;
   }
 
   grid = swapped;
+  highlightCell(r1, c1, false);
   selected = null;
   moves--;
-  updateStats();
+  chainDepth = 0;
+  lastSwap = { r1, c1, r2: r, c2: c };
+  document.getElementById('match-moves').textContent = moves;
 
-  resolveMatches();
+  resolveMatches(runId);
 }
 
-function resolveMatches() {
-  const currentRun = runId;
-  resolving = true;
+function highlightCell(r, c, on) {
+  const cell = document.querySelector(`.match-cell[data-row="${r}"][data-col="${c}"]`);
+  if (!cell) return;
+  cell.classList.toggle('selected', on);
+  cell.setAttribute('aria-pressed', String(on));
+  const type = grid[r]?.[c];
+  cell.setAttribute(
+    'aria-label',
+    `${getCellLabel(type)} tile at row ${r + 1}, column ${c + 1}${on ? ', selected' : ''}`
+  );
+}
+
+function clearSelection() {
+  if (!selected) return;
+  highlightCell(selected.r, selected.c, false);
+  selected = null;
+}
+
+function getCellLabel(type) {
+  switch (type) {
+    case 'heart': return 'Heart';
+    case 'star': return 'Star';
+    case 'cross': return 'Cross';
+    case 'flame': return 'Flame';
+    case 'drop': return 'Drop';
+    case 'gem': return 'Gem';
+    case 'bomb': return 'Bomb';
+    case 'rainbow': return 'Crystal';
+    default: return 'Empty';
+  }
+}
+
+// ── Special gem activation ───────────────────────────────
+function activateBomb(r, c) {
+  moves--;
+  document.getElementById('match-moves').textContent = moves;
+
+  // Visual flash on 3×3 explosion area of the primary bomb
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      const cell = document.querySelector(
+        `.match-cell[data-row="${r + dr}"][data-col="${c + dc}"]`
+      );
+      if (cell) cell.classList.add('bomb-flash');
+    }
+  }
+
+  const { grid: explodedGrid, cleared } = detonateAllBombs(grid, [{ r, c }]);
+  grid = applyGravity(explodedGrid);
+
+  const pts = cleared * 15;
+  score += pts;
+  coins += Math.ceil(cleared / 2);
+  chainDepth = 0;
+  lastSwap = null;
+
+  document.getElementById('match-score').textContent = score;
+  document.getElementById('match-coins').textContent = coins;
+  updateStoreButtons();
+
+  showFloatingScore(pts, 1, { r, c });
+  showBanner(`💣 Bomb! +${pts} pts`, 'banner--combo');
+
+  const myRunId = runId;
+  pendingTimeout = setTimeout(() => {
+    if (myRunId !== runId) return;
+    renderGrid();
+    resolveMatches(myRunId);
+  }, CHAIN_REACTION_DELAY_MS);
+}
+
+function activateRainbow(r, c) {
+  moves--;
+  document.getElementById('match-moves').textContent = moves;
+
+  const targetType = findMostCommonType(grid);
+  const cleared = countType(grid, targetType);
+
+  grid[r][c] = null; // remove the rainbow gem itself first
+  grid = applyRainbowClear(grid, targetType);
+  grid = applyGravity(grid);
+
+  const pts = cleared * 20;
+  score += pts;
+  coins += cleared;
+  chainDepth = 0;
+  lastSwap = null;
+
+  document.getElementById('match-score').textContent = score;
+  document.getElementById('match-coins').textContent = coins;
+  updateStoreButtons();
+
+  showFloatingScore(pts, 1, { r, c });
+  showBanner(`🌈 Crystal cleared ${cleared} ${GEM_LABELS[targetType] || targetType}s! +${pts} pts`, 'banner--combo');
+
+  const myRunId = runId;
+  pendingTimeout = setTimeout(() => {
+    if (myRunId !== runId) return;
+    renderGrid();
+    resolveMatches(myRunId);
+  }, CHAIN_REACTION_DELAY_MS);
+}
+
+// ── Match resolution & chain reactions ───────────────────
+function resolveMatches(myRunId) {
+  if (myRunId !== runId) return;
+
   const groups = findMatches(grid);
   if (groups.length === 0) {
-    if (resolveTimeoutId) clearTimeout(resolveTimeoutId);
-    resolveTimeoutId = null;
-    comboChain = 0;
-    comboMultiplier = 1;
-    resolving = false;
-    updateStoreAvailability();
     renderGrid();
     checkLevelUp();
     checkGameOver();
     return;
   }
 
-  comboChain++;
-  comboMultiplier = Math.min(MAX_COMBO_MULTIPLIER, 1 + (comboChain - 1) * 0.4);
+  const combo = chainDepth + 1;
 
-  const matchSet = collectMatchSet(groups);
-  const explodedSet = expandSpecials(matchSet);
-  const matchCells = [...explodedSet].map(fromKey);
+  // Score: sum all group sizes × combo multiplier (overlapping cells in L/T shapes score twice as a bonus)
+  let roundScore = 0;
+  groups.forEach(g => {
+    g.forEach(({ r, c }) => { roundScore += GEM_SCORE[grid[r][c]] ?? 10; });
+  });
+  roundScore *= combo;
+  score += roundScore;
 
-  const spawns = deriveSpecialSpawns(groups);
-  const shardGain = Math.max(1, Math.floor(matchCells.length / 4)) + (comboChain > 1 ? 1 : 0);
+  // Coins: based on unique matched cells
+  const uniqueKeys = new Set(groups.flatMap(g => g.map(({ r, c }) => `${r},${c}`)));
+  coins += Math.max(1, Math.floor(uniqueKeys.size * combo / 4));
 
-  shards += shardGain;
-  score += Math.round(matchCells.length * 12 * comboMultiplier);
-  flashStatus(`Chain x${comboChain}! +${shardGain} shards`);
-  updateStats();
-  renderGrid(explodedSet);
+  document.getElementById('match-score').textContent = score;
+  document.getElementById('match-coins').textContent = coins;
+  updateStoreButtons();
 
-  // Create particle effects for matched gems
-  createParticles(matchCells);
+  // Emit NexusOS arcade events if the shell is present
+  if (typeof window !== 'undefined' && window.NexusOS) {
+    window.NexusOS.emit('arcade-combo', { combo, score });
+    if (combo >= 4) window.NexusOS.emit('combo-tier4', { combo, score });
+  }
 
-  grid = clearMatches(grid, matchCells, spawns);
-  grid = applyGravity(grid);
+  // Combo notification
+  if (combo > 1) showComboNotification(combo, roundScore);
 
-  if (resolveTimeoutId) clearTimeout(resolveTimeoutId);
-  resolveTimeoutId = setTimeout(() => {
-    if (currentRun !== runId) {
-      resolveTimeoutId = null;
-      return;
+  // Chain visual effects
+  if (combo >= 3) showChainEffect(combo);
+
+  // Detect largest group for potential special gem creation (first move only)
+  let specialPlacement = null;
+  if (chainDepth === 0 && lastSwap && groups.length > 0) {
+    const largestGroup = groups.reduce((best, g) => g.length > best.length ? g : best, groups[0]);
+    if (largestGroup.length >= 4) {
+      // Place at the swap-destination cell if it's in the group; else group's midpoint
+      const swapCell = largestGroup.find(
+        ({ r, c }) => (r === lastSwap.r1 && c === lastSwap.c1) ||
+                      (r === lastSwap.r2 && c === lastSwap.c2)
+      ) || largestGroup[Math.floor(largestGroup.length / 2)];
+      specialPlacement = {
+        r: swapCell.r,
+        c: swapCell.c,
+        type: largestGroup.length >= 5 ? 'rainbow' : 'bomb',
+      };
     }
-    resolveTimeoutId = null;
-    resolveMatches();
+  }
+
+  // Animate matched cells
+  groups.forEach(group => {
+    group.forEach(({ r, c }) => {
+      const cell = document.querySelector(`.match-cell[data-row="${r}"][data-col="${c}"]`);
+      if (cell) cell.classList.add('popping');
+    });
+  });
+
+  showFloatingScore(roundScore, combo, groups[0][0]);
+
+  grid = clearMatches(grid, groups);
+
+  // Special gem placement (before gravity so it falls naturally)
+  if (specialPlacement && grid[specialPlacement.r][specialPlacement.c] === null) {
+    grid[specialPlacement.r][specialPlacement.c] = specialPlacement.type;
+  }
+
+  grid = applyGravity(grid);
+  chainDepth++;
+
+  pendingTimeout = setTimeout(() => {
+    if (myRunId !== runId) return;
+    renderGrid();
+    resolveMatches(myRunId);
   }, CHAIN_REACTION_DELAY_MS);
 }
 
-function deriveSpecialSpawns(groups) {
-  const spawns = [];
-  groups.forEach(group => {
-    if (group.length < 4) return;
-    const anchor = group[Math.floor(group.length / 2)];
-    const sameRow = group.every(p => p.r === group[0].r);
-    const sameCol = group.every(p => p.c === group[0].c);
-    if (!sameRow && !sameCol) return;
-    const special = sameRow ? 'row' : 'col';
-    const kind = grid[anchor.r][anchor.c]?.kind || 'star';
-    spawns.push({ r: anchor.r, c: anchor.c, kind, special });
+// ── Visual helpers ───────────────────────────────────────
+function showFloatingScore(pts, combo, cell) {
+  if (!cell) return;
+  const gridEl = document.getElementById('match-grid');
+  const cellEl = document.querySelector(
+    `.match-cell[data-row="${cell.r}"][data-col="${cell.c}"]`
+  );
+  if (!cellEl || !gridEl) return;
 
-    if (group.length >= 5) {
-      const extra = group[0];
-      spawns.push({ r: extra.r, c: extra.c, kind: 'wild', special: 'wild' });
-    }
-  });
+  const gr = gridEl.getBoundingClientRect();
+  const cr = cellEl.getBoundingClientRect();
 
-  const unique = new Map();
-  spawns.forEach(s => unique.set(key(s.r, s.c), s));
-  return [...unique.values()];
+  const el = document.createElement('div');
+  el.className = 'float-score' + (combo > 1 ? ' float-score--combo' : '');
+  el.textContent = combo > 1 ? `×${combo} +${pts}` : `+${pts}`;
+  el.style.left = `${cr.left - gr.left + cr.width / 2}px`;
+  el.style.top  = `${cr.top  - gr.top}px`;
+  gridEl.appendChild(el);
+  el.addEventListener('animationend', () => el.remove(), { once: true });
 }
 
-function expandSpecials(matchSet) {
-  const expanded = new Set(matchSet);
-  matchSet.forEach(k => {
-    const { r, c } = fromKey(k);
-    const cell = grid[r][c];
-    if (!cell || !cell.special) return;
-    if (cell.special === 'wild') return;
-    if (cell.special === 'row') {
-      for (let col = 0; col < GRID_SIZE; col++) expanded.add(key(r, col));
-    } else if (cell.special === 'col') {
-      for (let row = 0; row < GRID_SIZE; row++) expanded.add(key(row, c));
-    } else {
-      for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-          const nr = r + dr;
-          const nc = c + dc;
-          if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
-            expanded.add(key(nr, nc));
-          }
-        }
-      }
-    }
-  });
-  return expanded;
+function showComboNotification(combo, pts) {
+  let tier;
+  if (combo >= 5)      tier = '🌟 SUPERNOVA!';
+  else if (combo >= 4) tier = '💥 MEGA COMBO!';
+  else if (combo >= 3) tier = '🔥 CHAIN ×3!';
+  else                 tier = `⚡ COMBO ×${combo}`;
+  showBanner(`${tier}  +${pts} pts`, 'banner--combo');
 }
 
-function collectMatchSet(groups) {
-  const set = new Set();
-  groups.forEach(g => g.forEach(({ r, c }) => set.add(key(r, c))));
-  return set;
-}
+function showChainEffect(combo) {
+  const gridEl = document.getElementById('match-grid');
+  if (!gridEl) return;
 
-function addMoves(amount) {
-  moves += amount;
-  flashStatus(`+${amount} moves restored`);
-}
+  // Shooting star — fires on every chain ≥ 3
+  const star = document.createElement('div');
+  star.className = 'shooting-star';
+  gridEl.appendChild(star);
+  star.addEventListener('animationend', () => star.remove(), { once: true });
 
-function injectSpecial(special) {
-  if (resolving) {
-    flashStatus('Wait for chain reaction to finish');
-    return;
-  }
-  const openCells = [];
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
-      openCells.push({ r, c });
-    }
-  }
-  const target = openCells[Math.floor(Math.random() * openCells.length)];
-  const existingKind = grid[target.r][target.c]?.kind || 'star';
-  grid[target.r][target.c] = { kind: special === 'wild' ? 'wild' : existingKind, special };
-  flashStatus(`${specialLabel(special)} placed`);
-  renderGrid();
-}
-
-function specialLabel(special) {
-  if (special === 'row') return 'Line rune';
-  if (special === 'col') return 'Column rune';
-  if (special === 'bomb') return 'Crystal bomb';
-  return 'Rainbow wild';
-}
-
-function purchase(item) {
-  if (resolving) {
-    flashStatus('Wait for chain reaction to finish');
-    return;
-  }
-  if (shards < item.cost) {
-    flashStatus('Not enough shards');
-    return;
-  }
-  shards -= item.cost;
-  item.action();
-  updateStats();
-}
-
-function renderStore() {
-  if (storeBound) return;
-  const container = document.getElementById('match-store-items');
-  if (!container) return;
-  container.innerHTML = '';
-  STORE_ITEMS.forEach(item => {
-    const btn = document.createElement('button');
-    btn.className = 'store-item';
-    btn.dataset.itemId = item.id;
-    btn.innerHTML = `
-      <div class="store-title">${item.label}</div>
-      <div class="store-meta">Cost: ${item.cost} shards • ${item.detail}</div>
-    `;
-    btn.onclick = () => purchase(item);
-    container.appendChild(btn);
-  });
-  storeBound = true;
-}
-
-function updateStats() {
-  const scoreEl = document.getElementById('match-score');
-  const movesEl = document.getElementById('match-moves');
-  const levelEl = document.getElementById('match-level');
-  const comboEl = document.getElementById('match-combo');
-  const chainEl = document.getElementById('match-chain');
-  const shardEl = document.getElementById('match-shards');
-
-  // Trigger score pop animation on significant score changes
-  const prevScore = parseInt(scoreEl?.textContent || '0');
-  const scoreChange = score - prevScore;
-
-  if (scoreEl) {
-    scoreEl.textContent = score;
-    if (scoreChange > 20) {
-      const scoreDiv = scoreEl.parentElement;
-      scoreDiv?.classList.add('score-pop');
-      setTimeout(() => scoreDiv?.classList.remove('score-pop'), 500);
-    }
-  }
-
-  if (movesEl) movesEl.textContent = moves;
-  if (levelEl) levelEl.textContent = level;
-  if (comboEl) comboEl.textContent = `${comboMultiplier.toFixed(1)}x`;
-  if (chainEl) chainEl.textContent = comboChain > 0 ? `Chain ${comboChain}` : 'Chain 0';
-  if (shardEl) shardEl.textContent = shards;
-  updateStoreAvailability();
-
-  // Add visual feedback for active combos
-  const comboChip = comboEl?.closest('.momentum-chip');
-  const chainChip = chainEl?.closest('.momentum-chip');
-
-  if (comboChip) {
-    comboChip.classList.toggle('active', comboMultiplier > 1);
-  }
-  if (chainChip) {
-    chainChip.classList.toggle('active', comboChain > 0);
+  // Supernova burst on chain ≥ 5
+  if (combo >= 5) {
+    const nova = document.createElement('div');
+    nova.className = 'supernova';
+    gridEl.appendChild(nova);
+    nova.addEventListener('animationend', () => nova.remove(), { once: true });
   }
 }
 
-function updateStoreAvailability() {
-  const buttons = document.querySelectorAll('.store-item');
-  buttons.forEach(button => {
-    button.disabled = resolving;
-  });
+function showBanner(msg, cls) {
+  const banner = document.getElementById('match-badge-banner');
+  if (!banner) return;
+  clearTimeout(bannerHideTimer);
+  banner.textContent = msg;
+  banner.className = `match-badge-banner ${cls}`;
+  bannerHideTimer = setTimeout(() => banner.classList.add('hidden'), 2200);
 }
 
+// ── Level / game-over ────────────────────────────────────
 function checkLevelUp() {
   const threshold = level * SCORE_PER_LEVEL;
   if (score >= threshold) {
     onLevelComplete(level, score, db, user);
     level++;
     moves += 10;
-    updateStats();
+    document.getElementById('match-level').textContent = level;
+    document.getElementById('match-moves').textContent = moves;
   }
 }
 
@@ -419,85 +437,132 @@ function checkGameOver() {
   if (moves <= 0) {
     const banner = document.getElementById('match-badge-banner');
     if (banner) {
-      banner.textContent = `Game Over! Final score: ${score}`;
-      banner.classList.remove('hidden');
+      clearTimeout(bannerHideTimer);
+      banner.textContent = `Game Over! Final score: ${score} 🏅`;
+      banner.className = 'match-badge-banner banner--gameover';
     }
   }
 }
 
-function flashStatus(text) {
-  const banner = document.getElementById('match-badge-banner');
-  if (banner) {
-    banner.textContent = text;
-    banner.classList.remove('hidden');
-    if (statusTimeoutId) clearTimeout(statusTimeoutId);
-    statusTimeoutId = setTimeout(() => {
-      banner.classList.add('hidden');
-      statusTimeoutId = null;
-    }, 2000);
+// ── Store ────────────────────────────────────────────────
+
+/**
+ * Cancels any in-flight cascade and clears all transient interaction state.
+ * Call before any store action that mutates the board.
+ */
+function resetCascadeState() {
+  runId++;
+  if (pendingTimeout) { clearTimeout(pendingTimeout); pendingTimeout = null; }
+  clearSelection();
+  chainDepth = 0;
+  lastSwap = null;
+}
+
+export function purchaseItem(itemId) {
+  const item = STORE_ITEMS.find(i => i.id === itemId);
+  if (!item || coins < item.cost) return;
+
+  coins -= item.cost;
+  document.getElementById('match-coins').textContent = coins;
+  updateStoreButtons();
+
+  switch (itemId) {
+    case 'extra-moves':
+      moves += 5;
+      document.getElementById('match-moves').textContent = moves;
+      showBanner('🎯 +5 Moves added!', 'banner--badge');
+      break;
+
+    case 'shuffle':
+      resetCascadeState();
+      grid = createInitialGrid();
+      renderGrid();
+      showBanner('🔀 Board shuffled!', 'banner--badge');
+      break;
+
+    case 'place-bomb': {
+      resetCascadeState();
+      const candidates = [];
+      for (let r = 0; r < grid.length; r++) {
+        for (let c = 0; c < grid[r].length; c++) {
+          if (GEM_TYPES.includes(grid[r][c])) candidates.push({ r, c });
+        }
+      }
+      if (candidates.length > 0) {
+        const pos = candidates[Math.floor(Math.random() * candidates.length)];
+        grid[pos.r][pos.c] = 'bomb';
+        renderGrid();
+        showBanner('💣 Bomb placed on the board!', 'banner--badge');
+      }
+      break;
+    }
   }
 }
 
-function key(r, c) {
-  return `${r}:${c}`;
-}
-
-function fromKey(k) {
-  const [r, c] = k.split(':').map(Number);
-  return { r, c };
-}
-
-function createParticles(matchCells) {
-  const container = document.getElementById('match-grid');
-  if (!container) return;
-
-  matchCells.forEach(({ r, c }) => {
-    const cellEl = container.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-    if (!cellEl) return;
-
-    const rect = cellEl.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-
-    // Create 6-8 particles per gem
-    const particleCount = 6 + Math.floor(Math.random() * 3);
-
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-
-      // Random color based on gem type
-      const cell = grid[r][c];
-      const colors = {
-        'heart': '#ff6b9d',
-        'star': '#ffd700',
-        'cross': '#7ea6ff',
-        'flame': '#ff6347',
-        'drop': '#4fc3f7',
-        'wild': '#7effd8'
-      };
-      particle.style.background = colors[cell?.kind] || '#7effd8';
-      if (cell?.kind === 'star') particle.style.backgroundImage = `url('${STAR_SHEET_URL}')`;
-      if (cell?.kind === 'drop') particle.style.backgroundImage = `url('${SHOOTING_STAR_FX_URL}')`;
-      if (cell?.special === 'wild') particle.style.backgroundImage = `url('${SUPERNOVA_FX_URL}')`;
-
-      // Position relative to cell
-      const offsetX = rect.left - containerRect.left + rect.width / 2;
-      const offsetY = rect.top - containerRect.top + rect.height / 2;
-      particle.style.left = offsetX + 'px';
-      particle.style.top = offsetY + 'px';
-
-      // Random trajectory
-      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
-      const distance = 30 + Math.random() * 40;
-      const tx = Math.cos(angle) * distance;
-      const ty = Math.sin(angle) * distance;
-      particle.style.setProperty('--tx', tx + 'px');
-      particle.style.setProperty('--ty', ty + 'px');
-
-      container.appendChild(particle);
-
-      // Remove after animation
-      setTimeout(() => particle.remove(), 800);
-    }
+export function updateStoreButtons() {
+  STORE_ITEMS.forEach(item => {
+    const btn = document.getElementById(`store-btn-${item.id}`);
+    if (btn) btn.disabled = coins < item.cost;
   });
+}
+
+// ── Local helpers ─────────────────────────────────────────
+/**
+ * Detonates one or more bombs and chain-detonates any bombs caught in each blast radius.
+ * Any bomb destroyed by another bomb's explosion also detonates its own 3×3 area.
+ * Duplicate positions in startPositions are silently deduplicated via the scheduled Set.
+ * @param {string[][]} g - current grid
+ * @param {{ r: number, c: number }[]} startPositions - initial bomb positions to detonate
+ * @returns {{ grid: string[][], cleared: number }} updated grid and count of unique cells cleared
+ */
+function detonateAllBombs(g, startPositions) {
+  const scheduled = new Set(startPositions.map(({ r, c }) => `${r},${c}`));
+  const queue = [...startPositions];
+  const clearedKeys = new Set();
+  const rowCount = g.length;
+  const colCount = g[0]?.length ?? 0;
+
+  while (queue.length > 0) {
+    const { r, c } = queue.shift();
+
+    // Scan the 8 surrounding cells (not the center — the bomb itself is already scheduled)
+    // for any additional bombs to chain-detonate, before the current explosion clears them.
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue; // center is the detonating bomb, already queued
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < rowCount && nc >= 0 && nc < colCount) {
+          const nKey = `${nr},${nc}`;
+          if (g[nr][nc] === 'bomb' && !scheduled.has(nKey)) {
+            scheduled.add(nKey);
+            queue.push({ r: nr, c: nc });
+          }
+        }
+      }
+    }
+
+    // Record unique non-null cells about to be cleared (for scoring)
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < rowCount && nc >= 0 && nc < colCount && g[nr][nc] !== null) {
+          clearedKeys.add(`${nr},${nc}`);
+        }
+      }
+    }
+
+    g = applyBombExplosion(g, r, c);
+  }
+
+  return { grid: g, cleared: clearedKeys.size };
+}
+
+function countType(g, type) {
+  let n = 0;
+  for (let r = 0; r < g.length; r++) {
+    for (let c = 0; c < g[r].length; c++) {
+      if (g[r][c] === type) n++;
+    }
+  }
+  return n;
 }
